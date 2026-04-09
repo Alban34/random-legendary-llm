@@ -41,6 +41,9 @@ The current project work lives in `documentation/`.
 - `documentation/game-data.md` — human-readable data scope summary
 - `documentation/game-data-normalized.md` — normalized source-backed inventory
 - `documentation/clarifications.md` — clarification record and final decisions
+- `documentation/epics.md` — implementation epics and stories
+- `documentation/task-list.md` — checkable implementation tracker
+- `documentation/testing-qc-strategy.md` — testing and quality-control policy
 
 ---
 
