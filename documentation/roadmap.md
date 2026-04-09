@@ -26,9 +26,10 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 **Goal:** Implement storage and randomization logic as pure, testable modules.
 
 **Deliverables:**
-- `normalizeGameData` module: transforms canonical set data into resolved runtime entities and indexes
-- `StorageManager` module: load/save a versioned root state object (`legendary_state_v1`)
-- `SetupGenerator` module: randomizes a full game setup from normalized indexes, prefers never-played items, and falls back to the least-played items when necessary
+- `src/app/game-data-pipeline.mjs`: transforms canonical set data into resolved runtime entities and indexes
+- a state/storage module under `src/app/`: load/save a versioned root state object (`legendary_state_v1`)
+- a setup generator module under `src/app/`: randomizes a full game setup from normalized indexes, prefers never-played items, and falls back to the least-played items when necessary
+- npm-driven module tests for core logic (`node:test`)
 
 **Acceptance Criteria:**
 - `generateSetup(1, false)` returns a valid record with 3 heroes, 1 villain group, 1 henchman group, 1 mastermind, 1 scheme
@@ -38,7 +39,7 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 ---
 
 ## Milestone 3 — UI Shell
-**Goal:** Build the HTML skeleton, CSS design system, and tab navigation.
+**Goal:** Expand the existing HTML shell into the full application shell, design system, and tab navigation.
 
 **Deliverables:**
 - Sticky header with logo + tab navigation
@@ -62,7 +63,7 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 - "Add to Collection" / "Remove from Collection" toggle per set
 
 **Acceptance Criteria:**
-- All sets from `GAME_DATA` render correctly
+- All included sets from normalized runtime data render correctly
 - Toggling a set updates `localStorage` immediately
 - Visual distinction between owned and non-owned sets
 
@@ -108,7 +109,7 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 
 **Acceptance Criteria:**
 - History persists across page reloads
-- Full Reset clears all `legendary_*` keys from `localStorage`
+- Full Reset clears `legendary_state_v1` safely, plus any future app-owned persistence keys if they are introduced later
 - Per-category reset only clears that category's used list
 
 ---

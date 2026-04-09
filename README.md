@@ -4,13 +4,15 @@ STATUS: Approved
 
 ## Project state
 
-The repository now contains the **Epic 1 foundation** for the Legendary: Marvel randomizer.
+The repository now contains the **Epic 1 + Epic 2 foundation** for the Legendary: Marvel randomizer.
 
 Implemented so far:
 - canonical seed data under `src/data/`
 - shared normalization and validation logic under `src/app/`
+- versioned browser-state persistence under `src/app/state-store.mjs`
 - a thin `index.html` shell for the browser app
-- an Epic 1 terminal test harness under `tools/`
+- npm-based Epic 1 + Epic 2 tests under `test/`
+- an Epic 1 terminal summary harness under `tools/`
 
 The app remains **fully static**:
 - no server-side code
@@ -28,6 +30,7 @@ Current entry points:
 - `src/app/app-shell.css` — application shell styles
 - `src/app/browser-entry.mjs` — browser bootstrap entry
 - `src/app/game-data-pipeline.mjs` — canonical-data transformation, normalization, validation, and Epic 1 checks
+- `src/app/state-store.mjs` — versioned browser-state creation, hydration, persistence, history, and reset helpers
 - `src/app/app-renderer.mjs` — browser rendering for the current foundation screen
 - `src/data/canonical-game-data.json` — project-owned canonical game data asset
 
@@ -86,6 +89,13 @@ Run the full npm test suite:
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
 npm test
+```
+
+Run the Epic 2 state-management checks only:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run check:epic2
 ```
 
 Optional human-readable summary reporter:

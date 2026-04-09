@@ -254,6 +254,16 @@ The app should persist **one versioned root state object**.
 - easier export/import later,
 - fewer cross-key consistency problems.
 
+### Hydration expectations for Epic 2
+
+When the app starts, persisted state should be hydrated only after runtime indexes are available.
+
+Hydration rules:
+- invalid JSON or invalid root shape falls back to a fresh default state
+- stored `ownedSetIds` must be revalidated against `RUNTIME_DATA.indexes.setsById`
+- invalid stored entity references should be removed safely rather than crashing startup
+- any recovery notice shown to the user should be treated as ephemeral UI state, not as persisted root-state data
+
 ---
 
 ## 4. Usage tracking

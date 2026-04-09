@@ -112,7 +112,9 @@ QC checks:
 Required tests:
 - default root state is valid
 - load/save roundtrip preserves state correctly
+- invalid stored set IDs are removed safely during hydration
 - invalid or corrupted saved state falls back safely
+- recovery notification behavior is triggered when corrupted state is recovered
 - per-category resets clear only the intended usage data
 - full reset clears collection, usage, history, and preferences
 

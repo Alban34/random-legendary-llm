@@ -8,7 +8,9 @@
     "start": "node ./tools/dev-server.mjs",
     "test": "node --test",
     "test:epic1": "node --test ./test/epic1.test.mjs",
+    "test:epic2": "node --test ./test/epic2-state.test.mjs",
     "check:epic1": "node --test ./test/epic1.test.mjs",
+    "check:epic2": "node --test ./test/epic2-state.test.mjs",
     "report:epic1": "node ./tools/run_epic1_checks.mjs",
     "build:shell": "python3 ./tools/build_epic1_index.py",
     "build:seed": "python3 ./tools/build_epic1_seed.py"

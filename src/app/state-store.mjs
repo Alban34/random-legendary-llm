@@ -1,0 +1,473 @@
+export const STORAGE_KEY = 'legendary_state_v1';
+export const SCHEMA_VERSION = 1;
+export const USAGE_CATEGORIES = ['heroes', 'masterminds', 'villainGroups', 'henchmanGroups', 'schemes'];
+
+const USAGE_INDEX_KEYS = {
+  heroes: 'heroesById',
+  masterminds: 'mastermindsById',
+  villainGroups: 'villainGroupsById',
+  henchmanGroups: 'henchmanGroupsById',
+  schemes: 'schemesById'
+};
+
+function deepClone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function createDefaultUsageState() {
+  return {
+    heroes: {},
+    masterminds: {},
+    villainGroups: {},
+    henchmanGroups: {},
+    schemes: {}
+  };
+}
+
+function createDefaultPreferences() {
+  return {
+    lastPlayerCount: 1,
+    lastAdvancedSolo: false,
+    selectedTab: null
+  };
+}
+
+export function createDefaultState() {
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    collection: {
+      ownedSetIds: []
+    },
+    usage: createDefaultUsageState(),
+    history: [],
+    preferences: createDefaultPreferences()
+  };
+}
+
+function uniqueSortedStrings(values) {
+  return [...new Set(values.filter((value) => typeof value === 'string' && value))].sort((left, right) => left.localeCompare(right));
+}
+
+function sanitizeOwnedSetIds(candidateIds, indexes, notices) {
+  if (!Array.isArray(candidateIds)) {
+    notices.push('Recovered collection ownership because stored set IDs were not a valid list.');
+    return [];
+  }
+
+  const validIds = uniqueSortedStrings(candidateIds).filter((setId) => indexes.setsById[setId]);
+  if (validIds.length !== uniqueSortedStrings(candidateIds).length) {
+    notices.push('Removed invalid stored set IDs during state hydration.');
+  }
+  return validIds;
+}
+
+function sanitizeUsageStat(stat) {
+  if (!isPlainObject(stat)) {
+    return null;
+  }
+
+  const plays = Number.isInteger(stat.plays) && stat.plays >= 0 ? stat.plays : null;
+  const lastPlayedAt = stat.lastPlayedAt === null || typeof stat.lastPlayedAt === 'string'
+    ? stat.lastPlayedAt
+    : null;
+
+  if (plays === null) {
+    return null;
+  }
+
+  return { plays, lastPlayedAt };
+}
+
+function sanitizeUsageBucket(category, candidateBucket, indexes, notices) {
+  const sanitizedBucket = {};
+  const validLookup = indexes[USAGE_INDEX_KEYS[category]];
+
+  if (!isPlainObject(candidateBucket)) {
+    if (candidateBucket !== undefined) {
+      notices.push(`Recovered ${category} usage because the stored value was invalid.`);
+    }
+    return sanitizedBucket;
+  }
+
+  for (const [id, stat] of Object.entries(candidateBucket)) {
+    if (!validLookup[id]) {
+      notices.push(`Removed invalid stored ${category} usage entry '${id}'.`);
+      continue;
+    }
+
+    const sanitizedStat = sanitizeUsageStat(stat);
+    if (!sanitizedStat) {
+      notices.push(`Recovered ${category} usage entry '${id}' because its shape was invalid.`);
+      continue;
+    }
+
+    sanitizedBucket[id] = sanitizedStat;
+  }
+
+  return sanitizedBucket;
+}
+
+function isValidSnapshotIds(ids, lookup) {
+  return Array.isArray(ids) && ids.every((id) => typeof id === 'string' && lookup[id]);
+}
+
+function sanitizeGameRecord(record, indexes, notices) {
+  if (!isPlainObject(record) || !isPlainObject(record.setupSnapshot)) {
+    notices.push('Removed an invalid stored game history record during hydration.');
+    return null;
+  }
+
+  const { setupSnapshot } = record;
+  const isValid = typeof record.id === 'string'
+    && typeof record.createdAt === 'string'
+    && Number.isInteger(record.playerCount)
+    && record.playerCount >= 1
+    && record.playerCount <= 5
+    && typeof record.advancedSolo === 'boolean'
+    && typeof setupSnapshot.mastermindId === 'string'
+    && indexes.mastermindsById[setupSnapshot.mastermindId]
+    && typeof setupSnapshot.schemeId === 'string'
+    && indexes.schemesById[setupSnapshot.schemeId]
+    && isValidSnapshotIds(setupSnapshot.heroIds, indexes.heroesById)
+    && isValidSnapshotIds(setupSnapshot.villainGroupIds, indexes.villainGroupsById)
+    && isValidSnapshotIds(setupSnapshot.henchmanGroupIds, indexes.henchmanGroupsById);
+
+  if (!isValid) {
+    notices.push(`Removed invalid stored game history record '${record.id ?? 'unknown'}'.`);
+    return null;
+  }
+
+  return {
+    id: record.id,
+    createdAt: record.createdAt,
+    playerCount: record.playerCount,
+    advancedSolo: record.advancedSolo,
+    setupSnapshot: {
+      mastermindId: record.setupSnapshot.mastermindId,
+      schemeId: record.setupSnapshot.schemeId,
+      heroIds: [...record.setupSnapshot.heroIds],
+      villainGroupIds: [...record.setupSnapshot.villainGroupIds],
+      henchmanGroupIds: [...record.setupSnapshot.henchmanGroupIds]
+    }
+  };
+}
+
+function sortHistoryNewestFirst(history) {
+  return [...history].sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
+}
+
+function sanitizePreferences(candidatePreferences, notices) {
+  if (!isPlainObject(candidatePreferences)) {
+    if (candidatePreferences !== undefined) {
+      notices.push('Recovered preferences because the stored value was invalid.');
+    }
+    return createDefaultPreferences();
+  }
+
+  const defaultPreferences = createDefaultPreferences();
+  const lastPlayerCount = Number.isInteger(candidatePreferences.lastPlayerCount)
+    && candidatePreferences.lastPlayerCount >= 1
+    && candidatePreferences.lastPlayerCount <= 5
+    ? candidatePreferences.lastPlayerCount
+    : defaultPreferences.lastPlayerCount;
+  const lastAdvancedSolo = typeof candidatePreferences.lastAdvancedSolo === 'boolean'
+    ? candidatePreferences.lastAdvancedSolo
+    : defaultPreferences.lastAdvancedSolo;
+  const selectedTab = candidatePreferences.selectedTab === null || typeof candidatePreferences.selectedTab === 'string'
+    ? candidatePreferences.selectedTab
+    : defaultPreferences.selectedTab;
+
+  if (
+    lastPlayerCount !== candidatePreferences.lastPlayerCount
+    || lastAdvancedSolo !== candidatePreferences.lastAdvancedSolo
+    || selectedTab !== candidatePreferences.selectedTab
+  ) {
+    notices.push('Recovered invalid preference values during state hydration.');
+  }
+
+  return { lastPlayerCount, lastAdvancedSolo, selectedTab };
+}
+
+function sanitizeStateCandidate(candidate, indexes) {
+  const notices = [];
+  const defaultState = createDefaultState();
+
+  if (!isPlainObject(candidate) || candidate.schemaVersion !== SCHEMA_VERSION) {
+    notices.push('Recovered browser state because it was missing or had an unsupported schema.');
+    return { state: defaultState, notices };
+  }
+
+  const collection = {
+    ownedSetIds: sanitizeOwnedSetIds(candidate.collection?.ownedSetIds, indexes, notices)
+  };
+
+  const usage = {};
+  for (const category of USAGE_CATEGORIES) {
+    usage[category] = sanitizeUsageBucket(category, candidate.usage?.[category], indexes, notices);
+  }
+
+  const history = Array.isArray(candidate.history)
+    ? sortHistoryNewestFirst(candidate.history.map((record) => sanitizeGameRecord(record, indexes, notices)).filter(Boolean))
+    : [];
+
+  if (!Array.isArray(candidate.history) && candidate.history !== undefined) {
+    notices.push('Recovered game history because the stored value was invalid.');
+  }
+
+  const preferences = sanitizePreferences(candidate.preferences, notices);
+
+  return {
+    state: {
+      schemaVersion: SCHEMA_VERSION,
+      collection,
+      usage,
+      history,
+      preferences
+    },
+    notices
+  };
+}
+
+function createUnavailableResult(message) {
+  return {
+    ok: false,
+    storageAvailable: false,
+    message
+  };
+}
+
+export function createStorageAdapter(storageCandidate) {
+  const unavailableMessage = 'Browser storage is unavailable; changes will only live in memory for this session.';
+
+  if (
+    !storageCandidate
+    || typeof storageCandidate.getItem !== 'function'
+    || typeof storageCandidate.setItem !== 'function'
+    || typeof storageCandidate.removeItem !== 'function'
+  ) {
+    return {
+      available: false,
+      message: unavailableMessage,
+      getItem: () => null,
+      setItem: () => createUnavailableResult(unavailableMessage),
+      removeItem: () => createUnavailableResult(unavailableMessage)
+    };
+  }
+
+  try {
+    const probeKey = '__legendary_storage_probe__';
+    storageCandidate.setItem(probeKey, 'ok');
+    storageCandidate.removeItem(probeKey);
+  } catch (error) {
+    return {
+      available: false,
+      message: `Browser storage is unavailable: ${error.message}`,
+      getItem: () => null,
+      setItem: () => createUnavailableResult(`Browser storage is unavailable: ${error.message}`),
+      removeItem: () => createUnavailableResult(`Browser storage is unavailable: ${error.message}`)
+    };
+  }
+
+  return {
+    available: true,
+    message: null,
+    getItem(key) {
+      return storageCandidate.getItem(key);
+    },
+    setItem(key, value) {
+      try {
+        storageCandidate.setItem(key, value);
+        return {
+          ok: true,
+          storageAvailable: true,
+          message: 'Saved browser state successfully.'
+        };
+      } catch (error) {
+        return {
+          ok: false,
+          storageAvailable: true,
+          message: `Failed to save browser state: ${error.message}`
+        };
+      }
+    },
+    removeItem(key) {
+      try {
+        storageCandidate.removeItem(key);
+        return {
+          ok: true,
+          storageAvailable: true,
+          message: 'Reset browser state successfully.'
+        };
+      } catch (error) {
+        return {
+          ok: false,
+          storageAvailable: true,
+          message: `Failed to reset browser state: ${error.message}`
+        };
+      }
+    }
+  };
+}
+
+export function loadState({ storageAdapter, indexes }) {
+  if (!storageAdapter.available) {
+    return {
+      state: createDefaultState(),
+      storageAvailable: false,
+      hydratedFromStorage: false,
+      recovered: true,
+      notices: [storageAdapter.message]
+    };
+  }
+
+  const rawState = storageAdapter.getItem(STORAGE_KEY);
+  if (!rawState) {
+    return {
+      state: createDefaultState(),
+      storageAvailable: true,
+      hydratedFromStorage: false,
+      recovered: false,
+      notices: []
+    };
+  }
+
+  let parsedState;
+  try {
+    parsedState = JSON.parse(rawState);
+  } catch {
+    const recoveredState = createDefaultState();
+    const save = saveState({ storageAdapter, state: recoveredState });
+    return {
+      state: recoveredState,
+      storageAvailable: true,
+      hydratedFromStorage: true,
+      recovered: true,
+      notices: ['Recovered browser state because the saved JSON was corrupted.', ...(save.ok ? [] : [save.message])]
+    };
+  }
+
+  const { state, notices } = sanitizeStateCandidate(parsedState, indexes);
+  const recovered = notices.length > 0;
+
+  if (recovered) {
+    const save = saveState({ storageAdapter, state });
+    if (!save.ok) {
+      notices.push(save.message);
+    }
+  }
+
+  return {
+    state,
+    storageAvailable: true,
+    hydratedFromStorage: true,
+    recovered,
+    notices
+  };
+}
+
+export const hydrateState = loadState;
+
+export function saveState({ storageAdapter, state }) {
+  return storageAdapter.setItem(STORAGE_KEY, JSON.stringify(state, null, 2));
+}
+
+export function updateState({ storageAdapter, indexes, currentState, updater }) {
+  const draft = deepClone(currentState);
+  const updatedState = typeof updater === 'function' ? (updater(draft) ?? draft) : draft;
+  const { state, notices } = sanitizeStateCandidate(updatedState, indexes);
+  const save = saveState({ storageAdapter, state });
+
+  return {
+    state,
+    notices,
+    save
+  };
+}
+
+export function toggleOwnedSet(state, setId) {
+  const nextState = deepClone(state);
+  const ownedSetIds = new Set(nextState.collection.ownedSetIds);
+  if (ownedSetIds.has(setId)) {
+    ownedSetIds.delete(setId);
+  } else {
+    ownedSetIds.add(setId);
+  }
+  nextState.collection.ownedSetIds = [...ownedSetIds].sort((left, right) => left.localeCompare(right));
+  return nextState;
+}
+
+export function incrementUsageStat(usageBucket, id, playedAt) {
+  const current = usageBucket[id] || { plays: 0, lastPlayedAt: null };
+  usageBucket[id] = {
+    plays: current.plays + 1,
+    lastPlayedAt: playedAt
+  };
+}
+
+function createRecordId() {
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `game-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+}
+
+export function createGameRecord({ playerCount, advancedSolo, setupSnapshot, createdAt = new Date().toISOString(), id = createRecordId() }) {
+  return {
+    id,
+    createdAt,
+    playerCount,
+    advancedSolo,
+    setupSnapshot: {
+      mastermindId: setupSnapshot.mastermindId,
+      schemeId: setupSnapshot.schemeId,
+      heroIds: [...setupSnapshot.heroIds],
+      villainGroupIds: [...setupSnapshot.villainGroupIds],
+      henchmanGroupIds: [...setupSnapshot.henchmanGroupIds]
+    }
+  };
+}
+
+export function acceptGameSetup(state, gameConfig) {
+  const nextState = deepClone(state);
+  const record = createGameRecord(gameConfig);
+  const playedAt = record.createdAt;
+
+  nextState.history = sortHistoryNewestFirst([record, ...nextState.history]);
+  nextState.preferences.lastPlayerCount = record.playerCount;
+  nextState.preferences.lastAdvancedSolo = record.advancedSolo;
+
+  record.setupSnapshot.heroIds.forEach((id) => incrementUsageStat(nextState.usage.heroes, id, playedAt));
+  incrementUsageStat(nextState.usage.masterminds, record.setupSnapshot.mastermindId, playedAt);
+  record.setupSnapshot.villainGroupIds.forEach((id) => incrementUsageStat(nextState.usage.villainGroups, id, playedAt));
+  record.setupSnapshot.henchmanGroupIds.forEach((id) => incrementUsageStat(nextState.usage.henchmanGroups, id, playedAt));
+  incrementUsageStat(nextState.usage.schemes, record.setupSnapshot.schemeId, playedAt);
+
+  return nextState;
+}
+
+export function resetUsageCategory(state, category) {
+  const nextState = deepClone(state);
+  if (USAGE_CATEGORIES.includes(category)) {
+    nextState.usage[category] = {};
+  }
+  return nextState;
+}
+
+export function resetAllState({ storageAdapter }) {
+  const state = createDefaultState();
+  const save = storageAdapter.available
+    ? storageAdapter.removeItem(STORAGE_KEY)
+    : createUnavailableResult(storageAdapter.message);
+
+  return {
+    state,
+    save,
+    notices: []
+  };
+}
+

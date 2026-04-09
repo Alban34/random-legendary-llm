@@ -20,7 +20,7 @@ This project will allow the user to:
 - The project must not use any server-side code or external libraries.
 - The project must use browser storage (localStorage or sessionStorage) to keep track of the cards already selected in previous games.
 - The project must provide a user interface to view existing extensions, create a collection, and start games with randomized decks.
-- The possible player count must be from 1 to 4 players, with the option to play the "advanced solo" mode.
+- **Superseded scope detail:** the original brief said 1 to 4 players. The approved setup rules and roadmap now support **1 to 5 players**, with the option to play the "advanced solo" mode for 1 player.
 - The project must include a way to reset the stored data to allow for fresh starts.
 - The project must be visually appealing and user-friendly, with clear instructions and feedback for the user.
 - The project must be fully documented, with detailed specifications for the data structure of the card collections, the game rules, and the user interface design.

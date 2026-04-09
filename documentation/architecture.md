@@ -127,7 +127,7 @@ The normalization step should do the following:
 6. validate cross-references and report errors early.
 
 ### Example flow
-Canonical embedded fact:
+Canonical source fact:
 
 ```text
 name: "Dr. Doom"
@@ -234,6 +234,22 @@ Recommended shape:
 - less risk of partial writes,
 - easier export/import later,
 - clearer mental model.
+
+### Epic 2 implementation boundary recommendation
+Within the current static modular app, Epic 2 should keep persistence concerns separate from data normalization and rendering.
+
+Recommended module responsibilities:
+- `src/app/game-data-pipeline.mjs` — canonical data transformation, normalization, and runtime indexes only
+- `src/app/browser-entry.mjs` — bootstraps runtime data, hydrates persisted state, and wires state into rendering
+- a dedicated Epic 2 state/storage module under `src/app/` — default-state creation, load/save/update helpers, reset helpers, and storage availability handling
+- renderer modules — consume hydrated state and surface recovery or validation messages, but do not own persistence logic
+
+Recommended hydration order:
+1. load canonical game data and build `RUNTIME_DATA`
+2. load persisted `legendary_state_v1`
+3. validate stored IDs against runtime indexes
+4. recover invalid/corrupted slices safely
+5. render the app with runtime data plus hydrated user state
 
 ---
 

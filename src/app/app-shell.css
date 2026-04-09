@@ -57,6 +57,30 @@ main {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
+.row {
+  display: flex;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.gap-sm {
+  gap: 10px;
+}
+
+.gap-md {
+  gap: 16px;
+}
+
+.stack {
+  display: grid;
+}
+
 .two-col {
   display: grid;
   gap: 16px;
@@ -80,6 +104,80 @@ main {
   margin-bottom: 10px;
   background: transparent;
   padding: 12px;
+}
+
+.set-card {
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.set-card.owned {
+  border-color: rgba(46, 204, 113, 0.45);
+  background: rgba(46, 204, 113, 0.08);
+}
+
+.collection-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.summary-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-bottom: 14px;
+}
+
+.summary-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.metric-sm {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.button {
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  padding: 10px 14px;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button-primary {
+  border-color: rgba(24, 119, 242, 0.55);
+  background: rgba(24, 119, 242, 0.18);
+}
+
+.button-secondary {
+  border-color: var(--border);
+}
+
+.button-success {
+  border-color: rgba(46, 204, 113, 0.55);
+  background: rgba(46, 204, 113, 0.14);
+}
+
+.button-danger {
+  border-color: rgba(231, 76, 60, 0.55);
+  background: rgba(231, 76, 60, 0.14);
 }
 
 .metric {
@@ -162,5 +260,38 @@ details summary {
 .error {
   color: var(--danger);
   font-weight: 700;
+}
+
+.notice {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+}
+
+.notice.info {
+  background: rgba(24, 119, 242, 0.14);
+  border-color: rgba(24, 119, 242, 0.4);
+}
+
+.notice.success {
+  background: rgba(46, 204, 113, 0.12);
+  border-color: rgba(46, 204, 113, 0.4);
+}
+
+.notice.warning {
+  background: rgba(245, 166, 35, 0.12);
+  border-color: rgba(245, 166, 35, 0.4);
+}
+
+.history-item {
+  margin-bottom: 10px;
+}
+
+.history-meta {
+  margin-top: 8px;
+}
+
+.empty-state {
+  padding: 10px 0;
 }
 

@@ -69,52 +69,52 @@ See also: `documentation/testing-qc-strategy.md`
 ## Epic 2 — State Management and Persistence
 
 ### Story 2.1 — Create a storage manager for versioned root state
-- [ ] Define `legendary_state_v1` shape in code
-- [ ] Implement default-state factory
-- [ ] Implement safe load with fallback to defaults
-- [ ] Implement save/update helpers for the root state object
-- [ ] **Test:** verify save/load roundtrip preserves the root state shape
+- [x] Define `legendary_state_v1` shape in code
+- [x] Implement default-state factory
+- [x] Implement safe load with fallback to defaults
+- [x] Implement save/update helpers for the root state object
+- [x] **Test:** verify save/load roundtrip preserves the root state shape
 - [ ] **QC:** inspect stored browser data manually after state writes
 
 ### Story 2.2 — Persist and hydrate owned collection state
-- [ ] Store owned set IDs
-- [ ] Hydrate collection state on load
-- [ ] Validate stored set IDs against runtime indexes
-- [ ] Remove invalid stored references safely
-- [ ] **Test:** verify owned-set changes persist across reloads and invalid set IDs are handled safely
+- [x] Store owned set IDs
+- [x] Hydrate collection state on load
+- [x] Validate stored set IDs against runtime indexes
+- [x] Remove invalid stored references safely
+- [x] **Test:** verify owned-set changes persist across reloads and invalid set IDs are handled safely
 - [ ] **QC:** manually toggle several owned sets, reload, and confirm consistency
 
 ### Story 2.3 — Persist and update usage statistics (`plays`, `lastPlayedAt`)
-- [ ] Define per-category usage-stat containers
-- [ ] Implement usage-stat increment helper
-- [ ] Update `plays` on Accept & Log
-- [ ] Update `lastPlayedAt` on Accept & Log
-- [ ] **Test:** verify usage stats update only on accepted setups and store both `plays` and `lastPlayedAt`
+- [x] Define per-category usage-stat containers
+- [x] Implement usage-stat increment helper
+- [x] Update `plays` on Accept & Log
+- [x] Update `lastPlayedAt` on Accept & Log
+- [x] **Test:** verify usage stats update only on accepted setups and store both `plays` and `lastPlayedAt`
 - [ ] **QC:** manually accept multiple setups and inspect freshness ordering behavior
 
 ### Story 2.4 — Persist and retrieve accepted game history
-- [ ] Define `GameRecord` creation helper
-- [ ] Append accepted setups to history
-- [ ] Load history on startup
-- [ ] Sort or render history newest-first
-- [ ] **Test:** verify accepted setups create stable ID-based history records in newest-first order
+- [x] Define `GameRecord` creation helper
+- [x] Append accepted setups to history
+- [x] Load history on startup
+- [x] Sort or render history newest-first
+- [x] **Test:** verify accepted setups create stable ID-based history records in newest-first order
 - [ ] **QC:** manually compare rendered history against accepted setup output
 
 ### Story 2.5 — Support per-category and full reset operations
-- [ ] Reset hero usage stats
-- [ ] Reset mastermind usage stats
-- [ ] Reset villain-group usage stats
-- [ ] Reset henchman usage stats
-- [ ] Reset scheme usage stats
-- [ ] Reset the entire root state safely
-- [ ] **Test:** verify per-category reset only affects the intended category and full reset clears all slices
+- [x] Reset hero usage stats
+- [x] Reset mastermind usage stats
+- [x] Reset villain-group usage stats
+- [x] Reset henchman usage stats
+- [x] Reset scheme usage stats
+- [x] Reset the entire root state safely
+- [x] **Test:** verify per-category reset only affects the intended category and full reset clears all slices
 - [ ] **QC:** manually perform each reset action and confirm visible state updates correctly
 
 ### Story 2.6 — Handle corrupted or missing browser state gracefully
-- [ ] Detect invalid JSON/state shape
-- [ ] Recover with default state
-- [ ] Notify the user when recovery occurs
-- [ ] **Test:** simulate corrupted saved state and verify safe recovery
+- [x] Detect invalid JSON/state shape
+- [x] Recover with default state
+- [x] Notify the user when recovery occurs
+- [x] **Test:** simulate corrupted saved state and verify safe recovery
 - [ ] **QC:** confirm the recovery message is visible and understandable
 
 ---
@@ -187,7 +187,7 @@ See also: `documentation/testing-qc-strategy.md`
 
 ## Epic 4 — Application Shell and Navigation
 
-### Story 4.1 — Create the base HTML application shell
+### Story 4.1 — Expand the base HTML application shell
 - [ ] Create page structure and root container
 - [ ] Add four main tab panels
 - [ ] Add shared header area

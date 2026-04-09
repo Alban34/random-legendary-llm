@@ -8,13 +8,13 @@ html = '''<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legendary: Marvel Randomizer — Epic 1 Foundation</title>
+  <title>Legendary: Marvel Randomizer — Epic 2 Foundation</title>
   <link rel="stylesheet" href="./src/app/app-shell.css" />
 </head>
 <body>
   <header>
-    <h1>Legendary: Marvel Randomizer — Epic 1 Foundation</h1>
-    <p>This milestone establishes the project-owned canonical dataset, runtime normalization, ID generation, cross-reference resolution, validation, and internal test harness for the approved game scope.</p>
+    <h1>Legendary: Marvel Randomizer — Epic 2 Foundation</h1>
+    <p>This milestone builds on the Epic 1 data foundation by adding browser-state hydration, persistence, usage tracking, accepted game history, reset helpers, and recovery handling for corrupted or missing storage.</p>
   </header>
   <main>
     <section class="grid" id="metrics"></section>
@@ -29,9 +29,33 @@ html = '''<!DOCTYPE html>
         <div id="duplicates"></div>
       </section>
       <section class="panel">
-        <h2>Included sets preview</h2>
-        <div id="sets-preview"></div>
+        <h2>Collection persistence demo</h2>
+        <div id="collection-demo"></div>
       </section>
+    </section>
+    <section class="two-col">
+      <section class="panel">
+        <h2>Persistence and recovery status</h2>
+        <div id="persistence-summary"></div>
+      </section>
+      <section class="panel">
+        <h2>Usage statistics summary</h2>
+        <div id="usage-summary"></div>
+      </section>
+    </section>
+    <section class="two-col">
+      <section class="panel">
+        <h2>Epic 2 demo actions</h2>
+        <div id="state-actions"></div>
+      </section>
+      <section class="panel">
+        <h2>Accepted game history</h2>
+        <div id="history-preview"></div>
+      </section>
+    </section>
+    <section class="panel">
+      <h2>Persisted state snapshot</h2>
+      <pre id="state-snapshot"></pre>
     </section>
     <section class="panel">
       <h2>Runtime diagnostics</h2>

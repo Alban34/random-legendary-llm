@@ -46,6 +46,7 @@ Implement the versioned root browser state and all storage operations required b
 
 **In scope**
 - `legendary_state_v1`
+- shared state/storage modules under `src/app/`
 - collection persistence
 - usage stats persistence
 - history persistence
@@ -91,7 +92,7 @@ Generate legal game setups from the owned collection using legality-first valida
 ## Epic 4 — Application Shell and Navigation
 
 **Objective**
-Build the single-page shell, tab navigation, layout system, and shared UI infrastructure.
+Expand the existing single-page shell into the full tabbed application shell, layout system, and shared UI infrastructure.
 
 **In scope**
 - HTML shell
@@ -102,7 +103,7 @@ Build the single-page shell, tab navigation, layout system, and shared UI infras
 - empty states and panel layout
 
 **Stories**
-1. **Create the base HTML application shell**
+1. **Expand the base HTML application shell**
 2. **Implement responsive tab navigation for desktop and mobile**
 3. **Apply the approved dark Marvel visual design system**
 4. **Create reusable UI primitives for cards, buttons, badges, and panels**
