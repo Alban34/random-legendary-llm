@@ -9,9 +9,9 @@ This file records the clarification decisions that were needed before the docume
 ## Final decisions
 
 ### Q1 — Scope of expansions to include in the final specs
-**Answer:** `B`
+**Answer:** superseded by later scope update
 
-Include everything from the heroic line **plus MCU-branded Marvel sets**, but exclude `Villains`.
+Current scope: include **everything found on the approved BoardGameGeek references** for Legendary: Marvel, including `Villains`.
 
 ---
 
@@ -19,6 +19,10 @@ Include everything from the heroic line **plus MCU-branded Marvel sets**, but ex
 **Answer:** `A`
 
 `card-database.ts` is the final source of truth **exactly as-is**.
+
+**Superseded note:**
+This earlier decision has now been replaced by the source policy in `documentation/sources.md`.
+The project should now use the two BoardGameGeek reference pages as the authoritative source set for documentation review.
 
 ---
 
@@ -74,6 +78,7 @@ Once a spec file is complete, it should be changed from `Draft` to `In Review`.
 These decisions are now reflected in:
 
 - `README.md`
+- `documentation/sources.md`
 - `documentation/architecture.md`
 - `documentation/data-model.md`
 - `documentation/setup-rules.md`

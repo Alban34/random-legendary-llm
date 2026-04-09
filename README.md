@@ -1,6 +1,6 @@
 # Legendary: Marvel Randomizer
 
-STATUS: In Review
+STATUS: Approved
 
 ## Project state
 
@@ -33,13 +33,14 @@ The future app will:
 The current project work lives in `documentation/`.
 
 - `documentation/create-project.md` — original brief and constraints
+- `documentation/sources.md` — authoritative external reference sources
 - `documentation/architecture.md` — runtime architecture and normalization model
 - `documentation/roadmap.md` — implementation roadmap
 - `documentation/data-model.md` — data and local storage specification
 - `documentation/setup-rules.md` — setup rules and randomization rules
 - `documentation/ui-design.md` — visual design and user flows
 - `documentation/game-data.md` — human-readable data scope summary
-- `documentation/game-data-normalized.md` — normalized source-backed inventory
+- `documentation/game-data-normalized.md` — BGG-derived normalized inventory
 - `documentation/clarifications.md` — clarification record and final decisions
 - `documentation/epics.md` — implementation epics and stories
 - `documentation/task-list.md` — checkable implementation tracker
@@ -51,9 +52,8 @@ The current project work lives in `documentation/`.
 
 Approved specification decisions currently reflected in the docs:
 
-- include the heroic Marvel line plus MCU-branded Marvel sets,
-- exclude `Villains`,
-- treat `card-database.ts` as the source of truth exactly as-is,
+- include everything found on the approved BoardGameGeek references for Legendary: Marvel,
+- treat the two BoardGameGeek reference pages as the authoritative source set,
 - normalize source data once at startup into resolved runtime entities and indexes,
 - use set-scoped internal IDs for duplicate names,
 - document scheme setup rules as both structured data and human-readable notes,

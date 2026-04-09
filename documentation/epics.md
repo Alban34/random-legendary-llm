@@ -1,6 +1,6 @@
 # Epics and Stories
 
-STATUS: In Review
+STATUS: Approved
 
 ## Purpose
 
@@ -20,7 +20,7 @@ See also: `documentation/testing-qc-strategy.md`
 ## Epic 1 — Data Foundation and Normalization
 
 **Objective**
-Build the canonical game-data layer, normalize it into runtime-safe entities, and validate all source-backed references.
+Build the canonical game-data layer from the approved BoardGameGeek references, normalize it into runtime-safe entities, and validate all resolved references.
 
 **In scope**
 - embedded canonical source data

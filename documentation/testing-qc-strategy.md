@@ -1,6 +1,6 @@
 # Testing and Quality Control Strategy
 
-STATUS: In Review
+STATUS: Approved
 
 ## Purpose
 
@@ -18,6 +18,8 @@ This applies to:
 - persistence,
 - accessibility,
 - and documentation consistency.
+
+The authoritative reference baseline for inventory and setup-rule verification is defined in `documentation/sources.md`.
 
 ---
 
@@ -97,10 +99,10 @@ Required tests:
 - duplicate display names remain distinct by ID
 - Mastermind leads resolve to valid entity IDs
 - Scheme forced groups resolve to valid entity IDs
-- excluded sets are not present in normalized data
+- all in-scope BGG-listed sets are present in normalized data
 
 QC checks:
-- included set counts match `documentation/game-data-normalized.md`
+- included set counts and coverage match `documentation/game-data-normalized.md` and the BoardGameGeek references listed in `documentation/sources.md`
 - normalization errors are understandable if thrown
 
 ---
@@ -137,6 +139,7 @@ Required tests:
 QC checks:
 - walkthrough of at least one setup for each supported player count
 - walkthrough of a fallback scenario where no fully fresh setup is possible
+- manual comparison of representative special-rule setups against the BoardGameGeek card text reference
 
 ---
 
@@ -268,3 +271,4 @@ Before implementation is considered complete:
 - the app runs as a single page without external dependencies
 - local persistence works across reloads
 - reset flows and least-played fallback are verified manually and logically
+- representative inventory and rule behaviors have been cross-checked against `documentation/sources.md`

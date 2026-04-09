@@ -38,3 +38,7 @@ This project will allow the user to:
 
 ## Next steps
 - Create the epics to achieve the different milestones of the project, and break them down into user stories and tasks.
+
+## Helpful resources
+The full cards list: https://boardgamegeek.com/wiki/page/Legendary_Marvel_Complete_Card_List
+The full cards details: https://boardgamegeek.com/wiki/page/Legendary_Marvel_Complete_Card_Text

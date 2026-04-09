@@ -1,6 +1,6 @@
 # Implementation Task List
 
-STATUS: In Review
+STATUS: Approved
 
 ## Purpose
 
@@ -25,7 +25,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Create the embedded canonical game-data constant in `index.html`
 - [ ] Import or transcribe approved set inventory into the embedded data block
 - [ ] Preserve source display names exactly as approved
-- [ ] **Test:** verify all included sets from `documentation/game-data-normalized.md` are present in the embedded data
+- [ ] **Test:** verify all included sets from `documentation/game-data-normalized.md` are present in the embedded data and aligned with `documentation/sources.md`
 - [ ] **QC:** spot-check at least 5 sets against the approved data docs
 
 ### Story 1.2 — Normalize source entities into set-scoped runtime IDs
@@ -41,7 +41,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Resolve forced Scheme groups into runtime IDs
 - [ ] Convert known scheme setup behavior into structured rule modifiers
 - [ ] Preserve human-readable rule notes for display
-- [ ] **Test:** verify all resolved references exist and match approved source-backed behavior
+- [ ] **Test:** verify all resolved references exist and match the approved docs plus the BoardGameGeek references listed in `documentation/sources.md`
 - [ ] **QC:** manually inspect edge cases like `Dr. Doom` and `Secret Invasion of the Skrull Shapeshifters`
 
 ### Story 1.4 — Build flattened runtime indexes for all entity types
@@ -276,7 +276,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] **QC:** visually inspect grouping order and readability
 
 ### Story 6.2 — Mirror ownership toggles between Browse and Collection tabs
-- [ ] Share the same ownership source of truth
+- [ ] Share the same ownership state source across Browse and Collection
 - [ ] Re-render Browse on Collection changes
 - [ ] Re-render Collection on Browse changes
 - [ ] **Test:** verify ownership changes propagate across both tabs immediately

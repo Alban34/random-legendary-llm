@@ -7,17 +7,17 @@ STATUS: Approved
 This document defines the **data structures** used by the project.
 
 It distinguishes between:
-- **canonical embedded data**,
-- **derived runtime data**,
-- and **persisted application state**.
+- **canonical embedded game data** owned by the project,
+- **normalized runtime data** used by the app,
+- and **persisted application state** stored in the browser.
 
-This distinction is intentional and is part of the final architecture direction.
+The BoardGameGeek pages remain the verification source during documentation and maintenance, but the application itself should run on its own clean canonical format.
 
 ---
 
 ## 1. Canonical embedded game data
 
-The app should embed a canonical source-backed constant:
+The app should embed one canonical project-owned constant, verified from the authoritative references listed in `documentation/sources.md`:
 
 ```text
 const SOURCE_GAME_DATA = {
@@ -25,7 +25,7 @@ const SOURCE_GAME_DATA = {
 };
 ```
 
-This canonical data remains **nested by set**.
+This canonical data remains nested by set.
 
 ### `Set`
 
@@ -35,11 +35,12 @@ This canonical data remains **nested by set**.
   name: string,
   year: number,
   type: "base" | "large-expansion" | "small-expansion" | "standalone",
+  aliases: string[],
   heroes: Hero[],
   masterminds: Mastermind[],
   villainGroups: VillainGroup[],
   henchmanGroups: HenchmanGroup[],
-  schemes: SourceScheme[]
+  schemes: Scheme[]
 }
 ```
 
@@ -50,6 +51,7 @@ This canonical data remains **nested by set**.
   id: string,
   setId: string,
   name: string,
+  aliases: string[],
   teams: string[],
   cardCount: number
 }
@@ -62,12 +64,10 @@ This canonical data remains **nested by set**.
   id: string,
   setId: string,
   name: string,
-  lead: {
-    category: "villains" | "henchmen",
-    id: string
-  } | null,
-  specialLead: string | null,
-  epicVariant: boolean
+  aliases: string[],
+  leadName: string | null,
+  leadCategory: "villains" | "henchmen" | null,
+  notes: string[]
 }
 ```
 
@@ -78,6 +78,7 @@ This canonical data remains **nested by set**.
   id: string,
   setId: string,
   name: string,
+  aliases: string[],
   cardCount: number
 }
 ```
@@ -89,19 +90,88 @@ This canonical data remains **nested by set**.
   id: string,
   setId: string,
   name: string,
+  aliases: string[],
   cardCount: number
 }
 ```
 
-### `SourceScheme`
-
-This is the canonical source-backed scheme shape before the generator interprets it.
+### `Scheme`
 
 ```text
 {
   id: string,
   setId: string,
   name: string,
+  aliases: string[],
+  constraints: {
+    minimumPlayerCount: number | null
+  },
+  forcedGroups: Array<{
+    category: "villains" | "henchmen",
+    name: string
+  }>,
+  modifiers: RuleModifier[],
+  notes: string[]
+}
+```
+
+---
+
+## 2. Normalized runtime data
+
+At startup, the app should derive a normalized runtime model:
+
+```text
+const RUNTIME_DATA = normalizeGameData(SOURCE_GAME_DATA);
+```
+
+This runtime data is **not persisted**. It is rebuilt on load.
+
+### Runtime shape
+
+```text
+{
+  sets: Set[],
+  indexes: {
+    setsById: Record<string, Set>,
+    heroesById: Record<string, Hero>,
+    mastermindsById: Record<string, NormalizedMastermind>,
+    villainGroupsById: Record<string, VillainGroup>,
+    henchmanGroupsById: Record<string, HenchmanGroup>,
+    schemesById: Record<string, NormalizedScheme>,
+    allHeroes: Hero[],
+    allMasterminds: NormalizedMastermind[],
+    allVillainGroups: VillainGroup[],
+    allHenchmanGroups: HenchmanGroup[],
+    allSchemes: NormalizedScheme[]
+  }
+}
+```
+
+### `NormalizedMastermind`
+
+```text
+{
+  id: string,
+  setId: string,
+  name: string,
+  aliases: string[],
+  lead: {
+    category: "villains" | "henchmen",
+    id: string
+  } | null,
+  notes: string[]
+}
+```
+
+### `NormalizedScheme`
+
+```text
+{
+  id: string,
+  setId: string,
+  name: string,
+  aliases: string[],
   constraints: {
     minimumPlayerCount: number | null
   },
@@ -130,48 +200,11 @@ Examples:
 - `{ type: "add-villain-group", amount: 1 }`
 - `{ type: "set-min-heroes", value: 6 }`
 
----
+### Why both canonical and normalized layers exist
 
-## 2. Runtime normalized data
-
-At startup, the app should derive a normalized runtime model:
-
-```text
-const RUNTIME_DATA = normalizeGameData(SOURCE_GAME_DATA);
-```
-
-This runtime data is **not persisted**. It is rebuilt on load.
-
-### Runtime shape
-
-```text
-{
-  sets: Set[],
-  indexes: {
-    setsById: Record<string, Set>,
-    heroesById: Record<string, Hero>,
-    mastermindsById: Record<string, Mastermind>,
-    villainGroupsById: Record<string, VillainGroup>,
-    henchmanGroupsById: Record<string, HenchmanGroup>,
-    schemesById: Record<string, SourceScheme>,
-    allHeroes: Hero[],
-    allMasterminds: Mastermind[],
-    allVillainGroups: VillainGroup[],
-    allHenchmanGroups: HenchmanGroup[],
-    allSchemes: SourceScheme[]
-  }
-}
-```
-
-### Why both nested and flat layers exist
-
-- `sets[]` supports browsing and collection organization
-- flattened indexes support:
-  - setup generation,
-  - fast ID lookup,
-  - history rendering,
-  - validation,
-  - duplicate-name safety
+- canonical data remains human-manageable and set-oriented
+- normalized data converts name-based references into runtime-safe ID-based structures
+- the app stays simple at runtime without carrying import-phase metadata forever
 
 ---
 
@@ -312,7 +345,7 @@ The normalization layer should validate:
 - unique entity IDs,
 - valid mastermind lead references,
 - valid scheme forced-group references,
-- valid persisted IDs when hydrating state.
+- and valid persisted IDs when hydrating state.
 
 The generator should validate:
 - selected collection legality,
@@ -327,6 +360,7 @@ The generator should validate:
 
 - new sets should be addable by inserting a new `Set` object in the canonical data
 - new scheme behaviors should be expressible by adding new `RuleModifier.type` values
+- aliases support search and future naming reconciliation without changing IDs
 - UI labels can evolve without changing persisted history because history stores IDs
 - future export/import can serialize the entire root state object directly
 - if needed later, the same architecture can support additional game modes without replacing the data layer

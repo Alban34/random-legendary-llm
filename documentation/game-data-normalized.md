@@ -4,7 +4,7 @@ STATUS: Approved
 
 ## Purpose
 
-This file is the **machine-facing game-data specification** derived from `card-database.ts`.
+This file is the **machine-facing game-data specification** derived from the authoritative BoardGameGeek reference pages listed in `documentation/sources.md`.
 
 It defines:
 - the exact included source sets,
@@ -12,7 +12,7 @@ It defines:
 - the category counts that must be preserved,
 - and the normalization expectations for runtime use.
 
-> Per approved decision `Q2: A`, `card-database.ts` is the source of truth **exactly as-is** for names and content.
+> The authoritative external source set for this document is defined in `documentation/sources.md`.
 
 ---
 
@@ -20,20 +20,21 @@ It defines:
 
 The implementation must normalize source data into runtime-safe entities that:
 - keep display names exactly as sourced,
+- preserve aliases where useful,
 - use stable set-scoped IDs,
 - resolve cross-references to IDs,
 - preserve category membership exactly,
-- and support flattened indexes in memory.
+- support flattened indexes in memory,
+- and keep rule-bearing entities structured enough for generation logic.
 
 ---
 
 ## Included scope
 
 Included:
-- all heroic-line Marvel sets found in `card-database.ts`
-- MCU-branded Marvel sets found in `card-database.ts`
-
-Excluded:
+- all Legendary: Marvel product lines found in the approved BoardGameGeek references
+- heroic-line Marvel sets
+- MCU-branded Marvel sets
 - `Villains`
 
 ---
@@ -41,7 +42,7 @@ Excluded:
 ## Normalization rules
 
 ### 1. Display names vs internal IDs
-- display names remain exactly as they appear in `card-database.ts`
+- display names should follow the BoardGameGeek references
 - internal IDs are normalized as kebab-case and set-scoped
 - duplicate names across sets remain separate entries
 
@@ -54,14 +55,17 @@ The implementation must preserve source category membership exactly:
 - `schemes`
 
 ### 3. Reference resolution
-All source name-based references must be converted into resolved runtime references.
+All source name-based references from the BoardGameGeek references must be converted into resolved runtime references.
 
 Examples:
 - `alwaysLead + alwaysLeadCategory` → `lead: { category, id }`
 - scheme-forced groups → `forcedGroups[]`
 - scheme setup logic → `modifiers[] + notes[]`
 
-### 4. Runtime indexing requirement
+### 4. Aliases
+The normalized data may preserve project-local aliases when they improve search or naming consistency.
+
+### 5. Runtime indexing requirement
 The normalized result must support flattened runtime indexes such as:
 - `setsById`
 - `heroesById`
@@ -88,6 +92,7 @@ The normalized result must support flattened runtime indexes such as:
 | `Civil War` | `civil-war` | 2016 | `large-expansion` | 16 | 5 | 7 | 2 | 8 |
 | `Deadpool` | `deadpool` | 2017 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `Champions` | `champions` | 2018 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
+| `Villains` | `villains` | 2014 | `standalone` | 15 | 4 | 7 | 4 | 8 |
 | `Marvel Studios, Phase 1` | `marvel-studios-phase-1` | 2019 | `small-expansion` | 7 | 3 | 5 | 4 | 8 |
 | `Marvel Studios' Guardians of the Galaxy` | `marvel-studios-guardians-of-the-galaxy` | 2019 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `World War Hulk` | `world-war-hulk` | 2019 | `large-expansion` | 15 | 6 | 7 | 3 | 8 |
@@ -111,45 +116,32 @@ The normalized result must support flattened runtime indexes such as:
 
 ---
 
-## Explicitly excluded inventory
-
-| Source Extension Name | Reason |
-|---|---|
-| `Villains` | excluded by approved scope decision `Q1: B` |
-
----
 
 ## Runtime entity expectations
+
+The structures below are **project-local normalized runtime entities** built from the project's canonical data.
 
 ### Masterminds
 Mastermind runtime entities must carry a resolved lead reference:
 
-```js
-{
-  id: string,
-  setId: string,
-  name: string,
-  lead: {
-    category: "villains" | "henchmen",
-    id: string
-  } | null
-}
-```
+- `id`: stable set-scoped runtime ID
+- `setId`: owning set ID
+- `name`: display name from the reference sources
+- `aliases`: optional naming variants retained for matching/search
+- `lead`: resolved reference in the form `{ category, id } | null`
+- `notes`: human-readable setup notes retained in the project format when useful
 
 ### Schemes
 Scheme runtime entities must carry structured setup rules:
 
-```js
-{
-  id: string,
-  setId: string,
-  name: string,
-  constraints: { minimumPlayerCount: number | null },
-  forcedGroups: Array<{ category: "villains" | "henchmen", id: string }>,
-  modifiers: RuleModifier[],
-  notes: string[]
-}
-```
+- `id`: stable set-scoped runtime ID
+- `setId`: owning set ID
+- `name`: display name from the reference sources
+- `aliases`: optional naming variants retained for matching/search
+- `constraints`: structured legality constraints such as `minimumPlayerCount`
+- `forcedGroups`: resolved required groups as runtime IDs
+- `modifiers`: normalized setup-affecting rule modifiers
+- `notes`: human-readable rule notes for display
 
 ---
 

@@ -64,7 +64,7 @@ Every Mastermind may define a mandatory lead group.
 
 Runtime model:
 
-```js
+```text
 lead: {
   category: "villains" | "henchmen",
   id: string
@@ -90,7 +90,7 @@ Schemes should be interpreted through a structured rule model.
 
 Recommended runtime shape:
 
-```js
+```text
 {
   constraints: {
     minimumPlayerCount: number | null

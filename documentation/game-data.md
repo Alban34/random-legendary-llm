@@ -6,6 +6,10 @@ STATUS: Approved
 
 This file is the **human-readable summary** of the project game data scope.
 
+Its authoritative external references are defined in:
+
+- `documentation/sources.md`
+
 The **machine-facing, source-backed inventory** now lives in:
 
 - `documentation/game-data-normalized.md`
@@ -18,9 +22,8 @@ That split follows the approved decision from `Q7: C`.
 
 The documentation and future implementation will use the following rules:
 
-- **Scope:** include the main Legendary: Marvel heroic line **plus MCU-branded Marvel sets**.
-- **Exclude:** `Villains`-line content from the final app data.
-- **Source of truth:** `card-database.ts` is the source of truth **exactly as-is**.
+- **Scope:** include **everything found on the approved BoardGameGeek references** for Legendary: Marvel.
+- **Source of truth:** the two BoardGameGeek reference pages listed in `documentation/sources.md` are the authoritative source set.
 - **Duplicates / variants:** duplicate display names are allowed; all internal IDs are **set-scoped**.
 - **Special setup rules:** modeled as **both structured fields and human-readable notes**.
 - **Small / uneven sets:** all approved sets remain selectable, even if they do not form a balanced pool by themselves.
@@ -66,7 +69,7 @@ The documentation and future implementation will use the following rules:
 - `Marvel Studios, Phase 1`
 - `Marvel Studios' Guardians of the Galaxy`
 
-### Explicitly excluded from scope
+### Additional product lines included in scope
 - `Villains`
 
 ---
@@ -78,15 +81,15 @@ The documentation and future implementation will use the following rules:
 | Base Game | 1 | `Core Set` is the starting collection anchor |
 | Large Expansions | 8 | Includes `Dark City`, `Civil War`, `World War Hulk`, `X-Men`, `Venom`, and others classified as large in this project |
 | Small Expansions | 22 | Includes both comic-themed and MCU-branded small boxes / decks |
-| Standalone-Compatible | 1 | `Revelations` |
+| Standalone-Compatible | 2 | Includes `Revelations` and `Villains` |
 
-> Classification in this project is a planning metadata layer for the UI and collection filters. The **actual source content** remains the exact content from `card-database.ts`.
+> Classification in this project is a planning metadata layer for the UI and collection filters. The authoritative inventory and rule references come from the BoardGameGeek sources listed in `documentation/sources.md`.
 
 ---
 
 ## Important source-backed data realities
 
-The provided source data is not a perfect mirror of classic marketing categories. The project will preserve it exactly.
+The authoritative external references are not necessarily organized in the same way as UI-facing product categories. The project therefore preserves the reference content while adding local normalization metadata for implementation safety.
 
 Examples:
 - `Fear Itself` contains **6 heroes**, **1 mastermind**, **1 villain group**, **0 henchmen**, and **3 schemes** in the source.

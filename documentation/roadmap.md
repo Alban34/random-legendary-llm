@@ -12,12 +12,13 @@ A single `index.html` file (embedded CSS + JS, zero external dependencies) that 
 
 **Deliverables:**
 - `documentation/game-data.md` — complete expansion catalog with heroes, masterminds, villain groups, henchman groups, and schemes for each set
+- `documentation/sources.md` — authoritative reference policy for the two BoardGameGeek sources
 - `GAME_DATA` constant in `index.html` populated from that catalog
 
 **Acceptance Criteria:**
-- Every set listed has at minimum: `id`, `name`, `year`, `type`, and a non-empty `heroes[]` array
-- Every Mastermind has a valid `alwaysLeadsId` referencing an existing `VillainGroup.id`
-- At least the Base Game and 5 expansions are fully verified
+- Every set listed has at minimum: `id`, `name`, `year`, `type`, and a non-empty `heroes[]` array unless the approved external references explicitly indicate otherwise
+- Every Mastermind lead reference resolves to an existing Villain Group or Henchman Group, depending on category
+- The normalized inventory and rule notes are traceable back to the two BoardGameGeek reference pages
 
 ---
 
@@ -151,7 +152,6 @@ A single `index.html` file (embedded CSS + JS, zero external dependencies) that 
 - Export game history as JSON or CSV
 - Print-friendly setup summary
 - Card-level tracking within hero decks
-- Legendary Villains standalone integration
 - PWA (offline install, service worker)
 - Dark/light theme toggle
 
