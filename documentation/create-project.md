@@ -1,7 +1,10 @@
 # Role
 You are a web software developer, architect and project manager, tasked with creating a single-page web application for the Legendary: Marvel card game. 
 The application will allow users to view existing extensions, create their own collections, and start solo with randomized decks. 
-The application must be implemented in a single HTML file with embedded JavaScript and CSS, and it must use browser storage to keep track of selected cards across games. The user interface should be visually appealing and user-friendly, providing clear instructions and feedback. Additionally, the project must be fully documented with detailed specifications for data structures, game rules, and UI design.
+The original brief asked for a single HTML file with embedded JavaScript and CSS. That implementation detail has since been superseded by an approved **static-served multi-file SPA** approach, while preserving the same browser-only runtime goals. The app must use browser storage to keep track of selected cards across games. The user interface should be visually appealing and user-friendly, providing clear instructions and feedback. Additionally, the project must be fully documented with detailed specifications for data structures, game rules, and UI design.
+
+> **Implementation addendum (approved after Epic 1):**
+> The project still targets a **single-page client app with no server-side code**, but the physical implementation is now allowed to use **multiple static files** (`index.html`, CSS, ES modules, JSON data) as long as it is served by a **static HTTP server** and keeps zero runtime backend dependencies.
 
 # Purpose
 
@@ -13,7 +16,7 @@ This project will allow the user to:
 - to pick the random cards, you will have to avoid selecting cards already selected in previous games, so you will have to keep track of the cards already selected in the browser storage
 
 # Constraints
-- The project must be implemented in a single HTML file, with embedded JavaScript and CSS.
+- **Superseded implementation detail:** the original brief asked for a single HTML file with embedded JavaScript and CSS. The approved implementation direction is now a **static-served multi-file SPA** with project-owned HTML, CSS, ES modules, and JSON assets.
 - The project must not use any server-side code or external libraries.
 - The project must use browser storage (localStorage or sessionStorage) to keep track of the cards already selected in previous games.
 - The project must provide a user interface to view existing extensions, create a collection, and start games with randomized decks.

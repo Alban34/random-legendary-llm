@@ -21,48 +21,48 @@ See also: `documentation/testing-qc-strategy.md`
 
 ## Epic 1 — Data Foundation and Normalization
 
-### Story 1.1 — Embed canonical game data in the single-page application
-- [ ] Create the embedded canonical game-data constant in `index.html`
-- [ ] Import or transcribe approved set inventory into the embedded data block
-- [ ] Preserve source display names exactly as approved
-- [ ] **Test:** verify all included sets from `documentation/game-data-normalized.md` are present in the embedded data and aligned with `documentation/sources.md`
-- [ ] **QC:** spot-check at least 5 sets against the approved data docs
+### Story 1.1 — Ship canonical game data with the client application
+- [x] Create the canonical client data asset used by the app
+- [x] Import or transcribe approved set inventory into the client-shipped data asset
+- [x] Preserve source display names exactly as approved
+- [x] **Test:** verify all included sets from `documentation/game-data-normalized.md` are present in the client-shipped data and aligned with `documentation/sources.md`
+- [x] **QC:** spot-check at least 5 sets against the approved data docs
 
 ### Story 1.2 — Normalize source entities into set-scoped runtime IDs
-- [ ] Implement a slug/ID helper for set-scoped entity IDs
-- [ ] Generate stable IDs for sets
-- [ ] Generate stable IDs for heroes, masterminds, villain groups, henchman groups, and schemes
-- [ ] Ensure duplicate display names remain distinct via set-scoped IDs
-- [ ] **Test:** verify IDs are unique and duplicate display names remain distinct
-- [ ] **QC:** manually inspect duplicate-name examples like `Black Widow`, `Loki`, and `Thor`
+- [x] Implement a slug/ID helper for set-scoped entity IDs
+- [x] Generate stable IDs for sets
+- [x] Generate stable IDs for heroes, masterminds, villain groups, henchman groups, and schemes
+- [x] Ensure duplicate display names remain distinct via set-scoped IDs
+- [x] **Test:** verify IDs are unique and duplicate display names remain distinct
+- [x] **QC:** manually inspect duplicate-name examples like `Black Widow`, `Loki`, and `Thor`
 
 ### Story 1.3 — Resolve cross-references for Masterminds and Schemes
-- [ ] Resolve `alwaysLead` + category into runtime lead references
-- [ ] Resolve forced Scheme groups into runtime IDs
-- [ ] Convert known scheme setup behavior into structured rule modifiers
-- [ ] Preserve human-readable rule notes for display
-- [ ] **Test:** verify all resolved references exist and match the approved docs plus the BoardGameGeek references listed in `documentation/sources.md`
-- [ ] **QC:** manually inspect edge cases like `Dr. Doom` and `Secret Invasion of the Skrull Shapeshifters`
+- [x] Resolve `alwaysLead` + category into runtime lead references
+- [x] Resolve forced Scheme groups into runtime IDs
+- [x] Convert known scheme setup behavior into structured rule modifiers
+- [x] Preserve human-readable rule notes for display
+- [x] **Test:** verify all resolved references exist and match the approved docs plus the BoardGameGeek references listed in `documentation/sources.md`
+- [x] **QC:** manually inspect edge cases like `Dr. Doom` and `Secret Invasion of the Skrull Shapeshifters`
 
 ### Story 1.4 — Build flattened runtime indexes for all entity types
-- [ ] Build `setsById`
-- [ ] Build `heroesById`
-- [ ] Build `mastermindsById`
-- [ ] Build `villainGroupsById`
-- [ ] Build `henchmanGroupsById`
-- [ ] Build `schemesById`
-- [ ] Build flat arrays for each entity category
-- [ ] **Test:** verify index counts match canonical counts and each indexed ID resolves correctly
-- [ ] **QC:** inspect runtime index samples in the browser console or debug output
+- [x] Build `setsById`
+- [x] Build `heroesById`
+- [x] Build `mastermindsById`
+- [x] Build `villainGroupsById`
+- [x] Build `henchmanGroupsById`
+- [x] Build `schemesById`
+- [x] Build flat arrays for each entity category
+- [x] **Test:** verify index counts match canonical counts and each indexed ID resolves correctly
+- [x] **QC:** inspect runtime index samples in the browser console or debug output
 
 ### Story 1.5 — Validate normalized data and surface initialization errors
-- [ ] Validate unique set IDs
-- [ ] Validate unique entity IDs
-- [ ] Validate Mastermind lead references
-- [ ] Validate Scheme forced-group references
-- [ ] Surface initialization failures clearly in the UI
-- [ ] **Test:** trigger representative invalid-reference cases in a test harness and verify failure reporting
-- [ ] **QC:** confirm errors are understandable and non-technical enough for review
+- [x] Validate unique set IDs
+- [x] Validate unique entity IDs
+- [x] Validate Mastermind lead references
+- [x] Validate Scheme forced-group references
+- [x] Surface initialization failures clearly in the UI
+- [x] **Test:** trigger representative invalid-reference cases in a test harness and verify failure reporting
+- [x] **QC:** confirm errors are understandable and non-technical enough for review
 
 ---
 
@@ -446,7 +446,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] **Test:** verify implemented behavior matches documented architecture and rules
 - [ ] **QC:** perform a documentation-to-implementation consistency review
 
-### Story 10.2 — Document how to open and use the single-file app
+### Story 10.2 — Document how to open and use the static-served app
 - [ ] Update `README.md` usage instructions
 - [ ] Confirm browser support wording
 - [ ] **Test:** verify README instructions are sufficient to open and use the app from scratch

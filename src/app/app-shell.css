@@ -1,0 +1,166 @@
+:root {
+  color-scheme: dark;
+  --bg: #0d0d0d;
+  --panel: #141428;
+  --panel-2: #1b1b33;
+  --border: #2a2a4a;
+  --text: #f0f0f0;
+  --muted: #a0a0c0;
+  --success: #2ecc71;
+  --danger: #e74c3c;
+  --warning: #f5a623;
+  --accent: #e62429;
+  --info: #1877f2;
+  --shadow: rgba(0, 0, 0, 0.4);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+  background: #0a0a1a;
+  position: sticky;
+  top: 0;
+}
+
+header h1 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+  color: var(--accent);
+}
+
+header p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 70rem;
+}
+
+main {
+  padding: 24px;
+  display: grid;
+  gap: 24px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.two-col {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 10px 24px var(--shadow);
+  padding: 18px;
+}
+
+.panel h2,
+.panel h3 {
+  margin-top: 0;
+}
+
+.panel-inline {
+  margin-bottom: 10px;
+  background: transparent;
+  padding: 12px;
+}
+
+.metric {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.status-pass {
+  color: var(--success);
+}
+
+.status-fail {
+  color: var(--danger);
+}
+
+ul.clean {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+li.test {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+
+li.test.pass {
+  border-color: rgba(46, 204, 113, 0.45);
+}
+
+li.test.fail {
+  border-color: rgba(231, 76, 60, 0.55);
+}
+
+code,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #101022;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+details {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-2);
+  padding: 12px 14px;
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.pill {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(24, 119, 242, 0.15);
+  color: #8fc1ff;
+  font-size: 0.8rem;
+  margin-right: 6px;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 700;
+}
+

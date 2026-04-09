@@ -1,0 +1,17 @@
+{
+  "name": "legendary-marvel-randomizer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node ./tools/dev-server.mjs",
+    "start": "node ./tools/dev-server.mjs",
+    "test": "node --test",
+    "test:epic1": "node --test ./test/epic1.test.mjs",
+    "check:epic1": "node --test ./test/epic1.test.mjs",
+    "report:epic1": "node ./tools/run_epic1_checks.mjs",
+    "build:shell": "python3 ./tools/build_epic1_index.py",
+    "build:seed": "python3 ./tools/build_epic1_seed.py"
+  }
+}
+

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legendary: Marvel Randomizer — Epic 1 Foundation</title>
+  <link rel="stylesheet" href="./src/app/app-shell.css" />
+</head>
+<body>
+  <header>
+    <h1>Legendary: Marvel Randomizer — Epic 1 Foundation</h1>
+    <p>This milestone establishes the project-owned canonical dataset, runtime normalization, ID generation, cross-reference resolution, validation, and internal test harness for the approved game scope.</p>
+  </header>
+  <main>
+    <section class="grid" id="metrics"></section>
+    <section class="panel">
+      <h2>Epic 1 Test Results</h2>
+      <p class="muted">These checks validate dataset presence, ID generation, duplicate-name safety, reference resolution, runtime indexes, and representative invalid-data failure handling.</p>
+      <ul class="clean" id="tests"></ul>
+    </section>
+    <section class="two-col">
+      <section class="panel">
+        <h2>Duplicate-name QC samples</h2>
+        <div id="duplicates"></div>
+      </section>
+      <section class="panel">
+        <h2>Included sets preview</h2>
+        <div id="sets-preview"></div>
+      </section>
+    </section>
+    <section class="panel">
+      <h2>Runtime diagnostics</h2>
+      <details>
+        <summary>Show normalization summary</summary>
+        <pre id="diagnostics"></pre>
+      </details>
+    </section>
+    <section class="panel">
+      <h2>Initialization status</h2>
+      <div id="status"></div>
+    </section>
+  </main>
+
+  <script type="module" src="./src/app/browser-entry.mjs"></script>
+</body>
+</html>

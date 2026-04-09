@@ -23,7 +23,7 @@ See also: `documentation/testing-qc-strategy.md`
 Build the canonical game-data layer from the approved BoardGameGeek references, normalize it into runtime-safe entities, and validate all resolved references.
 
 **In scope**
-- embedded canonical source data
+- project-owned canonical client data
 - normalized IDs
 - resolved Mastermind leads
 - normalized Scheme rules
@@ -31,7 +31,7 @@ Build the canonical game-data layer from the approved BoardGameGeek references, 
 - validation of source references
 
 **Stories**
-1. **Embed canonical game data in the single-page application**
+1. **Ship canonical game data with the client application**
 2. **Normalize source entities into set-scoped runtime IDs**
 3. **Resolve cross-references for Masterminds and Schemes**
 4. **Build flattened runtime indexes for all entity types**
@@ -230,7 +230,7 @@ Finish all user-facing and developer-facing project documentation and align it w
 
 **Stories**
 1. **Update documentation to reflect implemented runtime behavior**
-2. **Document how to open and use the single-file app**
+2. **Document how to open and use the static-served app**
 3. **Document reset behavior, persistence, and limitations**
 4. **Perform a final consistency pass across all markdown specs**
 

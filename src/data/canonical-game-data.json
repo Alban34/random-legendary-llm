@@ -1,0 +1,6091 @@
+{
+  "setCatalog": [
+    {
+      "name": "Core Set",
+      "year": 2012,
+      "type": "base",
+      "aliases": [
+        "Legendary: A Marvel Deck Building Game"
+      ]
+    },
+    {
+      "name": "Dark City",
+      "year": 2013,
+      "type": "large-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Fantastic Four",
+      "year": 2014,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Paint the Town Red",
+      "year": 2014,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Guardians of the Galaxy",
+      "year": 2014,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Villains",
+      "year": 2014,
+      "type": "standalone",
+      "aliases": [
+        "Legendary: Villains"
+      ]
+    },
+    {
+      "name": "Fear Itself",
+      "year": 2015,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Secret Wars, Volume 1",
+      "year": 2015,
+      "type": "large-expansion",
+      "aliases": [
+        "Secret Wars Vol. 1"
+      ]
+    },
+    {
+      "name": "Secret Wars, Volume 2",
+      "year": 2015,
+      "type": "large-expansion",
+      "aliases": [
+        "Secret Wars Vol. 2"
+      ]
+    },
+    {
+      "name": "Captain America 75th Anniversary",
+      "year": 2016,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Civil War",
+      "year": 2016,
+      "type": "large-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Deadpool",
+      "year": 2017,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Champions",
+      "year": 2018,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Marvel Studios, Phase 1",
+      "year": 2019,
+      "type": "small-expansion",
+      "aliases": [
+        "MCU Phase 1"
+      ]
+    },
+    {
+      "name": "Marvel Studios' Guardians of the Galaxy",
+      "year": 2019,
+      "type": "small-expansion",
+      "aliases": [
+        "MCU Guardians of the Galaxy"
+      ]
+    },
+    {
+      "name": "World War Hulk",
+      "year": 2019,
+      "type": "large-expansion",
+      "aliases": []
+    },
+    {
+      "name": "S.H.I.E.L.D.",
+      "year": 2019,
+      "type": "large-expansion",
+      "aliases": [
+        "SHIELD"
+      ]
+    },
+    {
+      "name": "Ant-Man",
+      "year": 2019,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Dimensions",
+      "year": 2019,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Into the Cosmos",
+      "year": 2020,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Realm of Kings",
+      "year": 2020,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Heroes of Asgard",
+      "year": 2020,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Black Widow",
+      "year": 2020,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Black Panther",
+      "year": 2021,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Doctor Strange and the Shadows of Nightmare",
+      "year": 2021,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Annihilation",
+      "year": 2021,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Venom",
+      "year": 2021,
+      "type": "large-expansion",
+      "aliases": []
+    },
+    {
+      "name": "The New Mutants",
+      "year": 2021,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "X-Men",
+      "year": 2022,
+      "type": "large-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Revelations",
+      "year": 2022,
+      "type": "standalone",
+      "aliases": []
+    },
+    {
+      "name": "Messiah Complex",
+      "year": 2023,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Marvel Noir",
+      "year": 2023,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Spider-Man Homecoming",
+      "year": 2024,
+      "type": "small-expansion",
+      "aliases": []
+    }
+  ],
+  "rawCardData": {
+    "heroes": [
+      {
+        "name": "Adam Warlock",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Agent Phil Coulson",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Agent Venom",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Agent X-13",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Amadeus Cho",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "Champions"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Angel",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Angel Noir",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ant-Man",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Apocalyptic Kitty Pryde",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Arkon the Magnificent",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Aurora & Northstar",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Banshee",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Beast",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "Illuminati"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Beast",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Beta Ray Bill",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "teams": [
+          "Heroes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Bishop",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Black Bolt",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "Illuminati"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Black Bolt",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "teams": [
+          "Inhumans"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Black Cat",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Black Knight",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Black Panther",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "Illuminati"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Black Swan",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "Cabal"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Black Widow",
+        "setName": "Black Widow",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Black Widow",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Black Widow (Black Widow)",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Blade",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Bob, Agent of Hydra",
+        "setName": "Deadpool",
+        "aliases": [],
+        "teams": [
+          "HYDRA"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Brainstorm",
+        "setName": "Annihilation",
+        "aliases": [],
+        "teams": [
+          "Microbadge: Legendary: Fantastic Four"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Bruce Banner",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Bullseye",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Crime Syndicate"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Cable",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Force"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Caiera",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "Warbound"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Cannonball",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Captain America",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Captain America (Captain America)",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Captain America (Falcon)",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Captain America 1941",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Captain America, Secret Avenger",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Captain Britain",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "Illuminati"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Captain Mar-Vell",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Captain Marvel",
+        "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Captain Marvel",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Carnage",
+        "setName": "Venom",
+        "aliases": [],
+        "teams": [
+          "Venomverse"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Clea",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Cloak & Dagger",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers",
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Colossus",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Force"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Colossus & Wolverine",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Corvus Glaive",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "Cabal"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Crystal",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "teams": [
+          "Inhumans"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Cyclops",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Daredevil",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Daredevil",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers",
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Daredevil Noir",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Darkhawk",
+        "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Dazzler",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Deadpool",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Deadpool",
+        "setName": "Deadpool",
+        "aliases": [],
+        "teams": [
+          "Mercs for Money"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Deathlok",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Doctor Strange",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Doctor Voodoo",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Domino",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Force"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Dr Punisher, Soldier Supreme",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Dr. Octopus",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Sinister Six"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Dr. Strange",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "Illuminati"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Drax",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Drax the Destroyer",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Electro",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Sinister Six"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Elektra",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Elsa Bloodstone",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Emma Frost",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Enchantress",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Foes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Falcon",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Falcon & Winter Soldier",
+        "setName": "Black Widow",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Fantastic Four United",
+        "setName": "Annihilation",
+        "aliases": [],
+        "teams": [
+          "Microbadge: Legendary: Fantastic Four"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Forge",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Force"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Gambit",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Gamora",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Gamora",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "General Okoye",
+        "setName": "Black Panther",
+        "aliases": [],
+        "teams": [
+          "Heroes of Wakanda \"Wakanda Forever!\""
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ghost Rider",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Gladiator Hulk",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "Warbound"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Goliath",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Gorgon",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "teams": [
+          "Inhumans"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Green Goblin",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Sinister Six"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Greithoth, Breaker of Wills",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "teams": [
+          "Foes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Groot",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Gwenpool",
+        "setName": "Champions",
+        "aliases": [],
+        "teams": [
+          "Champions"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Happy Hogan",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Havok",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Hawkeye",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Hawkeye (Hawkeye)",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Hellcat",
+        "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Heralds of Galactus",
+        "setName": "Annihilation",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Hercules",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Hightech Spider-Man",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Hiroim",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "Warbound"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Howard the Duck",
+        "setName": "Dimensions",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Hulk",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Hulk (Hulk)",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Hulkbuster Iron Man",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Hulkling",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Human Torch",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "teams": [
+          "Fantastic Four"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Iceman",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Invisible Woman",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "teams": [
+          "Fantastic Four"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Iron Fist",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Iron Man",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Iron Man (Iron Man)",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Iron Man Noir",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Jean Grey",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Jessica Jones",
+        "setName": "Dimensions",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Jocasta",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Joe Fix-It, Grey Hulk",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "Crime Syndicate"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Jubilee",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Juggernaut",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Brotherhood"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Karma",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Karnak",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "teams": [
+          "Inhumans"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "King Black Panther",
+        "setName": "Black Panther",
+        "aliases": [],
+        "teams": [
+          "Heroes of Wakanda \"Wakanda Forever!\""
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Kingpin",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Crime Syndicate"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Kitty Pryde",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Korg",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "Warbound"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Kraven",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Sinister Six"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Kuurth, Breaker of Stone",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "teams": [
+          "Foes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Lady Sif",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "teams": [
+          "Heroes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Lady Thor",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Legion",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Loki",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Foes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Longshot",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Luke Cage",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers",
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Luke Cage Noir",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "M",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "teams": [
+          "X-Factor"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Magik",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Magneto",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Brotherhood"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Man-Thing",
+        "setName": "Dimensions",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Mantis",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Maximus",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "Cabal"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Medusa",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "teams": [
+          "Inhumans"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Miek the Unhived",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "Warbound"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Mirage",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Mockingbird",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Moon Knight",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Moondragon",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Mr Fantastic",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "teams": [
+          "Fantastic Four"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ms. America",
+        "setName": "Dimensions",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ms. Marvel",
+        "setName": "Champions",
+        "aliases": [],
+        "teams": [
+          "Champions"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Multiple Man",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "teams": [
+          "X-Factor"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Mysterio",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Sinister Six"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Mystique",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Brotherhood"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Namor",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "Cabal"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Namora",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "Champions"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Nebula",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Nerkkod, Breaker of Oceans",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "teams": [
+          "Foes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Nick Fury",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Nick Fury (Nick Fury)",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Nightcrawler",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "No-Name, Brood Queen",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "Warbound"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Nova",
+        "setName": "Champions",
+        "aliases": [],
+        "teams": [
+          "Champions"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Nova",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Nul, Breaker of Worlds",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "teams": [
+          "Foes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Old Man Logan",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Patriot",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Peter Parker",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers",
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Peter Parker, Homecoming",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Peter's Allies",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Phoenix",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Phoenix Force Cyclops",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Photon",
+        "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Phyla-Vell",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Polaris",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Princess Shuri",
+        "setName": "Black Panther",
+        "aliases": [],
+        "teams": [
+          "Heroes of Wakanda \"Wakanda Forever!\""
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Professor X",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Proxima Midnight",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "Cabal"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Psi-Lord",
+        "setName": "Annihilation",
+        "aliases": [],
+        "teams": [
+          "Microbadge: Legendary: Fantastic Four"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Psylocke",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Punisher",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Quake",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Quasar",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Queen Storm of Wakanda",
+        "setName": "Black Panther",
+        "aliases": [],
+        "teams": [
+          "Heroes of Wakanda \"Wakanda Forever!\""
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Quicksilver",
+        "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Red Guardian",
+        "setName": "Black Widow",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Rick Jones",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D.",
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Rictor",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "teams": [
+          "X-Factor"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Rocket and Groot",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Rocket Raccoon",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Rogue",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ronan the Accuser",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Ronin",
+        "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ruby Summers",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Sabretooth",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Brotherhood"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Scarlet Spider",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Scarlet Witch",
+        "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Sentry",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Shang-Chi",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Shatterstar",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "teams": [
+          "X-Force"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "She-Hulk",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Silk",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Silver Surfer",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Siryn",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "teams": [
+          "X-Factor"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Skaar, Son of Hulk",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Skadi",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "teams": [
+          "HYDRA"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Skirn, Breaker of Men",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "teams": [
+          "Foes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Slapstick",
+        "setName": "Deadpool",
+        "aliases": [],
+        "teams": [
+          "Mercs for Money"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Solo",
+        "setName": "Deadpool",
+        "aliases": [],
+        "teams": [
+          "Mercs for Money"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Soulsword Colossus",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Speed",
+        "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Speedball",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "New Warriors"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Spider-Gwen",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Spider-Man",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Spider-Man Noir",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Spider-Woman",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Squirrel Girl",
+        "setName": "Dimensions",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Star-Lord",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Star-Lord",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Stature",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Stepford Cuckoos",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Steve Rogers, Director of S.H.I.E.L.D.",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Stingray",
+        "setName": "Deadpool",
+        "aliases": [],
+        "teams": [
+          "Mercs for Money"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Storm",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Storm & Black Panther",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers",
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Strong Guy",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "teams": [
+          "X-Factor"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Sunspot",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Super-Skrull",
+        "setName": "Annihilation",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Superior Iron Man",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "Illuminati"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Symbiote Spider-Man",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Thanos",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "Cabal"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "The Ancient One",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "The Captain and the Devil",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "The Vishanti",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "The Warriors Three",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "teams": [
+          "Heroes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Thing",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "teams": [
+          "Fantastic Four"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Thor",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "teams": [
+          "Heroes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Thor",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Thor (Thor)",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Tigra",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Time-Traveling Jean Grey",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Tony Stark",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Totally Awesome Hulk",
+        "setName": "Champions",
+        "aliases": [],
+        "teams": [
+          "Champions"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ultimate Spider-Man",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "teams": [
+          "Spider Friends"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ultron",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Valkyrie",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "teams": [
+          "Heroes of Asgard"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Venom",
+        "setName": "Villains",
+        "aliases": [],
+        "teams": [
+          "Sinister Six"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Venom",
+        "setName": "Venom",
+        "aliases": [],
+        "teams": [
+          "Venomverse"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Venom Rocket",
+        "setName": "Venom",
+        "aliases": [],
+        "teams": [
+          "Venomverse"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Venomized Dr. Strange",
+        "setName": "Venom",
+        "aliases": [],
+        "teams": [
+          "Venomverse"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Venompool",
+        "setName": "Venom",
+        "aliases": [],
+        "teams": [
+          "Venomverse"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Vision",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Viv Vision",
+        "setName": "Champions",
+        "aliases": [],
+        "teams": [
+          "Champions"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "War Machine",
+        "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Warlock",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Warpath",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "teams": [
+          "X-Force"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Wasp",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "White Tiger",
+        "setName": "Black Widow",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "White Wolf",
+        "setName": "Black Panther",
+        "aliases": [],
+        "teams": [
+          "Heroes of Wakanda \"Wakanda Forever!\""
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Wiccan",
+        "setName": "Civil War",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Winter Soldier",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "teams": [],
+        "cardCount": 14
+      },
+      {
+        "name": "Wolfsbane",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Wolverine",
+        "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "X-Force"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Wolverine",
+        "setName": "Core Set",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Wonder Man",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "X-23",
+        "setName": "X-Men",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Yelena Belova",
+        "setName": "Black Widow",
+        "aliases": [],
+        "teams": [
+          "S.H.I.E.L.D."
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Yondu",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      }
+    ],
+    "masterminds": [
+      {
+        "name": "Adrian Toomes",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "leadName": "Salvagers",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Annihilus",
+        "setName": "Annihilation",
+        "aliases": [],
+        "leadName": "Annihilation Wave",
+        "leadCategory": "villains",
+        "notes": [
+          "In solo games, use 6 Henchmen cards."
+        ]
+      },
+      {
+        "name": "Apocalypse",
+        "setName": "Dark City",
+        "aliases": [],
+        "leadName": "Four Horsemen",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Arcade",
+        "setName": "X-Men",
+        "aliases": [],
+        "leadName": "Murderworld",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Arnim Zola",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "leadName": "Zola's Creations",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Authoritarian Iron Man",
+        "setName": "Civil War",
+        "aliases": [],
+        "leadName": "Superhuman Registration Act",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Baron Heinrich Zemo",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "leadName": "Masters of Evil (WWII)",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Baron Helmut Zemo",
+        "setName": "Civil War",
+        "aliases": [],
+        "leadName": "Thunderbolts",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Bastion",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "leadName": "Purifiers",
+        "leadCategory": "villains",
+        "notes": [
+          "Special lead hint: Sentinel.",
+          "Special lead hint: Sentinel."
+        ]
+      },
+      {
+        "name": "Belasco, Demon Lord of Limbo",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "leadName": "Demons of Limbo",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Carnage",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "leadName": "Maximum Carnage",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Charles Xavier, Professor of Crime",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "leadName": "X-Men Noir",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Dark Phoenix",
+        "setName": "X-Men",
+        "aliases": [],
+        "leadName": "Hellfire Club",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Deathbird",
+        "setName": "X-Men",
+        "aliases": [],
+        "leadName": "Shi'ar Imperial Guard",
+        "leadCategory": "villains",
+        "notes": [
+          "Special lead hint: Shi'Ar.",
+          "Special lead hint: Shi'ar."
+        ]
+      },
+      {
+        "name": "Dormammu",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "leadName": "Lords of the Netherworld",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Dr. Doom",
+        "setName": "Core Set",
+        "aliases": [],
+        "leadName": "Doombot Legion",
+        "leadCategory": "henchmen",
+        "notes": []
+      },
+      {
+        "name": "Dr. Strange",
+        "setName": "Villains",
+        "aliases": [],
+        "leadName": "Defenders",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Ego, The Living Planet",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "leadName": null,
+        "leadCategory": null,
+        "notes": [
+          "Add 1 extra Villain Group."
+        ]
+      },
+      {
+        "name": "Emma Frost, The White Queen",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "leadName": "Hellions",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Emperor Vulcan of the Shi'Ar",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "leadName": null,
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Evil Deadpool",
+        "setName": "Deadpool",
+        "aliases": [],
+        "leadName": "Evil Deadpool Corpse",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Exodus",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "leadName": "Acolytes",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Fin Fang Foom",
+        "setName": "Champions",
+        "aliases": [],
+        "leadName": "Monsters Unleashed",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Galactus",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "leadName": "Heralds of Galactus",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "General \"Thunderbolt\" Ross / Red Hulk",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "leadName": "Code Red",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Grandmaster",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "leadName": "Elders of the Universe",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Grim Reaper",
+        "setName": "Revelations",
+        "aliases": [],
+        "leadName": "Lethal Legion",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Hela, Goddess of Death",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "leadName": "Omens of Ragnarok",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Hybrid",
+        "setName": "Venom",
+        "aliases": [],
+        "leadName": "Life Foundation",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "HYDRA High Council",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "leadName": "HYDRA Elite",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "HYDRA Super Adaptoid",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "leadName": "A.I.M., HYDRA Offshoot",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Illuminati, Secret Society",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "leadName": "Illuminati",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Immortal Emperor Zheng-Zhu",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "leadName": "K'un Lun",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Indestructible Man",
+        "setName": "Black Widow",
+        "aliases": [],
+        "leadName": "Elite Assassins",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Iron Monger",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "leadName": "Iron Foes",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "J. Jonah Jameson",
+        "setName": "Dimensions",
+        "aliases": [],
+        "leadName": "Spider-Slayer",
+        "leadCategory": "henchmen",
+        "notes": []
+      },
+      {
+        "name": "Kang the Conqueror",
+        "setName": "Annihilation",
+        "aliases": [],
+        "leadName": "Timelines of Kang",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Killmonger",
+        "setName": "Black Panther",
+        "aliases": [],
+        "leadName": "Killmonger's League",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "King Hulk, Sakaarson",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "leadName": "Warbound",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "King Hyperion",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "leadName": "Utopolis",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Kingpin",
+        "setName": "Dark City",
+        "aliases": [],
+        "leadName": "Streets of New York",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Klaw",
+        "setName": "Black Panther",
+        "aliases": [],
+        "leadName": "Enemies of Wakanda",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Lady Deathstrike",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "leadName": "Reavers",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Loki",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "leadName": "Enemies of Asgard",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Loki",
+        "setName": "Core Set",
+        "aliases": [],
+        "leadName": "Enemies of Asgard",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "M.O.D.O.K.",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "leadName": "Intelligencia",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Macho Gomez",
+        "setName": "Deadpool",
+        "aliases": [],
+        "leadName": "Deadpool's \"Friends\"",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Madelyne Pryor, Goblin Queen",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "leadName": "Limbo",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Magneto",
+        "setName": "Core Set",
+        "aliases": [],
+        "leadName": "Brotherhood",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Magus",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "leadName": "Universal Church of Truth",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Malekith the Accursed",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "leadName": "Dark Council",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Mandarin",
+        "setName": "Revelations",
+        "aliases": [],
+        "leadName": "Mandarin's Rings",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Maria Hill, Director of S.H.I.E.L.D.",
+        "setName": "Civil War",
+        "aliases": [],
+        "leadName": "S.H.I.E.L.D. Elite",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Maximus the Mad",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "leadName": "Inhuman Rebellion",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Mephisto",
+        "setName": "Dark City",
+        "aliases": [],
+        "leadName": "Underworld",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Misty Knight",
+        "setName": "Civil War",
+        "aliases": [],
+        "leadName": "Heroes for Hire",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Mojo",
+        "setName": "X-Men",
+        "aliases": [],
+        "leadName": "Mojoverse",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Mole Man",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "leadName": "Subterranea",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Morgan Le Fay",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "leadName": "Queen's Vengeance",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Mr. Sinister",
+        "setName": "Dark City",
+        "aliases": [],
+        "leadName": "Marauders",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Mysterio",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "leadName": "Sinister Six",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Nick Fury",
+        "setName": "Villains",
+        "aliases": [],
+        "leadName": "Avengers",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Nightmare",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "leadName": "Fear Lords",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Nimrod, Super Sentinel",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "leadName": "Sentinel Territories",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Odin",
+        "setName": "Villains",
+        "aliases": [],
+        "leadName": "Asgardian Warriors",
+        "leadCategory": "henchmen",
+        "notes": []
+      },
+      {
+        "name": "Onslaught",
+        "setName": "X-Men",
+        "aliases": [],
+        "leadName": "Dark Descendants",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Pagliacci",
+        "setName": "Champions",
+        "aliases": [],
+        "leadName": "Wrecking Crew",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Poison Thanos",
+        "setName": "Venom",
+        "aliases": [],
+        "leadName": "Poisons",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Professor X",
+        "setName": "Villains",
+        "aliases": [],
+        "leadName": "X-Men First Class",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Ragnarok",
+        "setName": "Civil War",
+        "aliases": [],
+        "leadName": "Registration Enforcers",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Red Skull",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "leadName": "HYDRA",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Red Skull",
+        "setName": "Core Set",
+        "aliases": [],
+        "leadName": "HYDRA",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Ronan the Accuser",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "leadName": "Followers of Ronan",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Shadow King",
+        "setName": "X-Men",
+        "aliases": [],
+        "leadName": "Shadow-X",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Shiklah, the Demon Bride",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "leadName": "Monster Metropolis",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Spider Queen",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "leadName": "Spider-Infected",
+        "leadCategory": "henchmen",
+        "notes": []
+      },
+      {
+        "name": "Stryfe",
+        "setName": "Dark City",
+        "aliases": [],
+        "leadName": "MLF",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Supreme Intelligence of the Kree",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "leadName": "Kree Starforce",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Taskmaster",
+        "setName": "Black Widow",
+        "aliases": [],
+        "leadName": "Taskmaster's Thunderbolts",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Thanos",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "leadName": "Infinity Gems",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "The Beyonder",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "leadName": "From Beyond",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "The Goblin, Underworld Boss",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "leadName": "Goblin's Freak Show",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "The Hood",
+        "setName": "Revelations",
+        "aliases": [],
+        "leadName": "Hood's Gang",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "The Red King",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "leadName": "Sakaar Imperial Guard",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "The Sentry / The Void",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "leadName": "Aspects of the Void",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Ultron",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "leadName": "Ultron's Legacy",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Uru-Enchanted Iron Man",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "leadName": "The Mighty",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Vulture",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "leadName": "Vulture Tech",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Wasteland Hulk",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "leadName": "Wasteland",
+        "leadCategory": "villains",
+        "notes": []
+      },
+      {
+        "name": "Zombie Green Goblin",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "leadName": "The Deadlands",
+        "leadCategory": "villains",
+        "notes": []
+      }
+    ],
+    "villainGroups": [
+      {
+        "name": "A.I.M., HYDRA Offshoot",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Acolytes",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Annihilation Wave",
+        "setName": "Annihilation",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Army of Evil",
+        "setName": "Revelations",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Aspects of the Void",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Avengers",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Black Order of Thanos",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Brotherhood",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Celestials",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Chitauri",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Clan Yashida",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Code Red",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "CSA Special Marshals",
+        "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Dark Avengers",
+        "setName": "Revelations",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Dark Council",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Dark Descendants",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Deadpool's \"Friends\"",
+        "setName": "Deadpool",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Deadpool's Secret Secret Wars",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Defenders",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Demons of Limbo",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Domain of Apocalypse",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Elders of the Universe",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Elite Assassins",
+        "setName": "Black Widow",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Emissaries of Evil",
+        "setName": "Dark City",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Enemies of Asgard",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Enemies of Asgard",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Enemies of Wakanda",
+        "setName": "Black Panther",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Evil Deadpool Corpse",
+        "setName": "Deadpool",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Fear Lords",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Followers of Ronan",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Four Horsemen",
+        "setName": "Dark City",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "From Beyond",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Gamma Hunters",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Goblin's Freak Show",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Great Lake Avengers",
+        "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Guardians of Knowhere",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Hellfire Club",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Hellions",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Heralds of Galactus",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Heroes for Hire",
+        "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Hood's Gang",
+        "setName": "Revelations",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "HYDRA",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "HYDRA",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "HYDRA Elite",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Illuminati",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Infinity Gems",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Inhuman Rebellion",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Intelligencia",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Iron Foes",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "K'un Lun",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Killmonger's League",
+        "setName": "Black Panther",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Kree Starforce",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Lethal Legion",
+        "setName": "Revelations",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Life Foundation",
+        "setName": "Venom",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Limbo",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Lords of the Netherworld",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Manhattan (Earth-1610)",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Marauders",
+        "setName": "Dark City",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Marvel Knights",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Masters of Evil",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Masters of Evil (WWII)",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Maximum Carnage",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "MLF",
+        "setName": "Dark City",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Mojoverse",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Monster Metropolis",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Monsters Unleashed",
+        "setName": "Champions",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Murderworld",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Omens of Ragnarok",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Poisons",
+        "setName": "Venom",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Purifiers",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Queen's Vengeance",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Radiation",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Ravagers",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Reavers",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Registration Enforcers",
+        "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "S.H.I.E.L.D. Elite",
+        "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Sakaar Imperial Guard",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Salvagers",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Sentinel Territories",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Shadow-X",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Shi'Ar Imperial Elite",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Shi'ar Imperial Guard",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Sinister Six",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Sisterhood of Mutants",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Skrulls",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Spider Foes",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Spider Friends",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Streets of New York",
+        "setName": "Dark City",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Subterranea",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Superhuman Registration Act",
+        "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Taskmaster's Thunderbolts",
+        "setName": "Black Widow",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "The Deadlands",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "The Mighty",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Thunderbolts",
+        "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Timelines of Kang",
+        "setName": "Annihilation",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "U-Foes",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Ultron’s Legacy",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Uncanny Avengers",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Uncanny X-Men",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Underworld",
+        "setName": "Dark City",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Utopolis",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Vulture Tech",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Warbound",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Wasteland",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Wrecking Crew",
+        "setName": "Champions",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "X-Men 92 (Recruitable)",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "X-Men First Class",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "X-Men Noir",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Zola's Creations",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "cardCount": 8
+      }
+    ],
+    "henchmanGroups": [
+      {
+        "name": "Asgardian Warriors",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Cape-killers",
+        "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Circus of Crime",
+        "setName": "Dimensions",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Cops",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Cytoplasmic Spikes",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Death's Heads",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Doombot Legion",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Ghost Racers",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Hammer Drone Army",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Hand Ninjas",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Hellfire Cult",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Hydra Base",
+        "setName": "Revelations",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "HYDRA Pilots",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "HYDRA Spies",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Khonshu Guardians",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "M.O.D.O.K.s",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Maggia Goons",
+        "setName": "Dark City",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Magma Men",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Mandarin's Rings",
+        "setName": "Revelations",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Mandroids",
+        "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Mr. Sinister Clones",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Multiple Man",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Phalanx",
+        "setName": "Dark City",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "S.H.I.E.L.D. Assault Squad",
+        "setName": "Villains",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Sakaaran Hivelings",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Sapien League",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Savage Land Mutates",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Sentinel Squad O*N*E*",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Sentinels",
+        "setName": "Core Set",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Shi'ar Death Commandos",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Shi'ar Patrol Craft",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Sidera Maris, Bridge Builders",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Spider-Infected",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Spider-Slayer",
+        "setName": "Dimensions",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Ten Rings Fanatics",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "The Brood",
+        "setName": "X-Men",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Thor Corps",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Universal Church of Truth",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "cardCount": 10
+      }
+    ],
+    "schemes": [
+      {
+        "name": "Age of Ultron",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "conditional-add-villain-group",
+            "amount": 1,
+            "playerCounts": [
+              4,
+              5
+            ]
+          }
+        ],
+        "notes": [
+          "For 4 or 5 players, add 1 extra Villain Group."
+        ]
+      },
+      {
+        "name": "Alien Brood Encounters",
+        "setName": "X-Men",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Annihilation:Conquest",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Anti-Mutant Hatred",
+        "setName": "X-Men",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Asgard Under Siege",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Asgardian Test of Worth",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Avengers vs. X-Men",
+        "setName": "Civil War",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Bathe Earth in Cosmic Rays",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Brainwash the Military",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Breach Parallel Dimensions",
+        "setName": "Annihilation",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Break the Planet Asunder",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "set-min-heroes",
+            "value": 7
+          }
+        ],
+        "notes": [
+          "Use at least 7 Heroes in the setup."
+        ]
+      },
+      {
+        "name": "Build An Army of Annihilation",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Build an Underground Mega-Vault Prison",
+        "setName": "Villains",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Cage Villains in Power-Suppressing Cells",
+        "setName": "Villains",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Capture Baby Hope",
+        "setName": "Dark City",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Change the Outcome of WWII",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Claim Souls for Demons",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Clash of the Monsters Unleashed",
+        "setName": "Champions",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Corrupt the Next Generation of Heroes",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Corrupt the Spy Agencies",
+        "setName": "Black Widow",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Crash the Moon into the Sun",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Crown Thor King of Asgard",
+        "setName": "Villains",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Crush Hydra",
+        "setName": "Villains",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Crush Them with My Bare hands",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Cursed Pages of the Darkhold Tome",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add 1 extra Villain Group."
+        ]
+      },
+      {
+        "name": "Cytoplasm Spike Invasion",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Dark Alliance",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Dark Reign of H.A.M.M.E.R. Officers",
+        "setName": "Civil War",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Deadlands Hordes Charge the Wall",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add 1 extra Villain Group."
+        ]
+      },
+      {
+        "name": "Deadpool Kills the Marvel Universe",
+        "setName": "Deadpool",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Deadpool Wants a Chimichanga",
+        "setName": "Deadpool",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Deadpool Writes a Scheme",
+        "setName": "Deadpool",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Destroy the Cities of Earth!",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Destroy the Nova Corps",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Detonate the Helicarrier",
+        "setName": "Dark City",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "set-min-heroes",
+            "value": 6
+          }
+        ],
+        "notes": [
+          "Use at least 6 Heroes in the setup."
+        ]
+      },
+      {
+        "name": "Devolve with Xerogen Crystals",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Distract the Hero",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Divide and Conquer",
+        "setName": "Champions",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "set-min-heroes",
+            "value": 7
+          }
+        ],
+        "notes": [
+          "Use at least 7 Heroes in the setup."
+        ]
+      },
+      {
+        "name": "Drain Mutants' Powers to / Open Rifts to Future Timelines",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Duels of Science and Magic",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Earthquake Drains the Ocean / Tsunami Crushes the Coast",
+        "setName": "Revelations",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Enslave Minds with the Chitauri Scepter",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Enthrone the Barons of Battleworld",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Epic Super Hero Civil War",
+        "setName": "Civil War",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "conditional-set-min-heroes",
+            "value": 4,
+            "playerCounts": [
+              1
+            ]
+          }
+        ],
+        "notes": [
+          "For 1 player, use at least 4 Heroes in the setup."
+        ]
+      },
+      {
+        "name": "Everybody Hates Deadpool",
+        "setName": "Deadpool",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Explosion at the Washington Monument",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Fall of the Hulks",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "require-hero-name-match-count",
+            "pattern": "Hulk",
+            "value": 2
+          }
+        ],
+        "notes": [
+          "Adjust the selected Heroes so exactly 2 have \"Hulk\" in their names."
+        ]
+      },
+      {
+        "name": "Fear Itself",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Ferry Disaster",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Find the Split Personality Killer",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Five Families of Crime",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Flood the Planet with Melted Glaciers",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Forge the Infinity Gauntlet",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [
+          {
+            "category": "villains",
+            "name": "Infinity Gems"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "replace-villain-group-with-specific-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Force Infinity Gems and replace one random Villain Group with it."
+        ]
+      },
+      {
+        "name": "Fragmented Realities",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Frame Heroes for Murder",
+        "setName": "Black Widow",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Gladiator Pits of Sakaar",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Go Back in Time to Slay Heroes' Ancestors",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Graduation at Xavier's X-Academy",
+        "setName": "Villains",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Hack Cerebro to / Manipulate the Mutant Messiah",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Hail Hydra",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Hidden Heart of Darkness",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Hire Singularity Investigations to / Reveal Heroes' Evil Clones",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Horror of Horrors",
+        "setName": "X-Men",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "House of M / No More Mutants",
+        "setName": "Revelations",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "HYDRA Helicarriers Hunt Heroes",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add 1 extra Hero to the setup."
+        ]
+      },
+      {
+        "name": "Hypnotize Every Human",
+        "setName": "Champions",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "set-bystanders",
+            "value": 0
+          },
+          {
+            "type": "add-henchman-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Set Bystanders to 0 and add 1 extra Henchman Group."
+        ]
+      },
+      {
+        "name": "Imprison Unregistered Superhumans",
+        "setName": "Civil War",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Inescapable \"Kyln\" Space Prison",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Infiltrate the Lair with Spies",
+        "setName": "Villains",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Intergalactic Kree Nega-Bomb",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Invade Asgard",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Invade the Daily Bugle News HQ",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Invasion of the Venom Symbiotes",
+        "setName": "Venom",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Invincible Force Field",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Last Stand at Avengers Tower",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Mass Produce War Machine Armor",
+        "setName": "Villains",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Massive Earthquake Generator",
+        "setName": "Dark City",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Master of Tyrants",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Master the Mysteries of Kung-Fu",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Maximum Carnage",
+        "setName": "Venom",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Midtown Bank Robbery",
+        "setName": "Core Set",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "set-bystanders",
+            "value": 12
+          }
+        ],
+        "notes": [
+          "Set Bystanders to 12."
+        ]
+      },
+      {
+        "name": "Mutant-Hunting Super Sentinels",
+        "setName": "X-Men",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Mutating Gamma Rays",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Negative Zone Prison Breakout",
+        "setName": "Core Set",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "add-henchman-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add 1 extra Henchman Group."
+        ]
+      },
+      {
+        "name": "Nitro the Supervillain Threatens Crowds",
+        "setName": "Civil War",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Nuclear Armageddon",
+        "setName": "X-Men",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Organized Crime Wave",
+        "setName": "Dark City",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Pan-Dimensional Plague",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Paralyzing Venom",
+        "setName": "Venom",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Plunder Wakanda's Vibranium",
+        "setName": "Black Panther",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Poison Lakes with Nanite Microbots",
+        "setName": "Black Panther",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Portals to the Dark Dimension",
+        "setName": "Core Set",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Predict Future Crime",
+        "setName": "Civil War",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Provoke a Clash of Nations",
+        "setName": "Black Panther",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Provoke the Sovereign War Fleet",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Pull Earth Into Medieval Times",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Pull Reality into the Negative Zone",
+        "setName": "Fantastic Four",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Pulse Waves from the Negative Zone",
+        "setName": "Annihilation",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Put Humanity on Trial",
+        "setName": "Annihilation",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Radioactive Palladium Poisoning",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Ragnarok, Twilight of the Gods",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Raid Gene Bank to / Unleash an Anti-Mutant Bioweapon",
+        "setName": "Messiah Complex",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Replace Earth's Leaders with Killbots",
+        "setName": "Core Set",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Replace Earth's Leaders with HYDRA",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Resurrect Heroes with the Norn Stones",
+        "setName": "Villains",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Reveal Heroes' Secret Identities",
+        "setName": "Civil War",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Ruin the Perfect Wedding",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "S.H.I.E.L.D. Vs. HYDRA War",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Save Humanity",
+        "setName": "Dark City",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Scavenge Alien Weaponry",
+        "setName": "Spider-Man Homecoming",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Secret Empire of Betrayal",
+        "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Secret HYDRA Corruption / Open HYDRA Revolution",
+        "setName": "Revelations",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Secret Invasion of the Skrull Shapeshifters",
+        "setName": "Core Set",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [
+          {
+            "category": "villains",
+            "name": "Skrulls"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "set-min-heroes",
+            "value": 6
+          }
+        ],
+        "notes": [
+          "Force the Skrulls Villain Group and use at least 6 Heroes in the setup."
+        ]
+      },
+      {
+        "name": "Secret Wars",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Seize The Wakandan Throne",
+        "setName": "Black Panther",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Shoot Hulk into Space",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Silence the Witnesses",
+        "setName": "Marvel Noir",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Sinister Ambitions",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Smash Two Dimensions Together",
+        "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Sneak Attack the Heroes' Homes",
+        "setName": "Annihilation",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Sniper Rifle Assassins",
+        "setName": "Black Widow",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Splice Humans with Spider DNA",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Star-Lord's Awesome Mix Tape",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Steal All Oxygen on Earth",
+        "setName": "Champions",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Steal the Weaponized Plutonium",
+        "setName": "Dark City",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add 1 extra Villain Group."
+        ]
+      },
+      {
+        "name": "Subjugate With Obedience Disks",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Super Hero Civil War",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": 2
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": [
+          "Requires at least 2 players."
+        ]
+      },
+      {
+        "name": "Super Hero Civil War",
+        "setName": "Core Set",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": 2
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": [
+          "Requires at least 2 players."
+        ]
+      },
+      {
+        "name": "Superhuman Baseball Game",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Symbiotic Absorption",
+        "setName": "Venom",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Televised Deathtraps of Mojoworld",
+        "setName": "X-Men",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Clone Saga",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Contest of Champions",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Dark Phoenix Saga",
+        "setName": "X-Men",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Dark World of Svartalfheim",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Demon Bear Saga",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Fountain of Eternal Life",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The God-Emperor of Battleworld",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Korvac Saga / Korvac Revealed",
+        "setName": "Revelations",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Kree-Skrull War",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Legacy Virus",
+        "setName": "Core Set",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Mark of Khonshu",
+        "setName": "Secret Wars, Volume 2",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Traitor",
+        "setName": "Fear Itself",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "The Unbreakable Enigma Code",
+        "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Tornado of Terrigen Mists",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Train Black Widows in the Red Room",
+        "setName": "Black Widow",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Transform Citizens into Demons",
+        "setName": "Dark City",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Transform Commuters Into Giant Ants",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Trap Heroes In The Microverse",
+        "setName": "Ant-Man",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Trapped in the Insane Asylum",
+        "setName": "The New Mutants",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Turn the Soul of Adam Warlock",
+        "setName": "Into the Cosmos",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Unite the Shards",
+        "setName": "Guardians of the Galaxy",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "United States Split by Civil War",
+        "setName": "Civil War",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Unleash the Abilisk Space Monster",
+        "setName": "Marvel Studios' Guardians of the Galaxy",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Unleash the Power of the Cosmic Cube",
+        "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Unleash the Power of the Cosmic Cube",
+        "setName": "Core Set",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "War for the Dream Dimension",
+        "setName": "Doctor Strange and the Shadows of Nightmare",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "War of Kings",
+        "setName": "Realm of Kings",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "War of the Frost Giants",
+        "setName": "Heroes of Asgard",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Weave a Web of Lies",
+        "setName": "Paint the Town Red",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "World War Hulk",
+        "setName": "World War Hulk",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "X-Cutioner's Song",
+        "setName": "Dark City",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "X-Men Danger Room Goes Berserk",
+        "setName": "X-Men",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      }
+    ]
+  }
+}

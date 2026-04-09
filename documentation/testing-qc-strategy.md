@@ -37,7 +37,7 @@ A story can move to **Done** only when all of the following are true:
 
 ## Test pyramid for this project
 
-Because the project is a single HTML file with embedded JavaScript, testing will rely on a practical mix of:
+Because the project is a static-hosted client app with shared JavaScript modules, testing will rely on a practical mix of:
 
 ### 1. Data and logic verification
 Used for:
@@ -49,7 +49,7 @@ Used for:
 - persistence helpers
 
 Preferred form:
-- pure-function test harness embedded or run locally
+- `node:test`-based module tests run locally through npm
 - deterministic sample inputs / expected outputs
 
 ### 2. UI behavior verification
@@ -268,7 +268,7 @@ Before implementation is considered complete:
 - all stories in `documentation/task-list.md` have checked implementation, test, and QC items
 - no approved-scope story is left partially verified
 - root `README.md` matches the shipped behavior
-- the app runs as a single page without external dependencies
+- the app runs as a static-served single page without server-side dependencies
 - local persistence works across reloads
 - reset flows and least-played fallback are verified manually and logically
 - representative inventory and rule behaviors have been cross-checked against `documentation/sources.md`

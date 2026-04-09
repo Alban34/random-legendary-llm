@@ -7,7 +7,7 @@ STATUS: Approved
 This document defines the **data structures** used by the project.
 
 It distinguishes between:
-- **canonical embedded game data** owned by the project,
+- **canonical client-shipped game data** owned by the project,
 - **normalized runtime data** used by the app,
 - and **persisted application state** stored in the browser.
 
@@ -15,17 +15,21 @@ The BoardGameGeek pages remain the verification source during documentation and 
 
 ---
 
-## 1. Canonical embedded game data
+## 1. Canonical client-shipped seed data
 
-The app should embed one canonical project-owned constant, verified from the authoritative references listed in `documentation/sources.md`:
+The app should ship one canonical project-owned data asset, verified from the authoritative references listed in `documentation/sources.md`:
 
 ```text
-const SOURCE_GAME_DATA = {
-  sets: Set[]
-};
+src/data/canonical-game-data.json
 ```
 
-This canonical data remains nested by set.
+At startup, the app builds the nested canonical source object used by the runtime:
+
+```text
+const SOURCE_GAME_DATA = buildCanonicalSourceData(SEED_GAME_DATA);
+```
+
+That canonical source remains nested by set.
 
 ### `Set`
 
@@ -119,7 +123,7 @@ This canonical data remains nested by set.
 
 ## 2. Normalized runtime data
 
-At startup, the app should derive a normalized runtime model:
+At startup, the app should derive a normalized runtime model from the canonical source object:
 
 ```text
 const RUNTIME_DATA = normalizeGameData(SOURCE_GAME_DATA);

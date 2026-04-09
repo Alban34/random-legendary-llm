@@ -17,17 +17,25 @@ It explains how the application should use a project-owned canonical data format
 
 ## Architectural principles
 
-### 1. Single-file implementation, multi-layer design
-The final app will be implemented in a single `index.html`, but the internal design must still be layered.
+### 1. Static-served single-page implementation, multi-file design
+The final app should remain a **single-page application**, but it no longer needs to be a single physical file.
+
+It should be served by a **static HTTP server** using project-owned HTML, CSS, JavaScript modules, and data assets.
 
 Recommended conceptual layers:
-1. **Canonical Embedded Data Layer** — project-owned embedded game data
+1. **Canonical Client Data Layer** — project-owned static game data asset
 2. **Normalization Layer** — resolves canonical data into runtime-safe IDs and indexes
 3. **Runtime Index Layer** — flattened lookup maps for fast access
 4. **Application State Layer** — persisted user collection, usage stats, history, preferences
 5. **UI Layer** — renders tabs, forms, setup results, and history
 
-Even though all of these live in one file, they should remain logically separate.
+Recommended physical split:
+- `index.html` — shell and mounting points
+- `src/app/*.mjs` — runtime modules
+- `src/app/*.css` — styles
+- `src/data/*` — project-owned static data assets
+
+Even though these now live in separate files, they should remain logically separate as layers.
 
 ---
 
@@ -46,16 +54,14 @@ The app should therefore:
 
 ## Canonical vs derived data
 
-### Canonical embedded data
-The app should embed one canonical project-local constant:
+### Canonical client-shipped data
+The app should ship one canonical project-local data asset that is loaded entirely on the client:
 
 ```text
-const SOURCE_GAME_DATA = {
-  sets: Set[]
-};
+src/data/canonical-game-data.json
 ```
 
-This canonical data remains nested by set because that matches:
+That asset can be transformed at startup into the canonical nested runtime source model, which remains organized by set because that matches:
 - the product-oriented structure of the game line,
 - the browsing UI,
 - and the natural collection-building flow.
@@ -71,8 +77,8 @@ This runtime layer is not persisted. It is rebuilt whenever the page loads.
 
 ## Data flow
 
-### Level 1 — Canonical embedded data
-This is the application's own maintained data format.
+### Level 1 — Canonical client data asset
+This is the application's own maintained static data asset.
 
 Examples of fields that belong here:
 - display names
@@ -80,7 +86,16 @@ Examples of fields that belong here:
 - aliases if they help search or consistency
 - structured setup notes and rule fields
 
-### Level 2 — Normalized runtime layer
+### Level 2 — Canonical runtime source
+At startup the client first builds the nested canonical source model used by the rest of the app.
+
+Example:
+
+```text
+const SOURCE_GAME_DATA = buildCanonicalSourceData(SEED_GAME_DATA);
+```
+
+### Level 3 — Normalized runtime layer
 This layer converts canonical data into app-safe structures.
 
 Examples of fields that belong here:
@@ -89,7 +104,7 @@ Examples of fields that belong here:
 - resolved scheme forced-group IDs
 - runtime indexes
 
-### Level 3 — Persisted user state
+### Level 4 — Persisted user state
 This layer contains only user/application state.
 
 Examples:
@@ -321,6 +336,18 @@ The generator should validate:
 - Advanced Solo is only used with 1 player,
 - the forced Mastermind lead is counted in the correct category,
 - the least-played fallback only occurs after legality is established.
+
+---
+
+## Static hosting recommendation
+
+The app should assume it is opened through a static HTTP server rather than directly via `file://`.
+
+Why:
+- ES module loading is straightforward and standards-based
+- JSON/data asset loading stays simple
+- the app remains deployable to GitHub Pages, Netlify static hosting, S3-style hosting, or a local `python3 -m http.server`
+- Epic 2+ logic becomes much easier to test and maintain than in one monolithic HTML file
 
 ---
 

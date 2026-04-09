@@ -3,7 +3,7 @@
 STATUS: Approved
 
 ## Overview
-A single `index.html` file (embedded CSS + JS, zero external dependencies) that lets users browse all Legendary: Marvel sets, manage their personal collection, generate fully-randomized game setups, and track used cards across sessions via `localStorage`.
+A static-hosted single-page application (`index.html` + project-owned CSS, JS modules, and data assets) that lets users browse all Legendary: Marvel sets, manage their personal collection, generate fully-randomized game setups, and track used cards across sessions via `localStorage`.
 
 ---
 
@@ -13,7 +13,7 @@ A single `index.html` file (embedded CSS + JS, zero external dependencies) that 
 **Deliverables:**
 - `documentation/game-data.md` — complete expansion catalog with heroes, masterminds, villain groups, henchman groups, and schemes for each set
 - `documentation/sources.md` — authoritative reference policy for the two BoardGameGeek sources
-- `GAME_DATA` constant in `index.html` populated from that catalog
+- project-owned seed data asset under `src/data/` populated from that catalog
 
 **Acceptance Criteria:**
 - Every set listed has at minimum: `id`, `name`, `year`, `type`, and a non-empty `heroes[]` array unless the approved external references explicitly indicate otherwise
@@ -57,7 +57,7 @@ A single `index.html` file (embedded CSS + JS, zero external dependencies) that 
 **Goal:** Allow users to explore all available sets and toggle them into their collection.
 
 **Deliverables:**
-- Set card grid rendered from `GAME_DATA`
+- Set card grid rendered from normalized runtime data
 - Expandable set detail (heroes, masterminds, villain groups, schemes)
 - "Add to Collection" / "Remove from Collection" toggle per set
 

@@ -4,37 +4,120 @@ STATUS: Approved
 
 ## Project state
 
-This repository is currently in the **specification and architecture phase** for a single-page web application that will support setup generation for **Legendary: A Marvel Deck Building Game**.
+The repository now contains the **Epic 1 foundation** for the Legendary: Marvel randomizer.
 
-> Implementation has **not** started yet.
->
-> Per the project rules, coding begins only after the documentation is reviewed and approved.
+Implemented so far:
+- canonical seed data under `src/data/`
+- shared normalization and validation logic under `src/app/`
+- a thin `index.html` shell for the browser app
+- an Epic 1 terminal test harness under `tools/`
+
+The app remains **fully static**:
+- no server-side code
+- no framework build step
+- can be hosted by any static HTTP server
 
 ---
 
-## Planned application goals
+## Current architecture direction
 
-The future app will:
-- run as a single `index.html` file,
-- use embedded JavaScript and CSS only,
-- require no server-side code,
-- allow users to browse supported Legendary: Marvel sets,
-- let users select the sets they own,
-- generate randomized setups for **1 to 5 players**,
-- support **Advanced Solo** mode,
-- track heroes, masterminds, villain groups, henchman groups, and schemes across accepted games,
-- prefer **never-played** options first,
-- and reuse the **least-played** options when there are not enough fresh choices.
+The project is now a **single-page app served as static files**, rather than a single monolithic HTML file.
+
+Current entry points:
+- `index.html` — browser shell
+- `src/app/app-shell.css` — application shell styles
+- `src/app/browser-entry.mjs` — browser bootstrap entry
+- `src/app/game-data-pipeline.mjs` — canonical-data transformation, normalization, validation, and Epic 1 checks
+- `src/app/app-renderer.mjs` — browser rendering for the current foundation screen
+- `src/data/canonical-game-data.json` — project-owned canonical game data asset
+
+This keeps the app easy to host statically while making Epic 2+ work much easier to maintain and test.
+
+---
+
+## Run the app locally
+
+Because the app now loads ES modules and JSON assets, open it through a static HTTP server rather than `file://`.
+
+Preferred dev command with Node:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run dev
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8000/
+```
+
+Optional port override:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run dev -- --port 8123
+```
+
+Fallback example with Python:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+python3 -m http.server 8000
+```
+
+Then open:
+
+```text
+http://localhost:8000/
+```
+
+---
+
+## Run Epic 1 checks
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run check:epic1
+```
+
+Run the full npm test suite:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm test
+```
+
+Optional human-readable summary reporter:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run report:epic1
+```
+
+Optional shell refresh:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+python3 ./tools/build_epic1_index.py
+```
+
+Optional seed rebuild (expects the upstream source file path or `LEGENDARY_SOURCE_CARD_DB`):
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+python3 ./tools/build_epic1_seed.py
+```
 
 ---
 
 ## Documentation index
 
-The current project work lives in `documentation/`.
+Project documentation lives in `documentation/`.
 
-- `documentation/create-project.md` — original brief and constraints
+- `documentation/create-project.md` — original brief plus implementation-direction addendum
 - `documentation/sources.md` — authoritative external reference sources
-- `documentation/architecture.md` — runtime architecture and normalization model
+- `documentation/architecture.md` — runtime architecture and module boundaries
 - `documentation/roadmap.md` — implementation roadmap
 - `documentation/data-model.md` — data and local storage specification
 - `documentation/setup-rules.md` — setup rules and randomization rules
@@ -48,23 +131,6 @@ The current project work lives in `documentation/`.
 
 ---
 
-## Current documentation decisions
-
-Approved specification decisions currently reflected in the docs:
-
-- include everything found on the approved BoardGameGeek references for Legendary: Marvel,
-- treat the two BoardGameGeek reference pages as the authoritative source set,
-- normalize source data once at startup into resolved runtime entities and indexes,
-- use set-scoped internal IDs for duplicate names,
-- document scheme setup rules as both structured data and human-readable notes,
-- allow all approved sets in collection browsing,
-- persist a versioned root browser state object,
-- and fall back to the **least-played** items when there are not enough **unplayed** items in a category.
-
----
-
 ## Next step
 
-The next step is **documentation review and approval**.
-
-Once the docs are approved, the implementation phase can begin.
+With Epic 1 stabilized under the new static-hosted structure, the next major implementation target is **Epic 2 — State Management and Persistence**.
