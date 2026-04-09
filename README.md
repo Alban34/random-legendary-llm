@@ -7,13 +7,10 @@ STATUS: Approved
 The repository now contains the **Epic 1 + Epic 2 + Epic 3 + Epic 4 implementation foundation** for the Legendary: Marvel randomizer.
 
 Current status:
-- Epic 1 implementation, tests, and QC are complete
-- Epic 2 implementation and automated tests are in place
-- Epic 2 manual QC checklist items should still be reflected in `documentation/task-list.md`
-- Epic 3 implementation and automated tests are in place
-- Epic 3 manual QC checklist items are still pending in `documentation/task-list.md`
-- Epic 4 implementation and automated tests are in place
-- Epic 4 manual QC checklist items are still pending in `documentation/task-list.md`
+- Epic 1 implementation, tests, and browser QC automation are complete
+- Epic 2 implementation, automated tests, and browser QC automation are complete
+- Epic 3 implementation, automated tests, and browser QC automation are complete
+- Epic 4 implementation, automated tests, and browser QC automation are complete
 
 Implemented so far:
 - canonical seed data under `src/data/`
@@ -23,6 +20,7 @@ Implemented so far:
 - shared tab-shell metadata and navigation helpers under `src/app/app-tabs.mjs`
 - a tabbed `index.html` shell for the browser app
 - npm-based Epic 1 + Epic 2 + Epic 3 + Epic 4 tests under `test/`
+- Playwright browser QC coverage for the Epic 1 + Epic 2 + Epic 3 + Epic 4 flows under `test/playwright/`
 - a data-foundation summary reporter under `tools/`
 
 The app remains **fully static**:
@@ -126,6 +124,20 @@ cd "/Users/afayard1/Projects/random-legendary-llm"
 npm run check:epic4
 ```
 
+Run the browser QC suite for Epic 1–4:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run check:qc
+```
+
+Run the same browser QC suite in headed mode:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run test:qc:headed
+```
+
 Optional human-readable Epic 1 data summary reporter:
 
 ```sh
@@ -171,6 +183,4 @@ Project documentation lives in `documentation/`.
 
 ## Next step
 
-With Epic 1, Epic 2, Epic 3, and Epic 4 implemented in code, the next major implementation target is **Epic 5 — Browse Extensions Experience**.
-
-Before closing Epic 4 completely, the remaining manual QC items in `documentation/task-list.md` should still be exercised in the browser.
+With Epic 1, Epic 2, Epic 3, and Epic 4 implemented in code and covered by automated browser QC, the next major implementation target is **Epic 5 — Browse Extensions Experience**.

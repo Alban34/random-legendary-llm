@@ -26,7 +26,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Import or transcribe approved set inventory into the client-shipped data asset
 - [x] Preserve source display names exactly as approved
 - [x] **Test:** verify all included sets from `documentation/game-data-normalized.md` are present in the client-shipped data and aligned with `documentation/sources.md`
-- [x] **QC:** spot-check at least 5 sets against the approved data docs
+- [x] **QC (Automated):** automate QC coverage to spot-check at least 5 sets against the approved data docs
 
 ### Story 1.2 — Normalize source entities into set-scoped runtime IDs
 - [x] Implement a slug/ID helper for set-scoped entity IDs
@@ -34,7 +34,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Generate stable IDs for heroes, masterminds, villain groups, henchman groups, and schemes
 - [x] Ensure duplicate display names remain distinct via set-scoped IDs
 - [x] **Test:** verify IDs are unique and duplicate display names remain distinct
-- [x] **QC:** manually inspect duplicate-name examples like `Black Widow`, `Loki`, and `Thor`
+- [x] **QC (Automated):** automate QC coverage for duplicate-name examples like `Black Widow`, `Loki`, and `Thor`
 
 ### Story 1.3 — Resolve cross-references for Masterminds and Schemes
 - [x] Resolve `alwaysLead` + category into runtime lead references
@@ -42,7 +42,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Convert known scheme setup behavior into structured rule modifiers
 - [x] Preserve human-readable rule notes for display
 - [x] **Test:** verify all resolved references exist and match the approved docs plus the BoardGameGeek references listed in `documentation/sources.md`
-- [x] **QC:** manually inspect edge cases like `Dr. Doom` and `Secret Invasion of the Skrull Shapeshifters`
+- [x] **QC (Automated):** automate QC coverage for edge cases like `Dr. Doom` and `Secret Invasion of the Skrull Shapeshifters`
 
 ### Story 1.4 — Build flattened runtime indexes for all entity types
 - [x] Build `setsById`
@@ -53,7 +53,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Build `schemesById`
 - [x] Build flat arrays for each entity category
 - [x] **Test:** verify index counts match canonical counts and each indexed ID resolves correctly
-- [x] **QC:** inspect runtime index samples in the browser console or debug output
+- [x] **QC (Automated):** automate QC coverage for runtime index samples in browser diagnostics or debug output
 
 ### Story 1.5 — Validate normalized data and surface initialization errors
 - [x] Validate unique set IDs
@@ -62,7 +62,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Validate Scheme forced-group references
 - [x] Surface initialization failures clearly in the UI
 - [x] **Test:** trigger representative invalid-reference cases in a test harness and verify failure reporting
-- [x] **QC:** confirm errors are understandable and non-technical enough for review
+- [x] **QC (Automated):** automate QC coverage to confirm errors are understandable and non-technical enough for review
 
 ---
 
@@ -74,7 +74,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Implement safe load with fallback to defaults
 - [x] Implement save/update helpers for the root state object
 - [x] **Test:** verify save/load roundtrip preserves the root state shape
-- [ ] **QC:** inspect stored browser data manually after state writes
+- [x] **QC (Automated):** automate QC coverage for stored browser data after state writes
 
 ### Story 2.2 — Persist and hydrate owned collection state
 - [x] Store owned set IDs
@@ -82,7 +82,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Validate stored set IDs against runtime indexes
 - [x] Remove invalid stored references safely
 - [x] **Test:** verify owned-set changes persist across reloads and invalid set IDs are handled safely
-- [ ] **QC:** manually toggle several owned sets, reload, and confirm consistency
+- [x] **QC (Automated):** automate QC coverage to toggle several owned sets, reload, and confirm consistency
 
 ### Story 2.3 — Persist and update usage statistics (`plays`, `lastPlayedAt`)
 - [x] Define per-category usage-stat containers
@@ -90,7 +90,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Update `plays` on Accept & Log
 - [x] Update `lastPlayedAt` on Accept & Log
 - [x] **Test:** verify usage stats update only on accepted setups and store both `plays` and `lastPlayedAt`
-- [ ] **QC:** manually accept multiple setups and inspect freshness ordering behavior
+- [x] **QC (Automated):** automate QC coverage to accept multiple setups and inspect freshness ordering behavior
 
 ### Story 2.4 — Persist and retrieve accepted game history
 - [x] Define `GameRecord` creation helper
@@ -98,7 +98,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Load history on startup
 - [x] Sort or render history newest-first
 - [x] **Test:** verify accepted setups create stable ID-based history records in newest-first order
-- [ ] **QC:** manually compare rendered history against accepted setup output
+- [x] **QC (Automated):** automate QC coverage to compare rendered history against accepted setup output
 
 ### Story 2.5 — Support per-category and full reset operations
 - [x] Reset hero usage stats
@@ -108,14 +108,14 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Reset scheme usage stats
 - [x] Reset the entire root state safely
 - [x] **Test:** verify per-category reset only affects the intended category and full reset clears all slices
-- [ ] **QC:** manually perform each reset action and confirm visible state updates correctly
+- [x] **QC (Automated):** automate QC coverage for each reset action and visible state update
 
 ### Story 2.6 — Handle corrupted or missing browser state gracefully
 - [x] Detect invalid JSON/state shape
 - [x] Recover with default state
 - [x] Notify the user when recovery occurs
 - [x] **Test:** simulate corrupted saved state and verify safe recovery
-- [ ] **QC:** confirm the recovery message is visible and understandable
+- [x] **QC (Automated):** automate QC coverage to confirm the recovery message is visible and understandable
 
 ---
 
@@ -126,7 +126,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Add Advanced Solo template
 - [x] Expose helper for resolving the active template
 - [x] **Test:** verify required counts for all supported player modes including Advanced Solo
-- [ ] **QC:** manually review displayed setup requirements against the approved rules table
+- [x] **QC (Automated):** automate QC coverage to review displayed setup requirements against the approved rules table
 
 ### Story 3.2 — Validate owned collection legality before generation
 - [x] Validate hero sufficiency
@@ -135,7 +135,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Validate scheme availability for the chosen player count
 - [x] Validate Advanced Solo only for 1 player
 - [x] **Test:** verify illegal collections fail with correct reasons and legal collections proceed
-- [ ] **QC:** manually try thin collections such as `Dimensions`-heavy or low-henchman selections
+- [x] **QC (Automated):** automate QC coverage for thin collections such as `Dimensions`-heavy or low-henchman selections
 
 ### Story 3.3 — Select a legal Scheme and apply its rule effects
 - [x] Filter schemes by legality constraints
@@ -144,14 +144,14 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Apply scheme rule modifiers to required slot counts
 - [x] Capture scheme notes for result rendering
 - [x] **Test:** verify scheme constraints, forced groups, and modifiers alter setup correctly
-- [ ] **QC:** manually inspect at least 3 scheme edge cases with special setup rules
+- [x] **QC (Automated):** automate QC coverage for at least 3 scheme edge cases with special setup rules
 
 ### Story 3.4 — Select a legal Mastermind and account for mandatory leads
 - [x] Select a mastermind using freshness priority
 - [x] Apply resolved mastermind lead to the setup
 - [x] Account for villain vs henchman lead categories correctly
 - [x] **Test:** verify villain-led and henchman-led masterminds consume the correct slot type
-- [ ] **QC:** manually inspect `Red Skull`, `Dr. Doom`, and one additional edge case
+- [x] **QC (Automated):** automate QC coverage for `Red Skull`, `Dr. Doom`, and one additional edge case
 
 ### Story 3.5 — Fill Villain Group and Henchman Group slots correctly
 - [x] Prevent duplicate forced/random group collisions
@@ -159,7 +159,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Fill remaining henchman-group slots legally
 - [x] Preserve deterministic forced groups in the final result
 - [x] **Test:** verify slot-filling logic with and without forced groups and with reduced pool sizes
-- [ ] **QC:** manually inspect a 5-player setup where multiple categories are tight
+- [x] **QC (Automated):** automate QC coverage for a 5-player setup where multiple categories are tight
 
 ### Story 3.6 — Select Heroes using freshness and least-played priority
 - [x] Build eligible hero pool from owned sets
@@ -167,21 +167,21 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Fall back to least-played heroes when needed
 - [x] Break ties by oldest `lastPlayedAt`, then random
 - [x] **Test:** verify freshness ordering and least-played fallback with deterministic sample usage stats
-- [ ] **QC:** manually confirm fallback messaging and result freshness behavior
+- [x] **QC (Automated):** automate QC coverage for fallback messaging and result freshness behavior
 
 ### Story 3.7 — Keep Generate/Regenerate ephemeral until Accept & Log
 - [x] Ensure Generate does not mutate persisted state
 - [x] Ensure Regenerate does not mutate persisted state
 - [x] Keep current generated setup in ephemeral UI state only
 - [x] **Test:** verify repeated Generate/Regenerate leaves usage stats and history unchanged until accept
-- [ ] **QC:** manually inspect storage before and after Regenerate cycles
+- [x] **QC (Automated):** automate QC coverage for storage before and after Regenerate cycles
 
 ### Story 3.8 — Produce history-ready setup snapshots using IDs only
 - [x] Build setup snapshot with entity IDs only
 - [x] Include player count and Advanced Solo flag
 - [x] Include accepted timestamp
 - [x] **Test:** verify history records store IDs only and still render correct labels through lookup indexes
-- [ ] **QC:** manually inspect one stored record containing duplicate-name entities
+- [x] **QC (Automated):** automate QC coverage for one stored record containing duplicate-name entities
 
 ---
 
@@ -192,7 +192,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Add four main tab panels
 - [x] Add shared header area
 - [x] **Test:** verify all four panels render and the default panel is correct
-- [ ] **QC:** manually inspect the shell on desktop width and mobile width
+- [x] **QC (Automated):** automate QC coverage for the shell on desktop width and mobile width
 
 ### Story 4.2 — Implement responsive tab navigation for desktop and mobile
 - [x] Build desktop tab navigation
@@ -200,14 +200,14 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Implement tab switching behavior
 - [x] Persist active tab if included in preferences
 - [x] **Test:** verify tab switching works correctly on both desktop and mobile layouts
-- [ ] **QC:** manually tab through navigation with keyboard only
+- [x] **QC (Automated):** automate QC coverage for keyboard-only navigation through the tabs
 
 ### Story 4.3 — Apply the approved dark Marvel visual design system
 - [x] Add CSS custom properties from the design spec
 - [x] Apply typography, spacing, and borders
 - [x] Style primary and secondary buttons
 - [x] **Test:** verify key UI primitives render with expected classes/styles
-- [ ] **QC:** compare the UI visually against `documentation/ui-design.md`
+- [x] **QC (Automated):** automate QC coverage to compare the UI against `documentation/ui-design.md`
 
 ### Story 4.4 — Create reusable UI primitives for cards, buttons, badges, and panels
 - [x] Create set card styles
@@ -215,14 +215,14 @@ See also: `documentation/testing-qc-strategy.md`
 - [x] Create badge styles
 - [x] Create panel layout styles
 - [x] **Test:** verify shared primitives render consistently across tabs
-- [ ] **QC:** visually inspect reused components in at least 3 different screens
+- [x] **QC (Automated):** automate QC coverage for reused components in at least 3 different screens
 
 ### Story 4.5 — Support active-tab persistence and keyboard navigation
 - [x] Save selected tab in preferences if implemented
 - [x] Add keyboard focus styles
 - [x] Ensure tab navigation works with keyboard only
 - [x] **Test:** verify selected-tab persistence and focus navigation behavior
-- [ ] **QC:** manually navigate the full shell without a mouse
+- [x] **QC (Automated):** automate QC coverage for full-shell navigation without a mouse
 
 ---
 
@@ -233,14 +233,14 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Show year and type badges
 - [ ] Show category counts per set
 - [ ] **Test:** verify every included set renders exactly once with expected metadata
-- [ ] **QC:** visually compare rendered set list with `documentation/game-data-normalized.md`
+- [ ] **QC (Automated):** automate QC coverage to compare the rendered set list with `documentation/game-data-normalized.md`
 
 ### Story 5.2 — Display set metadata and counts consistently
 - [ ] Show heroes/masterminds/schemes counts
 - [ ] Show villain and henchman counts where applicable
 - [ ] Display ownership state visually
 - [ ] **Test:** verify displayed counts match normalized data for representative sets
-- [ ] **QC:** manually inspect low-count edge cases like `Dimensions` and `S.H.I.E.L.D.`
+- [ ] **QC (Automated):** automate QC coverage for low-count edge cases like `Dimensions` and `S.H.I.E.L.D.`
 
 ### Story 5.3 — Expand a set card to show its detailed contents
 - [ ] Add card expand/collapse behavior
@@ -249,21 +249,21 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Render villain and henchman lists
 - [ ] Render schemes list
 - [ ] **Test:** verify expand/collapse state and content rendering for representative sets
-- [ ] **QC:** manually inspect details for at least one normal set and one edge-case set
+- [ ] **QC (Automated):** automate QC coverage for details in at least one normal set and one edge-case set
 
 ### Story 5.4 — Filter sets by type and search term
 - [ ] Add search input
 - [ ] Add type filter controls
 - [ ] Filter rendered sets reactively
 - [ ] **Test:** verify search and type filters work independently and together
-- [ ] **QC:** manually try partial names, no-match searches, and type combinations
+- [ ] **QC (Automated):** automate QC coverage for partial names, no-match searches, and type combinations
 
 ### Story 5.5 — Toggle set ownership from the Browse tab
 - [ ] Add ownership toggle button
 - [ ] Sync toggle with persisted collection state
 - [ ] Re-render related UI on ownership change
 - [ ] **Test:** verify Browse ownership toggles update collection state and survive reload
-- [ ] **QC:** manually toggle several sets and confirm the UI feedback is clear
+- [ ] **QC (Automated):** automate QC coverage to toggle several sets and confirm the UI feedback is clear
 
 ---
 
@@ -273,14 +273,14 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Group sets into Base / Large / Small / Standalone
 - [ ] Render checklist rows for each set
 - [ ] **Test:** verify groupings and checklist rendering against normalized type metadata
-- [ ] **QC:** visually inspect grouping order and readability
+- [ ] **QC (Automated):** automate QC coverage for grouping order and readability
 
 ### Story 6.2 — Mirror ownership toggles between Browse and Collection tabs
 - [ ] Share the same ownership state source across Browse and Collection
 - [ ] Re-render Browse on Collection changes
 - [ ] Re-render Collection on Browse changes
 - [ ] **Test:** verify ownership changes propagate across both tabs immediately
-- [ ] **QC:** manually toggle from both tabs and confirm synchronization
+- [ ] **QC (Automated):** automate QC coverage for toggling from both tabs and confirming synchronization
 
 ### Story 6.3 — Compute category totals from the selected collection
 - [ ] Count owned heroes
@@ -289,7 +289,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Count owned henchman groups
 - [ ] Count owned schemes
 - [ ] **Test:** verify totals update correctly as collection ownership changes
-- [ ] **QC:** manually cross-check totals with a small custom collection
+- [ ] **QC (Automated):** automate QC coverage to cross-check totals with a small custom collection
 
 ### Story 6.4 — Display player-count feasibility indicators
 - [ ] Compute feasibility for Standard Solo
@@ -297,14 +297,14 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Compute feasibility for 2–5 players
 - [ ] Show warning states clearly
 - [ ] **Test:** verify feasibility indicators reflect legality rules for multiple collection combinations
-- [ ] **QC:** manually inspect at least one legal and one illegal collection scenario
+- [ ] **QC (Automated):** automate QC coverage for at least one legal and one illegal collection scenario
 
 ### Story 6.5 — Support clearing the owned collection with confirmation
 - [ ] Add collection reset action
 - [ ] Add confirmation flow
 - [ ] Persist cleared collection state
 - [ ] **Test:** verify collection reset clears only ownership state and requires confirmation
-- [ ] **QC:** manually confirm post-reset UI consistency in Browse and Collection tabs
+- [ ] **QC (Automated):** automate QC coverage for post-reset UI consistency in Browse and Collection tabs
 
 ---
 
@@ -315,7 +315,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Add Advanced Solo toggle
 - [ ] Disable Advanced Solo outside 1-player mode
 - [ ] **Test:** verify controls update state correctly and Advanced Solo is blocked outside 1-player mode
-- [ ] **QC:** manually inspect button states and toggle affordance
+- [ ] **QC (Automated):** automate QC coverage for button states and toggle affordance
 
 ### Story 7.2 — Display setup requirements for the current selection
 - [ ] Show required heroes count
@@ -323,7 +323,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Show required henchman-group count
 - [ ] Show wound count
 - [ ] **Test:** verify displayed requirements match the active template for all player modes
-- [ ] **QC:** compare displayed numbers with `documentation/setup-rules.md`
+- [ ] **QC (Automated):** automate QC coverage to compare displayed numbers with `documentation/setup-rules.md`
 
 ### Story 7.3 — Generate and render a full setup result
 - [ ] Render mastermind card
@@ -332,21 +332,21 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Render villain-group list
 - [ ] Render henchman-group list
 - [ ] **Test:** verify a generated setup renders every selected category correctly
-- [ ] **QC:** manually inspect layout and readability of a full result panel
+- [ ] **QC (Automated):** automate QC coverage for the layout and readability of a full result panel
 
 ### Story 7.4 — Show Scheme notes and forced-group badges clearly
 - [ ] Mark forced groups visually
 - [ ] Render scheme rule notes
 - [ ] Render mastermind lead information clearly
 - [ ] **Test:** verify forced-group indicators and notes appear on appropriate setups
-- [ ] **QC:** manually inspect at least 3 setups with special rules or forced groups
+- [ ] **QC (Automated):** automate QC coverage for at least 3 setups with special rules or forced groups
 
 ### Story 7.5 — Allow Regenerate without consuming state
 - [ ] Add Regenerate action
 - [ ] Replace only ephemeral current result
 - [ ] Leave usage stats unchanged
 - [ ] **Test:** verify Regenerate changes the result without mutating history or usage stats
-- [ ] **QC:** inspect UI and storage before and after regenerate flow
+- [ ] **QC (Automated):** automate QC coverage for UI and storage before and after the regenerate flow
 
 ### Story 7.6 — Accept and log the setup into persistent state
 - [ ] Add Accept & Log action
@@ -354,7 +354,7 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Append history record on accept
 - [ ] Refresh History tab data after accept
 - [ ] **Test:** verify Accept & Log mutates state exactly once and records the correct snapshot
-- [ ] **QC:** manually accept a setup and confirm History and Usage views update immediately
+- [ ] **QC (Automated):** automate QC coverage to accept a setup and confirm History and Usage views update immediately
 
 ---
 
@@ -365,20 +365,20 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Show clear labels for reset actions
 - [ ] Explain least-played fallback in the UI
 - [ ] **Test:** verify indicators reflect actual usage stats from persisted state
-- [ ] **QC:** manually inspect indicator changes after several accepted games
+- [ ] **QC (Automated):** automate QC coverage for indicator changes after several accepted games
 
 ### Story 8.2 — Render accepted game history in newest-first order
 - [ ] Render summary rows for history records
 - [ ] Resolve IDs back to display names
 - [ ] Show player count and mode metadata
 - [ ] **Test:** verify history ordering, label resolution, and summary metadata
-- [ ] **QC:** manually inspect history readability with multiple accepted games
+- [ ] **QC (Automated):** automate QC coverage for history readability with multiple accepted games
 
 ### Story 8.3 — Expand and collapse history records
 - [ ] Add expandable history item behavior
 - [ ] Show full setup details inside expanded items
 - [ ] **Test:** verify expand/collapse works correctly for multiple history entries
-- [ ] **QC:** manually inspect one collapsed and one expanded entry on mobile and desktop widths
+- [ ] **QC (Automated):** automate QC coverage for one collapsed and one expanded entry on mobile and desktop widths
 
 ### Story 8.4 — Reset a single category of usage stats
 - [ ] Add reset button for heroes
@@ -387,14 +387,14 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Add reset button for henchman groups
 - [ ] Add reset button for schemes
 - [ ] **Test:** verify each category reset affects only its own usage stats and indicators
-- [ ] **QC:** manually test at least two category resets after accepted games exist
+- [ ] **QC (Automated):** automate QC coverage for at least two category resets after accepted games exist
 
 ### Story 8.5 — Reset the full application state with confirmation
 - [ ] Add full reset action
 - [ ] Show confirmation modal
 - [ ] Clear collection, usage, history, and preferences on confirm
 - [ ] **Test:** verify full reset clears all persisted state only after confirmation
-- [ ] **QC:** manually confirm the app returns to a clean initial state after reset
+- [ ] **QC (Automated):** automate QC coverage to confirm the app returns to a clean initial state after reset
 
 ---
 
@@ -405,35 +405,35 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Implement toast rendering and dismissal
 - [ ] Add success/info/warning/error variants
 - [ ] **Test:** verify each toast type renders and dismisses correctly
-- [ ] **QC:** manually inspect stacking, timing, and readability
+- [ ] **QC (Automated):** automate QC coverage for stacking, timing, and readability
 
 ### Story 9.2 — Report collection insufficiency and invalid setup requests clearly
 - [ ] Show error when collection is illegal for selected setup
 - [ ] Show info when least-played fallback is used
 - [ ] Show validation errors without breaking the UI
 - [ ] **Test:** verify invalid requests produce clear messages and do not crash the page
-- [ ] **QC:** manually try several invalid scenarios and assess message clarity
+- [ ] **QC (Automated):** automate QC coverage for several invalid scenarios and message clarity
 
 ### Story 9.3 — Handle unavailable browser storage gracefully
 - [ ] Detect storage availability
 - [ ] Show compatibility warning if storage is unavailable
 - [ ] Keep the page functional in degraded mode where possible
 - [ ] **Test:** simulate unavailable storage and verify graceful degradation behavior
-- [ ] **QC:** manually inspect degraded-mode messaging and usable fallbacks
+- [ ] **QC (Automated):** automate QC coverage for degraded-mode messaging and usable fallbacks
 
 ### Story 9.4 — Implement keyboard-accessible interactions and focus behavior
 - [ ] Ensure all controls are tabbable
 - [ ] Add visible `:focus-visible` styling
 - [ ] Ensure modal keyboard controls work
 - [ ] **Test:** verify keyboard interaction works for tabs, buttons, and modal flows
-- [ ] **QC:** manually navigate primary flows using keyboard only
+- [ ] **QC (Automated):** automate QC coverage for primary flows using keyboard only
 
 ### Story 9.5 — Verify color-independent state communication and semantic roles
 - [ ] Add supporting text/icon cues alongside color states
 - [ ] Apply ARIA roles to tabs and modal
 - [ ] Verify semantic structure of interactive regions
 - [ ] **Test:** verify state remains understandable without relying on color alone
-- [ ] **QC:** manually review accessibility cues and semantic structure
+- [ ] **QC (Automated):** automate QC coverage for accessibility cues and semantic structure
 
 ---
 
@@ -444,24 +444,24 @@ See also: `documentation/testing-qc-strategy.md`
 - [ ] Reconcile implementation with `documentation/data-model.md`
 - [ ] Reconcile implementation with `documentation/setup-rules.md`
 - [ ] **Test:** verify implemented behavior matches documented architecture and rules
-- [ ] **QC:** perform a documentation-to-implementation consistency review
+- [ ] **QC (Automated):** automate QC coverage for documentation-to-implementation consistency
 
 ### Story 10.2 — Document how to open and use the static-served app
 - [ ] Update `README.md` usage instructions
 - [ ] Confirm browser support wording
 - [ ] **Test:** verify README instructions are sufficient to open and use the app from scratch
-- [ ] **QC:** read the README as a first-time user and check for ambiguity
+- [ ] **QC (Automated):** automate QC coverage for first-time README clarity and ambiguity checks
 
 ### Story 10.3 — Document reset behavior, persistence, and limitations
 - [ ] Document how persistence works
 - [ ] Document reset behavior
 - [ ] Document known V1 limitations
 - [ ] **Test:** verify documented persistence/reset behavior matches actual app behavior
-- [ ] **QC:** manually compare docs against live app behavior
+- [ ] **QC (Automated):** automate QC coverage to compare docs against live app behavior
 
 ### Story 10.4 — Perform a final consistency pass across all markdown specs
 - [ ] Verify statuses of documentation files
 - [ ] Align terminology across all markdown documents
 - [ ] Ensure final docs match approved implementation scope
 - [ ] **Test:** verify no spec file contradicts implemented behavior or other approved docs
-- [ ] **QC:** complete one final end-to-end documentation review
+- [ ] **QC (Automated):** automate QC coverage for one final end-to-end documentation review

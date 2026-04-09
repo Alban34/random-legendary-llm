@@ -62,8 +62,8 @@ Used for:
 - notifications and modals
 
 Preferred form:
-- manual scenario checklist
-- optional lightweight browser test harness if practical
+- Playwright browser QC specs for stable user-visible flows
+- targeted manual scenario checklist only where automation is not yet practical
 
 ### 3. End-to-end scenario verification
 Used for:
@@ -74,7 +74,8 @@ Used for:
 - least-played fallback
 
 Preferred form:
-- scripted manual walkthroughs with expected outcomes
+- scripted Playwright walkthroughs with expected outcomes
+- manual spot checks for any flows not yet automated
 
 ---
 
@@ -122,6 +123,9 @@ QC checks:
 - reload page and confirm state persistence
 - simulate missing storage support and verify graceful handling
 
+Automated coverage:
+- `test/playwright/epic2-qc.spec.mjs` covers persistence roundtrips, history rendering, reset behavior, and corrupted-state recovery
+
 ---
 
 ## Epic 3 — Setup Generation Engine
@@ -143,6 +147,9 @@ QC checks:
 - walkthrough of a fallback scenario where no fully fresh setup is possible
 - manual comparison of representative special-rule setups against the BoardGameGeek card text reference
 
+Automated coverage:
+- `test/playwright/epic3-qc.spec.mjs` covers player-count requirements, thin-collection legality failures, scheme and mastermind edge cases, fallback messaging, ephemeral generate/regenerate behavior, and duplicate-name history rendering
+
 ---
 
 ## Epic 4 — Application Shell and Navigation
@@ -156,6 +163,9 @@ QC checks:
 - desktop layout check
 - mobile layout check
 - keyboard navigation through tabs
+
+Automated coverage:
+- `test/playwright/epic4-qc.spec.mjs` covers responsive shell rendering, tab persistence, keyboard-only navigation, and visual primitive reuse checks
 
 ---
 
@@ -274,3 +284,7 @@ Before implementation is considered complete:
 - local persistence works across reloads
 - reset flows and least-played fallback are verified manually and logically
 - representative inventory and rule behaviors have been cross-checked against `documentation/sources.md`
+
+Current automated browser QC command for Epic 1–4:
+- `npm run check:qc`
+
