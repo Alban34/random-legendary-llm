@@ -181,6 +181,10 @@ Required tests:
 QC checks:
 - spot-check displayed counts and contents against approved data docs
 
+Automated coverage:
+- `test/epic5-browse-extensions.test.mjs` covers browse filtering, alias search behavior, type metadata, and representative set counts
+- `test/playwright/epic5-qc.spec.mjs` covers browse-grid rendering, detail expansion, type/search filtering, empty states, and ownership persistence from the Browse tab
+
 ---
 
 ## Epic 6 — Collection Management Experience

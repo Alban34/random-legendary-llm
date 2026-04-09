@@ -9,8 +9,8 @@ import {
 } from './helpers/app-fixture.mjs';
 
 async function toggleOwnedSet(page, setName) {
-  const card = page.locator('#panel-browse .set-card').filter({ hasText: setName });
-  await card.getByRole('button').click();
+  const card = page.locator(`#panel-browse .set-card[data-set-name="${setName}"]`);
+  await card.locator('[data-action="toggle-owned-set"]').click();
 }
 
 test.describe('Epic 2 automated QC', () => {
@@ -34,8 +34,8 @@ test.describe('Epic 2 automated QC', () => {
     await selectTab(page, 'browse');
 
     for (const setName of ['Core Set', 'Dark City', 'Fantastic Four']) {
-      const card = page.locator('#panel-browse .set-card').filter({ hasText: setName });
-      await expect(card.getByRole('button', { name: 'Owned' })).toBeVisible();
+      const card = page.locator(`#panel-browse .set-card[data-set-name="${setName}"]`);
+      await expect(card.locator('[data-action="toggle-owned-set"]')).toContainText('In Collection');
     }
 
     await selectTab(page, 'collection');

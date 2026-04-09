@@ -29,6 +29,11 @@ function syncDebugGlobals(viewModel) {
   window.__APP_PERSISTENCE__ = viewModel.persistence;
   window.__CURRENT_SETUP__ = viewModel.ui.currentSetup;
   window.__ACTIVE_TAB__ = viewModel.ui.selectedTab;
+  window.__BROWSE_UI__ = {
+    searchTerm: viewModel.ui.browseSearchTerm,
+    typeFilter: viewModel.ui.browseTypeFilter,
+    expandedSetId: viewModel.ui.expandedBrowseSetId
+  };
 }
 
 async function boot() {
@@ -53,6 +58,9 @@ async function boot() {
       generatorError: null,
       generatorNotices: [],
       currentSetup: null,
+      browseSearchTerm: '',
+      browseTypeFilter: 'all',
+      expandedBrowseSetId: null,
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
       advancedSolo: hydration.state.preferences.lastAdvancedSolo
@@ -131,6 +139,18 @@ async function boot() {
     toggleOwnedSet(setId) {
       clearGeneratedSetup();
       applyStateUpdate((currentState) => toggleOwnedSet(currentState, setId), 'Updated owned collection state. Generate a new setup to use the current collection.');
+    },
+    setBrowseSearchTerm(searchTerm) {
+      viewModel.ui.browseSearchTerm = searchTerm;
+      rerender();
+    },
+    setBrowseTypeFilter(typeFilter) {
+      viewModel.ui.browseTypeFilter = typeFilter;
+      rerender();
+    },
+    toggleBrowseSetExpanded(setId) {
+      viewModel.ui.expandedBrowseSetId = viewModel.ui.expandedBrowseSetId === setId ? null : setId;
+      rerender();
     },
     setPlayerCount(playerCount) {
       const advancedSolo = playerCount === 1 ? viewModel.ui.advancedSolo : false;

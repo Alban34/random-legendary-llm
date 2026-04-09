@@ -1,4 +1,5 @@
 import { APP_TABS, normalizeSelectedTab } from './app-tabs.mjs';
+import { BROWSE_TYPE_OPTIONS, filterBrowseSets, getBrowseTypeLabel, summarizeBrowseSet } from './browse-utils.mjs';
 
 const USAGE_LABELS = {
   heroes: 'Heroes',
@@ -89,8 +90,129 @@ function renderTabButtons(activeTabId, variant = 'desktop') {
   `).join('');
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+function formatBrowseMastermind(mastermind, indexes) {
+  if (!mastermind.lead) {
+    return mastermind.name;
+  }
+
+  const leadEntity = mastermind.lead.category === 'villains'
+    ? indexes.villainGroupsById[mastermind.lead.id]
+    : indexes.henchmanGroupsById[mastermind.lead.id];
+
+  return `${mastermind.name} → ${leadEntity?.name || mastermind.lead.id}`;
+}
+
+function formatBrowseEntityList(items, emptyLabel, formatter = (item) => item.name) {
+  if (!items.length) {
+    return `<p class="muted browse-empty-copy">${emptyLabel}</p>`;
+  }
+
+  return `
+    <ul class="clean browse-entity-list">
+      ${items.map((item) => `<li class="browse-entity-item">${formatter(item)}</li>`).join('')}
+    </ul>
+  `;
+}
+
+function renderBrowseTypeFilters(activeTypeFilter) {
+  return BROWSE_TYPE_OPTIONS.map((option) => `
+    <button
+      type="button"
+      class="button ${activeTypeFilter === option.id ? 'button-primary' : 'button-secondary'} browse-filter-button"
+      data-action="set-browse-type-filter"
+      data-type-filter="${option.id}"
+      aria-pressed="${activeTypeFilter === option.id}"
+    >
+      ${option.label}
+    </button>
+  `).join('');
+}
+
+function renderBrowseSetCard(set, viewModel) {
+  const { bundle, state, ui } = viewModel;
+  const indexes = bundle.runtime.indexes;
+  const counts = summarizeBrowseSet(set);
+  const owned = state.collection.ownedSetIds.includes(set.id);
+  const expanded = ui.expandedBrowseSetId === set.id;
+
+  return `
+    <article class="panel panel-inline set-card ${owned ? 'owned' : ''}" data-set-id="${set.id}" data-set-name="${set.name}" data-set-type="${set.type}">
+      <div class="stack gap-md">
+        <div class="row space-between gap-md wrap align-center">
+          <div class="stack gap-sm browse-card-copy">
+            <button
+              type="button"
+              class="set-card-toggle"
+              data-action="toggle-browse-set-expanded"
+              data-set-id="${set.id}"
+              aria-expanded="${expanded}"
+              aria-controls="browse-details-${set.id}"
+            >
+              <span class="set-card-title">${set.name}</span>
+              <span class="set-card-toggle-copy">${expanded ? 'Hide details' : 'Show details'}</span>
+            </button>
+            <div class="row wrap gap-sm align-center browse-badge-row">
+              <span class="pill set-year-badge">${set.year}</span>
+              <span class="pill set-type-badge">${getBrowseTypeLabel(set.type)}</span>
+              ${owned ? '<span class="pill set-owned-badge">In Collection</span>' : ''}
+            </div>
+            ${set.aliases.length ? `<div class="muted browse-aliases">Also listed as: ${set.aliases.map((alias) => escapeHtml(alias)).join(', ')}</div>` : ''}
+          </div>
+          <div class="stack gap-sm browse-card-actions">
+            <button class="button ${owned ? 'button-success' : 'button-secondary'}" data-action="toggle-owned-set" data-set-id="${set.id}">
+              ${owned ? '✓ In Collection' : 'Add to Collection'}
+            </button>
+            <div class="muted browse-ownership-copy">${owned ? 'Owned and available for setup generation.' : 'Not currently owned.'}</div>
+          </div>
+        </div>
+
+        <div class="browse-count-grid">
+          <div class="summary-card"><div class="muted">Heroes</div><div class="metric-sm">${counts.heroCount}</div></div>
+          <div class="summary-card"><div class="muted">Masterminds</div><div class="metric-sm">${counts.mastermindCount}</div></div>
+          <div class="summary-card"><div class="muted">Villain Groups</div><div class="metric-sm">${counts.villainGroupCount}</div></div>
+          <div class="summary-card"><div class="muted">Henchman Groups</div><div class="metric-sm">${counts.henchmanGroupCount}</div></div>
+          <div class="summary-card"><div class="muted">Schemes</div><div class="metric-sm">${counts.schemeCount}</div></div>
+        </div>
+
+        <div id="browse-details-${set.id}" class="browse-details" ${expanded ? '' : 'hidden'}>
+          <div class="browse-details-grid">
+            <section class="summary-card">
+              <h3>Heroes</h3>
+              ${formatBrowseEntityList(set.heroes, 'No heroes in this set.')}
+            </section>
+            <section class="summary-card">
+              <h3>Masterminds</h3>
+              ${formatBrowseEntityList(set.masterminds, 'No masterminds in this set.', (mastermind) => formatBrowseMastermind(mastermind, indexes))}
+            </section>
+            <section class="summary-card">
+              <h3>Villain Groups</h3>
+              ${formatBrowseEntityList(set.villainGroups, 'No villain groups in this set.')}
+            </section>
+            <section class="summary-card">
+              <h3>Henchman Groups</h3>
+              ${formatBrowseEntityList(set.henchmanGroups, 'No henchman groups in this set.')}
+            </section>
+            <section class="summary-card browse-detail-section-full">
+              <h3>Schemes</h3>
+              ${formatBrowseEntityList(set.schemes, 'No schemes in this set.')}
+            </section>
+          </div>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
 function renderBrowsePanel(viewModel) {
-  const { bundle, state } = viewModel;
+  const { bundle, state, ui } = viewModel;
   const metrics = [
     ['Sets', bundle.counts.sets],
     ['Heroes', bundle.counts.heroes],
@@ -101,7 +223,10 @@ function renderBrowsePanel(viewModel) {
     ['Owned Sets', state.collection.ownedSetIds.length],
     ['History Records', state.history.length]
   ];
-  const ownedSetIds = new Set(state.collection.ownedSetIds);
+  const browseSets = filterBrowseSets(bundle.runtime.sets, {
+    searchTerm: ui.browseSearchTerm,
+    typeFilter: ui.browseTypeFilter
+  });
 
   return `
     <section class="stack gap-md">
@@ -111,37 +236,40 @@ function renderBrowsePanel(viewModel) {
           <div class="metric">${value}</div>
         </article>
       `).join('')}</section>
-      <section class="panel">
-        <h2>Epic 1 Test Results</h2>
-        <p class="muted">These checks validate dataset presence, ID generation, duplicate-name safety, reference resolution, runtime indexes, and representative invalid-data failure handling.</p>
-        <ul class="clean">${bundle.tests.map((test) => `
-          <li class="test ${test.status}">
-            <strong class="status-${test.status}">${test.status === 'pass' ? 'PASS' : 'FAIL'}</strong>
-            — ${test.name}
-            ${test.error ? `<div class="error">${test.error}</div>` : ''}
-          </li>
-        `).join('')}</ul>
-      </section>
       <section class="two-col">
         <section class="panel">
-          <h2>Browse sets</h2>
-          <p class="muted">This foundation shell already uses the normalized runtime data to render collection-ready set cards.</p>
-          <div class="grid collection-grid">
-            ${bundle.source.sets.map((set) => `
-              <article class="panel panel-inline set-card ${ownedSetIds.has(set.id) ? 'owned' : ''}">
-                <div class="row space-between gap-sm wrap">
-                  <div>
-                    <strong>${set.name}</strong>
-                    <div class="muted">${set.year} · ${set.type}</div>
-                    <div class="muted">${set.heroes.length} heroes · ${set.masterminds.length} masterminds · ${set.schemes.length} schemes</div>
-                  </div>
-                  <button class="button ${ownedSetIds.has(set.id) ? 'button-success' : 'button-secondary'}" data-action="toggle-owned-set" data-set-id="${set.id}">
-                    ${ownedSetIds.has(set.id) ? 'Owned' : 'Add to owned'}
-                  </button>
-                </div>
-              </article>
-            `).join('')}
+          <div class="row space-between wrap gap-md align-center">
+            <div>
+              <h2>Browse sets</h2>
+              <p class="muted">Search by set name or alias, filter by product type, expand a card for contents, and toggle ownership directly from the Browse tab.</p>
+            </div>
+            <div class="summary-card browse-results-summary">
+              <div class="muted">Visible sets</div>
+              <div class="metric-sm">${browseSets.length}</div>
+              <div class="muted">of ${bundle.runtime.sets.length}</div>
+            </div>
           </div>
+          <div class="browse-toolbar">
+            <label class="browse-search-shell" for="browse-search-input">
+              <span class="muted">Search sets</span>
+              <input
+                id="browse-search-input"
+                class="text-input"
+                type="search"
+                placeholder="Search by set name or alias"
+                value="${escapeHtml(ui.browseSearchTerm)}"
+              />
+            </label>
+            <div class="stack gap-sm">
+              <span class="muted">Type filter</span>
+              <div class="button-row" role="group" aria-label="Browse set type filters">
+                ${renderBrowseTypeFilters(ui.browseTypeFilter)}
+              </div>
+            </div>
+          </div>
+          ${browseSets.length
+            ? `<div class="grid collection-grid browse-set-grid">${browseSets.map((set) => renderBrowseSetCard(set, viewModel)).join('')}</div>`
+            : `<div id="browse-empty-state" class="notice info">No sets match the current search and filter combination.</div>`}
         </section>
         <section class="panel">
           <h2>Duplicate-name QC samples</h2>
@@ -152,6 +280,17 @@ function renderBrowsePanel(viewModel) {
             </details>
           `).join('')}
         </section>
+      </section>
+      <section class="panel">
+        <h2>Epic 1 Test Results</h2>
+        <p class="muted">These checks validate dataset presence, ID generation, duplicate-name safety, reference resolution, runtime indexes, and representative invalid-data failure handling.</p>
+        <ul class="clean">${bundle.tests.map((test) => `
+          <li class="test ${test.status}">
+            <strong class="status-${test.status}">${test.status === 'pass' ? 'PASS' : 'FAIL'}</strong>
+            — ${test.name}
+            ${test.error ? `<div class="error">${test.error}</div>` : ''}
+          </li>
+        `).join('')}</ul>
       </section>
     </section>
   `;
@@ -387,7 +526,7 @@ function renderDiagnosticsPanel(viewModel) {
       <h2>Initialization status</h2>
       <div id="status-message">${failed.length
         ? `<p class="error">Foundation loaded with ${failed.length} failing Epic 1 test(s).</p>`
-        : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, Epic 3 setup generation, and Epic 4 shell/navigation are loaded successfully.</p>'}</div>
+        : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, Epic 3 setup generation, Epic 4 shell/navigation, and Epic 5 browse extensions are loaded successfully.</p>'}</div>
     </section>
     <section class="panel">
       <h2>Developer diagnostics</h2>
@@ -443,6 +582,14 @@ function bindActionButtons(doc, actions) {
     button.addEventListener('click', () => actions.resetUsageCategory(button.dataset.category));
   });
 
+  doc.querySelectorAll('[data-action="set-browse-type-filter"]').forEach((button) => {
+    button.addEventListener('click', () => actions.setBrowseTypeFilter(button.dataset.typeFilter));
+  });
+
+  doc.querySelectorAll('[data-action="toggle-browse-set-expanded"]').forEach((button) => {
+    button.addEventListener('click', () => actions.toggleBrowseSetExpanded(button.dataset.setId));
+  });
+
   doc.querySelectorAll('[data-action="set-player-count"]').forEach((button) => {
     button.addEventListener('click', () => actions.setPlayerCount(Number(button.dataset.playerCount)));
   });
@@ -456,6 +603,11 @@ function bindActionButtons(doc, actions) {
       }
     });
   });
+
+  const browseSearchInput = doc.getElementById('browse-search-input');
+  if (browseSearchInput) {
+    browseSearchInput.addEventListener('input', (event) => actions.setBrowseSearchTerm(event.target.value));
+  }
 
   const buttonHandlers = {
     'toggle-advanced-solo': actions.toggleAdvancedSolo,
@@ -480,8 +632,8 @@ export function renderBundle(doc, viewModel, actions) {
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
   const panelMarkup = renderTabPanels(viewModel);
 
-  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 4 Foundation';
-  doc.getElementById('app-subtitle').textContent = 'This milestone expands the current implementation into a real tabbed application shell with responsive navigation, persistent active-tab state, reusable UI primitives, and a developer diagnostics area outside the main workflow tabs.';
+  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 5 Browse Extensions';
+  doc.getElementById('app-subtitle').textContent = 'The current milestone now includes the Epic 5 Browse experience with searchable, filterable, expandable set cards while preserving the Epic 1–4 data, persistence, setup-generation, and shell foundations.';
   doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, 'desktop');
   doc.getElementById('mobile-tabs').innerHTML = renderTabButtons(activeTabId, 'mobile');
 
