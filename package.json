@@ -10,9 +10,11 @@
     "test:epic1": "node --test ./test/epic1.test.mjs",
     "test:epic2": "node --test ./test/epic2-state.test.mjs",
     "test:epic3": "node --test ./test/epic3-setup-generator.test.mjs",
+    "test:epic4": "node --test ./test/epic4-shell-navigation.test.mjs",
     "check:epic1": "node --test ./test/epic1.test.mjs",
     "check:epic2": "node --test ./test/epic2-state.test.mjs",
     "check:epic3": "node --test ./test/epic3-setup-generator.test.mjs",
+    "check:epic4": "node --test ./test/epic4-shell-navigation.test.mjs",
     "report:epic1": "node ./tools/run_epic1_checks.mjs",
     "build:shell": "python3 ./tools/build_epic1_index.py",
     "build:seed": "python3 ./tools/build_epic1_seed.py"

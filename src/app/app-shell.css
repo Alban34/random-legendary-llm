@@ -2,13 +2,17 @@
   color-scheme: dark;
   --bg: #0d0d0d;
   --panel: #141428;
+  --panel-hover: #1e1e38;
   --panel-2: #1b1b33;
   --border: #2a2a4a;
+  --border-focus: #e62429;
   --text: #f0f0f0;
   --muted: #a0a0c0;
+  --text-muted: #555577;
   --success: #2ecc71;
   --danger: #e74c3c;
   --warning: #f5a623;
+  --accent-gold: #f5a623;
   --accent: #e62429;
   --info: #1877f2;
   --shadow: rgba(0, 0, 0, 0.4);
@@ -23,32 +27,120 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
+  padding-bottom: 76px;
 }
 
-header {
+.app-header {
   padding: 24px;
   border-bottom: 1px solid var(--border);
   background: #0a0a1a;
   position: sticky;
   top: 0;
+  z-index: 10;
 }
 
-header h1 {
+.header-inner {
+  display: flex;
+  gap: 24px;
+  align-items: end;
+  justify-content: space-between;
+}
+
+.header-copy {
+  min-width: 0;
+}
+
+.app-header h1 {
   margin: 0 0 8px;
   font-size: 1.6rem;
   color: var(--accent);
 }
 
-header p {
+.app-header p {
   margin: 0;
   color: var(--muted);
   max-width: 70rem;
 }
 
-main {
+.app-main {
   padding: 24px;
   display: grid;
   gap: 24px;
+}
+
+.tab-panel-shell {
+  display: grid;
+  gap: 24px;
+}
+
+.tab-panel {
+  display: block;
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+.desktop-tab-nav {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-tab-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  background: #0a0a1a;
+  border-top: 1px solid var(--border);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  z-index: 20;
+}
+
+.tab-button {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.tab-button:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tab-button.active {
+  color: var(--text);
+  border-color: rgba(230, 36, 41, 0.45);
+  background: rgba(230, 36, 41, 0.16);
+}
+
+.tab-button.mobile {
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 4px;
+}
+
+.tab-button.mobile .tab-label {
+  font-size: 0.72rem;
+}
+
+.tab-icon {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .grid {
@@ -108,6 +200,10 @@ main {
   margin-bottom: 10px;
   background: transparent;
   padding: 12px;
+}
+
+.metric-card {
+  min-height: 100%;
 }
 
 .set-card {
@@ -176,6 +272,13 @@ main {
   transform: translateY(-1px);
 }
 
+button:focus-visible,
+.tab-button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
 .button-primary {
   border-color: rgba(24, 119, 242, 0.55);
   background: rgba(24, 119, 242, 0.18);
@@ -203,6 +306,10 @@ main {
 
 .muted {
   color: var(--muted);
+}
+
+.shell-two-col {
+  align-items: start;
 }
 
 .status-pass {
@@ -339,5 +446,34 @@ details summary {
 
 .empty-state {
   padding: 10px 0;
+}
+
+.note-list {
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  body {
+    padding-bottom: 0;
+  }
+
+  .desktop-tab-nav {
+    display: inline-flex;
+  }
+
+  .mobile-tab-nav {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .app-main {
+    padding: 20px 16px 96px;
+  }
 }
 

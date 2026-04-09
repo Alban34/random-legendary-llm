@@ -4,7 +4,7 @@ STATUS: Approved
 
 ## Project state
 
-The repository now contains the **Epic 1 + Epic 2 + Epic 3 implementation foundation** for the Legendary: Marvel randomizer.
+The repository now contains the **Epic 1 + Epic 2 + Epic 3 + Epic 4 implementation foundation** for the Legendary: Marvel randomizer.
 
 Current status:
 - Epic 1 implementation, tests, and QC are complete
@@ -12,14 +12,17 @@ Current status:
 - Epic 2 manual QC checklist items should still be reflected in `documentation/task-list.md`
 - Epic 3 implementation and automated tests are in place
 - Epic 3 manual QC checklist items are still pending in `documentation/task-list.md`
+- Epic 4 implementation and automated tests are in place
+- Epic 4 manual QC checklist items are still pending in `documentation/task-list.md`
 
 Implemented so far:
 - canonical seed data under `src/data/`
 - shared normalization and validation logic under `src/app/`
 - versioned browser-state persistence under `src/app/state-store.mjs`
 - setup templates and generation logic under `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs`
-- a thin `index.html` shell for the browser app
-- npm-based Epic 1 + Epic 2 + Epic 3 tests under `test/`
+- shared tab-shell metadata and navigation helpers under `src/app/app-tabs.mjs`
+- a tabbed `index.html` shell for the browser app
+- npm-based Epic 1 + Epic 2 + Epic 3 + Epic 4 tests under `test/`
 - a data-foundation summary reporter under `tools/`
 
 The app remains **fully static**:
@@ -41,6 +44,7 @@ Current entry points:
 - `src/app/state-store.mjs` — versioned browser-state creation, hydration, persistence, history, and reset helpers
 - `src/app/setup-rules.mjs` — player-count templates and active-mode resolution
 - `src/app/setup-generator.mjs` — legality checks, freshness ranking, forced-group handling, and setup generation
+- `src/app/app-tabs.mjs` — tab metadata, default-tab selection, and keyboard navigation order
 - `src/app/app-renderer.mjs` — browser rendering for the current foundation screen
 - `src/data/canonical-game-data.json` — project-owned canonical game data asset
 
@@ -115,6 +119,13 @@ cd "/Users/afayard1/Projects/random-legendary-llm"
 npm run check:epic3
 ```
 
+Run the Epic 4 shell and navigation checks only:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run check:epic4
+```
+
 Optional human-readable Epic 1 data summary reporter:
 
 ```sh
@@ -160,6 +171,6 @@ Project documentation lives in `documentation/`.
 
 ## Next step
 
-With Epic 1, Epic 2, and Epic 3 implemented in code, the next major implementation target is **Epic 4 — Application Shell and Navigation**.
+With Epic 1, Epic 2, Epic 3, and Epic 4 implemented in code, the next major implementation target is **Epic 5 — Browse Extensions Experience**.
 
-Before closing Epic 3 completely, the remaining manual QC items in `documentation/task-list.md` should still be exercised in the browser.
+Before closing Epic 4 completely, the remaining manual QC items in `documentation/task-list.md` should still be exercised in the browser.

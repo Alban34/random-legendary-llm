@@ -8,77 +8,30 @@ html = '''<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legendary: Marvel Randomizer — Epic 3 Foundation</title>
+  <title>Legendary: Marvel Randomizer — Epic 4 Foundation</title>
   <link rel="stylesheet" href="./src/app/app-shell.css" />
 </head>
 <body>
-  <header>
-    <h1>Legendary: Marvel Randomizer — Epic 3 Foundation</h1>
-    <p>This milestone builds on the Epic 1 data and Epic 2 persistence layers by adding player-count setup templates, legality validation, forced-group accounting, freshness-based selection, ephemeral generate/regenerate behavior, and history-ready setup snapshots.</p>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-copy">
+        <h1 id="app-title">Legendary: Marvel Randomizer — Epic 4 Foundation</h1>
+        <p id="app-subtitle">This milestone expands the current implementation into a real tabbed application shell with responsive navigation, persistent active-tab state, reusable UI primitives, and a developer diagnostics area outside the main workflow tabs.</p>
+      </div>
+      <nav class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary"></nav>
+    </div>
   </header>
-  <main>
-    <section class="grid" id="metrics"></section>
-    <section class="panel">
-      <h2>Epic 1 Test Results</h2>
-      <p class="muted">These checks validate dataset presence, ID generation, duplicate-name safety, reference resolution, runtime indexes, and representative invalid-data failure handling.</p>
-      <ul class="clean" id="tests"></ul>
-    </section>
-    <section class="two-col">
-      <section class="panel">
-        <h2>Duplicate-name QC samples</h2>
-        <div id="duplicates"></div>
-      </section>
-      <section class="panel">
-        <h2>Collection persistence demo</h2>
-        <div id="collection-demo"></div>
-      </section>
-    </section>
-    <section class="two-col">
-      <section class="panel">
-        <h2>Persistence and recovery status</h2>
-        <div id="persistence-summary"></div>
-      </section>
-      <section class="panel">
-        <h2>Setup engine preview</h2>
-        <div id="setup-engine"></div>
-      </section>
-    </section>
-    <section class="two-col">
-      <section class="panel">
-        <h2>Generated setup result</h2>
-        <div id="setup-result"></div>
-      </section>
-      <section class="panel">
-        <h2>Usage statistics summary</h2>
-        <div id="usage-summary"></div>
-      </section>
-    </section>
-    <section class="two-col">
-      <section class="panel">
-        <h2>Epic 2 demo actions</h2>
-        <div id="state-actions"></div>
-      </section>
-      <section class="panel">
-        <h2>Accepted game history</h2>
-        <div id="history-preview"></div>
-      </section>
-    </section>
-    <section class="panel">
-      <h2>Persisted state snapshot</h2>
-      <pre id="state-snapshot"></pre>
-    </section>
-    <section class="panel">
-      <h2>Runtime diagnostics</h2>
-      <details>
-        <summary>Show normalization summary</summary>
-        <pre id="diagnostics"></pre>
-      </details>
-    </section>
-    <section class="panel">
-      <h2>Initialization status</h2>
-      <div id="status"></div>
-    </section>
+  <main class="app-main">
+    <div class="tab-panel-shell">
+      <section class="tab-panel" id="panel-browse" role="tabpanel"></section>
+      <section class="tab-panel" id="panel-collection" role="tabpanel" hidden></section>
+      <section class="tab-panel" id="panel-new-game" role="tabpanel" hidden></section>
+      <section class="tab-panel" id="panel-history" role="tabpanel" hidden></section>
+    </div>
+    <section class="stack gap-md" id="diagnostics-shell"></section>
   </main>
+
+  <nav class="mobile-tab-nav" id="mobile-tabs" aria-label="Primary mobile"></nav>
 
   <script type="module" src="./src/app/browser-entry.mjs"></script>
 </body>

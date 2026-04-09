@@ -1,3 +1,5 @@
+import { normalizeSelectedTab } from './app-tabs.mjs';
+
 export const STORAGE_KEY = 'legendary_state_v1';
 export const SCHEMA_VERSION = 1;
 export const USAGE_CATEGORIES = ['heroes', 'masterminds', 'villainGroups', 'henchmanGroups', 'schemes'];
@@ -177,9 +179,12 @@ function sanitizePreferences(candidatePreferences, notices) {
   const lastAdvancedSolo = typeof candidatePreferences.lastAdvancedSolo === 'boolean'
     ? candidatePreferences.lastAdvancedSolo
     : defaultPreferences.lastAdvancedSolo;
-  const selectedTab = candidatePreferences.selectedTab === null || typeof candidatePreferences.selectedTab === 'string'
-    ? candidatePreferences.selectedTab
-    : defaultPreferences.selectedTab;
+  let selectedTab = defaultPreferences.selectedTab;
+  if (candidatePreferences.selectedTab === null || candidatePreferences.selectedTab === undefined) {
+    selectedTab = defaultPreferences.selectedTab;
+  } else if (typeof candidatePreferences.selectedTab === 'string') {
+    selectedTab = normalizeSelectedTab(candidatePreferences.selectedTab);
+  }
 
   if (
     lastPlayerCount !== candidatePreferences.lastPlayerCount

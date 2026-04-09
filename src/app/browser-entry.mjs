@@ -1,4 +1,5 @@
 import { createEpic1Bundle } from './game-data-pipeline.mjs';
+import { DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from './app-tabs.mjs';
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
 import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
 import {
@@ -27,6 +28,7 @@ function syncDebugGlobals(viewModel) {
   window.__APP_STATE__ = viewModel.state;
   window.__APP_PERSISTENCE__ = viewModel.persistence;
   window.__CURRENT_SETUP__ = viewModel.ui.currentSetup;
+  window.__ACTIVE_TAB__ = viewModel.ui.selectedTab;
 }
 
 async function boot() {
@@ -51,6 +53,7 @@ async function boot() {
       generatorError: null,
       generatorNotices: [],
       currentSetup: null,
+      selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
       advancedSolo: hydration.state.preferences.lastAdvancedSolo
     }
@@ -94,7 +97,37 @@ async function boot() {
     }, actionNotice);
   };
 
+  const persistSelectedTab = (tabId, actionNotice) => {
+    const normalizedTabId = normalizeSelectedTab(tabId);
+    viewModel.ui.selectedTab = normalizedTabId;
+    applyStateUpdate((currentState) => {
+      currentState.preferences.selectedTab = normalizedTabId;
+      return currentState;
+    }, actionNotice);
+  };
+
   const actions = {
+    selectTab(tabId) {
+      persistSelectedTab(tabId, `Switched to the ${normalizeSelectedTab(tabId)} tab.`);
+    },
+    handleTabKeydown(tabId, key) {
+      const normalizedTabId = normalizeSelectedTab(tabId);
+      if (key === 'ArrowRight' || key === 'ArrowDown') {
+        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'next'), 'Switched tabs with keyboard navigation.');
+        return;
+      }
+      if (key === 'ArrowLeft' || key === 'ArrowUp') {
+        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'previous'), 'Switched tabs with keyboard navigation.');
+        return;
+      }
+      if (key === 'Home') {
+        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'first'), 'Jumped to the first tab with keyboard navigation.');
+        return;
+      }
+      if (key === 'End') {
+        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'last'), 'Jumped to the last tab with keyboard navigation.');
+      }
+    },
     toggleOwnedSet(setId) {
       clearGeneratedSetup();
       applyStateUpdate((currentState) => toggleOwnedSet(currentState, setId), 'Updated owned collection state. Generate a new setup to use the current collection.');
@@ -163,6 +196,7 @@ async function boot() {
       viewModel.persistence.updateNotices = result.notices;
       viewModel.persistence.lastSaveMessage = result.save.message;
       viewModel.persistence.lastSaveOk = result.save.ok;
+      viewModel.ui.selectedTab = DEFAULT_TAB_ID;
       viewModel.ui.selectedPlayerCount = result.state.preferences.lastPlayerCount;
       viewModel.ui.advancedSolo = result.state.preferences.lastAdvancedSolo;
       clearGeneratedSetup();
