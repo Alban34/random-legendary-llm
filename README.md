@@ -4,15 +4,23 @@ STATUS: Approved
 
 ## Project state
 
-The repository now contains the **Epic 1 + Epic 2 foundation** for the Legendary: Marvel randomizer.
+The repository now contains the **Epic 1 + Epic 2 + Epic 3 implementation foundation** for the Legendary: Marvel randomizer.
+
+Current status:
+- Epic 1 implementation, tests, and QC are complete
+- Epic 2 implementation and automated tests are in place
+- Epic 2 manual QC checklist items should still be reflected in `documentation/task-list.md`
+- Epic 3 implementation and automated tests are in place
+- Epic 3 manual QC checklist items are still pending in `documentation/task-list.md`
 
 Implemented so far:
 - canonical seed data under `src/data/`
 - shared normalization and validation logic under `src/app/`
 - versioned browser-state persistence under `src/app/state-store.mjs`
+- setup templates and generation logic under `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs`
 - a thin `index.html` shell for the browser app
-- npm-based Epic 1 + Epic 2 tests under `test/`
-- an Epic 1 terminal summary harness under `tools/`
+- npm-based Epic 1 + Epic 2 + Epic 3 tests under `test/`
+- a data-foundation summary reporter under `tools/`
 
 The app remains **fully static**:
 - no server-side code
@@ -31,6 +39,8 @@ Current entry points:
 - `src/app/browser-entry.mjs` — browser bootstrap entry
 - `src/app/game-data-pipeline.mjs` — canonical-data transformation, normalization, validation, and Epic 1 checks
 - `src/app/state-store.mjs` — versioned browser-state creation, hydration, persistence, history, and reset helpers
+- `src/app/setup-rules.mjs` — player-count templates and active-mode resolution
+- `src/app/setup-generator.mjs` — legality checks, freshness ranking, forced-group handling, and setup generation
 - `src/app/app-renderer.mjs` — browser rendering for the current foundation screen
 - `src/data/canonical-game-data.json` — project-owned canonical game data asset
 
@@ -77,7 +87,7 @@ http://localhost:8000/
 
 ---
 
-## Run Epic 1 checks
+## Run validation checks
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
@@ -98,7 +108,14 @@ cd "/Users/afayard1/Projects/random-legendary-llm"
 npm run check:epic2
 ```
 
-Optional human-readable summary reporter:
+Run the Epic 3 setup-generation checks only:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run check:epic3
+```
+
+Optional human-readable Epic 1 data summary reporter:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
@@ -143,4 +160,6 @@ Project documentation lives in `documentation/`.
 
 ## Next step
 
-With Epic 1 stabilized under the new static-hosted structure, the next major implementation target is **Epic 2 — State Management and Persistence**.
+With Epic 1, Epic 2, and Epic 3 implemented in code, the next major implementation target is **Epic 4 — Application Shell and Navigation**.
+
+Before closing Epic 3 completely, the remaining manual QC items in `documentation/task-list.md` should still be exercised in the browser.

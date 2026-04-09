@@ -1,9 +1,11 @@
 import { createEpic1Bundle } from './game-data-pipeline.mjs';
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
+import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
 import {
   STORAGE_KEY,
   acceptGameSetup,
   createStorageAdapter,
+  createDefaultState,
   hydrateState,
   resetAllState,
   resetUsageCategory,
@@ -20,88 +22,11 @@ async function loadSeed() {
   return response.json();
 }
 
-function buildPoolsFromSets(sets) {
-  return sets.reduce((accumulator, set) => {
-    accumulator.heroes.push(...set.heroes);
-    accumulator.masterminds.push(...set.masterminds);
-    accumulator.villainGroups.push(...set.villainGroups);
-    accumulator.henchmanGroups.push(...set.henchmanGroups);
-    accumulator.schemes.push(...set.schemes);
-    return accumulator;
-  }, {
-    heroes: [],
-    masterminds: [],
-    villainGroups: [],
-    henchmanGroups: [],
-    schemes: []
-  });
-}
-
-function pickDistinct(pool, count, offset = 0) {
-  if (pool.length === 0 || count <= 0) {
-    return [];
-  }
-
-  const picks = [];
-  const usedIds = new Set();
-  let cursor = offset;
-
-  while (picks.length < Math.min(count, pool.length)) {
-    const candidate = pool[cursor % pool.length];
-    cursor += 1;
-    if (usedIds.has(candidate.id)) {
-      continue;
-    }
-    usedIds.add(candidate.id);
-    picks.push(candidate);
-  }
-
-  return picks;
-}
-
-function buildSampleAcceptedGame(bundle, state) {
-  const ownedSetIds = new Set(state.collection.ownedSetIds);
-  const ownedSets = bundle.runtime.sets.filter((set) => ownedSetIds.has(set.id));
-  const ownedPools = buildPoolsFromSets(ownedSets);
-  const globalPools = buildPoolsFromSets(bundle.runtime.sets);
-  const canUseOwnedPools = ownedPools.heroes.length >= 3
-    && ownedPools.masterminds.length >= 1
-    && ownedPools.villainGroups.length >= 1
-    && ownedPools.henchmanGroups.length >= 1
-    && ownedPools.schemes.length >= 1;
-
-  const pools = canUseOwnedPools ? ownedPools : globalPools;
-  const offset = state.history.length;
-  const heroes = pickDistinct(pools.heroes, 3, offset).map((entity) => entity.id);
-  const villainGroups = pickDistinct(pools.villainGroups, 1, offset).map((entity) => entity.id);
-  const henchmanGroups = pickDistinct(pools.henchmanGroups, 1, offset).map((entity) => entity.id);
-  const masterminds = pickDistinct(pools.masterminds, 1, offset);
-  const schemes = pickDistinct(pools.schemes, 1, offset);
-
-  return {
-    config: {
-      playerCount: 1,
-      advancedSolo: false,
-      setupSnapshot: {
-        mastermindId: masterminds[0].id,
-        schemeId: schemes[0].id,
-        heroIds: heroes,
-        villainGroupIds: villainGroups,
-        henchmanGroupIds: henchmanGroups
-      }
-    },
-    notice: canUseOwnedPools
-      ? 'Logged a sample accepted game using the currently owned collection.'
-      : ownedSetIds.size > 0
-        ? 'Owned sets were insufficient for a sample accepted game, so the demo used the full catalog fallback.'
-        : 'No owned sets are selected yet, so the demo used the full catalog.'
-  };
-}
-
 function syncDebugGlobals(viewModel) {
   window.__EPIC1 = viewModel.bundle;
   window.__APP_STATE__ = viewModel.state;
   window.__APP_PERSISTENCE__ = viewModel.persistence;
+  window.__CURRENT_SETUP__ = viewModel.ui.currentSetup;
 }
 
 async function boot() {
@@ -122,7 +47,12 @@ async function boot() {
       lastSaveOk: null
     },
     ui: {
-      lastActionNotice: null
+      lastActionNotice: null,
+      generatorError: null,
+      generatorNotices: [],
+      currentSetup: null,
+      selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
+      advancedSolo: hydration.state.preferences.lastAdvancedSolo
     }
   };
 
@@ -147,13 +77,82 @@ async function boot() {
     rerender();
   };
 
+  const clearGeneratedSetup = () => {
+    viewModel.ui.currentSetup = null;
+    viewModel.ui.generatorError = null;
+    viewModel.ui.generatorNotices = [];
+  };
+
+  const persistPreferences = (playerCount, advancedSolo, actionNotice) => {
+    viewModel.ui.selectedPlayerCount = playerCount;
+    viewModel.ui.advancedSolo = advancedSolo;
+    clearGeneratedSetup();
+    applyStateUpdate((currentState) => {
+      currentState.preferences.lastPlayerCount = playerCount;
+      currentState.preferences.lastAdvancedSolo = advancedSolo;
+      return currentState;
+    }, actionNotice);
+  };
+
   const actions = {
     toggleOwnedSet(setId) {
-      applyStateUpdate((currentState) => toggleOwnedSet(currentState, setId), 'Updated owned collection state.');
+      clearGeneratedSetup();
+      applyStateUpdate((currentState) => toggleOwnedSet(currentState, setId), 'Updated owned collection state. Generate a new setup to use the current collection.');
     },
-    logSampleAcceptedGame() {
-      const sampleGame = buildSampleAcceptedGame(bundle, viewModel.state);
-      applyStateUpdate((currentState) => acceptGameSetup(currentState, sampleGame.config), sampleGame.notice);
+    setPlayerCount(playerCount) {
+      const advancedSolo = playerCount === 1 ? viewModel.ui.advancedSolo : false;
+      persistPreferences(playerCount, advancedSolo, `Selected ${playerCount} player${playerCount === 1 ? '' : 's'} setup mode.`);
+    },
+    toggleAdvancedSolo() {
+      if (viewModel.ui.selectedPlayerCount !== 1) {
+        viewModel.ui.lastActionNotice = 'Advanced Solo is only available for 1 player.';
+        rerender();
+        return;
+      }
+      persistPreferences(
+        viewModel.ui.selectedPlayerCount,
+        !viewModel.ui.advancedSolo,
+        `${!viewModel.ui.advancedSolo ? 'Enabled' : 'Disabled'} Advanced Solo mode.`
+      );
+    },
+    generateSetup() {
+      try {
+        const setup = generateSetup({
+          runtime: bundle.runtime,
+          state: viewModel.state,
+          playerCount: viewModel.ui.selectedPlayerCount,
+          advancedSolo: viewModel.ui.advancedSolo
+        });
+        viewModel.ui.currentSetup = setup;
+        viewModel.ui.generatorError = null;
+        viewModel.ui.generatorNotices = setup.notices;
+        viewModel.ui.lastActionNotice = 'Generated a new setup without mutating persisted usage or history.';
+      } catch (error) {
+        viewModel.ui.currentSetup = null;
+        viewModel.ui.generatorNotices = [];
+        viewModel.ui.generatorError = error.message;
+        viewModel.ui.lastActionNotice = 'Could not generate a legal setup for the current collection.';
+      }
+      rerender();
+    },
+    regenerateSetup() {
+      actions.generateSetup();
+      if (!viewModel.ui.generatorError) {
+        viewModel.ui.lastActionNotice = 'Regenerated the current setup without mutating persisted state.';
+        rerender();
+      }
+    },
+    acceptCurrentSetup() {
+      if (!viewModel.ui.currentSetup) {
+        viewModel.ui.lastActionNotice = 'Generate a setup before using Accept & Log.';
+        rerender();
+        return;
+      }
+      applyStateUpdate((currentState) => acceptGameSetup(currentState, {
+        playerCount: viewModel.ui.selectedPlayerCount,
+        advancedSolo: viewModel.ui.advancedSolo,
+        setupSnapshot: buildHistoryReadySetupSnapshot(viewModel.ui.currentSetup)
+      }), 'Accepted & logged the current generated setup.');
     },
     resetUsageCategory(category) {
       applyStateUpdate((currentState) => resetUsageCategory(currentState, category), `Reset ${category} usage stats.`);
@@ -164,6 +163,9 @@ async function boot() {
       viewModel.persistence.updateNotices = result.notices;
       viewModel.persistence.lastSaveMessage = result.save.message;
       viewModel.persistence.lastSaveOk = result.save.ok;
+      viewModel.ui.selectedPlayerCount = result.state.preferences.lastPlayerCount;
+      viewModel.ui.advancedSolo = result.state.preferences.lastAdvancedSolo;
+      clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the entire application state to defaults.';
       rerender();
     },
@@ -186,6 +188,14 @@ async function boot() {
         ? 'Wrote an invalid owned set ID to storage. Reload the page to verify safe cleanup.'
         : 'Could not write an invalid owned set ID to browser storage.';
       rerender();
+    },
+    clearToDefaults() {
+      const defaultState = createDefaultState();
+      viewModel.ui.selectedPlayerCount = defaultState.preferences.lastPlayerCount;
+      viewModel.ui.advancedSolo = defaultState.preferences.lastAdvancedSolo;
+      clearGeneratedSetup();
+      viewModel.ui.lastActionNotice = 'Reset the current setup controls to their default values.';
+      rerender();
     }
   };
 
@@ -197,4 +207,3 @@ boot().catch((error) => {
   window.__EPIC1_ERROR__ = error;
   renderInitializationError(document, error);
 });
-

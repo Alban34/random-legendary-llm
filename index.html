@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legendary: Marvel Randomizer — Epic 2 Foundation</title>
+  <title>Legendary: Marvel Randomizer — Epic 3 Foundation</title>
   <link rel="stylesheet" href="./src/app/app-shell.css" />
 </head>
 <body>
   <header>
-    <h1>Legendary: Marvel Randomizer — Epic 2 Foundation</h1>
-    <p>This milestone builds on the Epic 1 data foundation by adding browser-state hydration, persistence, usage tracking, accepted game history, reset helpers, and recovery handling for corrupted or missing storage.</p>
+    <h1>Legendary: Marvel Randomizer — Epic 3 Foundation</h1>
+    <p>This milestone builds on the Epic 1 data and Epic 2 persistence layers by adding player-count setup templates, legality validation, forced-group accounting, freshness-based selection, ephemeral generate/regenerate behavior, and history-ready setup snapshots.</p>
   </header>
   <main>
     <section class="grid" id="metrics"></section>
@@ -32,6 +32,16 @@
       <section class="panel">
         <h2>Persistence and recovery status</h2>
         <div id="persistence-summary"></div>
+      </section>
+      <section class="panel">
+        <h2>Setup engine preview</h2>
+        <div id="setup-engine"></div>
+      </section>
+    </section>
+    <section class="two-col">
+      <section class="panel">
+        <h2>Generated setup result</h2>
+        <div id="setup-result"></div>
       </section>
       <section class="panel">
         <h2>Usage statistics summary</h2>

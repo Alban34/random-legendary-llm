@@ -69,6 +69,10 @@ main {
   flex-wrap: wrap;
 }
 
+.align-center {
+  align-items: center;
+}
+
 .gap-sm {
   gap: 10px;
 }
@@ -131,6 +135,17 @@ main {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px 14px;
+}
+
+.result-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.result-card h3 {
+  margin: 0 0 8px;
 }
 
 .metric-sm {
@@ -285,6 +300,37 @@ details summary {
 
 .history-item {
   margin-bottom: 10px;
+}
+
+.result-list {
+  gap: 8px;
+}
+
+.result-list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.entity-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.entity-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(24, 119, 242, 0.12);
+  border: 1px solid rgba(24, 119, 242, 0.28);
+  color: var(--text);
 }
 
 .history-meta {

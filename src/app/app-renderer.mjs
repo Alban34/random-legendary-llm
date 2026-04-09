@@ -38,6 +38,35 @@ function formatHistoryEntry(record, bundle) {
   `;
 }
 
+function formatGeneratorNotices(currentSetup, generatorNotices, generatorError) {
+  if (generatorError) {
+    return `<div class="notice warning">${generatorError}</div>`;
+  }
+
+  if (!currentSetup) {
+    return '<div class="notice info">Generate a setup to preview the Epic 3 engine. Regenerate stays ephemeral until you accept.</div>';
+  }
+
+  if (!generatorNotices.length) {
+    return '<div class="notice success">This setup used fully fresh items in every category.</div>';
+  }
+
+  return generatorNotices.map((notice) => `<div class="notice info">${notice}</div>`).join('');
+}
+
+function formatSetupGroupList(groups) {
+  return groups.map((group) => `
+    <li class="result-list-item">
+      <span>${group.name}</span>
+      ${group.forced ? `<span class="pill">Forced by ${group.forcedBy === 'mastermind' ? 'Mastermind lead' : 'Scheme'}</span>` : ''}
+    </li>
+  `).join('');
+}
+
+function formatEntityCards(entities) {
+  return entities.map((entity) => `<span class="entity-chip">${entity.name}</span>`).join('');
+}
+
 function bindActionButtons(doc, actions) {
   doc.querySelectorAll('[data-action="toggle-owned-set"]').forEach((button) => {
     button.addEventListener('click', () => actions.toggleOwnedSet(button.dataset.setId));
@@ -47,8 +76,16 @@ function bindActionButtons(doc, actions) {
     button.addEventListener('click', () => actions.resetUsageCategory(button.dataset.category));
   });
 
+  doc.querySelectorAll('[data-action="set-player-count"]').forEach((button) => {
+    button.addEventListener('click', () => actions.setPlayerCount(Number(button.dataset.playerCount)));
+  });
+
   const buttonHandlers = {
-    'log-sample-game': actions.logSampleAcceptedGame,
+    'toggle-advanced-solo': actions.toggleAdvancedSolo,
+    'generate-setup': actions.generateSetup,
+    'regenerate-setup': actions.regenerateSetup,
+    'accept-current-setup': actions.acceptCurrentSetup,
+    'clear-setup-controls': actions.clearToDefaults,
     'reset-all-state': actions.resetAllState,
     'corrupt-saved-state': actions.corruptSavedState,
     'inject-invalid-owned-set': actions.injectInvalidOwnedSet
@@ -60,6 +97,137 @@ function bindActionButtons(doc, actions) {
       button.addEventListener('click', () => handler());
     }
   });
+}
+
+function renderSetupControls(viewModel) {
+  const { state, ui } = viewModel;
+  const playerButtons = [1, 2, 3, 4, 5].map((playerCount) => `
+    <button
+      class="button ${ui.selectedPlayerCount === playerCount ? 'button-primary' : 'button-secondary'}"
+      data-action="set-player-count"
+      data-player-count="${playerCount}"
+    >
+      ${playerCount}P
+    </button>
+  `).join('');
+
+  return `
+    <div class="stack gap-md">
+      <div>
+        <h3>Setup controls</h3>
+        <div class="button-row">${playerButtons}</div>
+      </div>
+      <div class="row wrap gap-sm align-center">
+        <button class="button ${ui.advancedSolo ? 'button-primary' : 'button-secondary'}" data-action="toggle-advanced-solo">
+          ${ui.advancedSolo ? 'Advanced Solo ✓' : 'Advanced Solo'}
+        </button>
+        <button class="button button-secondary" data-action="clear-setup-controls">Reset controls</button>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="muted">Selected mode</div>
+          <div class="metric-sm">${ui.advancedSolo ? 'Advanced Solo' : ui.selectedPlayerCount === 1 ? 'Standard Solo' : 'Standard'}</div>
+        </div>
+        <div class="summary-card">
+          <div class="muted">Owned sets</div>
+          <div class="metric-sm">${state.collection.ownedSetIds.length}</div>
+        </div>
+        <div class="summary-card">
+          <div class="muted">Last persisted mode</div>
+          <div class="metric-sm">${state.preferences.lastPlayerCount}P${state.preferences.lastAdvancedSolo ? ' + AS' : ''}</div>
+        </div>
+      </div>
+      <div class="button-row">
+        <button class="button button-primary" data-action="generate-setup">Generate Setup</button>
+        <button class="button button-secondary" data-action="regenerate-setup">Regenerate</button>
+        <button class="button button-success" data-action="accept-current-setup">Accept &amp; Log</button>
+      </div>
+      <div class="muted">Generate and Regenerate keep the current setup ephemeral. Only Accept &amp; Log updates usage stats and history.</div>
+    </div>
+  `;
+}
+
+function renderSetupResult(viewModel) {
+  const { ui } = viewModel;
+  const currentSetup = ui.currentSetup;
+
+  if (!currentSetup) {
+    return `
+      <div class="stack gap-md">
+        ${formatGeneratorNotices(currentSetup, ui.generatorNotices, ui.generatorError)}
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="muted">Heroes</div>
+            <div class="metric-sm">—</div>
+          </div>
+          <div class="summary-card">
+            <div class="muted">Villain Groups</div>
+            <div class="metric-sm">—</div>
+          </div>
+          <div class="summary-card">
+            <div class="muted">Henchman Groups</div>
+            <div class="metric-sm">—</div>
+          </div>
+          <div class="summary-card">
+            <div class="muted">Wounds</div>
+            <div class="metric-sm">—</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="stack gap-md">
+      ${formatGeneratorNotices(currentSetup, ui.generatorNotices, ui.generatorError)}
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="muted">Heroes</div>
+          <div class="metric-sm">${currentSetup.requirements.heroCount}</div>
+        </div>
+        <div class="summary-card">
+          <div class="muted">Villain Groups</div>
+          <div class="metric-sm">${currentSetup.requirements.villainGroupCount}</div>
+        </div>
+        <div class="summary-card">
+          <div class="muted">Henchman Groups</div>
+          <div class="metric-sm">${currentSetup.requirements.henchmanGroupCount}</div>
+        </div>
+        <div class="summary-card">
+          <div class="muted">Wounds</div>
+          <div class="metric-sm">${currentSetup.requirements.wounds}</div>
+        </div>
+      </div>
+      <div class="result-card">
+        <h3>Mastermind</h3>
+        <div><strong>${currentSetup.mastermind.name}</strong></div>
+        <div class="muted">${currentSetup.mastermind.leadEntity ? `Lead: ${currentSetup.mastermind.leadEntity.name} (${currentSetup.mastermind.lead.category})` : 'No mandatory lead'}</div>
+        ${currentSetup.mastermind.notes.length ? `<div class="muted">${currentSetup.mastermind.notes.join(' ')}</div>` : ''}
+      </div>
+      <div class="result-card">
+        <h3>Scheme</h3>
+        <div><strong>${currentSetup.scheme.name}</strong></div>
+        <div class="muted">Mode: ${currentSetup.template.modeLabel} · Bystanders: ${currentSetup.requirements.bystanders}</div>
+        ${currentSetup.scheme.notes.length ? `<div class="muted">${currentSetup.scheme.notes.join(' ')}</div>` : ''}
+      </div>
+      <div class="result-card">
+        <h3>Heroes</h3>
+        <div class="entity-chip-row">${formatEntityCards(currentSetup.heroes)}</div>
+      </div>
+      <div class="result-card">
+        <h3>Villain Groups</h3>
+        <ul class="clean result-list">${formatSetupGroupList(currentSetup.villainGroups)}</ul>
+      </div>
+      <div class="result-card">
+        <h3>Henchman Groups</h3>
+        <ul class="clean result-list">${formatSetupGroupList(currentSetup.henchmanGroups)}</ul>
+      </div>
+      <details>
+        <summary>Show history-ready setup snapshot</summary>
+        <pre>${JSON.stringify(currentSetup.setupSnapshot, null, 2)}</pre>
+      </details>
+    </div>
+  `;
 }
 
 export function renderBundle(doc, viewModel, actions) {
@@ -127,6 +295,9 @@ export function renderBundle(doc, viewModel, actions) {
     </div>
   `;
 
+  doc.getElementById('setup-engine').innerHTML = renderSetupControls(viewModel);
+  doc.getElementById('setup-result').innerHTML = renderSetupResult(viewModel);
+
   const persistenceNotices = [
     ...persistence.hydrateNotices,
     ...persistence.updateNotices
@@ -149,11 +320,20 @@ export function renderBundle(doc, viewModel, actions) {
     <div class="summary-grid">
       ${Object.entries(USAGE_LABELS).map(([category, label]) => {
         const usedCount = Object.keys(state.usage[category]).length;
+        const totalCount = category === 'heroes'
+          ? bundle.runtime.indexes.allHeroes.length
+          : category === 'masterminds'
+            ? bundle.runtime.indexes.allMasterminds.length
+            : category === 'villainGroups'
+              ? bundle.runtime.indexes.allVillainGroups.length
+              : category === 'henchmanGroups'
+                ? bundle.runtime.indexes.allHenchmanGroups.length
+                : bundle.runtime.indexes.allSchemes.length;
         return `
           <div class="summary-card">
             <div class="muted">${label}</div>
             <div class="metric-sm">${usedCount}</div>
-            <div class="muted">tracked items</div>
+            <div class="muted">tracked · ${totalCount - usedCount} never-played</div>
           </div>
         `;
       }).join('')}
@@ -165,7 +345,6 @@ export function renderBundle(doc, viewModel, actions) {
       <div>
         <h3>Persistence demo actions</h3>
         <div class="button-row">
-          <button class="button button-primary" data-action="log-sample-game">Log sample accepted game</button>
           <button class="button button-secondary" data-action="corrupt-saved-state">Write corrupted JSON</button>
           <button class="button button-secondary" data-action="inject-invalid-owned-set">Write invalid owned set ID</button>
           <button class="button button-danger" data-action="reset-all-state">Reset all state</button>
@@ -179,7 +358,7 @@ export function renderBundle(doc, viewModel, actions) {
           `).join('')}
         </div>
       </div>
-      <p class="muted">Use the two storage corruption buttons, then reload the page, to verify Epic 2 recovery behavior in the UI.</p>
+      <p class="muted">Use the storage corruption actions, then reload the page, to verify the Epic 2 recovery behavior. Use Generate / Regenerate / Accept &amp; Log above to exercise the Epic 3 engine.</p>
     </div>
   `;
 
@@ -197,13 +376,14 @@ export function renderBundle(doc, viewModel, actions) {
       recoveredOnLoad: persistence.recoveredOnLoad,
       ownedSetIds: state.collection.ownedSetIds,
       historyCount: state.history.length
-    }
+    },
+    currentSetup: ui.currentSetup ? ui.currentSetup.setupSnapshot : null
   }, null, 2);
 
   const failed = bundle.tests.filter((test) => test.status === 'fail');
   doc.getElementById('status').innerHTML = failed.length
     ? `<p class="error">Foundation loaded with ${failed.length} failing Epic 1 test(s).</p>`
-    : '<p class="status-pass">Epic 1 data foundation and Epic 2 state layer loaded successfully.</p>';
+    : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, and Epic 3 setup generation are loaded successfully.</p>';
 
   bindActionButtons(doc, actions);
 }
