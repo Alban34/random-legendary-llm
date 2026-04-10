@@ -26,39 +26,39 @@ See also: `documentation/design-system-epics.md`, `documentation/design-system.m
 ## Epic DS1 — Design Token Foundation and Theme Contract
 
 ### Epic-wide validation gate
-- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS1 work complete
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS1 work complete
 
 ### Story DS1.1 — Define the shared semantic token set for the application
-- [ ] Audit the existing shell CSS and list every hard-coded visual value that should become a semantic token
-- [ ] Define the baseline token families for color, typography, spacing, radius, shadow, and motion
-- [ ] Replace ambiguous or screen-specific token names with reusable semantic names
-- [ ] Document token intent so component authors know when to use each token
-- [ ] **Test:** verify the token set covers the current shell and shared component needs without requiring ad hoc fallback values
-- [ ] **QC (Automated):** add or extend checks that fail when shared components reintroduce hard-coded values instead of governed tokens
+- [x] Audit the existing shell CSS and list every hard-coded visual value that should become a semantic token
+- [x] Define the baseline token families for color, typography, spacing, radius, shadow, and motion
+- [x] Replace ambiguous or screen-specific token names with reusable semantic names
+- [x] Document token intent so component authors know when to use each token
+- [x] **Test:** verify the token set covers the current shell and shared component needs without requiring ad hoc fallback values
+- [x] **QC (Automated):** add or extend checks that fail when shared components reintroduce hard-coded values instead of governed tokens
 
 ### Story DS1.2 — Map the token set across Dark and Light themes
-- [ ] Define the concrete Dark theme values for the approved semantic tokens
-- [ ] Define the concrete Light theme values for the same semantic tokens
-- [ ] Verify both themes preserve the same interaction hierarchy and semantic meaning
-- [ ] Remove theme-specific component overrides that duplicate logic already handled by tokens
-- [ ] **Test:** verify both themes implement the full semantic token set and recover safely from invalid theme IDs
-- [ ] **QC (Automated):** add browser coverage that switches between Dark and Light and confirms the main shell remains readable and coherent
+- [x] Define the concrete Dark theme values for the approved semantic tokens
+- [x] Define the concrete Light theme values for the same semantic tokens
+- [x] Verify both themes preserve the same interaction hierarchy and semantic meaning
+- [x] Remove theme-specific component overrides that duplicate logic already handled by tokens
+- [x] **Test:** verify both themes implement the full semantic token set and recover safely from invalid theme IDs
+- [x] **QC (Automated):** add browser coverage that switches between Dark and Light and confirms the main shell remains readable and coherent
 
 ### Story DS1.3 — Align early theme application with the persisted theme contract
-- [ ] Audit the current startup path that applies `data-theme` before first paint
-- [ ] Ensure the theme bootstrap logic consumes the governed theme IDs only
-- [ ] Preserve fallback-to-dark behavior for invalid or missing stored values while normalizing legacy `midnight` and `newsprint` values
-- [ ] Confirm the first-paint path does not introduce a theme flash or mismatched shell state
-- [ ] **Test:** verify saved theme preference is applied correctly on initial load, legacy theme IDs normalize safely, and invalid stored values recover to Dark
-- [ ] **QC (Automated):** add browser QC for first-load theme application and fallback behavior across reloads
+- [x] Audit the current startup path that applies `data-theme` before first paint
+- [x] Ensure the theme bootstrap logic consumes the governed theme IDs only
+- [x] Preserve fallback-to-dark behavior for invalid or missing stored values while normalizing legacy `midnight` and `newsprint` values
+- [x] Confirm the first-paint path does not introduce a theme flash or mismatched shell state
+- [x] **Test:** verify saved theme preference is applied correctly on initial load, legacy theme IDs normalize safely, and invalid stored values recover to Dark
+- [x] **QC (Automated):** add browser QC for first-load theme application and fallback behavior across reloads
 
 ### Story DS1.4 — Document token usage rules and non-goals for future contributors
-- [ ] Document when to introduce a new semantic token versus reusing an existing one
-- [ ] Document prohibited styling patterns such as screen-specific token forks and direct use of copyrighted cover elements
-- [ ] Add guidance for how design tokens should be referenced from component CSS
-- [ ] Link the token rules from the relevant styling and UI documentation entry points
-- [ ] **Test:** verify the documentation describes the same token families and theme contract used in the implementation
-- [ ] **QC (Automated):** extend documentation-alignment checks to detect token-contract drift between docs and shipped CSS
+- [x] Document when to introduce a new semantic token versus reusing an existing one
+- [x] Document prohibited styling patterns such as screen-specific token forks and direct use of copyrighted cover elements
+- [x] Add guidance for how design tokens should be referenced from component CSS
+- [x] Link the token rules from the relevant styling and UI documentation entry points
+- [x] **Test:** verify the documentation describes the same token families and theme contract used in the implementation
+- [x] **QC (Automated):** extend documentation-alignment checks to detect token-contract drift between docs and shipped CSS
 
 ---
 

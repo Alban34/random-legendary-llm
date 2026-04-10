@@ -12,6 +12,8 @@ The shipped theme model now supports two built-in themes:
 
 The app applies the active theme by setting `data-theme` on `document.documentElement`, and `index.html` performs an early browser-storage read so the saved preference is applied before the main stylesheet paints.
 
+Canonical token definitions and governance rules live in `documentation/design-system.md`.
+
 ## Why the current approach stays in place
 
 The project constraints still matter more than raw styling ergonomics:
@@ -78,6 +80,24 @@ The supported theme contract is:
 - invalid or unknown stored values recover to `dark`
 - component rules consume semantic tokens rather than per-theme duplicated blocks
 - the startup path avoids runtime CSS fetches beyond the local stylesheet already shipped with the app
+
+## Governed token layer
+
+The stylesheet now exposes a governed semantic token layer in `src/app/app-shell.css` with these token families:
+- `--color-*`
+- `--font-*`
+- `--space-*`
+- `--radius-*`
+- `--shadow-*`
+- `--motion-*`
+
+For migration safety, existing component-facing aliases such as `--bg`, `--panel`, `--text`, and `--accent` are still present, but they now resolve from the semantic token layer rather than acting as the source of truth.
+
+Contributor rules:
+- prefer semantic tokens for new work
+- add a new token only when an existing semantic token cannot express the intent clearly
+- avoid screen-specific one-off token forks when a reusable semantic token would do
+- use `documentation/design-system.md` as the authoritative reference when token names or intent are unclear
 
 ## Migration constraints and non-goals
 

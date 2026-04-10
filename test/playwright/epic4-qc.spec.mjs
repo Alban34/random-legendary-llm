@@ -59,8 +59,8 @@ test.describe('Epic 4 automated QC', () => {
       };
     });
 
-    expect(shellStyles.accent).toBe('#e62429');
-    expect(shellStyles.bg).toBe('#0d0d0d');
+    expect(shellStyles.accent).toBe('#f05a28');
+    expect(shellStyles.bg).toBe('#11131a');
     expect(shellStyles.headerPosition).toBe('sticky');
     expect(shellStyles.activeTabBackground).not.toBe('rgba(0, 0, 0, 0)');
     expect(shellStyles.buttonRadius).toBe('999px');

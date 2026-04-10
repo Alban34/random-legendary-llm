@@ -91,6 +91,25 @@ Every story must satisfy this Definition of Done:
 
 ---
 
+## Design System Epic DS1 — Design Token Foundation and Theme Contract
+
+Required tests:
+- the stylesheet defines governed semantic token families for color, typography, spacing, radius, shadow, and motion
+- both supported themes implement the semantic token set
+- compatibility aliases such as `--bg`, `--panel`, `--text`, and `--accent` resolve from the semantic token layer
+- legacy theme IDs `midnight` and `newsprint` normalize safely to `dark` and `light`
+- styling documentation references the same governed token contract as the stylesheet
+
+QC checks:
+- verify theme switching still applies before first paint on reload
+- verify both supported themes remain legible across the primary shell on desktop and mobile
+
+Automated coverage:
+- `test/design-system-epic1-foundation.test.mjs` covers the governed token layer and design-system documentation contract
+- `test/playwright/epic18-qc.spec.mjs` continues to cover browser theme switching, persistence, and cross-theme legibility
+
+---
+
 ## Required test categories by epic
 
 ## Epic 1 — Data Foundation and Normalization

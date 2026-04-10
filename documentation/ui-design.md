@@ -5,6 +5,8 @@ STATUS: Approved
 ## Design Philosophy
 Themeable Marvel-inspired UI. Functional first, visually bold second. No external fonts, no framework — pure CSS with semantic custom properties.
 
+Canonical token definitions now live in `documentation/design-system.md`. This document remains the screen-level UI specification and examples reference.
+
 The current supported themes are:
 - `Dark` — the default high-contrast dark theme
 - `Light` — a warm light theme for bright environments
