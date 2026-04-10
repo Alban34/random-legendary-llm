@@ -202,10 +202,10 @@ function validateBaseCounts(pools, template) {
   return reasons;
 }
 
-export function validateSetupLegality({ runtime, state, playerCount, advancedSolo = false }) {
+export function validateSetupLegality({ runtime, state, playerCount, advancedSolo = false, playMode }) {
   let template;
   try {
-    template = resolveSetupTemplate(playerCount, advancedSolo);
+    template = resolveSetupTemplate(playerCount, { advancedSolo, playMode });
   } catch (error) {
     return {
       ok: false,
@@ -389,8 +389,8 @@ function summarizeRequirements(template, effectiveRequirements) {
   };
 }
 
-export function generateSetup({ runtime, state, playerCount, advancedSolo = false, random = Math.random }) {
-  const legality = validateSetupLegality({ runtime, state, playerCount, advancedSolo });
+export function generateSetup({ runtime, state, playerCount, advancedSolo = false, playMode, random = Math.random }) {
+  const legality = validateSetupLegality({ runtime, state, playerCount, advancedSolo, playMode });
   if (!legality.ok) {
     throw new Error(legality.reasons.join(' '));
   }
@@ -457,7 +457,7 @@ export function generateSetup({ runtime, state, playerCount, advancedSolo = fals
     }
   }
 
-  throw new Error('No legal setup could be generated from the current owned collection for the selected player count.');
+  throw new Error('No legal setup could be generated from the current owned collection for the selected play mode.');
 }
 
 export function buildHistoryReadySetupSnapshot(setup) {

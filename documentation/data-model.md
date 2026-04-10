@@ -21,9 +21,19 @@ Persisted slices in V1:
 - `collection` — owned set IDs
 - `usage` — per-category `plays` and `lastPlayedAt`
 - `history` — accepted game records stored with IDs only
-- `preferences` — last player count, Advanced Solo flag, and selected tab
+- `preferences` — last player count, legacy Advanced Solo flag, normalized play mode, and selected tab
 
 Ephemeral UI-only state such as the current generated setup, active toast notifications, open confirmation modal, and transient recovery notices is intentionally kept out of persisted browser state.
+
+Two-Handed Solo is now modeled as a first-class play mode. It is still recorded as a solo game in history, but the setup template uses the standard 2-player counts.
+
+### `PlayMode`
+
+```text
+"standard" | "advanced-solo" | "two-handed-solo"
+```
+
+`advancedSolo` remains in persisted state and history for backward compatibility with earlier saved data, but new runtime logic resolves `playMode` as the normalized source of truth.
 
 ---
 
@@ -264,6 +274,7 @@ The app should persist **one versioned root state object**.
   preferences: {
     lastPlayerCount: number,
     lastAdvancedSolo: boolean,
+    lastPlayMode: PlayMode,
     selectedTab: string | null
   }
 }
@@ -327,6 +338,7 @@ Accepted setups should be stored using IDs only.
   createdAt: string,
   playerCount: 1 | 2 | 3 | 4 | 5,
   advancedSolo: boolean,
+  playMode: PlayMode,
   setupSnapshot: {
     mastermindId: string,
     schemeId: string,
@@ -369,6 +381,7 @@ These are computed from `RUNTIME_DATA` plus persisted state:
 const SETUP_RULES = {
   1: { heroCount: 3, villainGroupCount: 1, henchmanGroupCount: 1, wounds: 25 },
   "1-advanced": { heroCount: 4, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 25 },
+  "1-two-handed": { heroCount: 5, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 30 },
   2: { heroCount: 5, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 30 },
   3: { heroCount: 5, villainGroupCount: 3, henchmanGroupCount: 1, wounds: 30 },
   4: { heroCount: 6, villainGroupCount: 3, henchmanGroupCount: 2, wounds: 35 },
@@ -391,6 +404,7 @@ The generator should validate:
 - selected collection legality,
 - player-count legality,
 - Advanced Solo eligibility,
+- Two-Handed Solo eligibility,
 - forced-group slot accounting,
 - least-played fallback only after legality is confirmed.
 

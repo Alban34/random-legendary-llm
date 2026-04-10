@@ -1,4 +1,5 @@
 import { USAGE_CATEGORIES, createDefaultState } from './state-store.mjs';
+import { getPlayModeLabel, resolvePlayMode } from './setup-rules.mjs';
 
 export const HISTORY_USAGE_LABELS = {
   heroes: 'Heroes',
@@ -31,11 +32,16 @@ export function summarizeUsageIndicators(runtime, state) {
 }
 
 export function formatHistorySummary(record, indexes) {
+  const playMode = resolvePlayMode(record.playerCount, {
+    advancedSolo: record.advancedSolo,
+    playMode: record.playMode
+  });
+
   return {
     id: record.id,
     createdAt: record.createdAt,
     playerLabel: `${record.playerCount} Player${record.playerCount === 1 ? '' : 's'}`,
-    modeLabel: record.advancedSolo ? 'Advanced Solo' : record.playerCount === 1 ? 'Standard Solo' : 'Standard',
+    modeLabel: getPlayModeLabel(playMode, record.playerCount),
     mastermindName: indexes.mastermindsById[record.setupSnapshot.mastermindId].name,
     schemeName: indexes.schemesById[record.setupSnapshot.schemeId].name,
     heroNames: record.setupSnapshot.heroIds.map((id) => indexes.heroesById[id].name),

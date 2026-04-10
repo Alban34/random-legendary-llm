@@ -218,6 +218,25 @@ QC checks:
 
 Automated coverage:
 - `test/epic7-new-game-experience.test.mjs` covers New Game control helpers, visible requirements, special-rule rendering inputs, and Accept & Log persistence behavior
+
+---
+
+## Epic 11 — Alternate Solo and Multiplayer Modes
+
+Required tests:
+- two-handed solo resolves to the documented setup counts
+- play-mode controls update requirement messaging without breaking legacy Advanced Solo behavior
+- accepted history records persist explicit play-mode metadata
+- legacy history records without `playMode` still hydrate and render safely
+
+QC checks:
+- verify the New Game screen exposes clear mode selection for 1-player flows
+- verify Two-Handed Solo shows the correct explanatory copy and setup counts
+- verify accepted setups that differ only by play mode remain distinguishable in history
+
+Automated coverage:
+- `test/epic11-play-modes.test.mjs` covers the play-mode model, history compatibility, and helper behavior
+- `test/playwright/epic11-qc.spec.mjs` covers mode selection, generated two-handed setups, and history rendering in the browser
 - `test/playwright/epic7-qc.spec.mjs` covers player-count controls, displayed requirements, full result rendering, scheme/mastermind cues, regenerate ephemerality, and Accept & Log browser flows
 
 ---

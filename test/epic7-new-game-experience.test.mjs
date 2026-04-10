@@ -62,7 +62,7 @@ test('Epic 7 control helpers expose visible requirements and Advanced Solo avail
   });
 
   const currentSetup = {
-    template: { playerCount: 2, advancedSolo: false },
+    template: { playerCount: 2, advancedSolo: false, playMode: 'standard' },
     requirements: {
       heroCount: 6,
       villainGroupCount: 2,
@@ -71,7 +71,7 @@ test('Epic 7 control helpers expose visible requirements and Advanced Solo avail
       bystanders: 12
     }
   };
-  assert.deepEqual(getDisplayedSetupRequirements({ playerCount: 2, advancedSolo: false, currentSetup }), currentSetup.requirements);
+  assert.deepEqual(getDisplayedSetupRequirements({ playerCount: 2, advancedSolo: false, playMode: 'standard', currentSetup }), currentSetup.requirements);
 });
 
 test('Epic 7 exposes UI-facing lead, team, and forced-group details for representative setups', () => {

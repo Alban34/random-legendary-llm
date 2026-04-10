@@ -3,6 +3,7 @@ import { DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from './app-ta
 import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from './feedback-utils.mjs';
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
 import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
+import { resolvePlayMode } from './setup-rules.mjs';
 import {
   STORAGE_KEY,
   acceptGameSetup,
@@ -48,6 +49,11 @@ function syncDebugGlobals(viewModel) {
     aboutOpen: viewModel.ui.aboutPanelOpen,
     completed: viewModel.state.preferences.onboardingCompleted
   };
+  window.__PLAY_MODE_UI__ = {
+    playerCount: viewModel.ui.selectedPlayerCount,
+    playMode: viewModel.ui.selectedPlayMode,
+    advancedSolo: viewModel.ui.advancedSolo
+  };
   window.__TOASTS__ = viewModel.ui.toasts;
 }
 
@@ -85,6 +91,10 @@ async function boot() {
       aboutPanelOpen: false,
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
+      selectedPlayMode: resolvePlayMode(hydration.state.preferences.lastPlayerCount, {
+        advancedSolo: hydration.state.preferences.lastAdvancedSolo,
+        playMode: hydration.state.preferences.lastPlayMode
+      }),
       advancedSolo: hydration.state.preferences.lastAdvancedSolo
     }
   };
@@ -223,13 +233,17 @@ async function boot() {
     viewModel.ui.generatorNotices = [];
   };
 
-  const persistPreferences = (playerCount, advancedSolo, actionNotice) => {
+  const persistPreferences = (playerCount, playMode, actionNotice) => {
+    const normalizedPlayMode = resolvePlayMode(playerCount, { playMode });
+    const advancedSolo = normalizedPlayMode === 'advanced-solo';
     viewModel.ui.selectedPlayerCount = playerCount;
+    viewModel.ui.selectedPlayMode = normalizedPlayMode;
     viewModel.ui.advancedSolo = advancedSolo;
     clearGeneratedSetup();
     applyStateUpdate((currentState) => {
       currentState.preferences.lastPlayerCount = playerCount;
       currentState.preferences.lastAdvancedSolo = advancedSolo;
+      currentState.preferences.lastPlayMode = normalizedPlayMode;
       return currentState;
     }, actionNotice);
   };
@@ -365,21 +379,17 @@ async function boot() {
       focusActionButton(viewModel.ui.modalReturnFocusAction);
     },
     setPlayerCount(playerCount) {
-      const advancedSolo = playerCount === 1 ? viewModel.ui.advancedSolo : false;
-      persistPreferences(playerCount, advancedSolo, `Selected ${playerCount} player${playerCount === 1 ? '' : 's'} setup mode.`);
+      const playMode = playerCount === 1 ? viewModel.ui.selectedPlayMode : 'standard';
+      persistPreferences(playerCount, playMode, `Selected ${playerCount} player${playerCount === 1 ? '' : 's'} setup mode.`);
     },
-    toggleAdvancedSolo() {
-      if (viewModel.ui.selectedPlayerCount !== 1) {
-        viewModel.ui.lastActionNotice = 'Advanced Solo is only available for 1 player.';
+    setPlayMode(playMode) {
+      if (viewModel.ui.selectedPlayerCount !== 1 && playMode !== 'standard') {
+        viewModel.ui.lastActionNotice = 'Alternate solo modes are only available for 1 player.';
         rerender();
-        enqueueToast({ variant: 'warning', message: 'Advanced Solo is only available for 1 player.' });
+        enqueueToast({ variant: 'warning', message: 'Alternate solo modes are only available for 1 player.' });
         return;
       }
-      persistPreferences(
-        viewModel.ui.selectedPlayerCount,
-        !viewModel.ui.advancedSolo,
-        `${!viewModel.ui.advancedSolo ? 'Enabled' : 'Disabled'} Advanced Solo mode.`
-      );
+      persistPreferences(viewModel.ui.selectedPlayerCount, playMode, `Selected ${playMode.replaceAll('-', ' ')} mode.`);
     },
     generateSetup() {
       try {
@@ -387,7 +397,8 @@ async function boot() {
           runtime: bundle.runtime,
           state: viewModel.state,
           playerCount: viewModel.ui.selectedPlayerCount,
-          advancedSolo: viewModel.ui.advancedSolo
+          advancedSolo: viewModel.ui.advancedSolo,
+          playMode: viewModel.ui.selectedPlayMode
         });
         viewModel.ui.currentSetup = setup;
         viewModel.ui.generatorError = null;
@@ -419,6 +430,7 @@ async function boot() {
       applyStateUpdate((currentState) => acceptGameSetup(currentState, {
         playerCount: viewModel.ui.selectedPlayerCount,
         advancedSolo: viewModel.ui.advancedSolo,
+        playMode: viewModel.ui.selectedPlayMode,
         setupSnapshot: buildHistoryReadySetupSnapshot(viewModel.ui.currentSetup)
       }), 'Accepted & logged the current generated setup.');
       enqueueToast({ variant: 'success', message: 'Accepted & logged the current generated setup.' });
@@ -437,6 +449,10 @@ async function boot() {
       viewModel.persistence.lastSaveOk = result.save.ok;
       viewModel.ui.selectedTab = DEFAULT_TAB_ID;
       viewModel.ui.selectedPlayerCount = result.state.preferences.lastPlayerCount;
+      viewModel.ui.selectedPlayMode = resolvePlayMode(result.state.preferences.lastPlayerCount, {
+        advancedSolo: result.state.preferences.lastAdvancedSolo,
+        playMode: result.state.preferences.lastPlayMode
+      });
       viewModel.ui.advancedSolo = result.state.preferences.lastAdvancedSolo;
       viewModel.ui.onboardingVisible = !result.state.preferences.onboardingCompleted;
       viewModel.ui.onboardingStep = 0;
@@ -487,6 +503,7 @@ async function boot() {
     clearToDefaults() {
       const defaultState = createDefaultState();
       viewModel.ui.selectedPlayerCount = defaultState.preferences.lastPlayerCount;
+      viewModel.ui.selectedPlayMode = defaultState.preferences.lastPlayMode;
       viewModel.ui.advancedSolo = defaultState.preferences.lastAdvancedSolo;
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the current setup controls to their default values.';

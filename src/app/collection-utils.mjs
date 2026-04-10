@@ -8,12 +8,13 @@ export const COLLECTION_TYPE_GROUPS = [
 ];
 
 export const COLLECTION_FEASIBILITY_MODES = [
-  { id: 'standard-solo', label: 'Standard Solo (1P)', playerCount: 1, advancedSolo: false },
-  { id: 'advanced-solo', label: 'Advanced Solo', playerCount: 1, advancedSolo: true },
-  { id: '2p', label: '2 Players', playerCount: 2, advancedSolo: false },
-  { id: '3p', label: '3 Players', playerCount: 3, advancedSolo: false },
-  { id: '4p', label: '4 Players', playerCount: 4, advancedSolo: false },
-  { id: '5p', label: '5 Players', playerCount: 5, advancedSolo: false }
+  { id: 'standard-solo', label: 'Standard Solo (1P)', playerCount: 1, advancedSolo: false, playMode: 'standard' },
+  { id: 'advanced-solo', label: 'Advanced Solo', playerCount: 1, advancedSolo: true, playMode: 'advanced-solo' },
+  { id: 'two-handed-solo', label: 'Two-Handed Solo', playerCount: 1, advancedSolo: false, playMode: 'two-handed-solo' },
+  { id: '2p', label: '2 Players', playerCount: 2, advancedSolo: false, playMode: 'standard' },
+  { id: '3p', label: '3 Players', playerCount: 3, advancedSolo: false, playMode: 'standard' },
+  { id: '4p', label: '4 Players', playerCount: 4, advancedSolo: false, playMode: 'standard' },
+  { id: '5p', label: '5 Players', playerCount: 5, advancedSolo: false, playMode: 'standard' }
 ];
 
 export function groupSetsByType(sets) {
@@ -44,7 +45,8 @@ export function getCollectionFeasibility(runtime, state) {
       runtime,
       state,
       playerCount: mode.playerCount,
-      advancedSolo: mode.advancedSolo
+      advancedSolo: mode.advancedSolo,
+      playMode: mode.playMode
     });
 
     return {

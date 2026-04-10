@@ -76,6 +76,7 @@ test('Epic 6 feasibility indicators react to empty, thin, and healthy collection
   const healthyFeasibility = getCollectionFeasibility(bundle.runtime, healthyState);
   assert.equal(healthyFeasibility.length, COLLECTION_FEASIBILITY_MODES.length);
   assert.equal(healthyFeasibility.every((mode) => mode.ok === true), true);
+  assert.ok(healthyFeasibility.some((mode) => mode.id === 'two-handed-solo'));
 });
 
 test('Epic 6 clearing the collection removes owned sets without disturbing history or usage', () => {

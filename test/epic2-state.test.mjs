@@ -82,6 +82,7 @@ test('Epic 2 default root state matches the expected schema', () => {
   assert.deepEqual(state.preferences, {
     lastPlayerCount: 1,
     lastAdvancedSolo: false,
+    lastPlayMode: 'standard',
     selectedTab: null,
     onboardingCompleted: false
   });

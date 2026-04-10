@@ -92,6 +92,7 @@ test('Epic 10 architecture and data-model docs describe the shipped runtime laye
   assert.match(docs.dataModel, new RegExp(`"${STORAGE_KEY}"|${STORAGE_KEY}`));
   assert.match(docs.dataModel, /lastPlayerCount/);
   assert.match(docs.dataModel, /lastAdvancedSolo/);
+  assert.match(docs.dataModel, /lastPlayMode/);
   assert.match(docs.dataModel, /selectedTab/);
   assert.match(docs.dataModel, /GameRecord/);
   assert.match(docs.dataModel, /Generate\/Regenerate remain ephemeral/i);
@@ -106,12 +107,13 @@ test('Epic 10 setup-rules documentation matches the runtime setup templates and 
   const expectedRows = [
     { playerCount: 1, advancedSolo: false },
     { playerCount: 1, advancedSolo: true },
+    { playerCount: 1, playMode: 'two-handed-solo' },
     { playerCount: 2, advancedSolo: false },
     { playerCount: 3, advancedSolo: false },
     { playerCount: 4, advancedSolo: false },
     { playerCount: 5, advancedSolo: false }
-  ].map(({ playerCount, advancedSolo }) => {
-    const template = resolveSetupTemplate(playerCount, advancedSolo);
+  ].map(({ playerCount, advancedSolo, playMode }) => {
+    const template = resolveSetupTemplate(playerCount, { advancedSolo, playMode });
     return `| ${template.playerCount} | ${template.modeLabel} | ${template.heroCount} | ${template.villainGroupCount} | ${template.henchmanGroupCount} | ${template.wounds} |`;
   });
 
@@ -119,8 +121,9 @@ test('Epic 10 setup-rules documentation matches the runtime setup templates and 
     assert.ok(docs.setupRules.includes(row), `Missing setup-rules row: ${row}`);
   });
 
-  assert.equal(Object.keys(SETUP_RULES).length, 6);
+  assert.equal(Object.keys(SETUP_RULES).length, 7);
   assert.match(docs.setupRules, /Advanced Solo is only available in 1-player mode/);
+  assert.match(docs.setupRules, /Two-Handed Solo uses the standard 2-player setup counts/);
   assert.match(docs.setupRules, /Generate \/ Regenerate/);
   assert.match(docs.setupRules, /Accept & Log/);
   assert.match(docs.setupRules, /updates usage stats/i);

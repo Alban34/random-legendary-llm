@@ -1,6 +1,6 @@
 # Ideas of improvements
 
-- [ ] Add possibility to do 2-handed solo
+- [x] Add possibility to do 2-handed solo
 - [ ] Add possibility to save the score of a given game, and to keep track of the score history across games
 - [ ] Add possibility to export the collection and score history as a JSON file, and to import it back to the app
 - [ ] Add stats on games played, win/loss ratio, most played cards, etc.
@@ -14,3 +14,4 @@
 - [x] Improve the welcome page, it looks too crowded and overwhelming, maybe by adding some spacing, grouping related information, and using a more visually appealing layout
 - [x] Do not display developers information by default, it should be hidden behind a "About this project" link or button, to avoid overwhelming users who just want to use the app without being interested in the development details
 - [ ] Game history should be first in the History page
+- [ ] Interface localisation (fr, es, de, it)

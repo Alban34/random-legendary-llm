@@ -1,4 +1,5 @@
 import { normalizeSelectedTab } from './app-tabs.mjs';
+import { resolvePlayMode } from './setup-rules.mjs';
 
 export const STORAGE_KEY = 'legendary_state_v1';
 export const SCHEMA_VERSION = 1;
@@ -34,6 +35,7 @@ function createDefaultPreferences() {
   return {
     lastPlayerCount: 1,
     lastAdvancedSolo: false,
+    lastPlayMode: 'standard',
     selectedTab: null,
     onboardingCompleted: false
   };
@@ -144,11 +146,23 @@ function sanitizeGameRecord(record, indexes, notices) {
     return null;
   }
 
+  let playMode;
+  try {
+    playMode = resolvePlayMode(record.playerCount, {
+      advancedSolo: record.advancedSolo,
+      playMode: record.playMode
+    });
+  } catch (error) {
+    notices.push(`Removed invalid stored game history record '${record.id ?? 'unknown'}'.`);
+    return null;
+  }
+
   return {
     id: record.id,
     createdAt: record.createdAt,
     playerCount: record.playerCount,
-    advancedSolo: record.advancedSolo,
+    advancedSolo: playMode === 'advanced-solo',
+    playMode,
     setupSnapshot: {
       mastermindId: record.setupSnapshot.mastermindId,
       schemeId: record.setupSnapshot.schemeId,
@@ -180,6 +194,15 @@ function sanitizePreferences(candidatePreferences, notices) {
   const lastAdvancedSolo = typeof candidatePreferences.lastAdvancedSolo === 'boolean'
     ? candidatePreferences.lastAdvancedSolo
     : defaultPreferences.lastAdvancedSolo;
+  let lastPlayMode;
+  try {
+    lastPlayMode = resolvePlayMode(lastPlayerCount, {
+      advancedSolo: lastAdvancedSolo,
+      playMode: candidatePreferences.lastPlayMode
+    });
+  } catch (error) {
+    lastPlayMode = resolvePlayMode(lastPlayerCount, { advancedSolo: lastAdvancedSolo });
+  }
   let selectedTab = defaultPreferences.selectedTab;
   if (candidatePreferences.selectedTab === null || candidatePreferences.selectedTab === undefined) {
     selectedTab = defaultPreferences.selectedTab;
@@ -193,13 +216,14 @@ function sanitizePreferences(candidatePreferences, notices) {
   if (
     lastPlayerCount !== candidatePreferences.lastPlayerCount
     || lastAdvancedSolo !== candidatePreferences.lastAdvancedSolo
+    || (candidatePreferences.lastPlayMode !== undefined && lastPlayMode !== candidatePreferences.lastPlayMode)
     || selectedTab !== candidatePreferences.selectedTab
     || onboardingCompleted !== candidatePreferences.onboardingCompleted
   ) {
     notices.push('Recovered invalid preference values during state hydration.');
   }
 
-  return { lastPlayerCount, lastAdvancedSolo, selectedTab, onboardingCompleted };
+  return { lastPlayerCount, lastAdvancedSolo, lastPlayMode, selectedTab, onboardingCompleted };
 }
 
 function sanitizeStateCandidate(candidate, indexes) {
@@ -426,12 +450,14 @@ function createRecordId() {
   return `game-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
 }
 
-export function createGameRecord({ playerCount, advancedSolo, setupSnapshot, createdAt = new Date().toISOString(), id = createRecordId() }) {
+export function createGameRecord({ playerCount, advancedSolo, playMode, setupSnapshot, createdAt = new Date().toISOString(), id = createRecordId() }) {
+  const normalizedPlayMode = resolvePlayMode(playerCount, { advancedSolo, playMode });
   return {
     id,
     createdAt,
     playerCount,
-    advancedSolo,
+    advancedSolo: normalizedPlayMode === 'advanced-solo',
+    playMode: normalizedPlayMode,
     setupSnapshot: {
       mastermindId: setupSnapshot.mastermindId,
       schemeId: setupSnapshot.schemeId,
@@ -450,6 +476,7 @@ export function acceptGameSetup(state, gameConfig) {
   nextState.history = sortHistoryNewestFirst([record, ...nextState.history]);
   nextState.preferences.lastPlayerCount = record.playerCount;
   nextState.preferences.lastAdvancedSolo = record.advancedSolo;
+  nextState.preferences.lastPlayMode = record.playMode;
 
   record.setupSnapshot.heroIds.forEach((id) => incrementUsageStat(nextState.usage.heroes, id, playedAt));
   incrementUsageStat(nextState.usage.masterminds, record.setupSnapshot.mastermindId, playedAt);

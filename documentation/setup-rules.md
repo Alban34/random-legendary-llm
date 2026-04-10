@@ -13,7 +13,7 @@ It focuses on:
 - legality checks,
 - and selection priority rules.
 
-The shipped V1 implementation resolves these templates through `resolveSetupTemplate(playerCount, advancedSolo)` and applies them inside `generateSetup(...)` before any usage or history state is mutated.
+The shipped implementation resolves these templates through `resolveSetupTemplate(playerCount, { advancedSolo, playMode })` and applies them inside `generateSetup(...)` before any usage or history state is mutated.
 
 ---
 
@@ -23,6 +23,7 @@ The shipped V1 implementation resolves these templates through `resolveSetupTemp
 |---|---|---:|---:|---:|---:|
 | 1 | Standard Solo | 3 | 1 | 1 | 25 |
 | 1 | Advanced Solo | 4 | 2 | 1 | 25 |
+| 1 | Two-Handed Solo | 5 | 2 | 1 | 30 |
 | 2 | Standard | 5 | 2 | 1 | 30 |
 | 3 | Standard | 5 | 3 | 1 | 30 |
 | 4 | Standard | 6 | 3 | 2 | 35 |
@@ -55,8 +56,11 @@ Examples of legality checks:
 - enough total Henchman Groups exist after accounting for forced groups
 - the selected Scheme is legal for the selected player count
 - Advanced Solo is only available in 1-player mode
+- Two-Handed Solo is only available in 1-player mode
 
 If the owned pool is not legally sufficient, the app must fail with a clear message.
+
+Two-Handed Solo uses the standard 2-player setup counts while keeping accepted history records labeled as a solo mode.
 
 ---
 

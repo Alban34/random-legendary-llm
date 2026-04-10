@@ -38,19 +38,20 @@ test.describe('Epic 7 automated QC', () => {
     await selectTab(page, 'new-game');
   });
 
-  test('renders player-count controls, disables Advanced Solo outside 1-player mode, and updates displayed requirements', async ({ page }) => {
+  test('renders player-count controls, updates play-mode options by player count, and updates displayed requirements', async ({ page }) => {
     const requirementsCard = page.locator('#setup-requirements-card');
 
     await expect(requirementsCard).toContainText('3 Heroes · 1 Villain Group · 1 Henchman Group · 25 Wounds');
     await expect(page.locator('[data-action="accept-current-setup"]')).toBeDisabled();
+    await expect(page.locator('[data-action="set-play-mode"]')).toHaveCount(3);
 
     await page.locator('[data-action="set-player-count"][data-player-count="2"]').click();
-    await expect(page.locator('[data-action="toggle-advanced-solo"]')).toBeDisabled();
+    await expect(page.locator('[data-action="set-play-mode"]')).toHaveCount(1);
     await expect(requirementsCard).toContainText('5 Heroes · 2 Villain Groups · 1 Henchman Group · 30 Wounds');
 
     await page.locator('[data-action="set-player-count"][data-player-count="1"]').click();
-    await expect(page.locator('[data-action="toggle-advanced-solo"]')).toBeEnabled();
-    await page.locator('[data-action="toggle-advanced-solo"]').click();
+    await expect(page.locator('[data-action="set-play-mode"]')).toHaveCount(3);
+    await page.locator('[data-action="set-play-mode"][data-play-mode="advanced-solo"]').click();
     await expect(requirementsCard).toContainText('4 Heroes · 2 Villain Groups · 1 Henchman Group · 25 Wounds');
   });
 

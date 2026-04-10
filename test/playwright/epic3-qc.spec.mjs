@@ -81,13 +81,8 @@ async function generateSetup(page) {
 async function setPlayerMode(page, playerCount, advancedSolo = false) {
   await selectTab(page, 'new-game');
   await page.locator(`#panel-new-game [data-action="set-player-count"][data-player-count="${playerCount}"]`).click();
-  const advancedButton = page.locator('#panel-new-game [data-action="toggle-advanced-solo"]');
-  const shouldEnable = advancedSolo;
-  const isEnabled = await advancedButton.textContent();
-  const currentlyEnabled = isEnabled?.includes('✓') ?? false;
-  if (currentlyEnabled !== shouldEnable) {
-    await advancedButton.click();
-  }
+  const playMode = playerCount === 1 && advancedSolo ? 'advanced-solo' : 'standard';
+  await page.locator(`#panel-new-game [data-action="set-play-mode"][data-play-mode="${playMode}"]`).click();
 }
 
 test.describe('Epic 3 automated QC', () => {

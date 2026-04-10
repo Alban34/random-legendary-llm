@@ -68,8 +68,11 @@ test('Epic 3 resolves setup templates for all supported player modes including A
   assert.deepEqual(resolveSetupTemplate(1, false), {
     key: '1',
     playerCount: 1,
+    effectivePlayerCount: 1,
     advancedSolo: false,
+    playMode: 'standard',
     modeLabel: 'Standard Solo',
+    modeDescription: 'Use the standard setup counts for the selected player count.',
     heroCount: 3,
     villainGroupCount: 1,
     henchmanGroupCount: 1,

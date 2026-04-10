@@ -3,7 +3,7 @@ import { BROWSE_TYPE_OPTIONS, filterBrowseSets, getBrowseTypeLabel, summarizeBro
 import { COLLECTION_TYPE_GROUPS, getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
 import { TOAST_VARIANTS } from './feedback-utils.mjs';
 import { buildFullResetPreview, formatHistorySummary, summarizeUsageIndicators } from './history-utils.mjs';
-import { formatHeroTeamLabel, formatMastermindLeadLabel, getDisplayedSetupRequirements, isAdvancedSoloAvailable } from './new-game-utils.mjs';
+import { formatHeroTeamLabel, formatMastermindLeadLabel, formatPersistedPlayMode, getAvailablePlayModes, getDisplayedSetupRequirements, getPlayModeHelpText } from './new-game-utils.mjs';
 
 function formatDuplicateEntries(bundle) {
   return ['Black Widow', 'Loki', 'Thor', 'Nova', 'Venom']
@@ -23,7 +23,7 @@ function formatHistoryEntry(record, bundle) {
       <summary>
         <strong>${summary.mastermindName}</strong>
         <span class="pill">${summary.playerLabel}</span>
-        ${record.advancedSolo ? '<span class="pill">Advanced Solo</span>' : ''}
+        <span class="pill">${summary.modeLabel}</span>
       </summary>
       <div class="history-meta muted">Accepted ${new Date(summary.createdAt).toLocaleString()} · ${summary.modeLabel}</div>
       <div class="history-meta"><strong>Scheme:</strong> ${summary.schemeName}</div>
@@ -677,10 +677,11 @@ function renderCollectionPanel(viewModel) {
 
 function renderSetupControls(viewModel) {
   const { state, ui } = viewModel;
-  const advancedSoloAvailable = isAdvancedSoloAvailable(ui.selectedPlayerCount);
+  const availablePlayModes = getAvailablePlayModes(ui.selectedPlayerCount);
   const displayedRequirements = getDisplayedSetupRequirements({
     playerCount: ui.selectedPlayerCount,
     advancedSolo: ui.advancedSolo,
+    playMode: ui.selectedPlayMode,
     currentSetup: ui.currentSetup
   });
   const playerButtons = [1, 2, 3, 4, 5].map((playerCount) => `
@@ -692,6 +693,17 @@ function renderSetupControls(viewModel) {
       ${playerCount}P
     </button>
   `).join('');
+  const playModeButtons = availablePlayModes.map((mode) => `
+    <button
+      class="button ${ui.selectedPlayMode === mode.id ? 'button-primary' : 'button-secondary'}"
+      data-action="set-play-mode"
+      data-play-mode="${mode.id}"
+      aria-pressed="${ui.selectedPlayMode === mode.id}"
+      title="${mode.description}"
+    >
+      ${ui.selectedPlayMode === mode.id ? `${mode.label} ✓` : mode.label}
+    </button>
+  `).join('');
 
   return `
     <div class="stack gap-md">
@@ -699,17 +711,18 @@ function renderSetupControls(viewModel) {
         <h3>Player count</h3>
         <div class="button-row">${playerButtons}</div>
       </div>
+      <div>
+        <h3>Play mode</h3>
+        <div class="button-row">${playModeButtons}</div>
+      </div>
       <div class="row wrap gap-sm align-center">
-        <button class="button ${ui.advancedSolo ? 'button-primary' : 'button-secondary'} ${advancedSoloAvailable ? '' : 'button-disabled'}" data-action="toggle-advanced-solo" ${advancedSoloAvailable ? '' : 'disabled'}>
-          ${ui.advancedSolo ? 'Advanced Solo ✓' : 'Advanced Solo'}
-        </button>
         <button class="button button-secondary" data-action="clear-setup-controls">Reset controls</button>
       </div>
-      <div class="muted">${advancedSoloAvailable ? 'Advanced Solo is available only in 1-player mode.' : 'Advanced Solo is disabled until you switch back to 1 player.'}</div>
+      <div class="muted">${getPlayModeHelpText(ui.selectedPlayerCount, ui.selectedPlayMode)}</div>
       <div class="summary-grid">
         <div class="summary-card">
           <div class="muted">Selected mode</div>
-          <div class="metric-sm">${ui.advancedSolo ? 'Advanced Solo' : ui.selectedPlayerCount === 1 ? 'Standard Solo' : 'Standard'}</div>
+          <div class="metric-sm">${availablePlayModes.find((mode) => mode.id === ui.selectedPlayMode)?.label || 'Standard'}</div>
         </div>
         <div class="summary-card">
           <div class="muted">Owned sets</div>
@@ -717,12 +730,15 @@ function renderSetupControls(viewModel) {
         </div>
         <div class="summary-card">
           <div class="muted">Last persisted mode</div>
-          <div class="metric-sm">${state.preferences.lastPlayerCount}P${state.preferences.lastAdvancedSolo ? ' + AS' : ''}</div>
+          <div class="metric-sm">${formatPersistedPlayMode(state.preferences.lastPlayerCount, state.preferences.lastPlayMode)}</div>
         </div>
       </div>
       <div class="result-card current-requirements-card" id="setup-requirements-card">
         <h3>Setup requirements</h3>
         <div class="muted">${formatSetCountLabel(displayedRequirements.heroCount, 'Hero', 'Heroes')} · ${formatSetCountLabel(displayedRequirements.villainGroupCount, 'Villain Group')} · ${formatSetCountLabel(displayedRequirements.henchmanGroupCount, 'Henchman Group')} · ${formatSetCountLabel(displayedRequirements.wounds, 'Wound', 'Wounds')}</div>
+        ${ui.selectedPlayMode === 'two-handed-solo'
+          ? '<div class="muted">Two-Handed Solo uses the standard 2-player setup counts while keeping history labeled as a solo game.</div>'
+          : ''}
       </div>
       <div class="button-row">
         <button class="button button-primary" data-action="generate-setup">Generate Setup</button>
@@ -870,6 +886,10 @@ function bindActionButtons(doc, actions) {
     button.addEventListener('click', () => actions.setPlayerCount(Number(button.dataset.playerCount)));
   });
 
+  doc.querySelectorAll('[data-action="set-play-mode"]').forEach((button) => {
+    button.addEventListener('click', () => actions.setPlayMode(button.dataset.playMode));
+  });
+
   doc.querySelectorAll('[data-action="select-tab"]').forEach((button) => {
     button.addEventListener('click', () => actions.selectTab(button.dataset.tabId));
     button.addEventListener('keydown', (event) => {
@@ -900,7 +920,6 @@ function bindActionButtons(doc, actions) {
     'request-reset-all-state': actions.requestResetAllState,
     'cancel-reset-all-state': actions.cancelResetAllState,
     'confirm-reset-all-state': actions.resetAllState,
-    'toggle-advanced-solo': actions.toggleAdvancedSolo,
     'toggle-about-panel': actions.toggleAboutPanel,
     'start-onboarding': actions.startOnboarding,
     'previous-onboarding-step': actions.previousOnboardingStep,
