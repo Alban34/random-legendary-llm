@@ -3,7 +3,14 @@ import { BROWSE_TYPE_OPTIONS, filterBrowseSets, getBrowseTypeLabel, summarizeBro
 import { COLLECTION_TYPE_GROUPS, getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
 import { TOAST_VARIANTS } from './feedback-utils.mjs';
 import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from './forced-picks-utils.mjs';
-import { buildFullResetPreview, formatHistorySummary, summarizeUsageIndicators } from './history-utils.mjs';
+import {
+  buildFullResetPreview,
+  buildHistoryGroups,
+  DEFAULT_HISTORY_GROUPING_MODE,
+  formatHistorySummary,
+  HISTORY_GROUPING_MODES,
+  summarizeUsageIndicators
+} from './history-utils.mjs';
 import { formatHeroTeamLabel, formatMastermindLeadLabel, formatPersistedPlayMode, getAvailablePlayModes, getDisplayedSetupRequirements, getPlayModeHelpText } from './new-game-utils.mjs';
 import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from './result-utils.mjs';
 import { buildInsightsDashboard } from './stats-utils.mjs';
@@ -86,6 +93,62 @@ function formatHistoryEntry(record, bundle, ui) {
       ${isEditing ? renderHistoryResultEditor(summary, ui) : ''}
     </details>
   `;
+}
+
+function renderHistoryGroupingControls(activeMode) {
+  return `
+    <div class="stack gap-sm" data-history-grouping-controls>
+      <div class="row space-between wrap gap-sm align-center">
+        <strong>Group by</strong>
+        <span class="muted">Presentation only. Grouping never changes saved history or backups.</span>
+      </div>
+      <div class="button-row wrap">
+        ${HISTORY_GROUPING_MODES.map((mode) => `
+          <button
+            type="button"
+            class="button ${activeMode === mode.id ? 'button-primary' : 'button-secondary'}"
+            data-action="set-history-grouping"
+            data-history-grouping-mode="${mode.id}"
+            aria-pressed="${activeMode === mode.id}"
+          >
+            ${mode.label}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderGroupedHistory(viewModel) {
+  const { bundle, state, ui } = viewModel;
+  const groupingMode = ui.historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE;
+  const groups = buildHistoryGroups(state.history, bundle.runtime.indexes, { mode: groupingMode });
+
+  if (!state.history.length) {
+    return '<p class="muted empty-state">No accepted games have been logged yet.</p>';
+  }
+
+  if (groupingMode === 'none') {
+    return groups[0].records.map((summary) => {
+      const record = state.history.find((entry) => entry.id === summary.id);
+      return formatHistoryEntry(record, bundle, ui);
+    }).join('');
+  }
+
+  return groups.map((group, index) => `
+    <details class="history-group" data-history-group-id="${group.id}" data-history-grouping-mode="${group.mode}" ${index === 0 || group.records.some((record) => record.id === ui.resultEditorRecordId) ? 'open' : ''}>
+      <summary>
+        <span class="history-group-title">${escapeHtml(group.label)}</span>
+        <span class="pill">${group.count} game${group.count === 1 ? '' : 's'}</span>
+      </summary>
+      <div class="stack gap-sm history-group-records">
+        ${group.records.map((summary) => {
+          const record = state.history.find((entry) => entry.id === summary.id);
+          return formatHistoryEntry(record, bundle, ui);
+        }).join('')}
+      </div>
+    </details>
+  `).join('');
 }
 
 function formatGeneratorNotices(currentSetup, generatorNotices, generatorError) {
@@ -1202,15 +1265,14 @@ function renderSetupResult(viewModel) {
 }
 
 function renderHistoryPanel(viewModel) {
-  const { bundle, state, ui } = viewModel;
+  const { ui } = viewModel;
   return `
     <section class="stack gap-md">
       <section class="panel">
         <h2>Game history</h2>
         <div class="muted">Accepted setups are stored immediately. Each record can stay pending until you log a win/loss and score, then be corrected later if needed.</div>
-        ${state.history.length
-          ? state.history.map((record) => formatHistoryEntry(record, bundle, ui)).join('')
-          : '<p class="muted empty-state">No accepted games have been logged yet.</p>'}
+        ${renderHistoryGroupingControls(ui.historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE)}
+        ${renderGroupedHistory(viewModel)}
       </section>
       ${renderInsightsDashboard(viewModel)}
     </section>
@@ -1329,6 +1391,10 @@ function bindActionButtons(doc, actions) {
 
   doc.querySelectorAll('[data-action="edit-game-result"]').forEach((button) => {
     button.addEventListener('click', () => actions.editGameResult(button.dataset.recordId));
+  });
+
+  doc.querySelectorAll('[data-action="set-history-grouping"]').forEach((button) => {
+    button.addEventListener('click', () => actions.setHistoryGrouping(button.dataset.historyGroupingMode));
   });
 
   doc.querySelectorAll('[data-result-field="outcome"]').forEach((input) => {

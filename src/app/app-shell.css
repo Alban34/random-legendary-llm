@@ -805,6 +805,25 @@ details summary {
   margin-bottom: 10px;
 }
 
+.history-group {
+  margin-top: 14px;
+}
+
+.history-group summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.history-group-title {
+  font-weight: 700;
+}
+
+.history-group-records {
+  margin-top: 12px;
+}
+
 .history-item summary {
   display: flex;
   flex-wrap: wrap;
@@ -881,6 +900,10 @@ details summary {
   margin-top: 14px;
   display: grid;
   gap: 12px;
+}
+
+[data-history-grouping-controls] {
+  margin-top: 14px;
 }
 
 .insight-summary-grid {

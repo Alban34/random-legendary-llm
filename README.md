@@ -24,6 +24,7 @@ Implemented so far:
 - versioned browser-state persistence under `src/app/state-store.mjs`
 - a persisted theme switcher with the built-in Midnight and Newsprint themes
 - versioned backup export/import utilities under `src/app/backup-utils.mjs`
+- switchable History grouping modes for mastermind, player count, play mode, or an ungrouped view
 - setup templates and generation logic under `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs`
 - shared tab-shell metadata and navigation helpers under `src/app/app-tabs.mjs`
 - Browse filtering/detail helpers under `src/app/browse-utils.mjs`
@@ -73,7 +74,7 @@ Typical flow:
 4. Go to **New Game** to choose player count, optionally enable Advanced Solo for 1 player, then **Generate Setup**.
 5. Use **Regenerate** as much as you want without changing persisted history or usage.
 6. Use **Accept & Log** when you want the current setup to count toward usage tracking and game history.
-7. Review accepted games and insights from **History**.
+7. Review accepted games in **History**, regroup them by mastermind, players, play mode, or an ungrouped view, and inspect insights below the grouped history list.
 8. Use **Backup** to export a portable JSON backup, reset usage buckets, or import one with Merge or Replace restore modes.
 
 Important behavior:

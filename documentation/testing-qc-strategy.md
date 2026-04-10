@@ -345,6 +345,26 @@ Automated coverage:
 
 ---
 
+## Epic 20 — History Grouping and Organization
+
+Required tests:
+- grouping helpers keep grouped sections deterministic for mastermind, player-count, play-mode, and ungrouped views
+- duplicate mastermind names remain distinguishable inside grouped history labels
+- grouping state stays presentation-only and does not mutate persisted history records or backup payloads
+- result editing continues to target the correct record inside grouped sections
+
+QC checks:
+- verify History defaults to the documented grouping mode and keeps the newest group first
+- verify switching grouping modes updates the rendered sections without breaking existing record interactions
+- verify grouped history remains usable on desktop and mobile layouts
+- verify reloads and backup restore reset History back to the default grouping rather than persisting UI-only grouping state
+
+Automated coverage:
+- `test/epic20-history-grouping.test.mjs` covers grouped-history derivations, duplicate-name labels, and ungrouped fallback behavior
+- `test/playwright/epic20-qc.spec.mjs` covers default grouping, grouping-mode switching, grouped result editing, and reset-to-default behavior after reload and backup restore
+
+---
+
 ## Epic 8 — History, Usage, and Reset Experience
 
 Required tests:

@@ -3,6 +3,7 @@ import { DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from './app-ta
 import { buildBackupFilename, createBackupPayload, mergeImportedState, parseBackupText, summarizeBackupState } from './backup-utils.mjs';
 import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from './feedback-utils.mjs';
 import { addForcedPick, createEmptyForcedPicks, hasForcedPicks, removeForcedPick } from './forced-picks-utils.mjs';
+import { DEFAULT_HISTORY_GROUPING_MODE, HISTORY_GROUPING_MODES } from './history-utils.mjs';
 import { normalizeGameResultDraft, validateGameResultDraft } from './result-utils.mjs';
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
 import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
@@ -55,6 +56,8 @@ function syncDebugGlobals(viewModel) {
     confirmResetOwnedCollection: viewModel.ui.confirmResetOwnedCollection
   };
   window.__HISTORY_UI__ = {
+    groupingMode: viewModel.ui.historyGroupingMode,
+    supportedGroupingModes: HISTORY_GROUPING_MODES,
     confirmResetAllState: viewModel.ui.confirmResetAllState,
     resultEditorRecordId: viewModel.ui.resultEditorRecordId,
     resultDraft: viewModel.ui.resultDraft,
@@ -125,6 +128,7 @@ async function boot() {
       resultEditorRecordId: null,
       resultDraft: createEmptyResultDraft(),
       resultFormError: null,
+      historyGroupingMode: DEFAULT_HISTORY_GROUPING_MODE,
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
       selectedPlayMode: resolvePlayMode(hydration.state.preferences.lastPlayerCount, {
@@ -294,6 +298,7 @@ async function boot() {
     closeResultEditor();
     clearGeneratedSetup();
     clearBackupDraft();
+    viewModel.ui.historyGroupingMode = DEFAULT_HISTORY_GROUPING_MODE;
   };
 
   const closeResultEditor = () => {
@@ -353,6 +358,13 @@ async function boot() {
     resumeToastDismissal,
     selectTab(tabId) {
       persistSelectedTab(tabId, `Switched to the ${normalizeSelectedTab(tabId)} tab.`);
+    },
+    setHistoryGrouping(mode) {
+      viewModel.ui.historyGroupingMode = HISTORY_GROUPING_MODES.some((entry) => entry.id === mode)
+        ? mode
+        : DEFAULT_HISTORY_GROUPING_MODE;
+      viewModel.ui.lastActionNotice = `Updated History grouping to ${viewModel.ui.historyGroupingMode === 'none' ? 'Ungrouped' : viewModel.ui.historyGroupingMode.replace('-', ' ')}.`;
+      rerender();
     },
     handleTabKeydown(tabId, key) {
       const normalizedTabId = normalizeSelectedTab(tabId);

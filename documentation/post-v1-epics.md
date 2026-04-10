@@ -178,9 +178,9 @@ Improve visual flexibility and long-term maintainability by adding theme control
 
 ---
 
-## Additional backlog candidates pending review
+## Additional post-V1 backlog
 
-These epics come from the remaining unchecked ideas in `documentation/_next-steps.md` and are intentionally not yet sequenced in `documentation/post-v1-delivery-sequence.md`.
+These epics come from the remaining or newly adopted ideas in `documentation/_next-steps.md`. They can be sequenced in `documentation/post-v1-delivery-sequence.md` once they are ready for implementation.
 
 ## Epic 19 — Interface Localization
 

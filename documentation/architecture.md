@@ -310,6 +310,8 @@ Current restore behavior:
 - **Merge** unions collection/history, merges usage conservatively, and applies imported preferences,
 - **Replace** swaps the full persisted state for the imported backup.
 
+History grouping remains intentionally outside the persisted root state and backup schema. The active grouping mode is a presentation-only History-tab concern that resets to the default mode on reload and after backup restore.
+
 ---
 
 ## Usage tracking model

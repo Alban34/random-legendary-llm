@@ -229,19 +229,23 @@ font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 ## Tab 4 — History
 
 ```
+  Group by: [Mastermind] [Players] [Play Mode] [Ungrouped]
+
   ── Game History ────────────────────────────────────
 
-  ▼  Game #7 — Apr 9, 2026 · 2 Players
-     Mastermind: Dr. Doom  ·  Scheme: Secret Invasion...
-     Heroes: Iron Man, Wolverine, Thor, Captain America, Storm
-     Villains: Masters of Evil, Brotherhood  ·  Henchmen: HYDRA Soldiers
+  ▼  Dr. Doom                           [2 games]
+    ▼  Game #7 — Apr 9, 2026 · 2 Players
+      Mastermind: Dr. Doom  ·  Scheme: Secret Invasion...
+      Heroes: Iron Man, Wolverine, Thor, Captain America, Storm
+    ▶  Game #2 — Apr 2, 2026 · 1 Player
 
-  ▶  Game #6 — Apr 8, 2026 · 1 Player (Advanced Solo)
-  ▶  Game #5 — Apr 7, 2026 · 3 Players
+  ▶  Magneto                            [1 game]
   ...
 ```
 
 **Interactions:**
+- Grouping defaults to Mastermind and can be switched without changing saved data
+- Group headers can collapse or expand their records for faster scanning of long histories
 - History items collapse/expand on click
 - History is ordered newest-first
 

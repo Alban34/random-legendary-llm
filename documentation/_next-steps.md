@@ -15,4 +15,4 @@
 - [x] Do not display developers information by default, it should be hidden behind a "About this project" link or button, to avoid overwhelming users who just want to use the app without being interested in the development details
 - [x] Game history should be first in the History page
 - [ ] Interface localisation (fr, es, de, it)
-- [ ] Group games in history (by mastermind? player count? something else?)
+- [x] Group games in history (by mastermind? player count? something else?)
