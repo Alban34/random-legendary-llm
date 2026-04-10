@@ -20,8 +20,8 @@ The current release builds a bundle with `createEpic1Bundle(seed)` and persists 
 Persisted slices in V1:
 - `collection` — owned set IDs
 - `usage` — per-category `plays` and `lastPlayedAt`
-- `history` — accepted game records stored with IDs only
-- `preferences` — last player count, legacy Advanced Solo flag, normalized play mode, and selected tab
+- `history` — accepted game records stored with IDs only plus optional result data
+- `preferences` — last player count, legacy Advanced Solo flag, normalized play mode, selected tab, and onboarding completion
 
 Ephemeral UI-only state such as the current generated setup, active toast notifications, open confirmation modal, and transient recovery notices is intentionally kept out of persisted browser state.
 
@@ -275,7 +275,8 @@ The app should persist **one versioned root state object**.
     lastPlayerCount: number,
     lastAdvancedSolo: boolean,
     lastPlayMode: PlayMode,
-    selectedTab: string | null
+    selectedTab: string | null,
+    onboardingCompleted: boolean
   }
 }
 ```
@@ -347,15 +348,34 @@ Accepted setups should be stored using IDs only.
     heroIds: string[],
     villainGroupIds: string[],
     henchmanGroupIds: string[]
+  },
+  result: GameResult
+}
+```
+
+### `GameResult`
+
+```text
+{
+  status: "pending" | "completed",
+  outcome: "win" | "loss" | null,
+  score: number | null,
+  notes: string,
+  updatedAt: string | null
   }
 }
 ```
+
+For completed results, `score` is required for wins and optional for losses.
 
 ### Why IDs only
 
 - avoids ambiguity with duplicate names,
 - keeps history stable if display formatting changes,
-- lets the UI resolve current labels from runtime indexes.
+- lets the UI resolve current labels from runtime indexes,
+- and allows result data to evolve without duplicating the underlying accepted setup snapshot.
+
+Accepted setups now create `GameRecord`s immediately with a pending `GameResult`. Result entry is supported both immediately after acceptance and later from History.
 
 Generate/Regenerate remain ephemeral in UI state; only Accept & Log creates a `GameRecord` and updates usage statistics.
 

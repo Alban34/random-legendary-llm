@@ -58,6 +58,7 @@ test.describe('Epic 2 automated QC', () => {
     }));
     await page.locator('#panel-new-game [data-action="accept-current-setup"]').click();
 
+    await selectTab(page, 'new-game');
     await page.locator('#panel-new-game [data-action="set-player-count"][data-player-count="2"]').click();
     await page.locator('#panel-new-game [data-action="generate-setup"]').click();
     await page.waitForFunction(() => window.__CURRENT_SETUP__ !== null);

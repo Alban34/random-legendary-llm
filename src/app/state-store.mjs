@@ -1,4 +1,5 @@
 import { normalizeSelectedTab } from './app-tabs.mjs';
+import { createCompletedGameResult, createPendingGameResult, sanitizeStoredGameResult } from './result-utils.mjs';
 import { resolvePlayMode } from './setup-rules.mjs';
 
 export const STORAGE_KEY = 'legendary_state_v1';
@@ -157,6 +158,11 @@ function sanitizeGameRecord(record, indexes, notices) {
     return null;
   }
 
+  const sanitizedResult = sanitizeStoredGameResult(record.result);
+  if (sanitizedResult.recovered) {
+    notices.push(`Recovered invalid stored game result for '${record.id ?? 'unknown'}'.`);
+  }
+
   return {
     id: record.id,
     createdAt: record.createdAt,
@@ -169,7 +175,8 @@ function sanitizeGameRecord(record, indexes, notices) {
       heroIds: [...record.setupSnapshot.heroIds],
       villainGroupIds: [...record.setupSnapshot.villainGroupIds],
       henchmanGroupIds: [...record.setupSnapshot.henchmanGroupIds]
-    }
+    },
+    result: sanitizedResult.result
   };
 }
 
@@ -442,7 +449,7 @@ export function incrementUsageStat(usageBucket, id, playedAt) {
   };
 }
 
-function createRecordId() {
+export function createGameRecordId() {
   if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
     return globalThis.crypto.randomUUID();
   }
@@ -450,8 +457,9 @@ function createRecordId() {
   return `game-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
 }
 
-export function createGameRecord({ playerCount, advancedSolo, playMode, setupSnapshot, createdAt = new Date().toISOString(), id = createRecordId() }) {
+export function createGameRecord({ playerCount, advancedSolo, playMode, setupSnapshot, createdAt = new Date().toISOString(), id = createGameRecordId(), result = createPendingGameResult() }) {
   const normalizedPlayMode = resolvePlayMode(playerCount, { advancedSolo, playMode });
+  const sanitizedResult = sanitizeStoredGameResult(result).result;
   return {
     id,
     createdAt,
@@ -464,7 +472,8 @@ export function createGameRecord({ playerCount, advancedSolo, playMode, setupSna
       heroIds: [...setupSnapshot.heroIds],
       villainGroupIds: [...setupSnapshot.villainGroupIds],
       henchmanGroupIds: [...setupSnapshot.henchmanGroupIds]
-    }
+    },
+    result: sanitizedResult
   };
 }
 
@@ -484,6 +493,18 @@ export function acceptGameSetup(state, gameConfig) {
   record.setupSnapshot.henchmanGroupIds.forEach((id) => incrementUsageStat(nextState.usage.henchmanGroups, id, playedAt));
   incrementUsageStat(nextState.usage.schemes, record.setupSnapshot.schemeId, playedAt);
 
+  return nextState;
+}
+
+export function updateGameResult(state, { recordId, outcome, score, notes = '', updatedAt = new Date().toISOString() }) {
+  const nextState = deepClone(state);
+  const targetRecord = nextState.history.find((record) => record.id === recordId);
+
+  if (!targetRecord) {
+    return nextState;
+  }
+
+  targetRecord.result = createCompletedGameResult({ outcome, score, notes, updatedAt });
   return nextState;
 }
 

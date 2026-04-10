@@ -1,3 +1,4 @@
+import { formatGameResultStatus, isCompletedGameResult, sanitizeStoredGameResult } from './result-utils.mjs';
 import { USAGE_CATEGORIES, createDefaultState } from './state-store.mjs';
 import { getPlayModeLabel, resolvePlayMode } from './setup-rules.mjs';
 
@@ -37,6 +38,8 @@ export function formatHistorySummary(record, indexes) {
     playMode: record.playMode
   });
 
+  const result = sanitizeStoredGameResult(record.result).result;
+
   return {
     id: record.id,
     createdAt: record.createdAt,
@@ -46,7 +49,12 @@ export function formatHistorySummary(record, indexes) {
     schemeName: indexes.schemesById[record.setupSnapshot.schemeId].name,
     heroNames: record.setupSnapshot.heroIds.map((id) => indexes.heroesById[id].name),
     villainGroupNames: record.setupSnapshot.villainGroupIds.map((id) => indexes.villainGroupsById[id].name),
-    henchmanGroupNames: record.setupSnapshot.henchmanGroupIds.map((id) => indexes.henchmanGroupsById[id].name)
+    henchmanGroupNames: record.setupSnapshot.henchmanGroupIds.map((id) => indexes.henchmanGroupsById[id].name),
+    result,
+    resultLabel: formatGameResultStatus(result),
+    scoreLabel: isCompletedGameResult(result) && result.score !== null ? `Score ${result.score}` : null,
+    resultNotes: result.notes,
+    resultUpdatedAt: result.updatedAt
   };
 }
 

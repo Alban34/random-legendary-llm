@@ -5,6 +5,7 @@ import { TOAST_VARIANTS } from './feedback-utils.mjs';
 import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from './forced-picks-utils.mjs';
 import { buildFullResetPreview, formatHistorySummary, summarizeUsageIndicators } from './history-utils.mjs';
 import { formatHeroTeamLabel, formatMastermindLeadLabel, formatPersistedPlayMode, getAvailablePlayModes, getDisplayedSetupRequirements, getPlayModeHelpText } from './new-game-utils.mjs';
+import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from './result-utils.mjs';
 import { buildOwnedPools } from './setup-generator.mjs';
 
 function formatDuplicateEntries(bundle) {
@@ -17,21 +18,70 @@ function formatDuplicateEntries(bundle) {
     .filter((entry) => entry.all.length > 1);
 }
 
-function formatHistoryEntry(record, bundle) {
-  const summary = formatHistorySummary(record, bundle.runtime.indexes);
+function renderHistoryResultEditor(summary, ui) {
+  const isPending = !isCompletedGameResult(summary.result);
+  const errorMarkup = ui.resultFormError
+    ? `<div class="notice warning" data-result-form-error>${escapeHtml(ui.resultFormError)}</div>`
+    : '';
 
   return `
-    <details class="history-item" data-history-record-id="${summary.id}">
+    <section class="result-card history-result-editor" data-result-editor="${summary.id}">
+      <h3>${isPending ? 'Add game result' : 'Edit game result'}</h3>
+      <p class="muted">${isPending
+        ? 'The setup is already logged. Save the outcome now or skip it and come back later from History.'
+        : 'Correct the stored result without duplicating the accepted setup record.'}</p>
+      ${errorMarkup}
+      <div class="stack gap-sm">
+        <label for="result-outcome-${summary.id}"><strong>Outcome</strong></label>
+        <select id="result-outcome-${summary.id}" class="text-input" data-result-field="outcome">
+          <option value="">Choose outcome</option>
+          ${GAME_OUTCOME_OPTIONS.map((option) => `<option value="${option.id}" ${ui.resultDraft.outcome === option.id ? 'selected' : ''}>${option.label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="stack gap-sm">
+        <label for="result-score-${summary.id}"><strong>Score</strong> <span class="muted">(required for wins, optional for losses)</span></label>
+        <input id="result-score-${summary.id}" class="text-input" data-result-field="score" type="number" min="0" step="1" inputmode="numeric" value="${escapeHtml(ui.resultDraft.score)}" placeholder="0" />
+      </div>
+      <div class="stack gap-sm">
+        <label for="result-notes-${summary.id}"><strong>Notes</strong> <span class="muted">(optional)</span></label>
+        <textarea id="result-notes-${summary.id}" class="text-input result-notes-input" data-result-field="notes" rows="3" maxlength="500" placeholder="Optional notes about the game result">${escapeHtml(ui.resultDraft.notes)}</textarea>
+      </div>
+      <div class="button-row">
+        <button type="button" class="button button-success" data-action="save-game-result">Save result</button>
+        ${isPending ? '<button type="button" class="button button-secondary" data-action="skip-game-result">Skip for now</button>' : ''}
+        <button type="button" class="button button-secondary" data-action="cancel-result-entry">Cancel</button>
+      </div>
+    </section>
+  `;
+}
+
+function formatHistoryEntry(record, bundle, ui) {
+  const summary = formatHistorySummary(record, bundle.runtime.indexes);
+  const isEditing = ui.resultEditorRecordId === summary.id;
+  const resultPillClass = isCompletedGameResult(summary.result)
+    ? `result-pill-${summary.result.outcome}`
+    : 'result-pill-pending';
+
+  return `
+    <details class="history-item" data-history-record-id="${summary.id}" ${isEditing ? 'open' : ''}>
       <summary>
         <strong>${summary.mastermindName}</strong>
         <span class="pill">${summary.playerLabel}</span>
         <span class="pill">${summary.modeLabel}</span>
+        <span class="pill ${resultPillClass}" data-history-result-status="${summary.result.status}">${summary.resultLabel}</span>
       </summary>
       <div class="history-meta muted">Accepted ${new Date(summary.createdAt).toLocaleString()} · ${summary.modeLabel}</div>
+      <div class="history-meta"><strong>Result:</strong> ${summary.resultLabel}</div>
+      ${summary.resultNotes ? `<div class="history-meta"><strong>Notes:</strong> ${escapeHtml(summary.resultNotes)}</div>` : ''}
+      ${summary.resultUpdatedAt ? `<div class="history-meta muted">Last updated ${new Date(summary.resultUpdatedAt).toLocaleString()}</div>` : ''}
       <div class="history-meta"><strong>Scheme:</strong> ${summary.schemeName}</div>
       <div class="history-meta"><strong>Heroes:</strong> ${summary.heroNames.join(', ')}</div>
       <div class="history-meta"><strong>Villain Groups:</strong> ${summary.villainGroupNames.join(', ')}</div>
       <div class="history-meta"><strong>Henchman Groups:</strong> ${summary.henchmanGroupNames.join(', ')}</div>
+      <div class="button-row history-result-actions">
+        <button type="button" class="button button-secondary" data-action="edit-game-result" data-record-id="${summary.id}">${isCompletedGameResult(summary.result) ? 'Edit result' : 'Add result'}</button>
+      </div>
+      ${isEditing ? renderHistoryResultEditor(summary, ui) : ''}
     </details>
   `;
 }
@@ -937,8 +987,9 @@ function renderHistoryPanel(viewModel) {
       </section>
       <section class="panel">
         <h2>Game history</h2>
+        <div class="muted">Accepted setups are stored immediately. Each record can stay pending until you log a win/loss and score, then be corrected later if needed.</div>
         ${state.history.length
-          ? state.history.map((record) => formatHistoryEntry(record, bundle)).join('')
+          ? state.history.map((record) => formatHistoryEntry(record, bundle, ui)).join('')
           : '<p class="muted empty-state">No accepted games have been logged yet.</p>'}
       </section>
     </section>
@@ -1001,6 +1052,22 @@ function bindActionButtons(doc, actions) {
     button.addEventListener('click', () => actions.removeForcedPick(button.dataset.field, button.dataset.entityId));
   });
 
+  doc.querySelectorAll('[data-action="edit-game-result"]').forEach((button) => {
+    button.addEventListener('click', () => actions.editGameResult(button.dataset.recordId));
+  });
+
+  doc.querySelectorAll('[data-result-field="outcome"]').forEach((input) => {
+    input.addEventListener('change', (event) => actions.setResultOutcome(event.target.value));
+  });
+
+  doc.querySelectorAll('[data-result-field="score"]').forEach((input) => {
+    input.addEventListener('input', (event) => actions.setResultScore(event.target.value));
+  });
+
+  doc.querySelectorAll('[data-result-field="notes"]').forEach((input) => {
+    input.addEventListener('input', (event) => actions.setResultNotes(event.target.value));
+  });
+
   doc.querySelectorAll('[data-action="select-tab"]').forEach((button) => {
     button.addEventListener('click', () => actions.selectTab(button.dataset.tabId));
     button.addEventListener('keydown', (event) => {
@@ -1041,6 +1108,9 @@ function bindActionButtons(doc, actions) {
     'generate-setup': actions.generateSetup,
     'regenerate-setup': actions.regenerateSetup,
     'accept-current-setup': actions.acceptCurrentSetup,
+    'save-game-result': actions.saveGameResult,
+    'skip-game-result': actions.skipGameResultEntry,
+    'cancel-result-entry': actions.cancelResultEntry,
     'clear-setup-controls': actions.clearToDefaults,
     'corrupt-saved-state': actions.corruptSavedState,
     'inject-invalid-owned-set': actions.injectInvalidOwnedSet

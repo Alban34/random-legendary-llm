@@ -2,6 +2,7 @@ import { createEpic1Bundle } from './game-data-pipeline.mjs';
 import { DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from './app-tabs.mjs';
 import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from './feedback-utils.mjs';
 import { addForcedPick, createEmptyForcedPicks, hasForcedPicks, removeForcedPick } from './forced-picks-utils.mjs';
+import { normalizeGameResultDraft, validateGameResultDraft } from './result-utils.mjs';
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
 import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
 import { resolvePlayMode } from './setup-rules.mjs';
@@ -9,14 +10,24 @@ import {
   STORAGE_KEY,
   acceptGameSetup,
   createStorageAdapter,
+  createGameRecordId,
   createDefaultState,
   hydrateState,
   resetAllState,
   resetOwnedCollection,
   resetUsageCategory,
   toggleOwnedSet,
+  updateGameResult,
   updateState
 } from './state-store.mjs';
+
+function createEmptyResultDraft() {
+  return {
+    outcome: '',
+    score: '',
+    notes: ''
+  };
+}
 
 async function loadSeed() {
   const seedUrl = new URL('../data/canonical-game-data.json', import.meta.url);
@@ -42,7 +53,10 @@ function syncDebugGlobals(viewModel) {
     confirmResetOwnedCollection: viewModel.ui.confirmResetOwnedCollection
   };
   window.__HISTORY_UI__ = {
-    confirmResetAllState: viewModel.ui.confirmResetAllState
+    confirmResetAllState: viewModel.ui.confirmResetAllState,
+    resultEditorRecordId: viewModel.ui.resultEditorRecordId,
+    resultDraft: viewModel.ui.resultDraft,
+    resultFormError: viewModel.ui.resultFormError
   };
   window.__ONBOARDING_UI__ = {
     visible: viewModel.ui.onboardingVisible,
@@ -92,6 +106,9 @@ async function boot() {
       onboardingStep: 0,
       aboutPanelOpen: false,
       forcedPicks: createEmptyForcedPicks(),
+      resultEditorRecordId: null,
+      resultDraft: createEmptyResultDraft(),
+      resultFormError: null,
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
       selectedPlayMode: resolvePlayMode(hydration.state.preferences.lastPlayerCount, {
@@ -238,6 +255,24 @@ async function boot() {
 
   const clearForcedPicksState = () => {
     viewModel.ui.forcedPicks = createEmptyForcedPicks();
+  };
+
+  const closeResultEditor = () => {
+    viewModel.ui.resultEditorRecordId = null;
+    viewModel.ui.resultDraft = createEmptyResultDraft();
+    viewModel.ui.resultFormError = null;
+  };
+
+  const openResultEditor = (recordId) => {
+    const record = viewModel.state.history.find((entry) => entry.id === recordId);
+    if (!record) {
+      return false;
+    }
+
+    viewModel.ui.resultEditorRecordId = recordId;
+    viewModel.ui.resultDraft = normalizeGameResultDraft(record.result);
+    viewModel.ui.resultFormError = null;
+    return true;
   };
 
   const persistPreferences = (playerCount, playMode, actionNotice) => {
@@ -464,19 +499,92 @@ async function boot() {
         enqueueToast({ variant: 'warning', message: 'Generate a setup before using Accept & Log.' });
         return;
       }
-      applyStateUpdate((currentState) => acceptGameSetup(currentState, {
-        playerCount: viewModel.ui.selectedPlayerCount,
-        advancedSolo: viewModel.ui.advancedSolo,
-        playMode: viewModel.ui.selectedPlayMode,
-        setupSnapshot: buildHistoryReadySetupSnapshot(viewModel.ui.currentSetup)
-      }), hasForcedPicks(viewModel.ui.forcedPicks)
-        ? 'Accepted & logged the current generated setup and cleared the one-shot forced picks.'
-        : 'Accepted & logged the current generated setup.');
+      const acceptedRecordId = createGameRecordId();
+      const acceptedAt = new Date().toISOString();
+
+      applyStateUpdate((currentState) => {
+        const nextState = acceptGameSetup(currentState, {
+          id: acceptedRecordId,
+          createdAt: acceptedAt,
+          playerCount: viewModel.ui.selectedPlayerCount,
+          advancedSolo: viewModel.ui.advancedSolo,
+          playMode: viewModel.ui.selectedPlayMode,
+          setupSnapshot: buildHistoryReadySetupSnapshot(viewModel.ui.currentSetup)
+        });
+        nextState.preferences.selectedTab = 'history';
+        return nextState;
+      }, hasForcedPicks(viewModel.ui.forcedPicks)
+        ? 'Accepted & logged the current generated setup, opened score entry, and cleared the one-shot forced picks.'
+        : 'Accepted & logged the current generated setup and opened score entry in History.');
+      viewModel.ui.selectedTab = 'history';
+      openResultEditor(acceptedRecordId);
       clearForcedPicksState();
-      enqueueToast({ variant: 'success', message: 'Accepted & logged the current generated setup.' });
+      clearGeneratedSetup();
+      rerender();
+      enqueueToast({ variant: 'success', message: 'Accepted & logged the current generated setup. Add the result now or skip it for later.' });
+    },
+    editGameResult(recordId) {
+      if (!openResultEditor(recordId)) {
+        return;
+      }
+
+      viewModel.ui.lastActionNotice = 'Opened result editing for the selected history record.';
+      rerender();
+    },
+    setResultOutcome(outcome) {
+      viewModel.ui.resultDraft.outcome = outcome;
+      viewModel.ui.resultFormError = null;
+    },
+    setResultScore(score) {
+      viewModel.ui.resultDraft.score = score;
+      viewModel.ui.resultFormError = null;
+    },
+    setResultNotes(notes) {
+      viewModel.ui.resultDraft.notes = notes;
+      viewModel.ui.resultFormError = null;
+    },
+    skipGameResultEntry() {
+      closeResultEditor();
+      viewModel.ui.lastActionNotice = 'Left the selected game result pending. You can add it later from History.';
+      rerender();
+      enqueueToast({ variant: 'info', message: 'Kept the selected game result pending.' });
+    },
+    cancelResultEntry() {
+      closeResultEditor();
+      viewModel.ui.lastActionNotice = 'Closed result editing without changing the stored history record.';
+      rerender();
+    },
+    saveGameResult() {
+      if (!viewModel.ui.resultEditorRecordId) {
+        return;
+      }
+
+      const validation = validateGameResultDraft(viewModel.ui.resultDraft);
+      if (!validation.ok) {
+        viewModel.ui.resultFormError = validation.errors.join(' ');
+        viewModel.ui.lastActionNotice = 'Finish the required result fields before saving.';
+        rerender();
+        return;
+      }
+
+      const activeRecordId = viewModel.ui.resultEditorRecordId;
+      const wasPending = viewModel.state.history.find((record) => record.id === activeRecordId)?.result?.status !== 'completed';
+      applyStateUpdate((currentState) => updateGameResult(currentState, {
+        recordId: activeRecordId,
+        outcome: validation.result.outcome,
+        score: validation.result.score,
+        notes: validation.result.notes,
+        updatedAt: validation.result.updatedAt
+      }), wasPending
+        ? 'Saved the game result for the selected history record.'
+        : 'Saved the corrected game result for the selected history record.');
+      closeResultEditor();
+      rerender();
+      enqueueToast({ variant: 'success', message: wasPending ? 'Saved the game result.' : 'Saved the corrected game result.' });
     },
     resetUsageCategory(category) {
       viewModel.ui.confirmResetAllState = false;
+      closeResultEditor();
       applyStateUpdate((currentState) => resetUsageCategory(currentState, category), `Reset ${category} usage stats.`);
       enqueueToast({ variant: 'info', message: `Reset ${category} usage stats.` });
     },
@@ -498,6 +606,7 @@ async function boot() {
       viewModel.ui.onboardingStep = 0;
       viewModel.ui.aboutPanelOpen = false;
       clearForcedPicksState();
+      closeResultEditor();
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the entire application state to defaults.';
       rerender();
@@ -547,6 +656,7 @@ async function boot() {
       viewModel.ui.selectedPlayMode = defaultState.preferences.lastPlayMode;
       viewModel.ui.advancedSolo = defaultState.preferences.lastAdvancedSolo;
       clearForcedPicksState();
+      closeResultEditor();
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the current setup controls to their default values.';
       rerender();

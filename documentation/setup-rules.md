@@ -167,6 +167,15 @@ then the generator should:
 - updates usage stats for every selected category
 - records `lastPlayedAt`
 - appends a `GameRecord` to history
+- opens immediate result entry in History while still allowing the game result to stay pending for later completion
+
+### Result logging
+- accepted setups start with a pending result state
+- completed results require a win/loss outcome
+- wins require a non-negative whole-number score
+- losses may omit the score entirely, but any entered loss score must still be a non-negative whole number
+- optional notes may be added to a completed result
+- result edits update the existing history record instead of creating a duplicate entry
 
 ---
 
@@ -209,5 +218,4 @@ Not included in V1:
 - HQ management during play
 - turn flow
 - combat resolution
-- win/loss tracking
 - Mastermind tactic progression

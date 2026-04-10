@@ -78,11 +78,13 @@ test.describe('Epic 15 automated QC', () => {
     await page.locator('[data-action="generate-setup"]').click();
     await page.waitForFunction(() => window.__CURRENT_SETUP__ !== null);
     await page.locator('[data-action="accept-current-setup"]').click();
+    await selectTab(page, 'new-game');
     await expect(page.locator('[data-forced-picks-panel]')).toContainText('No forced picks are active.');
 
     const state = await readAppState(page);
     expect(state.history[0].forcedPicks).toBeUndefined();
 
+    await selectTab(page, 'new-game');
     await addForcedPick(page, 'heroIds', hero.id);
     await reloadApp(page);
     await selectTab(page, 'new-game');

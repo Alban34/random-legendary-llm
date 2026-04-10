@@ -393,6 +393,11 @@ body {
   outline-offset: 2px;
 }
 
+.result-notes-input {
+  resize: vertical;
+  min-height: 6.5rem;
+}
+
 .button:hover {
   transform: translateY(-1px);
 }
@@ -641,6 +646,13 @@ details summary {
   margin-bottom: 10px;
 }
 
+.history-item summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 .history-usage-indicators {
   gap: 12px;
 }
@@ -700,6 +712,31 @@ details summary {
 
 .history-meta {
   margin-top: 8px;
+}
+
+.history-result-actions {
+  margin-top: 12px;
+}
+
+.history-result-editor {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.result-pill-pending {
+  border-color: rgba(245, 166, 35, 0.45);
+  background: rgba(245, 166, 35, 0.12);
+}
+
+.result-pill-win {
+  border-color: rgba(46, 204, 113, 0.45);
+  background: rgba(46, 204, 113, 0.12);
+}
+
+.result-pill-loss {
+  border-color: rgba(231, 76, 60, 0.45);
+  background: rgba(231, 76, 60, 0.12);
 }
 
 #history-full-reset-confirmation {

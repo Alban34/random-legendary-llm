@@ -241,6 +241,27 @@ Automated coverage:
 
 ---
 
+## Epic 12 — Score Logging and Results History
+
+Required tests:
+- accepted setups start with a pending result state rather than mutating older history semantics
+- valid completed results accept only supported outcomes, require scores for wins, and allow scoreless losses
+- legacy history records without `result` hydrate safely as pending entries
+- malformed stored result payloads recover to a safe pending state without dropping the setup record
+- editing a result updates the existing record rather than duplicating it
+
+QC checks:
+- verify Accept & Log opens immediate result entry without making score entry mandatory
+- verify validation messaging appears for missing outcome or score fields
+- verify pending and completed history records remain readable on desktop and mobile layouts
+- verify older saved records without result data can still be completed from History
+
+Automated coverage:
+- `test/epic12-score-history.test.mjs` covers pending/default result state, invalid combinations, legacy compatibility, corrected-result updates, and save/load roundtrips
+- `test/playwright/epic12-qc.spec.mjs` covers immediate result entry, skip/cancel/edit flows, keyboard-driven score entry, mixed history layouts, and legacy upgrade behavior
+
+---
+
 ## Epic 15 — Guided Setup Constraints and Forced Picks
 
 Required tests:
