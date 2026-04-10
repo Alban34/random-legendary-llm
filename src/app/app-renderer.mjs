@@ -267,6 +267,54 @@ function renderCoverageList(entries, percentKey) {
   `;
 }
 
+function renderBackupPreview(ui) {
+  if (ui.backupImportError) {
+    return `
+      <div class="notice warning" data-backup-import-error>
+        ${escapeHtml(ui.backupImportError)}
+      </div>
+    `;
+  }
+
+  if (!ui.stagedBackup) {
+    return '';
+  }
+
+  const { summary, fileName, payload } = ui.stagedBackup;
+  const usageLines = [
+    ['Heroes', summary.usageCounts.heroes],
+    ['Masterminds', summary.usageCounts.masterminds],
+    ['Villain Groups', summary.usageCounts.villainGroups],
+    ['Henchman Groups', summary.usageCounts.henchmanGroups],
+    ['Schemes', summary.usageCounts.schemes]
+  ];
+
+  return `
+    <article class="result-card" data-backup-preview>
+      <div class="row space-between wrap gap-sm align-center">
+        <div>
+          <h3>Imported backup preview</h3>
+          <div class="muted">${escapeHtml(fileName)} · Exported ${new Date(payload.exportedAt).toLocaleString()}</div>
+        </div>
+        <span class="pill">v${payload.version}</span>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-card"><div class="muted">Owned Sets</div><div class="metric-sm">${summary.ownedSetCount}</div></div>
+        <div class="summary-card"><div class="muted">History Records</div><div class="metric-sm">${summary.historyCount}</div></div>
+        <div class="summary-card"><div class="muted">Theme</div><div class="metric-sm">${escapeHtml(summary.themeId)}</div></div>
+        <div class="summary-card"><div class="muted">Last Mode</div><div class="metric-sm">${escapeHtml(summary.playMode)}</div></div>
+      </div>
+      <div class="muted">Usage entries: ${usageLines.map(([label, count]) => `${label} ${count}`).join(' · ')}</div>
+      <div class="muted">Merge keeps the current app data and unions collection/history while applying imported preferences. Replace swaps the entire saved state for this backup.</div>
+      <div class="button-row">
+        <button type="button" class="button button-primary" data-action="request-merge-backup">Merge Backup</button>
+        <button type="button" class="button button-danger" data-action="request-replace-backup">Replace with Backup</button>
+        <button type="button" class="button button-secondary" data-action="cancel-backup-preview">Discard Preview</button>
+      </div>
+    </article>
+  `;
+}
+
 function renderInsightsDashboard(viewModel) {
   const dashboard = buildInsightsDashboard(viewModel.bundle.runtime, viewModel.state, { limit: 3 });
   const { outcome, usage, freshness, collectionCoverage } = dashboard;
@@ -643,6 +691,27 @@ function getActiveModalConfig(viewModel) {
     };
   }
 
+  if (viewModel.ui.confirmBackupRestoreMode && viewModel.ui.stagedBackup) {
+    const { summary } = viewModel.ui.stagedBackup;
+    if (viewModel.ui.confirmBackupRestoreMode === 'merge') {
+      return {
+        title: 'Merge imported backup?',
+        description: `This will merge ${summary.ownedSetCount} owned sets and ${summary.historyCount} history records into the current app data, then apply the imported preferences.`,
+        confirmAction: 'confirm-merge-backup',
+        cancelAction: 'cancel-backup-restore',
+        confirmLabel: 'Yes, Merge Backup'
+      };
+    }
+
+    return {
+      title: 'Replace current app data?',
+      description: `This will replace the current local collection, usage, history, and preferences with the imported backup containing ${summary.historyCount} history records. This cannot be undone.`,
+      confirmAction: 'confirm-replace-backup',
+      cancelAction: 'cancel-backup-restore',
+      confirmLabel: 'Yes, Replace Data'
+    };
+  }
+
   return null;
 }
 
@@ -822,7 +891,7 @@ function renderBrowsePanel(viewModel) {
     ['Included Sets', bundle.counts.sets],
     ['Owned Sets', state.collection.ownedSetIds.length],
     ['History Records', state.history.length],
-    ['Ready Tabs', 4]
+    ['Ready Tabs', 5]
   ];
   const browseSets = filterBrowseSets(bundle.runtime.sets, {
     searchTerm: ui.browseSearchTerm,
@@ -1134,8 +1203,6 @@ function renderSetupResult(viewModel) {
 
 function renderHistoryPanel(viewModel) {
   const { bundle, state, ui } = viewModel;
-  const indicators = summarizeUsageIndicators(bundle.runtime, state);
-  const resetPreview = buildFullResetPreview();
   return `
     <section class="stack gap-md">
       <section class="panel">
@@ -1146,8 +1213,29 @@ function renderHistoryPanel(viewModel) {
           : '<p class="muted empty-state">No accepted games have been logged yet.</p>'}
       </section>
       ${renderInsightsDashboard(viewModel)}
+    </section>
+  `;
+}
+
+function renderBackupPanel(viewModel) {
+  const { bundle, state, ui } = viewModel;
+  const indicators = summarizeUsageIndicators(bundle.runtime, state);
+  const resetPreview = buildFullResetPreview();
+  return `
+    <section class="stack gap-md">
+      <section class="panel" data-backup-panel>
+        <h2>Backup and restore</h2>
+        <div class="muted">Export your collection, usage, history, results, and preferences to a versioned JSON backup. Import a backup later and choose whether to merge it into the current state or replace local data entirely.</div>
+        <div class="button-row">
+          <button class="button button-secondary" data-action="export-backup">Export Backup</button>
+          <button class="button button-primary" data-action="open-import-backup">Import Backup</button>
+        </div>
+        <input id="backup-import-input" class="visually-hidden" type="file" accept=".json,application/json" />
+        ${renderBackupPreview(ui)}
+      </section>
       <section class="panel">
         <h2>Used card tracking</h2>
+        <div class="muted">Manage per-category freshness counters and destructive resets from the same data-management screen as backup and restore.</div>
         <div class="stack gap-sm history-usage-indicators">
           ${indicators.map((indicator) => `
             <article class="summary-card history-usage-row" data-usage-category="${indicator.category}">
@@ -1185,7 +1273,8 @@ function renderTabPanels(viewModel) {
         </section>
       </section>
     `,
-    history: renderHistoryPanel(viewModel)
+    history: renderHistoryPanel(viewModel),
+    backup: renderBackupPanel(viewModel)
   };
 }
 
@@ -1217,6 +1306,15 @@ function bindActionButtons(doc, actions) {
   doc.querySelectorAll('[data-action="set-theme"]').forEach((button) => {
     button.addEventListener('click', () => actions.setTheme(button.dataset.themeId));
   });
+
+  const backupImportInput = doc.getElementById('backup-import-input');
+  if (backupImportInput) {
+    backupImportInput.addEventListener('change', (event) => {
+      const [file] = [...(event.target.files || [])];
+      actions.importBackupFile(file);
+      event.target.value = '';
+    });
+  }
 
   doc.querySelectorAll('[data-action="add-forced-pick"]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -1275,6 +1373,14 @@ function bindActionButtons(doc, actions) {
     'request-reset-all-state': actions.requestResetAllState,
     'cancel-reset-all-state': actions.cancelResetAllState,
     'confirm-reset-all-state': actions.resetAllState,
+    'open-import-backup': actions.openImportBackup,
+    'export-backup': actions.exportBackup,
+    'request-merge-backup': actions.requestMergeBackup,
+    'request-replace-backup': actions.requestReplaceBackup,
+    'cancel-backup-preview': actions.cancelBackupPreview,
+    'cancel-backup-restore': actions.cancelBackupRestore,
+    'confirm-merge-backup': actions.confirmMergeBackup,
+    'confirm-replace-backup': actions.confirmReplaceBackup,
     'toggle-about-panel': actions.toggleAboutPanel,
     'start-onboarding': actions.startOnboarding,
     'previous-onboarding-step': actions.previousOnboardingStep,

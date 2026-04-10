@@ -2,7 +2,7 @@
 
 - [x] Add possibility to do 2-handed solo
 - [x] Add possibility to save the score of a given game, and to keep track of the score history across games
-- [ ] Add possibility to export the collection and score history as a JSON file, and to import it back to the app
+- [x] Add possibility to export the collection and score history as a JSON file, and to import it back to the app
 - [x] Add stats on games played, win/loss ratio, most played cards, etc.
 - [x] Add a "forced" mode where the user can select a card that must be included in the next setup, and the app will generate a setup that includes that card if possible
 - [x] Toasts should be floating from the bottom of the screen, not taking space in the layout, and should stack if multiple toasts are triggered at the same time

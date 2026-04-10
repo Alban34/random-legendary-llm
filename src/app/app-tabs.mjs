@@ -26,6 +26,13 @@ export const APP_TABS = [
     shortLabel: 'History',
     icon: '🕘',
     description: 'Inspect accepted setups and reset actions.'
+  },
+  {
+    id: 'backup',
+    label: 'Backup',
+    shortLabel: 'Backup',
+    icon: '💾',
+    description: 'Export and restore portable app backups.'
   }
 ];
 

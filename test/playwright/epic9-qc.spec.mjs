@@ -136,9 +136,16 @@ test.describe('Epic 9 automated QC', () => {
 
     await page.locator('#tab-desktop-collection').focus();
     await page.keyboard.press('End');
+    await expect(page.locator('#tab-desktop-backup')).toHaveAttribute('aria-selected', 'true');
+
+    await page.locator('#tab-desktop-backup').focus();
+    await page.keyboard.press('ArrowLeft');
     await expect(page.locator('#tab-desktop-history')).toHaveAttribute('aria-selected', 'true');
 
-    const resetButton = page.locator('[data-action="request-reset-all-state"]');
+    await page.locator('#tab-desktop-history').press('ArrowRight');
+    await expect(page.locator('#tab-desktop-backup')).toHaveAttribute('aria-selected', 'true');
+
+    const resetButton = page.locator('#panel-backup [data-action="request-reset-all-state"]');
     await resetButton.focus();
     await page.keyboard.press('Enter');
 

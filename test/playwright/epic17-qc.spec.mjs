@@ -72,8 +72,8 @@ test.describe('Epic 17 automated QC', () => {
 
     await expect(walkthrough).toBeHidden();
 
-    await selectTab(page, 'history');
-    await page.locator('#panel-history [data-action="request-reset-all-state"]').click();
+    await selectTab(page, 'backup');
+    await page.locator('#panel-backup [data-action="request-reset-all-state"]').click();
     await page.locator('#modal-root [data-action="confirm-reset-all-state"]').click();
 
     await expect(page.locator('#onboarding-shell')).toBeVisible();

@@ -23,6 +23,7 @@ Implemented so far:
 - shared normalization and validation logic under `src/app/`
 - versioned browser-state persistence under `src/app/state-store.mjs`
 - a persisted theme switcher with the built-in Midnight and Newsprint themes
+- versioned backup export/import utilities under `src/app/backup-utils.mjs`
 - setup templates and generation logic under `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs`
 - shared tab-shell metadata and navigation helpers under `src/app/app-tabs.mjs`
 - Browse filtering/detail helpers under `src/app/browse-utils.mjs`
@@ -30,7 +31,7 @@ Implemented so far:
 - New Game display/control helpers under `src/app/new-game-utils.mjs`
 - History/usage/reset helpers under `src/app/history-utils.mjs`
 - notification/toast helpers under `src/app/feedback-utils.mjs`
-- a tabbed `index.html` shell for the browser app with Browse, Collection, New Game, History, notifications, reset confirmation, and accessibility support
+- a tabbed `index.html` shell for the browser app with Browse, Collection, New Game, History, Backup, notifications, reset confirmation, and accessibility support
 - npm-based Epic 1 through Epic 10 tests under `test/`
 - Playwright browser QC coverage for the Epic 1 through Epic 10 flows under `test/playwright/`
 - a data-foundation summary reporter under `tools/`
@@ -72,7 +73,8 @@ Typical flow:
 4. Go to **New Game** to choose player count, optionally enable Advanced Solo for 1 player, then **Generate Setup**.
 5. Use **Regenerate** as much as you want without changing persisted history or usage.
 6. Use **Accept & Log** when you want the current setup to count toward usage tracking and game history.
-7. Review accepted games and reset actions from **History**.
+7. Review accepted games and insights from **History**.
+8. Use **Backup** to export a portable JSON backup, reset usage buckets, or import one with Merge or Replace restore modes.
 
 Important behavior:
 - **Generate** and **Regenerate** are ephemeral; they do not change persisted state
@@ -87,6 +89,7 @@ Persisted data:
 - the app stores one versioned root state object in browser storage under `legendary_state_v1`
 - that state contains collection ownership, usage statistics, accepted game history, and preferences
 - preferences now include the active theme so the theme switcher restores on reload without a visible restyle flash in normal browser conditions
+- the **Backup** tab can export the persistent data above as a versioned JSON backup and later import it with either **Merge** or **Replace** restore modes
 
 Reset behavior:
 - **Reset All Selections** in **Collection** clears owned sets only
@@ -94,7 +97,6 @@ Reset behavior:
 - **Full Reset — Clear all data** clears collection, usage, history, and preferences only after confirmation
 
 Current V1 limitations:
-- no export/import workflow yet
 - hero tracking is at the hero-deck level, not per individual card
 - the app must be opened through a static HTTP server rather than `file://`
 - browser QC is automated in Chromium via Playwright; runtime behavior targets modern browsers with graceful degradation when storage is unavailable

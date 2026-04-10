@@ -1,5 +1,6 @@
 import { createEpic1Bundle } from './game-data-pipeline.mjs';
 import { DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from './app-tabs.mjs';
+import { buildBackupFilename, createBackupPayload, mergeImportedState, parseBackupText, summarizeBackupState } from './backup-utils.mjs';
 import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from './feedback-utils.mjs';
 import { addForcedPick, createEmptyForcedPicks, hasForcedPicks, removeForcedPick } from './forced-picks-utils.mjs';
 import { normalizeGameResultDraft, validateGameResultDraft } from './result-utils.mjs';
@@ -74,6 +75,12 @@ function syncDebugGlobals(viewModel) {
     activeThemeId: viewModel.state.preferences.themeId,
     supportedThemes: THEME_OPTIONS.map((theme) => ({ id: theme.id, label: theme.label }))
   };
+  window.__BACKUP_UI__ = {
+    importError: viewModel.ui.backupImportError,
+    stagedBackupSummary: viewModel.ui.stagedBackup?.summary || null,
+    confirmRestoreMode: viewModel.ui.confirmBackupRestoreMode,
+    lastExportFileName: viewModel.ui.lastBackupExportFileName || null
+  };
   window.__FORCED_PICKS_UI__ = viewModel.ui.forcedPicks;
   window.__TOASTS__ = viewModel.ui.toasts;
 }
@@ -110,6 +117,10 @@ async function boot() {
       onboardingVisible: !hydration.state.preferences.onboardingCompleted,
       onboardingStep: 0,
       aboutPanelOpen: false,
+      backupImportError: null,
+      stagedBackup: null,
+      confirmBackupRestoreMode: null,
+      lastBackupExportFileName: null,
       forcedPicks: createEmptyForcedPicks(),
       resultEditorRecordId: null,
       resultDraft: createEmptyResultDraft(),
@@ -260,6 +271,29 @@ async function boot() {
 
   const clearForcedPicksState = () => {
     viewModel.ui.forcedPicks = createEmptyForcedPicks();
+  };
+
+  const clearBackupDraft = () => {
+    viewModel.ui.backupImportError = null;
+    viewModel.ui.stagedBackup = null;
+    viewModel.ui.confirmBackupRestoreMode = null;
+  };
+
+  const syncUiFromPersistedState = (nextState) => {
+    viewModel.ui.selectedTab = normalizeSelectedTab(nextState.preferences.selectedTab);
+    viewModel.ui.selectedPlayerCount = nextState.preferences.lastPlayerCount;
+    viewModel.ui.selectedPlayMode = resolvePlayMode(nextState.preferences.lastPlayerCount, {
+      advancedSolo: nextState.preferences.lastAdvancedSolo,
+      playMode: nextState.preferences.lastPlayMode
+    });
+    viewModel.ui.advancedSolo = nextState.preferences.lastAdvancedSolo;
+    viewModel.ui.onboardingVisible = !nextState.preferences.onboardingCompleted;
+    viewModel.ui.onboardingStep = 0;
+    viewModel.ui.aboutPanelOpen = false;
+    clearForcedPicksState();
+    closeResultEditor();
+    clearGeneratedSetup();
+    clearBackupDraft();
   };
 
   const closeResultEditor = () => {
@@ -450,6 +484,109 @@ async function boot() {
         return currentState;
       }, `Applied the ${normalizedThemeId} theme.`);
     },
+    exportBackup() {
+      const payload = createBackupPayload(viewModel.state);
+      const fileName = buildBackupFilename(payload.exportedAt);
+      const backupBlob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const downloadUrl = URL.createObjectURL(backupBlob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = fileName;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      queueMicrotask(() => URL.revokeObjectURL(downloadUrl));
+      viewModel.ui.lastBackupExportFileName = fileName;
+      viewModel.ui.lastActionNotice = `Exported a backup to ${fileName}.`;
+      rerender();
+      enqueueToast({ variant: 'success', message: `Exported backup as ${fileName}.` });
+    },
+    openImportBackup() {
+      document.getElementById('backup-import-input')?.click();
+    },
+    async importBackupFile(file) {
+      if (!file) {
+        return;
+      }
+
+      const importedText = await file.text();
+      const parsedBackup = parseBackupText(importedText, { indexes: bundle.runtime.indexes });
+
+      if (!parsedBackup.ok) {
+        viewModel.ui.stagedBackup = null;
+        viewModel.ui.confirmBackupRestoreMode = null;
+        viewModel.ui.backupImportError = parsedBackup.error;
+        viewModel.ui.lastActionNotice = 'The selected backup file could not be imported.';
+        rerender();
+        enqueueToast({ variant: 'error', message: parsedBackup.error, behavior: 'persistent' });
+        return;
+      }
+
+      viewModel.ui.backupImportError = null;
+      viewModel.ui.confirmBackupRestoreMode = null;
+      viewModel.ui.stagedBackup = {
+        fileName: file.name || buildBackupFilename(parsedBackup.payload.exportedAt),
+        payload: parsedBackup.payload,
+        importedState: parsedBackup.importedState,
+        summary: summarizeBackupState(parsedBackup.importedState)
+      };
+      viewModel.ui.lastActionNotice = 'Loaded a backup preview. Choose Merge or Replace to apply it.';
+      rerender();
+    },
+    cancelBackupPreview() {
+      clearBackupDraft();
+      viewModel.ui.lastActionNotice = 'Discarded the staged backup preview.';
+      rerender();
+    },
+    requestMergeBackup() {
+      if (!viewModel.ui.stagedBackup) {
+        return;
+      }
+      viewModel.ui.confirmBackupRestoreMode = 'merge';
+      viewModel.ui.modalReturnFocusAction = 'request-merge-backup';
+      viewModel.ui.lastActionNotice = 'Review the merge confirmation before applying the imported backup.';
+      rerender();
+      focusModalCancelButton();
+    },
+    requestReplaceBackup() {
+      if (!viewModel.ui.stagedBackup) {
+        return;
+      }
+      viewModel.ui.confirmBackupRestoreMode = 'replace';
+      viewModel.ui.modalReturnFocusAction = 'request-replace-backup';
+      viewModel.ui.lastActionNotice = 'Review the replace confirmation before applying the imported backup.';
+      rerender();
+      focusModalCancelButton();
+    },
+    cancelBackupRestore() {
+      viewModel.ui.confirmBackupRestoreMode = null;
+      viewModel.ui.lastActionNotice = 'Kept the staged backup preview without applying it.';
+      rerender();
+      focusActionButton(viewModel.ui.modalReturnFocusAction);
+    },
+    confirmMergeBackup() {
+      if (!viewModel.ui.stagedBackup) {
+        return;
+      }
+
+      viewModel.ui.confirmBackupRestoreMode = null;
+      const nextState = mergeImportedState(viewModel.state, viewModel.ui.stagedBackup.importedState);
+      const result = applyStateUpdate(() => nextState, 'Merged the imported backup with the current app data.');
+      syncUiFromPersistedState(result.state);
+      rerender();
+      enqueueToast({ variant: 'success', message: 'Merged the imported backup with the current app data.' });
+    },
+    confirmReplaceBackup() {
+      if (!viewModel.ui.stagedBackup) {
+        return;
+      }
+
+      viewModel.ui.confirmBackupRestoreMode = null;
+      const result = applyStateUpdate(() => viewModel.ui.stagedBackup.importedState, 'Replaced the current app data with the imported backup.');
+      syncUiFromPersistedState(result.state);
+      rerender();
+      enqueueToast({ variant: 'warning', message: 'Replaced the current app data with the imported backup.' });
+    },
     addForcedPick(field, value) {
       if (!value) {
         viewModel.ui.lastActionNotice = 'Choose a card or setup entity before adding a forced pick.';
@@ -611,19 +748,8 @@ async function boot() {
       viewModel.persistence.updateNotices = result.notices;
       viewModel.persistence.lastSaveMessage = result.save.message;
       viewModel.persistence.lastSaveOk = result.save.ok;
+      syncUiFromPersistedState(result.state);
       viewModel.ui.selectedTab = DEFAULT_TAB_ID;
-      viewModel.ui.selectedPlayerCount = result.state.preferences.lastPlayerCount;
-      viewModel.ui.selectedPlayMode = resolvePlayMode(result.state.preferences.lastPlayerCount, {
-        advancedSolo: result.state.preferences.lastAdvancedSolo,
-        playMode: result.state.preferences.lastPlayMode
-      });
-      viewModel.ui.advancedSolo = result.state.preferences.lastAdvancedSolo;
-      viewModel.ui.onboardingVisible = !result.state.preferences.onboardingCompleted;
-      viewModel.ui.onboardingStep = 0;
-      viewModel.ui.aboutPanelOpen = false;
-      clearForcedPicksState();
-      closeResultEditor();
-      clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the entire application state to defaults.';
       rerender();
       if (!result.save.ok) {

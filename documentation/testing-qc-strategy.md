@@ -262,6 +262,27 @@ Automated coverage:
 
 ---
 
+## Epic 13 — Data Portability and Backup
+
+Required tests:
+- exported payloads use the documented backup schema envelope, stable filename format, and persistent-only data slices
+- valid current backups and legacy-compatible backups sanitize successfully into importable state
+- malformed, unsupported, and partial backup payloads fail safely without mutating saved data
+- merge and replace restore paths update only the intended persistent slices and avoid duplicate shared history records
+
+QC checks:
+- verify the dedicated Backup tab exposes clear export and import entry points alongside usage-reset and full-reset controls without crowding the screen
+- verify exporting a backup triggers a JSON download with the current persistent data
+- verify importing a valid backup shows a staged preview before any write happens
+- verify Merge and Replace confirmations are explicit and leave the app in the expected restored state
+- verify invalid imports surface actionable error messaging and preserve the existing saved state
+
+Automated coverage:
+- `test/epic13-backup-portability.test.mjs` covers schema structure, filename generation, valid and legacy-compatible payload parsing, safe rejection of malformed payloads, and merge semantics
+- `test/playwright/epic13-qc.spec.mjs` covers export download validation, staged import preview with replace, merge behavior with overlapping history, and invalid-import recovery messaging
+
+---
+
 ## Epic 14 — Insights and Statistics Dashboard
 
 Required tests:
@@ -272,7 +293,7 @@ Required tests:
 - sparse or empty states expose helpful insight copy without fabricating misleading metrics
 
 QC checks:
-- verify the History tab keeps game history first while exposing the insights section below it
+- verify the History tab keeps game history first while exposing the insights section below it, without mixing in data-management controls
 - verify summary cards update immediately after wins, losses, scoreless losses, and pending results are logged
 - verify duplicate-name ranking entries remain distinguishable with set context
 - verify owned-collection and full-catalog coverage percentages remain distinct when the user owns only part of the catalog

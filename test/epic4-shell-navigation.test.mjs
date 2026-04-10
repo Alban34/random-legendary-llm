@@ -28,25 +28,27 @@ const minimalIndexes = {
   schemesById: {}
 };
 
-test('Epic 4 defines the four expected application tabs with a stable default tab', () => {
-  assert.deepEqual(APP_TABS.map((tab) => tab.id), ['browse', 'collection', 'new-game', 'history']);
+test('Epic 4 defines the expected application tabs with a stable default tab', () => {
+  assert.deepEqual(APP_TABS.map((tab) => tab.id), ['browse', 'collection', 'new-game', 'history', 'backup']);
   assert.equal(DEFAULT_TAB_ID, 'browse');
 });
 
 test('Epic 4 normalizes unsupported selected tabs back to the default tab', () => {
   assert.equal(normalizeSelectedTab('browse'), 'browse');
   assert.equal(normalizeSelectedTab('history'), 'history');
+  assert.equal(normalizeSelectedTab('backup'), 'backup');
   assert.equal(normalizeSelectedTab(null), DEFAULT_TAB_ID);
   assert.equal(normalizeSelectedTab('definitely-missing-tab'), DEFAULT_TAB_ID);
 });
 
 test('Epic 4 keyboard navigation order wraps correctly between tabs', () => {
-  assert.equal(getAdjacentTabId('browse', 'previous'), 'history');
+  assert.equal(getAdjacentTabId('browse', 'previous'), 'backup');
   assert.equal(getAdjacentTabId('browse', 'next'), 'collection');
-  assert.equal(getAdjacentTabId('history', 'next'), 'browse');
+  assert.equal(getAdjacentTabId('history', 'next'), 'backup');
+  assert.equal(getAdjacentTabId('backup', 'next'), 'browse');
   assert.equal(getAdjacentTabId('new-game', 'previous'), 'collection');
   assert.equal(getAdjacentTabId('collection', 'first'), 'browse');
-  assert.equal(getAdjacentTabId('collection', 'last'), 'history');
+  assert.equal(getAdjacentTabId('collection', 'last'), 'backup');
 });
 
 test('Epic 4 selected-tab preferences persist and invalid stored tabs recover safely', () => {

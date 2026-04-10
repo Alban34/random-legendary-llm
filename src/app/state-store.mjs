@@ -279,6 +279,10 @@ function sanitizeStateCandidate(candidate, indexes) {
   };
 }
 
+export function sanitizePersistedState({ candidate, indexes }) {
+  return sanitizeStateCandidate(candidate, indexes);
+}
+
 function createUnavailableResult(message) {
   return {
     ok: false,

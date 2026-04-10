@@ -226,21 +226,9 @@ font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 
 ---
 
-## Tab 4 — History & Reset
+## Tab 4 — History
 
 ```
-  ── Used Card Tracking ──────────────────────────────
-
-  Heroes         Never played: 10/52        [Reset Hero Counts]
-  Masterminds    Never played: 5/14         [Reset Mastermind Counts]
-  Villain Groups Never played: 6/18         [Reset Villain Counts]
-  Henchman GroupsNever played: 5/8          [Reset Henchman Counts]
-  Schemes        Never played: 4/24         [Reset Scheme Counts]
-
-  Lowest-play reuse activates automatically when a category runs out of never-played options.
-
-  [🗑 FULL RESET — Clear all data]
-
   ── Game History ────────────────────────────────────
 
   ▼  Game #7 — Apr 9, 2026 · 2 Players
@@ -254,11 +242,42 @@ font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 ```
 
 **Interactions:**
+- History items collapse/expand on click
+- History is ordered newest-first
+
+---
+
+## Tab 5 — Backup & Data Management
+
+```
+  ── Backup and Restore ──────────────────────────────
+
+  Export your collection, usage, history, results,
+  and preferences as a versioned JSON backup.
+
+  [Export Backup] [Import Backup]
+
+  Imported backup preview...
+  [Merge Backup] [Replace with Backup]
+
+  ── Used Card Tracking ──────────────────────────────
+
+  Heroes         Never played: 10/52        [Reset Hero Counts]
+  Masterminds    Never played: 5/14         [Reset Mastermind Counts]
+  Villain Groups Never played: 6/18         [Reset Villain Counts]
+  Henchman GroupsNever played: 5/8          [Reset Henchman Counts]
+  Schemes        Never played: 4/24         [Reset Scheme Counts]
+
+  Lowest-play reuse activates automatically when a category runs out of never-played options.
+
+  [🗑 FULL RESET — Clear all data]
+```
+
+**Interactions:**
 - Progress indicators show never-played/total for each category
 - Individual Reset buttons clear only that category's play counts (no confirmation needed)
 - Full Reset shows a modal confirmation: "This will delete all game history and reset all card tracking. Are you sure?"
-- History items collapse/expand on click
-- History is ordered newest-first
+- Import preview stages the backup before any merge or replace action is applied
 
 ---
 

@@ -18,6 +18,7 @@ It explains how the application should use a project-owned canonical data format
 The current release keeps the architecture described below and implements it with these primary runtime entry points:
 
 - `index.html` — static application shell and mounting points for tabs, toast region, and modal root
+- `src/app/backup-utils.mjs` — versioned backup serialization, parsing, validation, and merge helpers
 - `src/app/theme-utils.mjs` — supported theme metadata and theme-ID normalization helpers
 - `src/app/browser-entry.mjs` — bootstraps canonical data, hydration, ephemeral UI state, toasts, and actions
 - `src/app/game-data-pipeline.mjs` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
@@ -27,11 +28,12 @@ The current release keeps the architecture described below and implements it wit
 
 The shipped runtime bundle created by `createEpic1Bundle(seed)` exposes project-owned canonical source data, normalized runtime data, summary counts, and validation test results for the browser shell.
 
-The shipped shell currently exposes four primary tab panels with IDs that match the persisted preference and renderer contracts:
+The shipped shell currently exposes five primary tab panels with IDs that match the persisted preference and renderer contracts:
 - `browse`
 - `collection`
 - `new-game`
 - `history`
+- `backup`
 
 The shell also now applies a persisted `data-theme` attribute on `document.documentElement` before the module bootstrap finishes so theme preference and first paint stay aligned.
 
@@ -246,6 +248,9 @@ Current shape:
   preferences: {
     lastPlayerCount: number,
     lastAdvancedSolo: boolean,
+    lastPlayMode: string,
+    onboardingCompleted: boolean,
+    themeId: string,
     selectedTab: string | null
   }
 }
@@ -255,7 +260,7 @@ Current shape:
 - easier schema migration,
 - simpler reset behavior,
 - less risk of partial writes,
-- easier export/import later,
+- easier mapping into a portable backup schema,
 - clearer mental model.
 
 ### Epic 2 implementation boundary recommendation
@@ -273,6 +278,37 @@ Recommended hydration order:
 3. validate stored IDs against runtime indexes
 4. recover invalid/corrupted slices safely
 5. render the app with runtime data plus hydrated user state
+
+### Portable backup contract
+
+The shipped Backup tab owns the data-management actions instead of mixing them into History. It exports a separate portable backup envelope instead of serializing the internal browser-storage object directly.
+
+Current backup shape:
+
+```text
+{
+  schemaId: "legendary-marvel-randomizer-backup",
+  version: 1,
+  exportedAt: string,
+  metadata: {
+    appId: "legendary-marvel-randomizer",
+    storageKey: "legendary_state_v1",
+    stateSchemaVersion: 1
+  },
+  data: {
+    collection,
+    usage,
+    history,
+    preferences
+  }
+}
+```
+
+Current restore behavior:
+- import validation rejects malformed JSON, unsupported schema identifiers, unsupported versions, and partial payloads before any write occurs,
+- accepted imports are re-sanitized through the same persisted-state validation path used during normal hydration,
+- **Merge** unions collection/history, merges usage conservatively, and applies imported preferences,
+- **Replace** swaps the full persisted state for the imported backup.
 
 ---
 

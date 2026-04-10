@@ -92,7 +92,7 @@ test.describe('Epic 2 automated QC', () => {
     await page.waitForFunction(() => window.__CURRENT_SETUP__ !== null);
     await page.locator('#panel-new-game [data-action="accept-current-setup"]').click();
 
-    await selectTab(page, 'history');
+    await selectTab(page, 'backup');
 
     for (const [label, category] of [
       ['Heroes', 'heroes'],
@@ -101,13 +101,13 @@ test.describe('Epic 2 automated QC', () => {
       ['Henchman Groups', 'henchmanGroups'],
       ['Schemes', 'schemes']
     ]) {
-      await page.locator(`#panel-history [data-action="reset-usage"][data-category="${category}"]`).click();
+      await page.locator(`#panel-backup [data-action="reset-usage"][data-category="${category}"]`).click();
       const state = await readAppState(page);
       expect(Object.keys(state.usage[category])).toHaveLength(0);
-      await expect(page.locator('#panel-history')).toContainText(label);
+      await expect(page.locator('#panel-backup')).toContainText(label);
     }
 
-    await page.locator('#panel-history [data-action="request-reset-all-state"]').click();
+    await page.locator('#panel-backup [data-action="request-reset-all-state"]').click();
     await page.locator('#modal-root [data-action="confirm-reset-all-state"]').click();
     await page.waitForFunction(() => window.__ACTIVE_TAB__ === 'browse');
     const resetState = await readAppState(page);

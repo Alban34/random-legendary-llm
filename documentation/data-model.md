@@ -457,11 +457,54 @@ The generator should validate:
 
 ---
 
-## 9. Extensibility notes
+## 9. Portable backup schema
+
+The shipped app persists one internal root state object in browser storage, but backup files use a separate portable envelope so imports remain explicit and versioned.
+
+Current backup contract:
+
+```text
+BackupEnvelope = {
+  schemaId: "legendary-marvel-randomizer-backup",
+  version: 1,
+  exportedAt: string,
+  metadata: {
+    appId: "legendary-marvel-randomizer",
+    storageKey: "legendary_state_v1",
+    stateSchemaVersion: 1
+  },
+  data: {
+    collection: CollectionState,
+    usage: UsageState,
+    history: GameRecord[],
+    preferences: PreferencesState
+  }
+}
+```
+
+Why the backup format stays separate from the stored root object:
+- the app can reject unsupported imports by `schemaId` and `version` before touching local data,
+- metadata makes the export self-describing without leaking transient UI state,
+- the persisted browser state can evolve independently as long as the import/export layer keeps mapping safely.
+
+Import rules:
+- malformed JSON fails before any state write,
+- unsupported schema IDs or versions fail before any state write,
+- missing `collection`, `usage`, `history`, or `preferences` sections fail before any state write,
+- imported IDs and record shapes are re-sanitized through the same persisted-state validation used on normal hydration,
+- sanitized imports that still produce recovery notices are rejected rather than partially applied.
+
+Restore modes:
+- **Replace** swaps the current persisted collection, usage, history, and preferences for the imported backup.
+- **Merge** unions owned sets, deduplicates history by record ID, keeps the stronger usage stat per entity (`max(plays)` plus latest `lastPlayedAt`), and applies imported preferences as the new preference slice.
+
+---
+
+## 10. Extensibility notes
 
 - new sets should be addable by inserting a new `Set` object in the canonical data
 - new scheme behaviors should be expressible by adding new `RuleModifier.type` values
 - aliases support search and future naming reconciliation without changing IDs
 - UI labels can evolve without changing persisted history because history stores IDs
-- future export/import can serialize the entire root state object directly
+- future backup schema versions can add metadata or optional sections without redefining the internal persisted root object
 - if needed later, the same architecture can support additional game modes without replacing the data layer

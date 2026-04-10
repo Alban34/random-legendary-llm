@@ -32,14 +32,14 @@ test.describe('Epic 4 automated QC', () => {
     await expect(page.locator('#tab-desktop-collection')).toHaveAttribute('aria-selected', 'true');
 
     await page.locator('#tab-desktop-collection').press('End');
-    await page.waitForFunction(() => window.__ACTIVE_TAB__ === 'history');
-    await expect(page.locator('#tab-desktop-history')).toHaveAttribute('aria-selected', 'true');
+    await page.waitForFunction(() => window.__ACTIVE_TAB__ === 'backup');
+    await expect(page.locator('#tab-desktop-backup')).toHaveAttribute('aria-selected', 'true');
 
     await reloadApp(page);
-    await expect(page.locator('#tab-desktop-history')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#tab-desktop-backup')).toHaveAttribute('aria-selected', 'true');
 
     const state = await readAppState(page);
-    expect(state.preferences.selectedTab).toBe('history');
+    expect(state.preferences.selectedTab).toBe('backup');
   });
 
   test('applies the dark visual design system and reuses primitives across multiple screens', async ({ page }) => {
@@ -77,7 +77,11 @@ test.describe('Epic 4 automated QC', () => {
     await page.locator('#panel-new-game [data-action="generate-setup"]').click();
     await selectTab(page, 'history');
     await expect(page.locator('#panel-history .panel').first()).toBeVisible();
-    await expect(page.locator('#panel-history .button').first()).toBeVisible();
+    await expect(page.locator('#panel-history .panel h2').first()).toContainText('Game history');
+
+    await selectTab(page, 'backup');
+    await expect(page.locator('#panel-backup .panel').first()).toBeVisible();
+    await expect(page.locator('#panel-backup .button').first()).toBeVisible();
   });
 
   test('can traverse the full shell without a mouse and shows visible focus treatment', async ({ page }) => {
@@ -103,6 +107,10 @@ test.describe('Epic 4 automated QC', () => {
     await page.locator('#tab-desktop-new-game').press('ArrowRight');
     await page.waitForFunction(() => window.__ACTIVE_TAB__ === 'history');
     await expect(page.locator('#panel-history')).toBeVisible();
+
+    await page.locator('#tab-desktop-history').press('ArrowRight');
+    await page.waitForFunction(() => window.__ACTIVE_TAB__ === 'backup');
+    await expect(page.locator('#panel-backup')).toBeVisible();
   });
 });
 
