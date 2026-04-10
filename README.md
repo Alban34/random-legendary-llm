@@ -4,25 +4,19 @@ STATUS: Approved
 
 ## Project state
 
-The repository now contains the **Epic 1 through Epic 10 implementation, documentation, and release-readiness pass** for the Legendary: Marvel randomizer.
+The repository now contains the **Epic 1 through Epic 20 implementation**, including post-v1 updates for alternate play modes, score logging, backup portability, insights, forced picks, onboarding, theming, interface localization, and grouped history.
 
 Current status:
-- Epic 1 implementation, tests, and browser QC automation are complete
-- Epic 2 implementation, automated tests, and browser QC automation are complete
-- Epic 3 implementation, automated tests, and browser QC automation are complete
-- Epic 4 implementation, automated tests, and browser QC automation are complete
-- Epic 5 Browse implementation, automated tests, and browser QC automation are complete
-- Epic 6 Collection implementation, automated tests, and browser QC automation are complete
-- Epic 7 New Game implementation, automated tests, and browser QC automation are complete
-- Epic 8 History/Usage/Reset implementation, automated tests, and browser QC automation are complete
-- Epic 9 Notifications/Error Handling/Accessibility implementation, automated tests, and browser QC automation are complete
-- Epic 10 Final Documentation/Release Readiness updates, automated tests, and browser QC automation are complete
+- Epic 10 release readiness is complete and remains covered by documentation-alignment automation
+- Epics 1 through 20 are implemented
+- Node-based automated tests cover the current shipped runtime modules and documentation contracts
+- Playwright browser QC covers the current shipped user flows, including localization switching and fallback behavior
 
 Implemented so far:
 - canonical seed data under `src/data/`
 - shared normalization and validation logic under `src/app/`
 - versioned browser-state persistence under `src/app/state-store.mjs`
-- a persisted theme switcher with the built-in Midnight and Newsprint themes
+- a persisted theme switcher plus a persisted language selector with built-in English, French, and long-copy QA locale support
 - versioned backup export/import utilities under `src/app/backup-utils.mjs`
 - switchable History grouping modes for mastermind, player count, play mode, or an ungrouped view
 - setup templates and generation logic under `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs`
@@ -69,13 +63,14 @@ This keeps the app easy to host statically while making Epic 2+ work much easier
 Typical flow:
 
 1. Open the app through a static HTTP server.
-2. Use the **Browse** tab to inspect included sets and add them to your collection.
-3. Review totals and legality warnings in **Collection**.
-4. Go to **New Game** to choose player count, optionally enable Advanced Solo for 1 player, then **Generate Setup**.
-5. Use **Regenerate** as much as you want without changing persisted history or usage.
-6. Use **Accept & Log** when you want the current setup to count toward usage tracking and game history.
-7. Review accepted games in **History**, regroup them by mastermind, players, play mode, or an ungrouped view, and inspect insights below the grouped history list.
-8. Use **Backup** to export a portable JSON backup, reset usage buckets, or import one with Merge or Replace restore modes.
+2. Use the shared header controls to choose your preferred language and theme.
+3. Use the **Browse** tab to inspect included sets and add them to your collection.
+4. Review totals and legality warnings in **Collection**.
+5. Go to **New Game** to choose player count, optionally enable Advanced Solo for 1 player, then **Generate Setup**.
+6. Use **Regenerate** as much as you want without changing persisted history or usage.
+7. Use **Accept & Log** when you want the current setup to count toward usage tracking and game history.
+8. Review accepted games in **History**, regroup them by mastermind, players, play mode, or an ungrouped view, and inspect insights below the grouped history list.
+9. Use **Backup** to export a portable JSON backup, reset usage buckets, or import one with Merge or Replace restore modes.
 
 Important behavior:
 - **Generate** and **Regenerate** are ephemeral; they do not change persisted state
@@ -89,12 +84,12 @@ Important behavior:
 Persisted data:
 - the app stores one versioned root state object in browser storage under `legendary_state_v1`
 - that state contains collection ownership, usage statistics, accepted game history, and preferences
-- preferences now include the active theme so the theme switcher restores on reload without a visible restyle flash in normal browser conditions
+- preferences now include the active theme and locale so the shared header controls restore on reload without leaving the shell in a mixed state longer than necessary
 - the **Backup** tab can export the persistent data above as a versioned JSON backup and later import it with either **Merge** or **Replace** restore modes
 
 Reset behavior:
 - **Reset All Selections** in **Collection** clears owned sets only
-- **Reset Heroes / Masterminds / Villain Groups / Henchman Groups / Schemes** in **History** clear only the selected usage bucket
+- **Reset Heroes / Masterminds / Villain Groups / Henchman Groups / Schemes** in **Backup** clear only the selected usage bucket
 - **Full Reset — Clear all data** clears collection, usage, history, and preferences only after confirmation
 
 Current V1 limitations:
@@ -294,6 +289,6 @@ Project documentation lives in `documentation/`.
 
 ## Current release status
 
-Epic 1 through Epic 10 are implemented, documented, and covered by automated logic tests plus browser QC.
+Epic 1 through Epic 10 are implemented, documented, and covered by automated logic tests plus browser QC, and Epic 10 release readiness remains complete in the shipped baseline.
 
 For future enhancements beyond the current release, see `documentation/_next-steps.md`.

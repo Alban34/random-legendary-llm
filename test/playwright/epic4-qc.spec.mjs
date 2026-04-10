@@ -89,10 +89,13 @@ test.describe('Epic 4 automated QC', () => {
     await reloadApp(page);
 
     await page.keyboard.press('Tab');
-    await expect(page.locator('[data-action="set-theme"][data-theme-id="midnight"]')).toBeFocused();
+    await expect(page.locator('#header-locale-select')).toBeFocused();
 
     const focusOutline = await page.evaluate(() => getComputedStyle(document.activeElement).outlineStyle);
     expect(focusOutline).toBe('solid');
+
+    await page.keyboard.press('Tab');
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="midnight"]')).toBeFocused();
 
     await page.keyboard.press('Tab');
     await expect(page.locator('[data-action="set-theme"][data-theme-id="newsprint"]')).toBeFocused();

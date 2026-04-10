@@ -19,6 +19,7 @@ The current release keeps the architecture described below and implements it wit
 
 - `index.html` — static application shell and mounting points for tabs, toast region, and modal root
 - `src/app/backup-utils.mjs` — versioned backup serialization, parsing, validation, and merge helpers
+- `src/app/localization-utils.mjs` — locale metadata, translation lookup, fallback handling, and locale-aware formatting helpers
 - `src/app/theme-utils.mjs` — supported theme metadata and theme-ID normalization helpers
 - `src/app/browser-entry.mjs` — bootstraps canonical data, hydration, ephemeral UI state, toasts, and actions
 - `src/app/game-data-pipeline.mjs` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
@@ -35,7 +36,7 @@ The shipped shell currently exposes five primary tab panels with IDs that match 
 - `history`
 - `backup`
 
-The shell also now applies a persisted `data-theme` attribute on `document.documentElement` before the module bootstrap finishes so theme preference and first paint stay aligned.
+The shell also now applies persisted `data-theme` and `lang` values on `document.documentElement` before the module bootstrap finishes so theme and locale preference stay aligned with first paint.
 
 ---
 

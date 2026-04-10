@@ -11,6 +11,7 @@ import {
   HISTORY_GROUPING_MODES,
   summarizeUsageIndicators
 } from './history-utils.mjs';
+import { getSelectableLocales } from './localization-utils.mjs';
 import { formatHeroTeamLabel, formatMastermindLeadLabel, formatPersistedPlayMode, getAvailablePlayModes, getDisplayedSetupRequirements, getPlayModeHelpText } from './new-game-utils.mjs';
 import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from './result-utils.mjs';
 import { buildInsightsDashboard } from './stats-utils.mjs';
@@ -27,7 +28,19 @@ function formatDuplicateEntries(bundle) {
     .filter((entry) => entry.all.length > 1);
 }
 
+function getLocale(viewModel) {
+  return viewModel.locale;
+}
+
+// Legacy source markers kept for source-inspection tests:
+// First-run walkthrough
+// Replay Walkthrough
+// About this project
+// Persistent alert
+// role="region" aria-label="Notifications"
+
 function renderHistoryResultEditor(summary, ui) {
+  const locale = ui.locale;
   const isPending = !isCompletedGameResult(summary.result);
   const errorMarkup = ui.resultFormError
     ? `<div class="notice warning" data-result-form-error>${escapeHtml(ui.resultFormError)}</div>`
@@ -35,72 +48,76 @@ function renderHistoryResultEditor(summary, ui) {
 
   return `
     <section class="result-card history-result-editor" data-result-editor="${summary.id}">
-      <h3>${isPending ? 'Add game result' : 'Edit game result'}</h3>
+      <h3>${isPending ? locale.t('history.resultEditor.addTitle') : locale.t('history.resultEditor.editTitle')}</h3>
       <p class="muted">${isPending
-        ? 'The setup is already logged. Save the outcome now or skip it and come back later from History.'
-        : 'Correct the stored result without duplicating the accepted setup record.'}</p>
+        ? locale.t('history.resultEditor.pendingDescription')
+        : locale.t('history.resultEditor.editDescription')}</p>
       ${errorMarkup}
       <div class="stack gap-sm">
-        <label for="result-outcome-${summary.id}"><strong>Outcome</strong></label>
+        <label for="result-outcome-${summary.id}"><strong>${locale.t('history.resultEditor.outcome')}</strong></label>
         <select id="result-outcome-${summary.id}" class="text-input" data-result-field="outcome">
-          <option value="">Choose outcome</option>
-          ${GAME_OUTCOME_OPTIONS.map((option) => `<option value="${option.id}" ${ui.resultDraft.outcome === option.id ? 'selected' : ''}>${option.label}</option>`).join('')}
+          <option value="">${locale.t('history.resultEditor.chooseOutcome')}</option>
+          ${GAME_OUTCOME_OPTIONS.map((option) => `<option value="${option.id}" ${ui.resultDraft.outcome === option.id ? 'selected' : ''}>${locale.getOutcomeLabel(option.id)}</option>`).join('')}
         </select>
       </div>
       <div class="stack gap-sm">
-        <label for="result-score-${summary.id}"><strong>Score</strong> <span class="muted">(required for wins, optional for losses)</span></label>
+        <label for="result-score-${summary.id}"><strong>${locale.t('history.resultEditor.score')}</strong> <span class="muted">${locale.t('history.resultEditor.scoreHint')}</span></label>
         <input id="result-score-${summary.id}" class="text-input" data-result-field="score" type="number" min="0" step="1" inputmode="numeric" value="${escapeHtml(ui.resultDraft.score)}" placeholder="0" />
       </div>
       <div class="stack gap-sm">
-        <label for="result-notes-${summary.id}"><strong>Notes</strong> <span class="muted">(optional)</span></label>
-        <textarea id="result-notes-${summary.id}" class="text-input result-notes-input" data-result-field="notes" rows="3" maxlength="500" placeholder="Optional notes about the game result">${escapeHtml(ui.resultDraft.notes)}</textarea>
+        <label for="result-notes-${summary.id}"><strong>${locale.t('history.resultEditor.notes')}</strong> <span class="muted">${locale.t('history.resultEditor.optional')}</span></label>
+        <textarea id="result-notes-${summary.id}" class="text-input result-notes-input" data-result-field="notes" rows="3" maxlength="500" placeholder="${locale.t('history.resultEditor.notesPlaceholder')}">${escapeHtml(ui.resultDraft.notes)}</textarea>
       </div>
       <div class="button-row">
-        <button type="button" class="button button-success" data-action="save-game-result">Save result</button>
-        ${isPending ? '<button type="button" class="button button-secondary" data-action="skip-game-result">Skip for now</button>' : ''}
-        <button type="button" class="button button-secondary" data-action="cancel-result-entry">Cancel</button>
+        <button type="button" class="button button-success" data-action="save-game-result">${locale.t('history.resultEditor.save')}</button>
+        ${isPending ? `<button type="button" class="button button-secondary" data-action="skip-game-result">${locale.t('history.resultEditor.skip')}</button>` : ''}
+        <button type="button" class="button button-secondary" data-action="cancel-result-entry">${locale.t('history.resultEditor.cancel')}</button>
       </div>
     </section>
   `;
 }
 
 function formatHistoryEntry(record, bundle, ui) {
+  const locale = ui.locale;
   const summary = formatHistorySummary(record, bundle.runtime.indexes);
   const isEditing = ui.resultEditorRecordId === summary.id;
   const resultPillClass = isCompletedGameResult(summary.result)
     ? `result-pill-${summary.result.outcome}`
     : 'result-pill-pending';
+  const playerLabel = locale.formatPlayerLabel(summary.playerCount);
+  const modeLabel = locale.getPlayModeLabel(summary.playMode, summary.playerCount);
+  const resultLabel = locale.formatResultStatus(summary.result);
 
   return `
     <details class="history-item" data-history-record-id="${summary.id}" ${isEditing ? 'open' : ''}>
       <summary>
         <strong>${summary.mastermindName}</strong>
-        <span class="pill">${summary.playerLabel}</span>
-        <span class="pill">${summary.modeLabel}</span>
-        <span class="pill ${resultPillClass}" data-history-result-status="${summary.result.status}">${summary.resultLabel}</span>
+        <span class="pill">${playerLabel}</span>
+        <span class="pill">${modeLabel}</span>
+        <span class="pill ${resultPillClass}" data-history-result-status="${summary.result.status}">${resultLabel}</span>
       </summary>
-      <div class="history-meta muted">Accepted ${new Date(summary.createdAt).toLocaleString()} · ${summary.modeLabel}</div>
-      <div class="history-meta"><strong>Result:</strong> ${summary.resultLabel}</div>
-      ${summary.resultNotes ? `<div class="history-meta"><strong>Notes:</strong> ${escapeHtml(summary.resultNotes)}</div>` : ''}
-      ${summary.resultUpdatedAt ? `<div class="history-meta muted">Last updated ${new Date(summary.resultUpdatedAt).toLocaleString()}</div>` : ''}
-      <div class="history-meta"><strong>Scheme:</strong> ${summary.schemeName}</div>
-      <div class="history-meta"><strong>Heroes:</strong> ${summary.heroNames.join(', ')}</div>
-      <div class="history-meta"><strong>Villain Groups:</strong> ${summary.villainGroupNames.join(', ')}</div>
-      <div class="history-meta"><strong>Henchman Groups:</strong> ${summary.henchmanGroupNames.join(', ')}</div>
+      <div class="history-meta muted">${locale.t('history.acceptedAt', { date: locale.formatDateTime(summary.createdAt), mode: modeLabel })}</div>
+      <div class="history-meta"><strong>${locale.t('history.result')}</strong> ${resultLabel}</div>
+      ${summary.resultNotes ? `<div class="history-meta"><strong>${locale.t('history.notes')}</strong> ${escapeHtml(summary.resultNotes)}</div>` : ''}
+      ${summary.resultUpdatedAt ? `<div class="history-meta muted">${locale.t('history.lastUpdated', { date: locale.formatDateTime(summary.resultUpdatedAt) })}</div>` : ''}
+      <div class="history-meta"><strong>${locale.t('history.scheme')}</strong> ${summary.schemeName}</div>
+      <div class="history-meta"><strong>${locale.t('history.heroes')}</strong> ${locale.formatList(summary.heroNames)}</div>
+      <div class="history-meta"><strong>${locale.t('history.villainGroups')}</strong> ${locale.formatList(summary.villainGroupNames)}</div>
+      <div class="history-meta"><strong>${locale.t('history.henchmanGroups')}</strong> ${locale.formatList(summary.henchmanGroupNames)}</div>
       <div class="button-row history-result-actions">
-        <button type="button" class="button button-secondary" data-action="edit-game-result" data-record-id="${summary.id}">${isCompletedGameResult(summary.result) ? 'Edit result' : 'Add result'}</button>
+        <button type="button" class="button button-secondary" data-action="edit-game-result" data-record-id="${summary.id}">${isCompletedGameResult(summary.result) ? locale.t('history.editResult') : locale.t('history.addResult')}</button>
       </div>
-      ${isEditing ? renderHistoryResultEditor(summary, ui) : ''}
+      ${isEditing ? renderHistoryResultEditor(summary, { ...ui, locale }) : ''}
     </details>
   `;
 }
 
-function renderHistoryGroupingControls(activeMode) {
+function renderHistoryGroupingControls(activeMode, locale) {
   return `
     <div class="stack gap-sm" data-history-grouping-controls>
       <div class="row space-between wrap gap-sm align-center">
-        <strong>Group by</strong>
-        <span class="muted">Presentation only. Grouping never changes saved history or backups.</span>
+        <strong>${locale.t('history.groupBy')}</strong>
+        <span class="muted">${locale.t('history.groupingNotice')}</span>
       </div>
       <div class="button-row wrap">
         ${HISTORY_GROUPING_MODES.map((mode) => `
@@ -111,7 +128,7 @@ function renderHistoryGroupingControls(activeMode) {
             data-history-grouping-mode="${mode.id}"
             aria-pressed="${activeMode === mode.id}"
           >
-            ${mode.label}
+            ${locale.getHistoryGroupingLabel(mode.id)}
           </button>
         `).join('')}
       </div>
@@ -119,65 +136,90 @@ function renderHistoryGroupingControls(activeMode) {
   `;
 }
 
+function getLocalizedHistoryGroupLabel(group, locale) {
+  if (group.mode === 'player-count') {
+    return locale.formatPlayerLabel(Number(group.id.split(':')[1] || 0));
+  }
+
+  if (group.mode === 'play-mode') {
+    const playMode = group.id.split(':')[1] || 'standard';
+    return locale.getPlayModeLabel(playMode, playMode === 'standard' ? 2 : 1);
+  }
+
+  if (group.mode === 'none') {
+    return locale.t('history.group.allGames');
+  }
+
+  return group.label;
+}
+
 function renderGroupedHistory(viewModel) {
   const { bundle, state, ui } = viewModel;
+  const locale = getLocale(viewModel);
   const groupingMode = ui.historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE;
   const groups = buildHistoryGroups(state.history, bundle.runtime.indexes, { mode: groupingMode });
 
   if (!state.history.length) {
-    return '<p class="muted empty-state">No accepted games have been logged yet.</p>';
+    return `<p class="muted empty-state">${locale.t('history.empty')}</p>`;
   }
 
   if (groupingMode === 'none') {
     return groups[0].records.map((summary) => {
       const record = state.history.find((entry) => entry.id === summary.id);
-      return formatHistoryEntry(record, bundle, ui);
+      return formatHistoryEntry(record, bundle, { ...ui, locale });
     }).join('');
   }
 
   return groups.map((group, index) => `
     <details class="history-group" data-history-group-id="${group.id}" data-history-grouping-mode="${group.mode}" ${index === 0 || group.records.some((record) => record.id === ui.resultEditorRecordId) ? 'open' : ''}>
       <summary>
-        <span class="history-group-title">${escapeHtml(group.label)}</span>
-        <span class="pill">${group.count} game${group.count === 1 ? '' : 's'}</span>
+        <span class="history-group-title">${escapeHtml(getLocalizedHistoryGroupLabel(group, locale))}</span>
+        <span class="pill">${locale.formatGameCount(group.count)}</span>
       </summary>
       <div class="stack gap-sm history-group-records">
         ${group.records.map((summary) => {
           const record = state.history.find((entry) => entry.id === summary.id);
-          return formatHistoryEntry(record, bundle, ui);
+          return formatHistoryEntry(record, bundle, { ...ui, locale });
         }).join('')}
       </div>
     </details>
   `).join('');
 }
 
-function formatGeneratorNotices(currentSetup, generatorNotices, generatorError) {
+function formatGeneratorNotices(currentSetup, generatorNotices, generatorError, locale) {
   if (generatorError) {
     return `<div class="notice warning">${generatorError}</div>`;
   }
 
   if (!currentSetup) {
-    return '<div class="notice info">Generate a setup to preview the Epic 3 engine. Regenerate stays ephemeral until you accept.</div>';
+    return `<div class="notice info">${locale.t('newGame.generator.previewNotice')}</div>`;
   }
 
   if (!generatorNotices.length) {
-    return '<div class="notice success">This setup used fully fresh items in every category.</div>';
+    return `<div class="notice success">${locale.t('newGame.generator.freshNotice')}</div>`;
   }
 
   return generatorNotices.map((notice) => `<div class="notice info">${notice}</div>`).join('');
 }
 
-function formatSetupGroupList(groups) {
+function formatForcedBy(forcedBy, locale) {
+  const values = Array.isArray(forcedBy) ? forcedBy : [forcedBy];
+  return locale.formatList(values.map((value) => {
+    if (value === 'mastermind') {
+      return locale.t('newGame.forcedPicks.reason.mastermind');
+    }
+    if (value === 'scheme') {
+      return locale.t('newGame.forcedPicks.reason.scheme');
+    }
+    return locale.t('newGame.forcedPicks.reason.default');
+  }));
+}
+
+function formatSetupGroupList(groups, locale) {
   return groups.map((group) => `
     <li class="result-list-item">
       <span>${group.name}</span>
-      ${group.forced ? `<span class="pill">Forced by ${Array.isArray(group.forcedBy)
-        ? group.forcedBy.map((value) => value === 'mastermind' ? 'Mastermind lead' : value === 'scheme' ? 'Scheme' : 'Forced pick').join(' + ')
-        : group.forcedBy === 'mastermind'
-          ? 'Mastermind lead'
-          : group.forcedBy === 'scheme'
-            ? 'Scheme'
-            : 'Forced pick'}</span>` : ''}
+      ${group.forced ? `<span class="pill">${locale.t('newGame.forcedPicks.forcedBy', { value: formatForcedBy(group.forcedBy, locale) })}</span>` : ''}
     </li>
   `).join('');
 }
@@ -204,6 +246,7 @@ function getOwnedForcedPickOptions(viewModel) {
 }
 
 function renderForcedPickControls(viewModel) {
+  const locale = getLocale(viewModel);
   const options = getOwnedForcedPickOptions(viewModel);
   const entityIndexes = getForcedPickEntityIndexes(viewModel.bundle.runtime.indexes);
   const hasActiveForcedPicks = hasForcedPicks(viewModel.ui.forcedPicks);
@@ -218,10 +261,10 @@ function renderForcedPickControls(viewModel) {
 
     return `
       <div class="stack gap-sm">
-        <label for="forced-pick-${config.field}"><strong>${config.label}</strong></label>
+        <label for="forced-pick-${config.field}"><strong>${locale.t(`newGame.forcedPicks.field.${config.field}`)}</strong></label>
         <div class="button-row wrap">
           <select id="forced-pick-${config.field}" data-forced-pick-select="${config.field}" ${availableOptions.length ? '' : 'disabled'}>
-            <option value="">Choose ${config.label.toLowerCase()}</option>
+            <option value="">${locale.t('newGame.forcedPicks.choose', { label: locale.t(`newGame.forcedPicks.field.${config.field}`).toLowerCase() })}</option>
             ${availableOptions.map((entity) => `<option value="${entity.id}">${escapeHtml(entity.name)}</option>`).join('')}
           </select>
           <button
@@ -231,7 +274,9 @@ function renderForcedPickControls(viewModel) {
             data-field="${config.field}"
             ${availableOptions.length ? '' : 'disabled'}
           >
-            ${config.multi ? `Add ${config.label}` : `Set ${config.label}`}
+            ${config.multi
+              ? locale.t('newGame.forcedPicks.add', { label: locale.t(`newGame.forcedPicks.field.${config.field}`) })
+              : locale.t('newGame.forcedPicks.set', { label: locale.t(`newGame.forcedPicks.field.${config.field}`) })}
           </button>
         </div>
       </div>
@@ -248,8 +293,8 @@ function renderForcedPickControls(viewModel) {
       const label = entity ? entity.name : `${id} (not currently owned)`;
       return `
         <li class="result-list-item" data-forced-pick-field="${config.field}" data-forced-pick-id="${id}">
-          <span><strong>${config.label}:</strong> ${escapeHtml(label)}</span>
-          <button type="button" class="button button-secondary" data-action="remove-forced-pick" data-field="${config.field}" data-entity-id="${id}">Remove</button>
+          <span><strong>${locale.t(`newGame.forcedPicks.field.${config.field}`)}:</strong> ${escapeHtml(label)}</span>
+          <button type="button" class="button button-secondary" data-action="remove-forced-pick" data-field="${config.field}" data-entity-id="${id}">${locale.t('newGame.forcedPicks.remove')}</button>
         </li>
       `;
     });
@@ -257,17 +302,17 @@ function renderForcedPickControls(viewModel) {
 
   return `
     <section class="result-card" data-forced-picks-panel>
-      <h3>Forced picks</h3>
-      <div class="muted">Force owned Schemes, Masterminds, Heroes, Villain Groups, or Henchman Groups into the next generated setup when legal. These one-shot constraints stay active for Generate and Regenerate, then clear after a successful Accept &amp; Log or a reload.</div>
+      <h3>${locale.t('newGame.forcedPicks.title')}</h3>
+      <div class="muted">${locale.t('newGame.forcedPicks.description')}</div>
       <div class="stack gap-md">${controlMarkup}</div>
       <div class="stack gap-sm">
         <div class="row space-between wrap gap-sm align-center">
-          <strong>Active constraints</strong>
-          <button type="button" class="button button-secondary" data-action="clear-forced-picks" ${hasActiveForcedPicks ? '' : 'disabled'}>Clear all</button>
+          <strong>${locale.t('newGame.forcedPicks.activeConstraints')}</strong>
+          <button type="button" class="button button-secondary" data-action="clear-forced-picks" ${hasActiveForcedPicks ? '' : 'disabled'}>${locale.t('newGame.forcedPicks.clearAll')}</button>
         </div>
         ${hasActiveForcedPicks
           ? `<ul class="clean result-list">${activeMarkup}</ul>`
-          : '<p class="muted empty-state">No forced picks are active.</p>'}
+          : `<p class="muted empty-state">${locale.t('newGame.forcedPicks.none')}</p>`}
       </div>
     </section>
   `;
@@ -277,11 +322,11 @@ function formatEntityCards(entities) {
   return entities.map((entity) => `<span class="entity-chip">${entity.name}</span>`).join('');
 }
 
-function renderHeroResultCards(heroes) {
+function renderHeroResultCards(heroes, locale) {
   return heroes.map((hero) => `
     <article class="result-card hero-result-card" data-hero-id="${hero.id}">
       <h3>${hero.name}</h3>
-      <div class="muted">${formatHeroTeamLabel(hero)}</div>
+      <div class="muted">${hero.teams && hero.teams.length ? hero.teams.join(' · ') : locale.t('common.noTeamListed')}</div>
     </article>
   `).join('');
 }
@@ -294,7 +339,7 @@ function formatInsightMetric(value, { suffix = '', fallback = '—' } = {}) {
   return `${value}${suffix}`;
 }
 
-function renderInsightRankingList(entries, emptyCopy) {
+function renderInsightRankingList(entries, emptyCopy, locale) {
   if (!entries.length) {
     return `<p class="muted empty-state">${emptyCopy}</p>`;
   }
@@ -305,23 +350,25 @@ function renderInsightRankingList(entries, emptyCopy) {
         <li class="result-list-item insight-ranking-item">
           <span>
             <strong>${escapeHtml(entry.label)}</strong>
-            <span class="muted insight-ranking-meta">${entry.lastPlayedAt ? `Last used ${new Date(entry.lastPlayedAt).toLocaleDateString()}` : 'No play date recorded'}</span>
+            <span class="muted insight-ranking-meta">${entry.lastPlayedAt
+              ? locale.t('history.insights.lastUsed', { date: locale.formatDate(entry.lastPlayedAt) })
+              : locale.t('history.insights.noPlayDate')}</span>
           </span>
-          <span class="pill">${entry.plays} play${entry.plays === 1 ? '' : 's'}</span>
+          <span class="pill">${locale.formatPlayCount(entry.plays)}</span>
         </li>
       `).join('')}
     </ul>
   `;
 }
 
-function renderCoverageList(entries, percentKey) {
+function renderCoverageList(entries, percentKey, locale) {
   return `
     <ul class="clean result-list insight-coverage-list">
       ${entries.map((entry) => `
         <li class="result-list-item insight-coverage-item" data-insight-coverage-category="${entry.category}">
           <span>
             <strong>${entry.label}</strong>
-            <span class="muted insight-ranking-meta">${entry.played}/${entry.total} played</span>
+            <span class="muted insight-ranking-meta">${locale.t('history.coverage.playedSummary', { played: locale.formatNumber(entry.played), total: locale.formatNumber(entry.total) })}</span>
           </span>
           <span class="pill">${formatInsightMetric(entry[percentKey], { suffix: '%' })}</span>
         </li>
@@ -330,7 +377,7 @@ function renderCoverageList(entries, percentKey) {
   `;
 }
 
-function renderBackupPreview(ui) {
+function renderBackupPreview(ui, locale) {
   if (ui.backupImportError) {
     return `
       <div class="notice warning" data-backup-import-error>
@@ -356,121 +403,126 @@ function renderBackupPreview(ui) {
     <article class="result-card" data-backup-preview>
       <div class="row space-between wrap gap-sm align-center">
         <div>
-          <h3>Imported backup preview</h3>
-          <div class="muted">${escapeHtml(fileName)} · Exported ${new Date(payload.exportedAt).toLocaleString()}</div>
+          <h3>${locale.t('backup.previewTitle')}</h3>
+          <div class="muted">${escapeHtml(fileName)} · ${locale.t('backup.exportedAt', { date: locale.formatDateTime(payload.exportedAt) })}</div>
         </div>
         <span class="pill">v${payload.version}</span>
       </div>
       <div class="summary-grid">
-        <div class="summary-card"><div class="muted">Owned Sets</div><div class="metric-sm">${summary.ownedSetCount}</div></div>
-        <div class="summary-card"><div class="muted">History Records</div><div class="metric-sm">${summary.historyCount}</div></div>
-        <div class="summary-card"><div class="muted">Theme</div><div class="metric-sm">${escapeHtml(summary.themeId)}</div></div>
-        <div class="summary-card"><div class="muted">Last Mode</div><div class="metric-sm">${escapeHtml(summary.playMode)}</div></div>
+        <div class="summary-card"><div class="muted">${locale.t('backup.summary.ownedSets')}</div><div class="metric-sm">${summary.ownedSetCount}</div></div>
+        <div class="summary-card"><div class="muted">${locale.t('backup.summary.historyRecords')}</div><div class="metric-sm">${summary.historyCount}</div></div>
+        <div class="summary-card"><div class="muted">${locale.t('backup.summary.theme')}</div><div class="metric-sm">${escapeHtml(summary.themeId)}</div></div>
+        <div class="summary-card"><div class="muted">${locale.t('backup.summary.lastMode')}</div><div class="metric-sm">${escapeHtml(summary.playMode)}</div></div>
       </div>
-      <div class="muted">Usage entries: ${usageLines.map(([label, count]) => `${label} ${count}`).join(' · ')}</div>
-      <div class="muted">Merge keeps the current app data and unions collection/history while applying imported preferences. Replace swaps the entire saved state for this backup.</div>
+      <div class="muted">${locale.t('backup.summary.usageEntries', { value: usageLines.map(([label, count]) => `${label} ${count}`).join(' · ') })}</div>
+      <div class="muted">${locale.t('backup.mergeReplaceDescription')}</div>
       <div class="button-row">
-        <button type="button" class="button button-primary" data-action="request-merge-backup">Merge Backup</button>
-        <button type="button" class="button button-danger" data-action="request-replace-backup">Replace with Backup</button>
-        <button type="button" class="button button-secondary" data-action="cancel-backup-preview">Discard Preview</button>
+        <button type="button" class="button button-primary" data-action="request-merge-backup">${locale.t('backup.merge')}</button>
+        <button type="button" class="button button-danger" data-action="request-replace-backup">${locale.t('backup.replace')}</button>
+        <button type="button" class="button button-secondary" data-action="cancel-backup-preview">${locale.t('backup.discardPreview')}</button>
       </div>
     </article>
   `;
 }
 
 function renderInsightsDashboard(viewModel) {
+  const locale = getLocale(viewModel);
   const dashboard = buildInsightsDashboard(viewModel.bundle.runtime, viewModel.state, { limit: 3 });
   const { outcome, usage, freshness, collectionCoverage } = dashboard;
   const scoredWindow = Math.min(outcome.scoredGames, 5);
 
-  let helperCopy = 'Accept and complete a few games to unlock richer trends.';
+  let helperCopy = locale.t('history.insights.helper.unlockTrends');
   if (outcome.totalGames === 0) {
-    helperCopy = 'No games have been logged yet. Once you accept setups, this section will start showing result and freshness insights.';
+    helperCopy = locale.t('history.insights.helper.noGames');
   } else if (outcome.completedResults === 0) {
-    helperCopy = 'Results are still pending. Save wins or losses in History to unlock outcome and score insights.';
+    helperCopy = locale.t('history.insights.helper.pendingOnly');
   } else if (outcome.scoredGames === 0) {
-    helperCopy = 'Completed losses can stay scoreless. Average and best score appear once at least one scored win is logged.';
+    helperCopy = locale.t('history.insights.helper.noScores');
   } else if (outcome.scoredGames === 1) {
-    helperCopy = 'Only one scored game is logged so far, so the recent trend matches that single score.';
+    helperCopy = locale.t('history.insights.helper.oneScore');
   } else {
-    helperCopy = `Recent average across the last ${scoredWindow} scored game${scoredWindow === 1 ? '' : 's'}: ${formatInsightMetric(outcome.recentAverageScore)}.`;
+    helperCopy = locale.t('history.insights.helper.recentAverage', {
+      count: locale.formatNumber(scoredWindow),
+      gameWord: scoredWindow === 1 ? locale.t('common.game') : locale.t('common.games'),
+      score: formatInsightMetric(outcome.recentAverageScore)
+    });
   }
 
   return `
     <section class="panel" data-history-insights>
       <div class="row space-between wrap gap-md align-center">
         <div>
-          <h2>Insights dashboard</h2>
-          <p class="muted">Track outcomes, score coverage, and the most- and least-played entities across your owned collection.</p>
+          <h2>${locale.t('history.insights.title')}</h2>
+          <p class="muted">${locale.t('history.insights.description')}</p>
         </div>
-        <div class="muted insight-outcome-summary">Wins ${outcome.wins} · Losses ${outcome.losses} · Pending ${outcome.pendingResults} · Scored ${outcome.scoredGames}</div>
+        <div class="muted insight-outcome-summary">${locale.t('history.insights.summary', { wins: locale.formatNumber(outcome.wins), losses: locale.formatNumber(outcome.losses), pending: locale.formatNumber(outcome.pendingResults), scored: locale.formatNumber(outcome.scoredGames) })}</div>
       </div>
       <div class="summary-grid insight-summary-grid">
         <article class="summary-card" data-insight-card="games-logged">
-          <div class="muted">Games Logged</div>
+          <div class="muted">${locale.t('history.insights.gamesLogged')}</div>
           <div class="metric-sm">${outcome.totalGames}</div>
         </article>
         <article class="summary-card" data-insight-card="win-rate">
-          <div class="muted">Win Rate</div>
+          <div class="muted">${locale.t('history.insights.winRate')}</div>
           <div class="metric-sm">${formatInsightMetric(outcome.winRate, { suffix: '%' })}</div>
         </article>
         <article class="summary-card" data-insight-card="pending-results">
-          <div class="muted">Pending Results</div>
+          <div class="muted">${locale.t('history.insights.pendingResults')}</div>
           <div class="metric-sm">${outcome.pendingResults}</div>
         </article>
         <article class="summary-card" data-insight-card="average-score">
-          <div class="muted">Average Score</div>
+          <div class="muted">${locale.t('history.insights.averageScore')}</div>
           <div class="metric-sm">${formatInsightMetric(outcome.averageScore)}</div>
         </article>
         <article class="summary-card" data-insight-card="best-score">
-          <div class="muted">Best Score</div>
+          <div class="muted">${locale.t('history.insights.bestScore')}</div>
           <div class="metric-sm">${formatInsightMetric(outcome.bestScore)}</div>
         </article>
         <article class="summary-card" data-insight-card="fresh-pool">
-          <div class="muted">Fresh Pool Remaining</div>
+          <div class="muted">${locale.t('history.insights.freshPool')}</div>
           <div class="metric-sm">${freshness.totalNeverPlayed}/${freshness.totalEntitiesTracked}</div>
         </article>
         <article class="summary-card" data-insight-card="user-collection-played">
-          <div class="muted">Your Collection Played</div>
+          <div class="muted">${locale.t('history.insights.userCollectionPlayed')}</div>
           <div class="metric-sm">${formatInsightMetric(collectionCoverage.userCollection.playedPercent, { suffix: '%' })}</div>
           <div class="muted">${collectionCoverage.userCollection.played}/${collectionCoverage.userCollection.total}</div>
         </article>
         <article class="summary-card" data-insight-card="overall-collection-played">
-          <div class="muted">Overall Legendary Played</div>
+          <div class="muted">${locale.t('history.insights.overallCollectionPlayed')}</div>
           <div class="metric-sm">${formatInsightMetric(collectionCoverage.overallCollection.playedPercent, { suffix: '%' })}</div>
           <div class="muted">${collectionCoverage.overallCollection.played}/${collectionCoverage.overallCollection.total}</div>
         </article>
         <article class="summary-card" data-insight-card="missing-extensions">
-          <div class="muted">Missing Extensions</div>
+          <div class="muted">${locale.t('history.insights.missingExtensions')}</div>
           <div class="metric-sm">${formatInsightMetric(collectionCoverage.missingExtensions.missingPercent, { suffix: '%' })}</div>
-          <div class="muted">${collectionCoverage.missingExtensions.missing}/${collectionCoverage.missingExtensions.total} not owned</div>
+          <div class="muted">${collectionCoverage.missingExtensions.missing}/${collectionCoverage.missingExtensions.total} ${locale.t('history.insights.notOwned')}</div>
         </article>
       </div>
       <div class="notice info">${helperCopy}</div>
       <div class="two-col insight-coverage-grid">
         <article class="result-card insight-ranking-card" data-insight-coverage-group="user-collection">
-          <h3>Your collection coverage</h3>
-          <div class="muted">Percentage of the currently owned collection that has been played at least once.</div>
-          ${renderCoverageList(collectionCoverage.userCollection.byType, 'playedPercent')}
+          <h3>${locale.t('history.insights.userCoverage')}</h3>
+          <div class="muted">${locale.t('history.insights.userCoverageDescription')}</div>
+          ${renderCoverageList(collectionCoverage.userCollection.byType, 'playedPercent', locale)}
         </article>
         <article class="result-card insight-ranking-card" data-insight-coverage-group="overall-collection">
-          <h3>Overall Legendary coverage</h3>
-          <div class="muted">Percentage of the full supported Legendary: Marvel catalog that has been played at least once.</div>
-          ${renderCoverageList(collectionCoverage.overallCollection.byType, 'playedPercent')}
+          <h3>${locale.t('history.insights.overallCoverage')}</h3>
+          <div class="muted">${locale.t('history.insights.overallCoverageDescription')}</div>
+          ${renderCoverageList(collectionCoverage.overallCollection.byType, 'playedPercent', locale)}
         </article>
       </div>
       <div class="two-col insight-ranking-grid">
         ${usage.map((category) => `
           <article class="result-card insight-ranking-card" data-insight-ranking-category="${category.category}">
             <h3>${category.label}</h3>
-            <div class="muted">Used ${category.used}/${category.total} · Never played ${category.neverPlayed}</div>
+            <div class="muted">${locale.t('history.insights.playedSummary', { used: locale.formatNumber(category.used), total: locale.formatNumber(category.total), neverPlayed: locale.formatNumber(category.neverPlayed) })}</div>
             <div class="stack gap-sm insight-ranking-section">
-              <strong>Most played</strong>
-              ${renderInsightRankingList(category.mostPlayed, `No ${category.label.toLowerCase()} have been used in accepted games yet.`)}
+              <strong>${locale.t('history.insights.mostPlayed')}</strong>
+              ${renderInsightRankingList(category.mostPlayed, locale.t('history.insights.noneMostPlayed', { label: category.label.toLowerCase() }), locale)}
             </div>
             <div class="stack gap-sm insight-ranking-section">
-              <strong>Least played used</strong>
-              ${renderInsightRankingList(category.leastPlayed, `No used ${category.label.toLowerCase()} are available to rank yet.`)}
+              <strong>${locale.t('history.insights.leastPlayed')}</strong>
+              ${renderInsightRankingList(category.leastPlayed, locale.t('history.insights.noneLeastPlayed', { label: category.label.toLowerCase() }), locale)}
             </div>
           </article>
         `).join('')}
@@ -479,7 +531,7 @@ function renderInsightsDashboard(viewModel) {
   `;
 }
 
-function renderTabButtons(activeTabId, variant = 'desktop') {
+function renderTabButtons(activeTabId, locale, variant = 'desktop') {
   return APP_TABS.map((tab) => `
     <button
       type="button"
@@ -491,22 +543,22 @@ function renderTabButtons(activeTabId, variant = 'desktop') {
       data-action="select-tab"
       data-tab-id="${tab.id}"
       tabindex="${activeTabId === tab.id ? '0' : '-1'}"
-      title="${tab.description}"
+      title="${locale.getTabDescription(tab.id)}"
     >
       <span class="tab-icon" aria-hidden="true">${tab.icon}</span>
-      <span class="tab-label">${variant === 'mobile' ? tab.shortLabel : tab.label}</span>
+      <span class="tab-label">${variant === 'mobile' ? locale.getTabShortLabel(tab.id) : locale.getTabLabel(tab.id)}</span>
     </button>
   `).join('');
 }
 
-function renderThemeControls(activeThemeId) {
+function renderThemeControls(activeThemeId, locale) {
   return `
-    <section class="theme-switcher" aria-label="Theme selector" data-theme-switcher>
+    <section class="theme-switcher" aria-label="${locale.t('header.theme.groupLabel')}" data-theme-switcher>
       <div class="theme-switcher-copy">
-        <span class="theme-switcher-label">Theme</span>
-        <span class="muted theme-switcher-caption">Saved in browser preferences</span>
+        <span class="theme-switcher-label">${locale.t('header.theme.label')}</span>
+        <span class="muted theme-switcher-caption">${locale.t('header.theme.caption')}</span>
       </div>
-      <div class="theme-switcher-buttons" role="group" aria-label="Choose theme">
+      <div class="theme-switcher-buttons" role="group" aria-label="${locale.t('header.theme.groupLabel')}">
         ${THEME_OPTIONS.map((theme) => `
           <button
             type="button"
@@ -514,12 +566,36 @@ function renderThemeControls(activeThemeId) {
             data-action="set-theme"
             data-theme-id="${theme.id}"
             aria-pressed="${activeThemeId === theme.id}"
-            title="${theme.description}"
+            title="${locale.getThemeDescription(theme.id)}"
           >
-            ${theme.label}
+            ${locale.getThemeLabel(theme.id)}
           </button>
         `).join('')}
       </div>
+    </section>
+  `;
+}
+
+function renderLocaleControls(activeLocaleId, locale) {
+  return `
+    <section class="theme-switcher" aria-label="${locale.t('header.locale.groupLabel')}" data-locale-switcher>
+      <div class="theme-switcher-copy">
+        <span class="theme-switcher-label">${locale.t('header.locale.label')}</span>
+        <span class="muted theme-switcher-caption">${locale.t('header.locale.caption')}</span>
+      </div>
+      <label class="stack gap-sm" for="header-locale-select">
+        <select
+          id="header-locale-select"
+          class="text-input"
+          data-action="set-locale-select"
+          aria-label="${locale.t('header.locale.groupLabel')}"
+        >
+          ${getSelectableLocales().map((option) => `
+            <option value="${option.id}" ${activeLocaleId === option.id ? 'selected' : ''}>${option.nativeLabel}</option>
+          `).join('')}
+        </select>
+      </label>
+      ${locale.hasFallbacks ? `<div class="muted" data-locale-fallback-notice>${locale.t('header.locale.fallbackNotice')}</div>` : ''}
     </section>
   `;
 }
@@ -556,7 +632,7 @@ function formatBrowseEntityList(items, emptyLabel, formatter = (item) => item.na
   `;
 }
 
-function renderBrowseTypeFilters(activeTypeFilter) {
+function renderBrowseTypeFilters(activeTypeFilter, locale) {
   return BROWSE_TYPE_OPTIONS.map((option) => `
     <button
       type="button"
@@ -565,7 +641,7 @@ function renderBrowseTypeFilters(activeTypeFilter) {
       data-type-filter="${option.id}"
       aria-pressed="${activeTypeFilter === option.id}"
     >
-      ${option.label}
+      ${locale.getBrowseTypeFilterLabel(option.id)}
     </button>
   `).join('');
 }
@@ -573,35 +649,19 @@ function renderBrowseTypeFilters(activeTypeFilter) {
 const ONBOARDING_STEPS = [
   {
     id: 'browse',
-    tabId: 'browse',
-    eyebrow: 'Step 1',
-    title: 'Browse the full catalog first',
-    description: 'Search by set name or alias, filter by product type, and expand cards to inspect heroes, masterminds, villain groups, henchmen, and schemes.',
-    actionLabel: 'Stay in Browse'
+    tabId: 'browse'
   },
   {
     id: 'collection',
-    tabId: 'collection',
-    eyebrow: 'Step 2',
-    title: 'Mark what you actually own',
-    description: 'Use Browse or Collection to toggle owned sets, then confirm the collection totals and player-count feasibility before generating setups.',
-    actionLabel: 'Open Collection'
+    tabId: 'collection'
   },
   {
     id: 'new-game',
-    tabId: 'new-game',
-    eyebrow: 'Step 3',
-    title: 'Generate a legal setup',
-    description: 'Choose the player mode, generate a setup, and only use Accept & Log once you want the app to update history and freshness tracking.',
-    actionLabel: 'Open New Game'
+    tabId: 'new-game'
   },
   {
     id: 'history',
-    tabId: 'history',
-    eyebrow: 'Step 4',
-    title: 'Review history and resets',
-    description: 'History shows accepted games and category freshness, while reset controls let you clear usage or restart the app state intentionally.',
-    actionLabel: 'Open History'
+    tabId: 'history'
   }
 ];
 
@@ -614,37 +674,39 @@ function renderOnboardingShell(viewModel) {
     return '';
   }
 
+  const locale = getLocale(viewModel);
   const currentStep = ONBOARDING_STEPS[Math.max(0, Math.min(viewModel.ui.onboardingStep, ONBOARDING_STEPS.length - 1))];
   const isLastStep = currentStep.id === ONBOARDING_STEPS[ONBOARDING_STEPS.length - 1].id;
+  const currentStepNumber = viewModel.ui.onboardingStep + 1;
 
   return `
     <section class="panel onboarding-shell" id="onboarding-shell" aria-live="polite">
       <div class="row space-between wrap gap-md align-center">
         <div>
-          <div class="eyebrow">First-run walkthrough</div>
-          <h2>Get comfortable with the app in under a minute</h2>
-          <p class="muted">This walkthrough is shown on first launch, can be skipped without trapping navigation, and can be replayed anytime from the Browse tab.</p>
+          <div class="eyebrow">${locale.t('onboarding.titleEyebrow')}</div>
+          <h2>${locale.t('onboarding.title')}</h2>
+          <p class="muted">${locale.t('onboarding.description')}</p>
         </div>
-        <div class="onboarding-progress" aria-label="Walkthrough progress">
+        <div class="onboarding-progress" aria-label="${locale.t('onboarding.progress')}">
           ${ONBOARDING_STEPS.map((step, index) => `
-            <span class="onboarding-step-pill ${index === viewModel.ui.onboardingStep ? 'active' : index < viewModel.ui.onboardingStep ? 'complete' : ''}">${step.eyebrow}</span>
+            <span class="onboarding-step-pill ${index === viewModel.ui.onboardingStep ? 'active' : index < viewModel.ui.onboardingStep ? 'complete' : ''}">${locale.t(`onboarding.step${index + 1}.eyebrow`)}</span>
           `).join('')}
         </div>
       </div>
       <div class="result-card onboarding-step-card" data-onboarding-step="${currentStep.id}">
-        <div class="eyebrow">${currentStep.eyebrow} of ${ONBOARDING_STEPS.length}</div>
-        <h3>${currentStep.title}</h3>
-        <p>${currentStep.description}</p>
+        <div class="eyebrow">${locale.t('onboarding.stepPrefix', { current: currentStepNumber, total: ONBOARDING_STEPS.length })}</div>
+        <h3>${locale.t(`onboarding.step${currentStepNumber}.title`)}</h3>
+        <p>${locale.t(`onboarding.step${currentStepNumber}.description`)}</p>
         <div class="button-row">
-          <button type="button" class="button button-secondary" data-action="open-onboarding-tab" data-tab-id="${currentStep.tabId}">${currentStep.actionLabel}</button>
+          <button type="button" class="button button-secondary" data-action="open-onboarding-tab" data-tab-id="${currentStep.tabId}">${locale.t(`onboarding.step${currentStepNumber}.action`)}</button>
         </div>
       </div>
       <div class="button-row onboarding-actions">
-        <button type="button" class="button button-secondary" data-action="previous-onboarding-step" ${viewModel.ui.onboardingStep === 0 ? 'disabled' : ''}>Previous</button>
+        <button type="button" class="button button-secondary" data-action="previous-onboarding-step" ${viewModel.ui.onboardingStep === 0 ? 'disabled' : ''}>${locale.t('onboarding.previous')}</button>
         ${isLastStep
-          ? '<button type="button" class="button button-success" data-action="complete-onboarding">Finish walkthrough</button>'
-          : '<button type="button" class="button button-primary" data-action="next-onboarding-step">Next step</button>'}
-        <button type="button" class="button button-secondary" data-action="skip-onboarding">Skip for now</button>
+          ? `<button type="button" class="button button-success" data-action="complete-onboarding">${locale.t('onboarding.finish')}</button>`
+          : `<button type="button" class="button button-primary" data-action="next-onboarding-step">${locale.t('onboarding.next')}</button>`}
+        <button type="button" class="button button-secondary" data-action="skip-onboarding">${locale.t('onboarding.skip')}</button>
       </div>
     </section>
   `;
@@ -652,38 +714,39 @@ function renderOnboardingShell(viewModel) {
 
 function renderAboutPanel(viewModel) {
   const { bundle, state, persistence, ui } = viewModel;
+  const locale = getLocale(viewModel);
   const failed = bundle.tests.filter((test) => test.status === 'fail');
 
   return `
     <section class="panel about-panel" id="about-panel">
       <div class="row space-between wrap gap-md align-center">
         <div>
-          <div class="eyebrow">About this project</div>
-          <h2>Project details and developer diagnostics</h2>
-          <p class="muted">This section keeps implementation-oriented details available without putting them in front of players who only want to use the app.</p>
+          <div class="eyebrow">${locale.t('about.eyebrow')}</div>
+          <h2>${locale.t('about.title')}</h2>
+          <p class="muted">${locale.t('about.description')}</p>
         </div>
         <div class="button-row">
-          <button type="button" class="button button-secondary" data-action="toggle-about-panel">Hide About</button>
+          <button type="button" class="button button-secondary" data-action="toggle-about-panel">${locale.t('about.hide')}</button>
         </div>
       </div>
       <section class="two-col about-layout">
         <section class="stack gap-md">
           <details class="about-card">
             <summary>
-              <h3>Initialization status</h3>
+              <h3>${locale.t('about.initStatus')}</h3>
             </summary>
             <div>${failed.length
-              ? `<p class="error">Foundation loaded with ${failed.length} failing Epic 1 test(s).</p>`
-              : '<p class="status-pass">Legendary: Marvel Randomizer is loaded successfully with Epic 1–10 implementation, documentation alignment, and automated release-readiness coverage.</p>'}</div>
+              ? `<p class="error">${locale.t('about.failedInit', { count: locale.formatNumber(failed.length) })}</p>`
+              : `<p class="status-pass">${locale.t('about.loadedOk')}</p>`}</div>
           </details>
           <details class="about-card">
             <summary>
-              <h3>Data-quality samples</h3>
+              <h3>${locale.t('about.dataSamples')}</h3>
             </summary>
             <div class="stack gap-sm">
               ${formatDuplicateEntries(bundle).map((entry) => `
                 <details>
-                  <summary>${entry.name} <span class="pill">${entry.all.length} entries</span></summary>
+                  <summary>${entry.name} <span class="pill">${locale.formatNumber(entry.all.length)} ${locale.t('about.entries')}</span></summary>
                   <pre>${entry.all.map((entity) => `${entity.id}  ←  ${entity.setId}`).join('\n')}</pre>
                 </details>
               `).join('')}
@@ -691,7 +754,7 @@ function renderAboutPanel(viewModel) {
           </details>
           <details class="about-card">
             <summary>
-              <h3>Epic 1 test results</h3>
+              <h3>${locale.t('about.testResults')}</h3>
             </summary>
             <ul class="clean">${bundle.tests.map((test) => `
               <li class="test ${test.status}">
@@ -705,7 +768,7 @@ function renderAboutPanel(viewModel) {
         <section class="stack gap-md">
           <details class="about-card">
             <summary>
-              <h3>Runtime diagnostics</h3>
+              <h3>${locale.t('about.runtimeDiagnostics')}</h3>
             </summary>
             <pre>${JSON.stringify({
               sampleLeadResolution: bundle.runtime.indexes.allMasterminds.filter((entity) => entity.lead).slice(0, 5),
@@ -723,7 +786,7 @@ function renderAboutPanel(viewModel) {
           </details>
           <details class="about-card">
             <summary>
-              <h3>Persisted state snapshot</h3>
+              <h3>${locale.t('about.persistedState')}</h3>
             </summary>
             <pre>${JSON.stringify(state, null, 2)}</pre>
           </details>
@@ -734,23 +797,24 @@ function renderAboutPanel(viewModel) {
 }
 
 function getActiveModalConfig(viewModel) {
+  const locale = getLocale(viewModel);
   if (viewModel.ui.confirmResetOwnedCollection) {
     return {
-      title: '⚠️ Are you sure?',
-      description: 'This will clear all owned collection selections. Usage statistics, history, and preferences will stay intact.',
+      title: locale.t('modal.reset.title'),
+      description: locale.t('modal.resetCollection.description'),
       confirmAction: 'confirm-reset-owned-collection',
       cancelAction: 'cancel-reset-owned-collection',
-      confirmLabel: 'Yes, Clear Collection'
+      confirmLabel: locale.t('modal.resetCollection.confirm')
     };
   }
 
   if (viewModel.ui.confirmResetAllState) {
     return {
-      title: '⚠️ Are you sure?',
-      description: 'This will delete all game history and reset all card tracking. This cannot be undone.',
+      title: locale.t('modal.reset.title'),
+      description: locale.t('modal.resetAll.description'),
       confirmAction: 'confirm-reset-all-state',
       cancelAction: 'cancel-reset-all-state',
-      confirmLabel: 'Yes, Reset All'
+      confirmLabel: locale.t('modal.resetAll.confirm')
     };
   }
 
@@ -758,20 +822,20 @@ function getActiveModalConfig(viewModel) {
     const { summary } = viewModel.ui.stagedBackup;
     if (viewModel.ui.confirmBackupRestoreMode === 'merge') {
       return {
-        title: 'Merge imported backup?',
-        description: `This will merge ${summary.ownedSetCount} owned sets and ${summary.historyCount} history records into the current app data, then apply the imported preferences.`,
+        title: locale.t('modal.merge.title'),
+        description: locale.t('modal.merge.description', { ownedSetCount: locale.formatNumber(summary.ownedSetCount), historyCount: locale.formatNumber(summary.historyCount) }),
         confirmAction: 'confirm-merge-backup',
         cancelAction: 'cancel-backup-restore',
-        confirmLabel: 'Yes, Merge Backup'
+        confirmLabel: locale.t('modal.merge.confirm')
       };
     }
 
     return {
-      title: 'Replace current app data?',
-      description: `This will replace the current local collection, usage, history, and preferences with the imported backup containing ${summary.historyCount} history records. This cannot be undone.`,
+      title: locale.t('modal.replace.title'),
+      description: locale.t('modal.replace.description', { historyCount: locale.formatNumber(summary.historyCount) }),
       confirmAction: 'confirm-replace-backup',
       cancelAction: 'cancel-backup-restore',
-      confirmLabel: 'Yes, Replace Data'
+      confirmLabel: locale.t('modal.replace.confirm')
     };
   }
 
@@ -783,17 +847,18 @@ function renderToastRegion(viewModel) {
     return '';
   }
 
+  const locale = getLocale(viewModel);
   return `
-    <div class="toast-stack" role="region" aria-label="Notifications">
+    <div class="toast-stack" role="region" aria-label="${locale.t('toast.region')}">
       ${viewModel.ui.toasts.map((toast) => `
         <article class="toast toast-${toast.variant} toast-${toast.behavior}" role="${toast.live === 'assertive' ? 'alert' : 'status'}" aria-live="${toast.live}" data-toast-id="${toast.id}" data-toast-dismiss-on-click="${toast.dismissOnClick ? 'true' : 'false'}" data-toast-auto-dismiss="${toast.autoDismissMs ? 'true' : 'false'}" data-toast-behavior="${toast.behavior}">
           <div class="toast-copy">
             <div class="toast-title">${toast.icon} ${toast.label}</div>
-            ${toast.isPersistent ? '<div class="toast-meta">Persistent alert</div>' : ''}
+            ${toast.isPersistent ? `<div class="toast-meta">${locale.t('toast.persistent')}</div>` : ''}
             <div>${toast.message}</div>
           </div>
           ${toast.dismissible
-            ? `<button type="button" class="button button-secondary toast-dismiss" data-action="dismiss-toast" data-toast-id="${toast.id}" aria-label="${toast.isPersistent ? 'Acknowledge' : 'Dismiss'} ${toast.label} notification">${toast.isPersistent ? 'Acknowledge' : 'Dismiss'}</button>`
+            ? `<button type="button" class="button button-secondary toast-dismiss" data-action="dismiss-toast" data-toast-id="${toast.id}" aria-label="${toast.isPersistent ? locale.t('toast.acknowledge') : locale.t('toast.dismiss')} ${toast.label} notification">${toast.isPersistent ? locale.t('toast.acknowledge') : locale.t('toast.dismiss')}</button>`
             : ''}
         </article>
       `).join('')}
@@ -807,13 +872,14 @@ function renderActiveModal(viewModel) {
     return '';
   }
 
+  const locale = getLocale(viewModel);
   return `
     <div class="modal-backdrop">
       <section class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description" tabindex="-1">
         <h2 id="modal-title">${modal.title}</h2>
         <p id="modal-description">${modal.description}</p>
         <div class="button-row confirmation-actions">
-          <button type="button" class="button button-secondary" data-action="${modal.cancelAction}" data-modal-focus="cancel">Cancel</button>
+          <button type="button" class="button button-secondary" data-action="${modal.cancelAction}" data-modal-focus="cancel">${locale.t('modal.cancel')}</button>
           <button type="button" class="button button-danger" data-action="${modal.confirmAction}" data-modal-focus="confirm">${modal.confirmLabel}</button>
         </div>
       </section>
@@ -823,27 +889,29 @@ function renderActiveModal(viewModel) {
 
 function renderCollectionFeasibility(viewModel) {
   const feasibility = getCollectionFeasibility(viewModel.bundle.runtime, viewModel.state);
+  const locale = getLocale(viewModel);
 
   return feasibility.map((mode) => `
     <article class="summary-card feasibility-card ${mode.ok ? 'is-ok' : 'is-warning'}" data-feasibility-mode="${mode.id}">
       <div class="row space-between gap-sm wrap align-center">
-        <strong>${mode.label}</strong>
-        <span class="pill ${mode.ok ? 'feasibility-pill-ok' : 'feasibility-pill-warning'}">${mode.ok ? '✓ Legal' : '⚠ Warning'}</span>
+        <strong>${mode.playerCount === 1 ? locale.getPlayModeLabel(mode.playMode, mode.playerCount) : locale.formatPlayerLabel(mode.playerCount)}</strong>
+        <span class="pill ${mode.ok ? 'feasibility-pill-ok' : 'feasibility-pill-warning'}">${mode.ok ? `✓ ${locale.t('collection.feasibility.legal')}` : `⚠ ${locale.t('collection.feasibility.warning')}`}</span>
       </div>
       <div class="muted feasibility-copy">${mode.ok
-        ? 'Collection currently supports this setup mode.'
-        : (mode.reasons[0] || 'Collection cannot currently support this setup mode.')}</div>
+        ? locale.t('collection.feasibility.okCopy')
+        : (mode.reasons[0] || locale.t('collection.feasibility.badCopy'))}</div>
     </article>
   `).join('');
 }
 
 function renderCollectionGroups(viewModel) {
+  const locale = getLocale(viewModel);
   const ownedSetIds = new Set(viewModel.state.collection.ownedSetIds);
   const groupedSets = groupSetsByType(viewModel.bundle.runtime.sets);
 
   return groupedSets.map((group) => `
     <section class="panel collection-group" data-collection-group="${group.id}">
-      <h3>${COLLECTION_TYPE_GROUPS.find((entry) => entry.id === group.id)?.label || group.label}</h3>
+      <h3>${locale.getCollectionGroupLabel(group.id)}</h3>
       <div class="stack gap-sm">
         ${group.sets.map((set) => {
           const counts = summarizeBrowseSet(set);
@@ -863,7 +931,7 @@ function renderCollectionGroups(viewModel) {
                 </span>
               </span>
               <span class="muted collection-row-meta">
-                ${formatSetCountLabel(counts.heroCount, 'hero', 'heroes')} · ${formatSetCountLabel(counts.mastermindCount, 'mastermind')} · ${formatSetCountLabel(counts.villainGroupCount, 'villain group')} · ${formatSetCountLabel(counts.henchmanGroupCount, 'henchman group')} · ${formatSetCountLabel(counts.schemeCount, 'scheme')}
+                ${locale.formatEntityCount(counts.heroCount, 'common.hero', 'common.heroesLower')} · ${locale.formatEntityCount(counts.mastermindCount, 'common.mastermind', 'common.mastermindsLower')} · ${locale.formatEntityCount(counts.villainGroupCount, 'common.villainGroup', 'common.villainGroupsLower')} · ${locale.formatEntityCount(counts.henchmanGroupCount, 'common.henchmanGroup', 'common.henchmanGroupsLower')} · ${locale.formatEntityCount(counts.schemeCount, 'common.scheme', 'common.schemesLower')}
               </span>
             </label>
           `;
@@ -875,6 +943,7 @@ function renderCollectionGroups(viewModel) {
 
 function renderBrowseSetCard(set, viewModel) {
   const { bundle, state, ui } = viewModel;
+  const locale = getLocale(viewModel);
   const indexes = bundle.runtime.indexes;
   const counts = summarizeBrowseSet(set);
   const owned = state.collection.ownedSetIds.includes(set.id);
@@ -894,52 +963,52 @@ function renderBrowseSetCard(set, viewModel) {
               aria-controls="browse-details-${set.id}"
             >
               <span class="set-card-title">${set.name}</span>
-              <span class="set-card-toggle-copy">${expanded ? 'Hide details' : 'Show details'}</span>
+              <span class="set-card-toggle-copy">${expanded ? locale.t('browse.set.hideDetails') : locale.t('browse.set.showDetails')}</span>
             </button>
             <div class="row wrap gap-sm align-center browse-badge-row">
               <span class="pill set-year-badge">${set.year}</span>
-              <span class="pill set-type-badge">${getBrowseTypeLabel(set.type)}</span>
-              ${owned ? '<span class="pill set-owned-badge">In Collection</span>' : ''}
+              <span class="pill set-type-badge">${locale.getBrowseTypeLabel(set.type)}</span>
+              ${owned ? `<span class="pill set-owned-badge">${locale.t('browse.set.inCollection')}</span>` : ''}
             </div>
-            ${set.aliases.length ? `<div class="muted browse-aliases">Also listed as: ${set.aliases.map((alias) => escapeHtml(alias)).join(', ')}</div>` : ''}
+            ${set.aliases.length ? `<div class="muted browse-aliases">${locale.t('browse.set.aliases')} ${set.aliases.map((alias) => escapeHtml(alias)).join(', ')}</div>` : ''}
           </div>
           <div class="stack gap-sm browse-card-actions">
             <button class="button ${owned ? 'button-success' : 'button-secondary'}" data-action="toggle-owned-set" data-set-id="${set.id}">
-              ${owned ? '✓ In Collection' : 'Add to Collection'}
+              ${owned ? `✓ ${locale.t('browse.set.inCollection')}` : locale.t('browse.set.addToCollection')}
             </button>
-            <div class="muted browse-ownership-copy">${owned ? 'Owned and available for setup generation.' : 'Not currently owned.'}</div>
+            <div class="muted browse-ownership-copy">${owned ? locale.t('browse.set.ownedAvailable') : locale.t('browse.set.notOwned')}</div>
           </div>
         </div>
 
         <div class="browse-count-grid">
-          <div class="summary-card"><div class="muted">Heroes</div><div class="metric-sm">${counts.heroCount}</div></div>
-          <div class="summary-card"><div class="muted">Masterminds</div><div class="metric-sm">${counts.mastermindCount}</div></div>
-          <div class="summary-card"><div class="muted">Villain Groups</div><div class="metric-sm">${counts.villainGroupCount}</div></div>
-          <div class="summary-card"><div class="muted">Henchman Groups</div><div class="metric-sm">${counts.henchmanGroupCount}</div></div>
-          <div class="summary-card"><div class="muted">Schemes</div><div class="metric-sm">${counts.schemeCount}</div></div>
+          <div class="summary-card"><div class="muted">${locale.t('common.heroes')}</div><div class="metric-sm">${counts.heroCount}</div></div>
+          <div class="summary-card"><div class="muted">${locale.t('common.masterminds')}</div><div class="metric-sm">${counts.mastermindCount}</div></div>
+          <div class="summary-card"><div class="muted">${locale.t('common.villainGroups')}</div><div class="metric-sm">${counts.villainGroupCount}</div></div>
+          <div class="summary-card"><div class="muted">${locale.t('common.henchmanGroups')}</div><div class="metric-sm">${counts.henchmanGroupCount}</div></div>
+          <div class="summary-card"><div class="muted">${locale.t('common.schemes')}</div><div class="metric-sm">${counts.schemeCount}</div></div>
         </div>
 
         <div id="browse-details-${set.id}" class="browse-details" ${expanded ? '' : 'hidden'}>
           <div class="browse-details-grid">
             <section class="summary-card">
-              <h3>Heroes</h3>
-              ${formatBrowseEntityList(set.heroes, 'No heroes in this set.')}
+              <h3>${locale.t('common.heroes')}</h3>
+              ${formatBrowseEntityList(set.heroes, locale.t('browse.noHeroes'))}
             </section>
             <section class="summary-card">
-              <h3>Masterminds</h3>
-              ${formatBrowseEntityList(set.masterminds, 'No masterminds in this set.', (mastermind) => formatBrowseMastermind(mastermind, indexes))}
+              <h3>${locale.t('common.masterminds')}</h3>
+              ${formatBrowseEntityList(set.masterminds, locale.t('browse.noMasterminds'), (mastermind) => formatBrowseMastermind(mastermind, indexes))}
             </section>
             <section class="summary-card">
-              <h3>Villain Groups</h3>
-              ${formatBrowseEntityList(set.villainGroups, 'No villain groups in this set.')}
+              <h3>${locale.t('common.villainGroups')}</h3>
+              ${formatBrowseEntityList(set.villainGroups, locale.t('browse.noVillainGroups'))}
             </section>
             <section class="summary-card">
-              <h3>Henchman Groups</h3>
-              ${formatBrowseEntityList(set.henchmanGroups, 'No henchman groups in this set.')}
+              <h3>${locale.t('common.henchmanGroups')}</h3>
+              ${formatBrowseEntityList(set.henchmanGroups, locale.t('browse.noHenchmanGroups'))}
             </section>
             <section class="summary-card browse-detail-section-full">
-              <h3>Schemes</h3>
-              ${formatBrowseEntityList(set.schemes, 'No schemes in this set.')}
+              <h3>${locale.t('common.schemes')}</h3>
+              ${formatBrowseEntityList(set.schemes, locale.t('browse.noSchemes'))}
             </section>
           </div>
         </div>
@@ -950,11 +1019,12 @@ function renderBrowseSetCard(set, viewModel) {
 
 function renderBrowsePanel(viewModel) {
   const { bundle, state, ui } = viewModel;
+  const locale = getLocale(viewModel);
   const metrics = [
-    ['Included Sets', bundle.counts.sets],
-    ['Owned Sets', state.collection.ownedSetIds.length],
-    ['History Records', state.history.length],
-    ['Ready Tabs', 5]
+    [locale.t('browse.metrics.includedSets'), bundle.counts.sets],
+    [locale.t('browse.metrics.ownedSets'), state.collection.ownedSetIds.length],
+    [locale.t('browse.metrics.historyRecords'), state.history.length],
+    [locale.t('browse.metrics.readyTabs'), 5]
   ];
   const browseSets = filterBrowseSets(bundle.runtime.sets, {
     searchTerm: ui.browseSearchTerm,
@@ -966,14 +1036,14 @@ function renderBrowsePanel(viewModel) {
       <section class="panel browse-hero">
         <div class="row space-between wrap gap-md align-center">
           <div class="browse-hero-copy">
-            <div class="eyebrow">Welcome</div>
-            <h2>Plan the next Legendary session without the clutter</h2>
-            <p class="muted">Browse every set, mark the collection you own, generate a legal setup, and review play history from one static browser app.</p>
+            <div class="eyebrow">${locale.t('browse.hero.eyebrow')}</div>
+            <h2>${locale.t('browse.hero.title')}</h2>
+            <p class="muted">${locale.t('browse.hero.description')}</p>
             <div class="button-row browse-hero-actions">
-              <button type="button" class="button button-primary" data-action="jump-tab" data-tab-id="collection">Manage Collection</button>
-              <button type="button" class="button button-secondary" data-action="jump-tab" data-tab-id="new-game">Generate a Game</button>
-              <button type="button" class="button button-secondary" data-action="start-onboarding">Replay Walkthrough</button>
-              <button type="button" class="button button-secondary" data-action="toggle-about-panel" aria-expanded="${ui.aboutPanelOpen}">About this project</button>
+              <button type="button" class="button button-primary" data-action="jump-tab" data-tab-id="collection">${locale.t('browse.hero.manageCollection')}</button>
+              <button type="button" class="button button-secondary" data-action="jump-tab" data-tab-id="new-game">${locale.t('browse.hero.generateGame')}</button>
+              <button type="button" class="button button-secondary" data-action="start-onboarding">${locale.t('browse.hero.replayWalkthrough')}</button>
+              <button type="button" class="button button-secondary" data-action="toggle-about-panel" aria-expanded="${ui.aboutPanelOpen}">${locale.t('browse.hero.aboutProject')}</button>
             </div>
           </div>
           <div class="summary-grid browse-hero-metrics">${metrics.map(([label, value]) => `
@@ -988,58 +1058,58 @@ function renderBrowsePanel(viewModel) {
         <section class="panel">
           <div class="row space-between wrap gap-md align-center">
             <div>
-              <h2>Start here</h2>
-              <p class="muted">Use this page as the landing zone: check what the app contains, jump into the workflow, and only open project details when you want them.</p>
+              <h2>${locale.t('browse.startHere.title')}</h2>
+              <p class="muted">${locale.t('browse.startHere.description')}</p>
             </div>
           </div>
           <div class="stack gap-sm browse-priority-list">
             <article class="summary-card browse-priority-item">
-              <strong>1. Confirm your collection</strong>
-              <div class="muted">Use Browse or Collection to add owned sets before generating games.</div>
+              <strong>${locale.t('browse.startHere.step1Title')}</strong>
+              <div class="muted">${locale.t('browse.startHere.step1Body')}</div>
             </article>
             <article class="summary-card browse-priority-item">
-              <strong>2. Generate a legal setup</strong>
-              <div class="muted">New Game respects player mode, collection size, mandatory leads, and freshness history.</div>
+              <strong>${locale.t('browse.startHere.step2Title')}</strong>
+              <div class="muted">${locale.t('browse.startHere.step2Body')}</div>
             </article>
             <article class="summary-card browse-priority-item">
-              <strong>3. Track what you played</strong>
-              <div class="muted">History and usage reset tools stay available without getting in the way of first-time users.</div>
+              <strong>${locale.t('browse.startHere.step3Title')}</strong>
+              <div class="muted">${locale.t('browse.startHere.step3Body')}</div>
             </article>
           </div>
         </section>
         <section class="panel">
           <div class="row space-between wrap gap-md align-center">
             <div>
-              <h2>Browse sets</h2>
-              <p class="muted">Search by set name or alias, filter by product type, expand a card for contents, and toggle ownership directly from the Browse tab.</p>
+              <h2>${locale.t('browse.panel.title')}</h2>
+              <p class="muted">${locale.t('browse.panel.description')}</p>
             </div>
             <div class="summary-card browse-results-summary">
-              <div class="muted">Visible sets</div>
+              <div class="muted">${locale.t('browse.visibleSets')}</div>
               <div class="metric-sm">${browseSets.length}</div>
               <div class="muted">of ${bundle.runtime.sets.length}</div>
             </div>
           </div>
           <div class="browse-toolbar">
             <label class="browse-search-shell" for="browse-search-input">
-              <span class="muted">Search sets</span>
+              <span class="muted">${locale.t('browse.searchLabel')}</span>
               <input
                 id="browse-search-input"
                 class="text-input"
                 type="search"
-                placeholder="Search by set name or alias"
+                placeholder="${locale.t('browse.searchPlaceholder')}"
                 value="${escapeHtml(ui.browseSearchTerm)}"
               />
             </label>
             <div class="stack gap-sm">
-              <span class="muted">Type filter</span>
-              <div class="button-row" role="group" aria-label="Browse set type filters">
-                ${renderBrowseTypeFilters(ui.browseTypeFilter)}
+              <span class="muted">${locale.t('browse.typeFilter')}</span>
+              <div class="button-row" role="group" aria-label="${locale.t('browse.typeFilter')}">
+                ${renderBrowseTypeFilters(ui.browseTypeFilter, locale)}
               </div>
             </div>
           </div>
           ${browseSets.length
             ? `<div class="grid collection-grid browse-set-grid">${browseSets.map((set) => renderBrowseSetCard(set, viewModel)).join('')}</div>`
-            : `<div id="browse-empty-state" class="notice info">No sets match the current search and filter combination.</div>`}
+            : `<div id="browse-empty-state" class="notice info">${locale.t('browse.emptyFiltered')}</div>`}
         </section>
       </section>
       ${ui.aboutPanelOpen ? renderAboutPanel(viewModel) : ''}
@@ -1049,6 +1119,7 @@ function renderBrowsePanel(viewModel) {
 
 function renderCollectionPanel(viewModel) {
   const { bundle, state, persistence, ui } = viewModel;
+  const locale = getLocale(viewModel);
   const totals = summarizeOwnedCollection(bundle.runtime, state.collection.ownedSetIds);
   const persistenceNotices = [
     ...persistence.hydrateNotices,
@@ -1060,64 +1131,49 @@ function renderCollectionPanel(viewModel) {
       <section class="panel">
         <div class="row space-between wrap gap-md align-center">
           <div>
-            <h2>My Collection</h2>
-            <p class="muted">Manage owned sets here with the same persisted ownership state used by Browse and setup generation.</p>
+            <h2>${locale.t('collection.title')}</h2>
+            <p class="muted">${locale.t('collection.description')}</p>
           </div>
           <div class="button-row">
-            <button class="button button-secondary" data-action="request-reset-owned-collection">Reset All Selections</button>
+            <button class="button button-secondary" data-action="request-reset-owned-collection">${locale.t('collection.resetSelections')}</button>
           </div>
         </div>
         <div class="stack gap-sm">
           <div class="summary-grid">
             <div class="summary-card">
-              <div class="muted">Owned sets</div>
+              <div class="muted">${locale.t('collection.ownedSets')}</div>
               <div class="metric-sm">${totals.setCount}</div>
             </div>
-            <div class="summary-card">
-              <div class="muted">Heroes</div>
-              <div class="metric-sm">${totals.heroCount}</div>
-            </div>
-            <div class="summary-card">
-              <div class="muted">Masterminds</div>
-              <div class="metric-sm">${totals.mastermindCount}</div>
-            </div>
-            <div class="summary-card">
-              <div class="muted">Villain Groups</div>
-              <div class="metric-sm">${totals.villainGroupCount}</div>
-            </div>
-            <div class="summary-card">
-              <div class="muted">Henchman Groups</div>
-              <div class="metric-sm">${totals.henchmanGroupCount}</div>
-            </div>
-            <div class="summary-card">
-              <div class="muted">Schemes</div>
-              <div class="metric-sm">${totals.schemeCount}</div>
-            </div>
+            <div class="summary-card"><div class="muted">${locale.t('common.heroes')}</div><div class="metric-sm">${totals.heroCount}</div></div>
+            <div class="summary-card"><div class="muted">${locale.t('common.masterminds')}</div><div class="metric-sm">${totals.mastermindCount}</div></div>
+            <div class="summary-card"><div class="muted">${locale.t('common.villainGroups')}</div><div class="metric-sm">${totals.villainGroupCount}</div></div>
+            <div class="summary-card"><div class="muted">${locale.t('common.henchmanGroups')}</div><div class="metric-sm">${totals.henchmanGroupCount}</div></div>
+            <div class="summary-card"><div class="muted">${locale.t('common.schemes')}</div><div class="metric-sm">${totals.schemeCount}</div></div>
           </div>
           <div class="summary-card">
-            <div><strong>Storage:</strong> ${persistence.storageAvailable ? 'Available' : 'Unavailable'} · ${persistence.hydratedFromStorage ? 'Hydrated from storage' : 'Using defaults'} · ${persistence.recoveredOnLoad ? 'Recovered on load' : 'No recovery needed'}</div>
-            ${ui.lastActionNotice ? `<div class="muted">Latest action: ${ui.lastActionNotice}</div>` : ''}
+            <div><strong>${locale.t('collection.storage')}:</strong> ${persistence.storageAvailable ? locale.t('collection.storage.available') : locale.t('collection.storage.unavailable')} · ${persistence.hydratedFromStorage ? locale.t('collection.storage.hydrated') : locale.t('collection.storage.defaults')} · ${persistence.recoveredOnLoad ? locale.t('collection.storage.recovered') : locale.t('collection.storage.clean')}</div>
+            ${ui.lastActionNotice ? `<div class="muted">${locale.t('collection.latestAction')} ${ui.lastActionNotice}</div>` : ''}
           </div>
           ${persistenceNotices.length
             ? persistenceNotices.map((notice) => `<div class="notice warning">${notice}</div>`).join('')
-            : '<div class="notice success">No storage recovery issues are currently active.</div>'}
+            : `<div class="notice success">${locale.t('collection.noRecoveryIssues')}</div>`}
         </div>
       </section>
       <section class="two-col">
         <section class="panel">
-          <h2>Total available from selected collection</h2>
-          <p class="muted">These totals update immediately as ownership changes from either the Browse tab or this Collection tab.</p>
+          <h2>${locale.t('collection.totals.title')}</h2>
+          <p class="muted">${locale.t('collection.totals.description')}</p>
           <div class="summary-grid collection-totals-grid">
-            <div class="summary-card"><div class="muted">Heroes</div><div class="metric-sm">${totals.heroCount}</div></div>
-            <div class="summary-card"><div class="muted">Masterminds</div><div class="metric-sm">${totals.mastermindCount}</div></div>
-            <div class="summary-card"><div class="muted">Villain Groups</div><div class="metric-sm">${totals.villainGroupCount}</div></div>
-            <div class="summary-card"><div class="muted">Henchman Groups</div><div class="metric-sm">${totals.henchmanGroupCount}</div></div>
-            <div class="summary-card"><div class="muted">Schemes</div><div class="metric-sm">${totals.schemeCount}</div></div>
+            <div class="summary-card"><div class="muted">${locale.t('common.heroes')}</div><div class="metric-sm">${totals.heroCount}</div></div>
+            <div class="summary-card"><div class="muted">${locale.t('common.masterminds')}</div><div class="metric-sm">${totals.mastermindCount}</div></div>
+            <div class="summary-card"><div class="muted">${locale.t('common.villainGroups')}</div><div class="metric-sm">${totals.villainGroupCount}</div></div>
+            <div class="summary-card"><div class="muted">${locale.t('common.henchmanGroups')}</div><div class="metric-sm">${totals.henchmanGroupCount}</div></div>
+            <div class="summary-card"><div class="muted">${locale.t('common.schemes')}</div><div class="metric-sm">${totals.schemeCount}</div></div>
           </div>
         </section>
         <section class="panel">
-          <h2>Capacity</h2>
-          <p class="muted">Warnings use the same legality checks as the setup generator, so thin or uneven collections surface immediately here.</p>
+          <h2>${locale.t('collection.capacity.title')}</h2>
+          <p class="muted">${locale.t('collection.capacity.description')}</p>
           <div class="summary-grid collection-feasibility-grid">
             ${renderCollectionFeasibility(viewModel)}
           </div>
@@ -1130,6 +1186,7 @@ function renderCollectionPanel(viewModel) {
 
 function renderSetupControls(viewModel) {
   const { state, ui } = viewModel;
+  const locale = getLocale(viewModel);
   const availablePlayModes = getAvailablePlayModes(ui.selectedPlayerCount);
   const displayedRequirements = getDisplayedSetupRequirements({
     playerCount: ui.selectedPlayerCount,
@@ -1152,71 +1209,72 @@ function renderSetupControls(viewModel) {
       data-action="set-play-mode"
       data-play-mode="${mode.id}"
       aria-pressed="${ui.selectedPlayMode === mode.id}"
-      title="${mode.description}"
+      title="${locale.getPlayModeDescription(mode.id, ui.selectedPlayerCount)}"
     >
-      ${ui.selectedPlayMode === mode.id ? `${mode.label} ✓` : mode.label}
+      ${ui.selectedPlayMode === mode.id ? `${locale.getPlayModeLabel(mode.id, ui.selectedPlayerCount)} ✓` : locale.getPlayModeLabel(mode.id, ui.selectedPlayerCount)}
     </button>
   `).join('');
 
   return `
     <div class="stack gap-md">
       <div>
-        <h3>Player count</h3>
+        <h3>${locale.t('newGame.playerCount')}</h3>
         <div class="button-row">${playerButtons}</div>
       </div>
       <div>
-        <h3>Play mode</h3>
+        <h3>${locale.t('newGame.playMode')}</h3>
         <div class="button-row">${playModeButtons}</div>
       </div>
       <div class="row wrap gap-sm align-center">
-        <button class="button button-secondary" data-action="clear-setup-controls">Reset controls</button>
+        <button class="button button-secondary" data-action="clear-setup-controls">${locale.t('newGame.resetControls')}</button>
       </div>
-      <div class="muted">${getPlayModeHelpText(ui.selectedPlayerCount, ui.selectedPlayMode)}</div>
+      <div class="muted">${locale.getPlayModeHelpText(ui.selectedPlayerCount, ui.selectedPlayMode)}</div>
       <div class="summary-grid">
         <div class="summary-card">
-          <div class="muted">Selected mode</div>
-          <div class="metric-sm">${availablePlayModes.find((mode) => mode.id === ui.selectedPlayMode)?.label || 'Standard'}</div>
+          <div class="muted">${locale.t('newGame.selectedMode')}</div>
+          <div class="metric-sm">${availablePlayModes.find((mode) => mode.id === ui.selectedPlayMode) ? locale.getPlayModeLabel(ui.selectedPlayMode, ui.selectedPlayerCount) : locale.getPlayModeLabel('standard', ui.selectedPlayerCount)}</div>
         </div>
         <div class="summary-card">
-          <div class="muted">Owned sets</div>
+          <div class="muted">${locale.t('newGame.ownedSets')}</div>
           <div class="metric-sm">${state.collection.ownedSetIds.length}</div>
         </div>
         <div class="summary-card">
-          <div class="muted">Last persisted mode</div>
-          <div class="metric-sm">${formatPersistedPlayMode(state.preferences.lastPlayerCount, state.preferences.lastPlayMode)}</div>
+          <div class="muted">${locale.t('newGame.lastPersistedMode')}</div>
+          <div class="metric-sm">${locale.formatPersistedPlayMode(state.preferences.lastPlayerCount, state.preferences.lastPlayMode)}</div>
         </div>
       </div>
       <div class="result-card current-requirements-card" id="setup-requirements-card">
-        <h3>Setup requirements</h3>
-        <div class="muted">${formatSetCountLabel(displayedRequirements.heroCount, 'Hero', 'Heroes')} · ${formatSetCountLabel(displayedRequirements.villainGroupCount, 'Villain Group')} · ${formatSetCountLabel(displayedRequirements.henchmanGroupCount, 'Henchman Group')} · ${formatSetCountLabel(displayedRequirements.wounds, 'Wound', 'Wounds')}</div>
+        <h3>${locale.t('newGame.setupRequirements')}</h3>
+        <div class="muted">${locale.formatEntityCount(displayedRequirements.heroCount, 'common.heroTitle', 'common.heroes')} · ${locale.formatEntityCount(displayedRequirements.villainGroupCount, 'common.villainGroupTitle', 'common.villainGroups')} · ${locale.formatEntityCount(displayedRequirements.henchmanGroupCount, 'common.henchmanGroupTitle', 'common.henchmanGroups')} · ${locale.formatEntityCount(displayedRequirements.wounds, 'common.wound', 'common.wounds')}</div>
         ${ui.selectedPlayMode === 'two-handed-solo'
-          ? '<div class="muted">Two-Handed Solo uses the standard 2-player setup counts while keeping history labeled as a solo game.</div>'
+          ? `<div class="muted">${locale.t('newGame.twoHandedHelp')}</div>`
           : ''}
       </div>
       ${renderForcedPickControls(viewModel)}
       <div class="button-row">
-        <button class="button button-primary" data-action="generate-setup">Generate Setup</button>
-        <button class="button button-secondary" data-action="regenerate-setup">Regenerate</button>
-        <button class="button button-success" data-action="accept-current-setup" ${ui.currentSetup ? '' : 'disabled'}>Accept &amp; Log</button>
+        <button class="button button-primary" data-action="generate-setup">${locale.t('newGame.generate')}</button>
+        <button class="button button-secondary" data-action="regenerate-setup">${locale.t('newGame.regenerate')}</button>
+        <button class="button button-success" data-action="accept-current-setup" ${ui.currentSetup ? '' : 'disabled'}>${locale.t('newGame.acceptLog')}</button>
       </div>
-      <div class="muted">Generate and Regenerate keep the current setup ephemeral. Only Accept &amp; Log updates usage stats and history.</div>
+      <div class="muted">${locale.t('newGame.ephemeralNotice')}</div>
     </div>
   `;
 }
 
 function renderSetupResult(viewModel) {
   const { ui } = viewModel;
+  const locale = getLocale(viewModel);
   const currentSetup = ui.currentSetup;
 
   if (!currentSetup) {
     return `
       <div class="stack gap-md">
-        ${formatGeneratorNotices(currentSetup, ui.generatorNotices, ui.generatorError)}
+        ${formatGeneratorNotices(currentSetup, ui.generatorNotices, ui.generatorError, locale)}
         <div class="summary-grid">
-          <div class="summary-card"><div class="muted">Heroes</div><div class="metric-sm">—</div></div>
-          <div class="summary-card"><div class="muted">Villain Groups</div><div class="metric-sm">—</div></div>
-          <div class="summary-card"><div class="muted">Henchman Groups</div><div class="metric-sm">—</div></div>
-          <div class="summary-card"><div class="muted">Wounds</div><div class="metric-sm">—</div></div>
+          <div class="summary-card"><div class="muted">${locale.t('common.heroes')}</div><div class="metric-sm">—</div></div>
+          <div class="summary-card"><div class="muted">${locale.t('common.villainGroups')}</div><div class="metric-sm">—</div></div>
+          <div class="summary-card"><div class="muted">${locale.t('common.henchmanGroups')}</div><div class="metric-sm">—</div></div>
+          <div class="summary-card"><div class="muted">${locale.t('common.wounds')}</div><div class="metric-sm">—</div></div>
         </div>
       </div>
     `;
@@ -1224,40 +1282,40 @@ function renderSetupResult(viewModel) {
 
   return `
     <div class="stack gap-md">
-      ${formatGeneratorNotices(currentSetup, ui.generatorNotices, ui.generatorError)}
+      ${formatGeneratorNotices(currentSetup, ui.generatorNotices, ui.generatorError, locale)}
       <div class="summary-grid">
-        <div class="summary-card"><div class="muted">Heroes</div><div class="metric-sm">${currentSetup.requirements.heroCount}</div></div>
-        <div class="summary-card"><div class="muted">Villain Groups</div><div class="metric-sm">${currentSetup.requirements.villainGroupCount}</div></div>
-        <div class="summary-card"><div class="muted">Henchman Groups</div><div class="metric-sm">${currentSetup.requirements.henchmanGroupCount}</div></div>
-        <div class="summary-card"><div class="muted">Wounds</div><div class="metric-sm">${currentSetup.requirements.wounds}</div></div>
+        <div class="summary-card"><div class="muted">${locale.t('common.heroes')}</div><div class="metric-sm">${currentSetup.requirements.heroCount}</div></div>
+        <div class="summary-card"><div class="muted">${locale.t('common.villainGroups')}</div><div class="metric-sm">${currentSetup.requirements.villainGroupCount}</div></div>
+        <div class="summary-card"><div class="muted">${locale.t('common.henchmanGroups')}</div><div class="metric-sm">${currentSetup.requirements.henchmanGroupCount}</div></div>
+        <div class="summary-card"><div class="muted">${locale.t('common.wounds')}</div><div class="metric-sm">${currentSetup.requirements.wounds}</div></div>
       </div>
       <div class="result-card" data-result-section="mastermind">
-        <h3>Mastermind</h3>
+        <h3>${locale.t('newGame.result.mastermind')}</h3>
         <div><strong>${currentSetup.mastermind.name}</strong></div>
-        <div class="muted">${formatMastermindLeadLabel(currentSetup.mastermind)}</div>
-        ${currentSetup.mastermind.leadEntity ? '<div class="pill">★ Mandatory lead</div>' : ''}
+        <div class="muted">${currentSetup.mastermind.leadEntity ? locale.t('common.alwaysLeads', { name: currentSetup.mastermind.leadEntity.name }) : locale.t('common.noMandatoryLead')}</div>
+        ${currentSetup.mastermind.leadEntity ? `<div class="pill">★ ${locale.t('common.mandatoryLead')}</div>` : ''}
         ${currentSetup.mastermind.notes.length ? `<div class="muted">${currentSetup.mastermind.notes.join(' ')}</div>` : ''}
       </div>
       <div class="result-card" data-result-section="scheme">
-        <h3>Scheme</h3>
+        <h3>${locale.t('newGame.result.scheme')}</h3>
         <div><strong>${currentSetup.scheme.name}</strong></div>
-        <div class="muted">Mode: ${currentSetup.template.modeLabel} · Bystanders: ${currentSetup.requirements.bystanders}</div>
-        ${currentSetup.scheme.notes.length ? `<div class="notice info">⚠ Special: ${currentSetup.scheme.notes.join(' ')}</div>` : ''}
+        <div class="muted">${locale.t('newGame.result.modeBystanders', { mode: currentSetup.template.modeLabel, count: locale.formatNumber(currentSetup.requirements.bystanders) })}</div>
+        ${currentSetup.scheme.notes.length ? `<div class="notice info">⚠ ${locale.t('newGame.result.special', { notes: currentSetup.scheme.notes.join(' ') })}</div>` : ''}
       </div>
       <div class="result-card" data-result-section="heroes">
-        <h3>Heroes</h3>
-        <div class="new-game-hero-grid">${renderHeroResultCards(currentSetup.heroes)}</div>
+        <h3>${locale.t('newGame.result.heroes')}</h3>
+        <div class="new-game-hero-grid">${renderHeroResultCards(currentSetup.heroes, locale)}</div>
       </div>
       <div class="result-card" data-result-section="villain-groups">
-        <h3>Villain Groups</h3>
-        <ul class="clean result-list">${formatSetupGroupList(currentSetup.villainGroups)}</ul>
+        <h3>${locale.t('newGame.result.villainGroups')}</h3>
+        <ul class="clean result-list">${formatSetupGroupList(currentSetup.villainGroups, locale)}</ul>
       </div>
       <div class="result-card" data-result-section="henchman-groups">
-        <h3>Henchman Groups</h3>
-        <ul class="clean result-list">${formatSetupGroupList(currentSetup.henchmanGroups)}</ul>
+        <h3>${locale.t('newGame.result.henchmanGroups')}</h3>
+        <ul class="clean result-list">${formatSetupGroupList(currentSetup.henchmanGroups, locale)}</ul>
       </div>
       <details>
-        <summary>Show history-ready setup snapshot</summary>
+        <summary>${locale.t('newGame.result.snapshot')}</summary>
         <pre>${JSON.stringify(currentSetup.setupSnapshot, null, 2)}</pre>
       </details>
     </div>
@@ -1266,12 +1324,13 @@ function renderSetupResult(viewModel) {
 
 function renderHistoryPanel(viewModel) {
   const { ui } = viewModel;
+  const locale = getLocale(viewModel);
   return `
     <section class="stack gap-md">
       <section class="panel">
-        <h2>Game history</h2>
-        <div class="muted">Accepted setups are stored immediately. Each record can stay pending until you log a win/loss and score, then be corrected later if needed.</div>
-        ${renderHistoryGroupingControls(ui.historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE)}
+        <h2>${locale.t('history.title')}</h2>
+        <div class="muted">${locale.t('history.description')}</div>
+        ${renderHistoryGroupingControls(ui.historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE, locale)}
         ${renderGroupedHistory(viewModel)}
       </section>
       ${renderInsightsDashboard(viewModel)}
@@ -1281,38 +1340,39 @@ function renderHistoryPanel(viewModel) {
 
 function renderBackupPanel(viewModel) {
   const { bundle, state, ui } = viewModel;
+  const locale = getLocale(viewModel);
   const indicators = summarizeUsageIndicators(bundle.runtime, state);
   const resetPreview = buildFullResetPreview();
   return `
     <section class="stack gap-md">
       <section class="panel" data-backup-panel>
-        <h2>Backup and restore</h2>
-        <div class="muted">Export your collection, usage, history, results, and preferences to a versioned JSON backup. Import a backup later and choose whether to merge it into the current state or replace local data entirely.</div>
+        <h2>${locale.t('backup.title')}</h2>
+        <div class="muted">${locale.t('backup.description')}</div>
         <div class="button-row">
-          <button class="button button-secondary" data-action="export-backup">Export Backup</button>
-          <button class="button button-primary" data-action="open-import-backup">Import Backup</button>
+          <button class="button button-secondary" data-action="export-backup">${locale.t('backup.export')}</button>
+          <button class="button button-primary" data-action="open-import-backup">${locale.t('backup.import')}</button>
         </div>
         <input id="backup-import-input" class="visually-hidden" type="file" accept=".json,application/json" />
-        ${renderBackupPreview(ui)}
+        ${renderBackupPreview(ui, locale)}
       </section>
       <section class="panel">
-        <h2>Used card tracking</h2>
-        <div class="muted">Manage per-category freshness counters and destructive resets from the same data-management screen as backup and restore.</div>
+        <h2>${locale.t('backup.usedCardTracking')}</h2>
+        <div class="muted">${locale.t('backup.usedCardDescription')}</div>
         <div class="stack gap-sm history-usage-indicators">
           ${indicators.map((indicator) => `
             <article class="summary-card history-usage-row" data-usage-category="${indicator.category}">
               <div>
-                <strong>${indicator.label}</strong>
-                <div class="muted">Never played: ${indicator.neverPlayed}/${indicator.total}</div>
+                <strong>${locale.getUsageLabel(indicator.category)}</strong>
+                <div class="muted">${locale.t('backup.neverPlayed', { value: `${locale.formatNumber(indicator.neverPlayed)}/${locale.formatNumber(indicator.total)}` })}</div>
               </div>
-              <button class="button button-secondary" data-action="reset-usage" data-category="${indicator.category}">Reset ${indicator.label}</button>
+              <button class="button button-secondary" data-action="reset-usage" data-category="${indicator.category}">${locale.t('backup.resetCategory', { label: locale.getUsageLabel(indicator.category) })}</button>
             </article>
           `).join('')}
         </div>
-        <p class="muted">Lowest-play reuse activates automatically when a category runs out of never-played options.</p>
-        <div class="muted">Reset preview: ${resetPreview.history.length} history entries, ${resetPreview.collection.ownedSetIds.length} owned sets, and clean usage buckets after a full reset.</div>
+        <p class="muted">${locale.t('backup.lowestPlayReuse')}</p>
+        <div class="muted">${locale.t('backup.resetPreview', { historyCount: locale.formatNumber(resetPreview.history.length), ownedSetCount: locale.formatNumber(resetPreview.collection.ownedSetIds.length) })}</div>
         <div class="button-row">
-          <button class="button button-danger" data-action="request-reset-all-state">Full Reset — Clear all data</button>
+          <button class="button button-danger" data-action="request-reset-all-state">${locale.t('backup.fullReset')}</button>
         </div>
       </section>
     </section>
@@ -1326,11 +1386,11 @@ function renderTabPanels(viewModel) {
     'new-game': `
       <section class="two-col shell-two-col">
         <section class="panel">
-          <h2>Setup engine preview</h2>
+          <h2>${getLocale(viewModel).t('newGame.panel.setupTitle')}</h2>
           ${renderSetupControls(viewModel)}
         </section>
         <section class="panel">
-          <h2>Generated setup result</h2>
+          <h2>${getLocale(viewModel).t('newGame.panel.resultTitle')}</h2>
           ${renderSetupResult(viewModel)}
         </section>
       </section>
@@ -1367,6 +1427,10 @@ function bindActionButtons(doc, actions) {
 
   doc.querySelectorAll('[data-action="set-theme"]').forEach((button) => {
     button.addEventListener('click', () => actions.setTheme(button.dataset.themeId));
+  });
+
+  doc.querySelectorAll('[data-action="set-locale-select"]').forEach((select) => {
+    select.addEventListener('change', () => actions.setLocale(select.value));
   });
 
   const backupImportInput = doc.getElementById('backup-import-input');
@@ -1533,16 +1597,22 @@ export function renderBundle(doc, viewModel, actions) {
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
   const activeThemeId = normalizeThemeId(viewModel.state.preferences.themeId);
   const activeTheme = getThemeDefinition(activeThemeId);
+  const locale = getLocale(viewModel);
   const panelMarkup = renderTabPanels(viewModel);
   const onboardingMarkup = renderOnboardingShell(viewModel);
 
   doc.documentElement.dataset.theme = activeThemeId;
+  doc.documentElement.lang = locale.documentLang;
   doc.documentElement.style.colorScheme = activeTheme.colorScheme;
-  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer';
-  doc.getElementById('app-subtitle').textContent = 'Browse sets, manage your collection, generate legal setups, and track history with browser-based persistence.';
-  doc.getElementById('header-theme-controls').innerHTML = renderThemeControls(activeThemeId);
-  doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, 'desktop');
-  doc.getElementById('mobile-tabs').innerHTML = renderTabButtons(activeTabId, 'mobile');
+  doc.title = locale.t('app.documentTitle');
+  doc.getElementById('app-title').textContent = locale.t('app.title');
+  doc.getElementById('app-subtitle').textContent = locale.t('app.subtitle');
+  doc.getElementById('header-theme-controls').innerHTML = renderThemeControls(activeThemeId, locale);
+  doc.getElementById('header-locale-controls').innerHTML = renderLocaleControls(viewModel.state.preferences.localeId, locale);
+  doc.getElementById('desktop-tabs').setAttribute('aria-label', locale.t('header.primaryNav'));
+  doc.getElementById('mobile-tabs').setAttribute('aria-label', locale.t('header.primaryNavMobile'));
+  doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, locale, 'desktop');
+  doc.getElementById('mobile-tabs').innerHTML = renderTabButtons(activeTabId, locale, 'mobile');
 
   APP_TABS.forEach((tab) => {
     const panel = doc.getElementById(`panel-${tab.id}`);

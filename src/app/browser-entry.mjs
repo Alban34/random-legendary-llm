@@ -4,6 +4,7 @@ import { buildBackupFilename, createBackupPayload, mergeImportedState, parseBack
 import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from './feedback-utils.mjs';
 import { addForcedPick, createEmptyForcedPicks, hasForcedPicks, removeForcedPick } from './forced-picks-utils.mjs';
 import { DEFAULT_HISTORY_GROUPING_MODE, HISTORY_GROUPING_MODES } from './history-utils.mjs';
+import { createLocaleTools, getSelectableLocales, normalizeLocaleId } from './localization-utils.mjs';
 import { normalizeGameResultDraft, validateGameResultDraft } from './result-utils.mjs';
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
 import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
@@ -76,7 +77,13 @@ function syncDebugGlobals(viewModel) {
   };
   window.__THEME_UI__ = {
     activeThemeId: viewModel.state.preferences.themeId,
-    supportedThemes: THEME_OPTIONS.map((theme) => ({ id: theme.id, label: theme.label }))
+    supportedThemes: THEME_OPTIONS.map((theme) => ({ id: theme.id, label: viewModel.locale.getThemeLabel(theme.id) }))
+  };
+  window.__LOCALE_UI__ = {
+    activeLocaleId: viewModel.state.preferences.localeId,
+    supportedLocales: getSelectableLocales(),
+    hasFallbacks: viewModel.locale.hasFallbacks,
+    fallbackKeys: viewModel.locale.fallbackKeys
   };
   window.__BACKUP_UI__ = {
     importError: viewModel.ui.backupImportError,
@@ -96,6 +103,7 @@ async function boot() {
   const viewModel = {
     bundle,
     state: hydration.state,
+    locale: createLocaleTools(hydration.state.preferences.localeId),
     persistence: {
       storageAvailable: hydration.storageAvailable,
       hydratedFromStorage: hydration.hydratedFromStorage,
@@ -140,6 +148,11 @@ async function boot() {
   };
   const toastTimers = new Map();
   let nextToastId = 1;
+  const t = (key, params) => viewModel.locale.t(key, params);
+  const refreshLocaleState = () => {
+    viewModel.locale = createLocaleTools(viewModel.state.preferences.localeId);
+  };
+  const localizeNotice = (notice) => viewModel.locale.localizeNotice(notice);
 
   const clearToastTimer = (id) => {
     const record = toastTimers.get(id);
@@ -251,12 +264,13 @@ async function boot() {
     });
 
     viewModel.state = result.state;
+    refreshLocaleState();
     viewModel.persistence.updateNotices = result.notices;
     viewModel.persistence.lastSaveMessage = result.save.message;
     viewModel.persistence.lastSaveOk = result.save.ok;
     viewModel.ui.lastActionNotice = actionNotice;
     rerender();
-    result.notices.forEach((notice) => enqueueToast({ variant: 'warning', message: notice, behavior: 'persistent' }));
+    result.notices.forEach((notice) => enqueueToast({ variant: 'warning', message: localizeNotice(notice), behavior: 'persistent' }));
     if (!result.save.ok) {
       enqueueToast({
         variant: result.save.storageAvailable === false ? 'warning' : 'error',
@@ -284,6 +298,8 @@ async function boot() {
   };
 
   const syncUiFromPersistedState = (nextState) => {
+    viewModel.state = nextState;
+    refreshLocaleState();
     viewModel.ui.selectedTab = normalizeSelectedTab(nextState.preferences.selectedTab);
     viewModel.ui.selectedPlayerCount = nextState.preferences.lastPlayerCount;
     viewModel.ui.selectedPlayMode = resolvePlayMode(nextState.preferences.lastPlayerCount, {
@@ -357,38 +373,40 @@ async function boot() {
     pauseToastDismissal,
     resumeToastDismissal,
     selectTab(tabId) {
-      persistSelectedTab(tabId, `Switched to the ${normalizeSelectedTab(tabId)} tab.`);
+      persistSelectedTab(tabId, t('actions.switchedTab', { tab: viewModel.locale.getTabLabel(normalizeSelectedTab(tabId)) }));
     },
     setHistoryGrouping(mode) {
       viewModel.ui.historyGroupingMode = HISTORY_GROUPING_MODES.some((entry) => entry.id === mode)
         ? mode
         : DEFAULT_HISTORY_GROUPING_MODE;
-      viewModel.ui.lastActionNotice = `Updated History grouping to ${viewModel.ui.historyGroupingMode === 'none' ? 'Ungrouped' : viewModel.ui.historyGroupingMode.replace('-', ' ')}.`;
+      viewModel.ui.lastActionNotice = t('actions.updatedHistoryGrouping', {
+        mode: viewModel.locale.getHistoryGroupingLabel(viewModel.ui.historyGroupingMode)
+      });
       rerender();
     },
     handleTabKeydown(tabId, key) {
       const normalizedTabId = normalizeSelectedTab(tabId);
       if (key === 'ArrowRight' || key === 'ArrowDown') {
-        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'next'), 'Switched tabs with keyboard navigation.');
+        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'next'), t('actions.keyboardTabs'));
         return;
       }
       if (key === 'ArrowLeft' || key === 'ArrowUp') {
-        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'previous'), 'Switched tabs with keyboard navigation.');
+        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'previous'), t('actions.keyboardTabs'));
         return;
       }
       if (key === 'Home') {
-        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'first'), 'Jumped to the first tab with keyboard navigation.');
+        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'first'), t('actions.keyboardFirstTab'));
         return;
       }
       if (key === 'End') {
-        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'last'), 'Jumped to the last tab with keyboard navigation.');
+        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'last'), t('actions.keyboardLastTab'));
       }
     },
     toggleOwnedSet(setId) {
       clearGeneratedSetup();
       viewModel.ui.confirmResetOwnedCollection = false;
       viewModel.ui.confirmResetAllState = false;
-      applyStateUpdate((currentState) => toggleOwnedSet(currentState, setId), 'Updated owned collection state. Generate a new setup to use the current collection.');
+      applyStateUpdate((currentState) => toggleOwnedSet(currentState, setId), t('actions.updatedOwnedCollection'));
     },
     setBrowseSearchTerm(searchTerm) {
       viewModel.ui.browseSearchTerm = searchTerm;
@@ -401,39 +419,39 @@ async function boot() {
     toggleAboutPanel() {
       viewModel.ui.aboutPanelOpen = !viewModel.ui.aboutPanelOpen;
       viewModel.ui.lastActionNotice = viewModel.ui.aboutPanelOpen
-        ? 'Opened the About this project panel.'
-        : 'Closed the About this project panel.';
+        ? t('actions.openedAbout')
+        : t('actions.closedAbout');
       rerender();
     },
     startOnboarding() {
       viewModel.ui.onboardingVisible = true;
       viewModel.ui.onboardingStep = 0;
       viewModel.ui.aboutPanelOpen = false;
-      viewModel.ui.lastActionNotice = 'Opened the introductory walkthrough.';
+      viewModel.ui.lastActionNotice = t('actions.openedWalkthrough');
       if (viewModel.ui.selectedTab !== 'browse') {
-        persistSelectedTab('browse', 'Returned to the Browse tab to replay the walkthrough.');
+        persistSelectedTab('browse', t('actions.replayWalkthrough'));
         return;
       }
       rerender();
     },
     previousOnboardingStep() {
       viewModel.ui.onboardingStep = Math.max(0, viewModel.ui.onboardingStep - 1);
-      viewModel.ui.lastActionNotice = 'Moved to the previous walkthrough step.';
+      viewModel.ui.lastActionNotice = t('actions.previousWalkthrough');
       rerender();
     },
     nextOnboardingStep() {
       viewModel.ui.onboardingStep = Math.min(3, viewModel.ui.onboardingStep + 1);
-      viewModel.ui.lastActionNotice = 'Moved to the next walkthrough step.';
+      viewModel.ui.lastActionNotice = t('actions.nextWalkthrough');
       rerender();
     },
     openOnboardingTab(tabId) {
-      persistSelectedTab(tabId, `Opened the ${normalizeSelectedTab(tabId)} tab from the walkthrough.`);
+      persistSelectedTab(tabId, t('actions.openedWalkthroughTab', { tab: viewModel.locale.getTabLabel(normalizeSelectedTab(tabId)) }));
     },
     skipOnboarding() {
-      completeOnboardingFlow('Skipped the walkthrough. Replay it anytime from Browse.');
+      completeOnboardingFlow(t('actions.skippedWalkthrough'));
     },
     completeOnboarding() {
-      completeOnboardingFlow('Completed the walkthrough. Replay it anytime from Browse.');
+      completeOnboardingFlow(t('actions.completedWalkthrough'));
     },
     toggleBrowseSetExpanded(setId) {
       viewModel.ui.expandedBrowseSetId = viewModel.ui.expandedBrowseSetId === setId ? null : setId;
@@ -442,13 +460,13 @@ async function boot() {
     requestResetOwnedCollection() {
       viewModel.ui.confirmResetOwnedCollection = true;
       viewModel.ui.modalReturnFocusAction = 'request-reset-owned-collection';
-      viewModel.ui.lastActionNotice = 'Confirm clearing the owned collection to remove all current selections.';
+      viewModel.ui.lastActionNotice = t('actions.confirmResetCollection');
       rerender();
       focusModalCancelButton();
     },
     cancelResetOwnedCollection() {
       viewModel.ui.confirmResetOwnedCollection = false;
-      viewModel.ui.lastActionNotice = 'Kept the current owned collection selections.';
+      viewModel.ui.lastActionNotice = t('actions.keptCollection');
       rerender();
       focusActionButton(viewModel.ui.modalReturnFocusAction);
     },
@@ -456,34 +474,39 @@ async function boot() {
       viewModel.ui.confirmResetOwnedCollection = false;
       clearForcedPicksState();
       clearGeneratedSetup();
-      applyStateUpdate((currentState) => resetOwnedCollection(currentState), 'Cleared all owned collection selections.');
-      enqueueToast({ variant: 'success', message: 'Cleared all owned collection selections.' });
+      applyStateUpdate((currentState) => resetOwnedCollection(currentState), t('actions.clearedCollection'));
+      enqueueToast({ variant: 'success', message: t('actions.clearedCollection') });
     },
     requestResetAllState() {
       viewModel.ui.confirmResetAllState = true;
       viewModel.ui.modalReturnFocusAction = 'request-reset-all-state';
-      viewModel.ui.lastActionNotice = 'Confirm the full reset to clear collection, usage, history, and preferences.';
+      viewModel.ui.lastActionNotice = t('actions.confirmResetAll');
       rerender();
       focusModalCancelButton();
     },
     cancelResetAllState() {
       viewModel.ui.confirmResetAllState = false;
-      viewModel.ui.lastActionNotice = 'Kept the current persisted application state.';
+      viewModel.ui.lastActionNotice = t('actions.keptState');
       rerender();
       focusActionButton(viewModel.ui.modalReturnFocusAction);
     },
     setPlayerCount(playerCount) {
       const playMode = playerCount === 1 ? viewModel.ui.selectedPlayMode : 'standard';
-      persistPreferences(playerCount, playMode, `Selected ${playerCount} player${playerCount === 1 ? '' : 's'} setup mode.`);
+      persistPreferences(playerCount, playMode, t('actions.selectedPlayerMode', {
+        count: viewModel.locale.formatNumber(playerCount),
+        playerWord: playerCount === 1 ? 'player' : 'players'
+      }));
     },
     setPlayMode(playMode) {
       if (viewModel.ui.selectedPlayerCount !== 1 && playMode !== 'standard') {
-        viewModel.ui.lastActionNotice = 'Alternate solo modes are only available for 1 player.';
+        viewModel.ui.lastActionNotice = t('actions.invalidSoloMode');
         rerender();
-        enqueueToast({ variant: 'warning', message: 'Alternate solo modes are only available for 1 player.' });
+        enqueueToast({ variant: 'warning', message: t('actions.invalidSoloMode') });
         return;
       }
-      persistPreferences(viewModel.ui.selectedPlayerCount, playMode, `Selected ${playMode.replaceAll('-', ' ')} mode.`);
+      persistPreferences(viewModel.ui.selectedPlayerCount, playMode, t('actions.selectedPlayMode', {
+        mode: viewModel.locale.getPlayModeLabel(playMode, viewModel.ui.selectedPlayerCount)
+      }));
     },
     setTheme(themeId) {
       const normalizedThemeId = normalizeThemeId(themeId);
@@ -494,7 +517,18 @@ async function boot() {
       applyStateUpdate((currentState) => {
         currentState.preferences.themeId = normalizedThemeId;
         return currentState;
-      }, `Applied the ${normalizedThemeId} theme.`);
+      }, t('actions.appliedTheme', { theme: viewModel.locale.getThemeLabel(normalizedThemeId) }));
+    },
+    setLocale(localeId) {
+      const normalizedLocaleId = normalizeLocaleId(localeId);
+      if (viewModel.state.preferences.localeId === normalizedLocaleId) {
+        return;
+      }
+
+      applyStateUpdate((currentState) => {
+        currentState.preferences.localeId = normalizedLocaleId;
+        return currentState;
+      }, t('actions.appliedLocale', { locale: createLocaleTools(normalizedLocaleId).localeLabel }));
     },
     exportBackup() {
       const payload = createBackupPayload(viewModel.state);
@@ -509,9 +543,9 @@ async function boot() {
       link.remove();
       queueMicrotask(() => URL.revokeObjectURL(downloadUrl));
       viewModel.ui.lastBackupExportFileName = fileName;
-      viewModel.ui.lastActionNotice = `Exported a backup to ${fileName}.`;
+      viewModel.ui.lastActionNotice = t('actions.exportedBackup', { fileName });
       rerender();
-      enqueueToast({ variant: 'success', message: `Exported backup as ${fileName}.` });
+      enqueueToast({ variant: 'success', message: t('actions.exportedBackupToast', { fileName }) });
     },
     openImportBackup() {
       document.getElementById('backup-import-input')?.click();
@@ -528,7 +562,7 @@ async function boot() {
         viewModel.ui.stagedBackup = null;
         viewModel.ui.confirmBackupRestoreMode = null;
         viewModel.ui.backupImportError = parsedBackup.error;
-        viewModel.ui.lastActionNotice = 'The selected backup file could not be imported.';
+        viewModel.ui.lastActionNotice = t('actions.backupImportFailed');
         rerender();
         enqueueToast({ variant: 'error', message: parsedBackup.error, behavior: 'persistent' });
         return;
@@ -542,12 +576,12 @@ async function boot() {
         importedState: parsedBackup.importedState,
         summary: summarizeBackupState(parsedBackup.importedState)
       };
-      viewModel.ui.lastActionNotice = 'Loaded a backup preview. Choose Merge or Replace to apply it.';
+      viewModel.ui.lastActionNotice = t('actions.loadedBackupPreview');
       rerender();
     },
     cancelBackupPreview() {
       clearBackupDraft();
-      viewModel.ui.lastActionNotice = 'Discarded the staged backup preview.';
+      viewModel.ui.lastActionNotice = t('actions.discardedBackupPreview');
       rerender();
     },
     requestMergeBackup() {
@@ -556,7 +590,7 @@ async function boot() {
       }
       viewModel.ui.confirmBackupRestoreMode = 'merge';
       viewModel.ui.modalReturnFocusAction = 'request-merge-backup';
-      viewModel.ui.lastActionNotice = 'Review the merge confirmation before applying the imported backup.';
+      viewModel.ui.lastActionNotice = t('actions.reviewMerge');
       rerender();
       focusModalCancelButton();
     },
@@ -566,13 +600,13 @@ async function boot() {
       }
       viewModel.ui.confirmBackupRestoreMode = 'replace';
       viewModel.ui.modalReturnFocusAction = 'request-replace-backup';
-      viewModel.ui.lastActionNotice = 'Review the replace confirmation before applying the imported backup.';
+      viewModel.ui.lastActionNotice = t('actions.reviewReplace');
       rerender();
       focusModalCancelButton();
     },
     cancelBackupRestore() {
       viewModel.ui.confirmBackupRestoreMode = null;
-      viewModel.ui.lastActionNotice = 'Kept the staged backup preview without applying it.';
+      viewModel.ui.lastActionNotice = t('actions.keptBackupPreview');
       rerender();
       focusActionButton(viewModel.ui.modalReturnFocusAction);
     },
@@ -583,10 +617,10 @@ async function boot() {
 
       viewModel.ui.confirmBackupRestoreMode = null;
       const nextState = mergeImportedState(viewModel.state, viewModel.ui.stagedBackup.importedState);
-      const result = applyStateUpdate(() => nextState, 'Merged the imported backup with the current app data.');
+      const result = applyStateUpdate(() => nextState, t('actions.mergedBackup'));
       syncUiFromPersistedState(result.state);
       rerender();
-      enqueueToast({ variant: 'success', message: 'Merged the imported backup with the current app data.' });
+      enqueueToast({ variant: 'success', message: t('actions.mergedBackup') });
     },
     confirmReplaceBackup() {
       if (!viewModel.ui.stagedBackup) {
@@ -594,14 +628,14 @@ async function boot() {
       }
 
       viewModel.ui.confirmBackupRestoreMode = null;
-      const result = applyStateUpdate(() => viewModel.ui.stagedBackup.importedState, 'Replaced the current app data with the imported backup.');
+      const result = applyStateUpdate(() => viewModel.ui.stagedBackup.importedState, t('actions.replacedBackup'));
       syncUiFromPersistedState(result.state);
       rerender();
-      enqueueToast({ variant: 'warning', message: 'Replaced the current app data with the imported backup.' });
+      enqueueToast({ variant: 'warning', message: t('actions.replacedBackup') });
     },
     addForcedPick(field, value) {
       if (!value) {
-        viewModel.ui.lastActionNotice = 'Choose a card or setup entity before adding a forced pick.';
+        viewModel.ui.lastActionNotice = t('actions.chooseForcedPick');
         rerender();
         return;
       }
@@ -611,20 +645,20 @@ async function boot() {
       viewModel.ui.forcedPicks = nextForcedPicks;
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = changed
-        ? 'Updated the active forced picks for the next generated setup.'
-        : 'That forced pick was already active.';
+        ? t('actions.updatedForcedPicks')
+        : t('actions.duplicateForcedPick');
       rerender();
     },
     removeForcedPick(field, value) {
       viewModel.ui.forcedPicks = removeForcedPick(viewModel.ui.forcedPicks, field, value);
       clearGeneratedSetup();
-      viewModel.ui.lastActionNotice = 'Removed one forced pick from the next generated setup.';
+      viewModel.ui.lastActionNotice = t('actions.removedForcedPick');
       rerender();
     },
     clearForcedPicks() {
       clearForcedPicksState();
       clearGeneratedSetup();
-      viewModel.ui.lastActionNotice = 'Cleared all forced picks for the next generated setup.';
+      viewModel.ui.lastActionNotice = t('actions.clearedForcedPicks');
       rerender();
     },
     generateSetup() {
@@ -640,12 +674,12 @@ async function boot() {
         viewModel.ui.currentSetup = setup;
         viewModel.ui.generatorError = null;
         viewModel.ui.generatorNotices = setup.notices;
-        viewModel.ui.lastActionNotice = 'Generated a new setup without mutating persisted usage or history.';
+        viewModel.ui.lastActionNotice = t('actions.generatedSetup');
       } catch (error) {
         viewModel.ui.currentSetup = null;
         viewModel.ui.generatorNotices = [];
         viewModel.ui.generatorError = error.message;
-        viewModel.ui.lastActionNotice = 'Could not generate a legal setup for the current collection.';
+        viewModel.ui.lastActionNotice = t('actions.failedSetup');
         enqueueToast({ variant: 'error', message: error.message, behavior: 'persistent' });
       }
       rerender();
@@ -653,15 +687,15 @@ async function boot() {
     regenerateSetup() {
       actions.generateSetup();
       if (!viewModel.ui.generatorError) {
-        viewModel.ui.lastActionNotice = 'Regenerated the current setup without mutating persisted state.';
+        viewModel.ui.lastActionNotice = t('actions.regeneratedSetup');
         rerender();
       }
     },
     acceptCurrentSetup() {
       if (!viewModel.ui.currentSetup) {
-        viewModel.ui.lastActionNotice = 'Generate a setup before using Accept & Log.';
+        viewModel.ui.lastActionNotice = t('actions.acceptBeforeLog');
         rerender();
-        enqueueToast({ variant: 'warning', message: 'Generate a setup before using Accept & Log.' });
+        enqueueToast({ variant: 'warning', message: t('actions.acceptBeforeLog') });
         return;
       }
       const acceptedRecordId = createGameRecordId();
@@ -679,21 +713,21 @@ async function boot() {
         nextState.preferences.selectedTab = 'history';
         return nextState;
       }, hasForcedPicks(viewModel.ui.forcedPicks)
-        ? 'Accepted & logged the current generated setup, opened score entry, and cleared the one-shot forced picks.'
-        : 'Accepted & logged the current generated setup and opened score entry in History.');
+        ? t('actions.acceptedLoggedForced')
+        : t('actions.acceptedLogged'));
       viewModel.ui.selectedTab = 'history';
       openResultEditor(acceptedRecordId);
       clearForcedPicksState();
       clearGeneratedSetup();
       rerender();
-      enqueueToast({ variant: 'success', message: 'Accepted & logged the current generated setup. Add the result now or skip it for later.' });
+      enqueueToast({ variant: 'success', message: t('actions.acceptedToast') });
     },
     editGameResult(recordId) {
       if (!openResultEditor(recordId)) {
         return;
       }
 
-      viewModel.ui.lastActionNotice = 'Opened result editing for the selected history record.';
+      viewModel.ui.lastActionNotice = t('actions.openedResultEditor');
       rerender();
     },
     setResultOutcome(outcome) {
@@ -710,13 +744,13 @@ async function boot() {
     },
     skipGameResultEntry() {
       closeResultEditor();
-      viewModel.ui.lastActionNotice = 'Left the selected game result pending. You can add it later from History.';
+      viewModel.ui.lastActionNotice = t('actions.pendingResult');
       rerender();
-      enqueueToast({ variant: 'info', message: 'Kept the selected game result pending.' });
+      enqueueToast({ variant: 'info', message: t('actions.pendingResultToast') });
     },
     cancelResultEntry() {
       closeResultEditor();
-      viewModel.ui.lastActionNotice = 'Closed result editing without changing the stored history record.';
+      viewModel.ui.lastActionNotice = t('actions.closedResultEditor');
       rerender();
     },
     saveGameResult() {
@@ -726,8 +760,8 @@ async function boot() {
 
       const validation = validateGameResultDraft(viewModel.ui.resultDraft);
       if (!validation.ok) {
-        viewModel.ui.resultFormError = validation.errors.join(' ');
-        viewModel.ui.lastActionNotice = 'Finish the required result fields before saving.';
+        viewModel.ui.resultFormError = validation.errors.map((message) => viewModel.locale.localizeValidationMessage(message)).join(' ');
+        viewModel.ui.lastActionNotice = t('actions.finishResultFields');
         rerender();
         return;
       }
@@ -741,17 +775,18 @@ async function boot() {
         notes: validation.result.notes,
         updatedAt: validation.result.updatedAt
       }), wasPending
-        ? 'Saved the game result for the selected history record.'
-        : 'Saved the corrected game result for the selected history record.');
+        ? t('actions.savedResult')
+        : t('actions.savedCorrectedResult'));
       closeResultEditor();
       rerender();
-      enqueueToast({ variant: 'success', message: wasPending ? 'Saved the game result.' : 'Saved the corrected game result.' });
+      enqueueToast({ variant: 'success', message: wasPending ? t('actions.savedResultToast') : t('actions.savedCorrectedResultToast') });
     },
     resetUsageCategory(category) {
       viewModel.ui.confirmResetAllState = false;
       closeResultEditor();
-      applyStateUpdate((currentState) => resetUsageCategory(currentState, category), `Reset ${category} usage stats.`);
-      enqueueToast({ variant: 'info', message: `Reset ${category} usage stats.` });
+      const label = viewModel.locale.getUsageLabel(category);
+      applyStateUpdate((currentState) => resetUsageCategory(currentState, category), t('actions.resetUsageStats', { label }));
+      enqueueToast({ variant: 'info', message: t('actions.resetUsageStats', { label }) });
     },
     resetAllState() {
       viewModel.ui.confirmResetAllState = false;
@@ -762,7 +797,7 @@ async function boot() {
       viewModel.persistence.lastSaveOk = result.save.ok;
       syncUiFromPersistedState(result.state);
       viewModel.ui.selectedTab = DEFAULT_TAB_ID;
-      viewModel.ui.lastActionNotice = 'Reset the entire application state to defaults.';
+      viewModel.ui.lastActionNotice = t('actions.resetAllDefaults');
       rerender();
       if (!result.save.ok) {
         enqueueToast({
@@ -771,7 +806,7 @@ async function boot() {
           behavior: 'persistent'
         });
       } else {
-        enqueueToast({ variant: 'warning', message: 'Reset the entire application state to defaults.' });
+        enqueueToast({ variant: 'warning', message: t('actions.resetAllDefaults') });
       }
     },
     corruptSavedState() {
@@ -812,14 +847,14 @@ async function boot() {
       clearForcedPicksState();
       closeResultEditor();
       clearGeneratedSetup();
-      viewModel.ui.lastActionNotice = 'Reset the current setup controls to their default values.';
+      viewModel.ui.lastActionNotice = t('actions.clearDefaults');
       rerender();
-      enqueueToast({ variant: 'info', message: 'Reset the current setup controls to their default values.' });
+      enqueueToast({ variant: 'info', message: t('actions.clearDefaults') });
     }
   };
 
   if (hydration.notices.length) {
-    hydration.notices.forEach((notice) => enqueueToast({ variant: 'warning', message: notice, behavior: 'persistent' }));
+    hydration.notices.forEach((notice) => enqueueToast({ variant: 'warning', message: localizeNotice(notice), behavior: 'persistent' }));
   }
 
   rerender();

@@ -258,6 +258,25 @@ QC checks:
 
 Automated coverage:
 - `test/epic12-score-history.test.mjs` covers pending/default result state, invalid combinations, legacy compatibility, corrected-result updates, and save/load roundtrips
+
+---
+
+## Epic 19 — Interface Localization
+
+Required tests:
+- locale preferences default safely and recover invalid stored locale IDs
+- locale resources expose the supported public locales and incomplete-pack fallback metadata
+- localized shell and panel copy update without mutating canonical game names or exported schema fields
+- date and number formatting follow the active locale on the main localized surfaces
+
+QC checks:
+- verify the shared header locale selector updates the visible UI and persists across reloads
+- verify a long-copy locale keeps the shared shell readable on desktop and mobile
+- verify an incomplete locale pack shows visible fallback behavior instead of failing silently
+
+Automated coverage:
+- `test/epic19-localization.test.mjs` covers locale defaults, persistence, normalization, and fallback metadata
+- `test/playwright/epic19-qc.spec.mjs` covers locale switching, reload persistence, long-copy shell readability, and incomplete-pack fallback behavior
 - `test/playwright/epic12-qc.spec.mjs` covers immediate result entry, skip/cancel/edit flows, keyboard-driven score entry, mixed history layouts, and legacy upgrade behavior
 
 ---

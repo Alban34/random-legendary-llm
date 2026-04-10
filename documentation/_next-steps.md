@@ -14,5 +14,9 @@
 - [x] Improve the welcome page, it looks too crowded and overwhelming, maybe by adding some spacing, grouping related information, and using a more visually appealing layout
 - [x] Do not display developers information by default, it should be hidden behind a "About this project" link or button, to avoid overwhelming users who just want to use the app without being interested in the development details
 - [x] Game history should be first in the History page
-- [ ] Interface localisation (fr, es, de, it)
+- [x] Interface localisation
 - [x] Group games in history (by mastermind? player count? something else?)
+- [ ] Move the "Get comfortable with the app in under a minute" on top
+- [ ] "Browse sets" should be full width
+- [ ] "Ready Tabs" is not a relevant information, you should remove it
+- [ ] Validate with "stitch" the UX designer

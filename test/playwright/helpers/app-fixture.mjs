@@ -53,10 +53,21 @@ export async function selectTheme(page, themeId) {
   await page.locator(`[data-action="set-theme"][data-theme-id="${themeId}"]`).click();
 }
 
+export async function selectLocale(page, localeId) {
+  await page.locator('#header-locale-select').selectOption(localeId);
+}
+
 export async function readDocumentTheme(page) {
   return page.evaluate(() => ({
     themeId: document.documentElement.dataset.theme,
     colorScheme: getComputedStyle(document.documentElement).colorScheme
+  }));
+}
+
+export async function readDocumentLocale(page) {
+  return page.evaluate(() => ({
+    lang: document.documentElement.lang,
+    title: document.title
   }));
 }
 

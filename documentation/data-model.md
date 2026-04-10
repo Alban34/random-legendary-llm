@@ -21,7 +21,7 @@ Persisted slices in V1:
 - `collection` — owned set IDs
 - `usage` — per-category `plays` and `lastPlayedAt`
 - `history` — accepted game records stored with IDs only plus optional result data
-- `preferences` — last player count, legacy Advanced Solo flag, normalized play mode, selected tab, onboarding completion, and the active theme ID
+- `preferences` — last player count, legacy Advanced Solo flag, normalized play mode, selected tab, onboarding completion, the active theme ID, and the active locale ID
 
 ### `ThemeId`
 
@@ -30,6 +30,14 @@ Persisted slices in V1:
 ```
 
 The default selection rule is `midnight` so the current shipped visual identity stays stable for existing users. Invalid or missing stored theme values recover safely to that default.
+
+### `LocaleId`
+
+```text
+"en-US" | "fr-FR" | "en-XA" | "fr-CA"
+```
+
+The user-visible locale selector currently exposes `en-US`, `fr-FR`, and the long-copy QA locale `en-XA`. The partial `fr-CA` pack remains available for fallback and regression coverage so incomplete translation packs can be validated without changing the primary language contract.
 
 Ephemeral UI-only state such as the current generated setup, active toast notifications, open confirmation modal, and transient recovery notices is intentionally kept out of persisted browser state.
 
