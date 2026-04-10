@@ -472,6 +472,11 @@ details summary {
   box-shadow: 0 10px 24px var(--shadow);
 }
 
+.toast-persistent {
+  border-width: 2px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.42);
+}
+
 .toast-success {
   border-color: rgba(46, 204, 113, 0.45);
 }
@@ -495,6 +500,14 @@ details summary {
 .toast-title {
   font-weight: 700;
   margin-bottom: 4px;
+}
+
+.toast-meta {
+  margin-bottom: 4px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .toast-dismiss {

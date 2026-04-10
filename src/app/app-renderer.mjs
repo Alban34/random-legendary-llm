@@ -174,12 +174,15 @@ function renderToastRegion(viewModel) {
   return `
     <div class="toast-stack" role="region" aria-label="Notifications">
       ${viewModel.ui.toasts.map((toast) => `
-        <article class="toast toast-${toast.variant}" role="${toast.live === 'assertive' ? 'alert' : 'status'}" aria-live="${toast.live}" data-toast-id="${toast.id}">
+        <article class="toast toast-${toast.variant} toast-${toast.behavior}" role="${toast.live === 'assertive' ? 'alert' : 'status'}" aria-live="${toast.live}" data-toast-id="${toast.id}" data-toast-dismiss-on-click="${toast.dismissOnClick ? 'true' : 'false'}" data-toast-auto-dismiss="${toast.autoDismissMs ? 'true' : 'false'}" data-toast-behavior="${toast.behavior}">
           <div class="toast-copy">
             <div class="toast-title">${toast.icon} ${toast.label}</div>
+            ${toast.isPersistent ? '<div class="toast-meta">Persistent alert</div>' : ''}
             <div>${toast.message}</div>
           </div>
-          <button type="button" class="button button-secondary toast-dismiss" data-action="dismiss-toast" data-toast-id="${toast.id}" aria-label="Dismiss ${toast.label} notification">Dismiss</button>
+          ${toast.dismissible
+            ? `<button type="button" class="button button-secondary toast-dismiss" data-action="dismiss-toast" data-toast-id="${toast.id}" aria-label="${toast.isPersistent ? 'Acknowledge' : 'Dismiss'} ${toast.label} notification">${toast.isPersistent ? 'Acknowledge' : 'Dismiss'}</button>`
+            : ''}
         </article>
       `).join('')}
     </div>
@@ -768,8 +771,30 @@ function bindActionButtons(doc, actions) {
     }
   });
 
-  doc.querySelectorAll('[data-action="dismiss-toast"]').forEach((button) => {
-    button.addEventListener('click', () => actions.dismissToast(button.dataset.toastId));
+  const dismissButtons = [...doc.querySelectorAll('[data-action="dismiss-toast"]')];
+  dismissButtons.forEach((button, index) => {
+    button.addEventListener('click', () => {
+      const fallbackButton = dismissButtons[index + 1] || dismissButtons[index - 1] || null;
+      actions.dismissToast(button.dataset.toastId, {
+        focusToastId: fallbackButton?.dataset.toastId || null
+      });
+    });
+  });
+
+  doc.querySelectorAll('[data-toast-dismiss-on-click="true"]').forEach((toast) => {
+    toast.addEventListener('click', (event) => {
+      if (event.target.closest('[data-action="dismiss-toast"]')) {
+        return;
+      }
+      actions.dismissToast(toast.dataset.toastId);
+    });
+  });
+
+  doc.querySelectorAll('[data-toast-auto-dismiss="true"]').forEach((toast) => {
+    toast.addEventListener('mouseenter', () => actions.pauseToastDismissal(toast.dataset.toastId));
+    toast.addEventListener('mouseleave', () => actions.resumeToastDismissal(toast.dataset.toastId));
+    toast.addEventListener('focusin', () => actions.pauseToastDismissal(toast.dataset.toastId));
+    toast.addEventListener('focusout', () => actions.resumeToastDismissal(toast.dataset.toastId));
   });
 
   const modalDialog = doc.querySelector('#modal-root [role="dialog"]');

@@ -26,6 +26,8 @@ test.describe('Epic 9 automated QC', () => {
     await toasts.first().locator('[data-action="dismiss-toast"]').click();
     await expect(toasts).toHaveCount(3);
 
+    await page.evaluate(() => document.activeElement?.blur());
+    await page.locator('#app-title').hover();
     await expect.poll(async () => toasts.count(), { timeout: 6_000 }).toBe(0);
   });
 
@@ -84,8 +86,8 @@ test.describe('Epic 9 automated QC', () => {
     await selectTab(page, 'new-game');
     await page.locator('[data-action="generate-setup"]').click();
 
-    await expect(page.locator('#toast-region .toast-info').filter({ hasText: 'Least-played fallback used for Hero selection' })).toHaveCount(1);
     await expect(page.locator('#panel-new-game')).toContainText('Least-played fallback used for Hero selection');
+    await expect(page.locator('#toast-region .toast-info').filter({ hasText: 'Least-played fallback used for Hero selection' })).toHaveCount(0);
     await page.waitForFunction(() => Boolean(window.__CURRENT_SETUP__));
   });
 
@@ -117,6 +119,7 @@ test.describe('Epic 9 automated QC', () => {
 
     await page.locator('#tab-desktop-history').click();
     await expect(page.locator('#toast-region .toast-warning').filter({ hasText: 'Browser storage is unavailable' }).first()).toContainText('Browser storage is unavailable');
+    await expect(page.locator('#toast-region .toast-warning').filter({ hasText: 'Browser storage is unavailable' }).first()).toContainText('Persistent alert');
     await expect(page.locator('#panel-history')).toBeVisible();
   });
 

@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
-import { createToastRecord, pushToast, removeToast } from '../src/app/feedback-utils.mjs';
+import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from '../src/app/feedback-utils.mjs';
 import { generateSetup } from '../src/app/setup-generator.mjs';
 import { createDefaultState, createStorageAdapter, loadState } from '../src/app/state-store.mjs';
 
@@ -57,26 +57,35 @@ before(async () => {
 test('Epic 9 toast helpers preserve variant metadata, dismiss records, and cap stacked notifications', () => {
   const successToast = createToastRecord({ id: 'toast-1', variant: 'success', message: 'Saved setup.' });
   const fallbackToast = createToastRecord({ id: 'toast-2', variant: 'missing', message: 'Fallback copy.' });
+  const persistentWarning = createToastRecord({ id: 'toast-3', variant: 'warning', behavior: 'persistent', message: 'Storage is unavailable.' });
 
   assert.equal(successToast.variant, 'success');
   assert.equal(successToast.label, 'Success');
   assert.equal(successToast.icon, '✅');
   assert.equal(successToast.live, 'polite');
+  assert.equal(successToast.behavior, 'transient');
+  assert.equal(shouldAutoDismissToast(successToast), true);
 
   assert.equal(fallbackToast.variant, 'info');
   assert.equal(fallbackToast.label, 'Info');
   assert.equal(fallbackToast.icon, 'ℹ️');
   assert.equal(fallbackToast.live, 'polite');
+  assert.equal(fallbackToast.behavior, 'transient');
 
-  const stacked = ['toast-1', 'toast-2', 'toast-3', 'toast-4', 'toast-5'].reduce((toasts, id, index) => {
+  assert.equal(persistentWarning.variant, 'warning');
+  assert.equal(persistentWarning.behavior, 'persistent');
+  assert.equal(persistentWarning.isPersistent, true);
+  assert.equal(shouldAutoDismissToast(persistentWarning), false);
+
+  const stacked = ['toast-1', 'toast-2', 'toast-4', 'toast-5'].reduce((toasts, id, index) => {
     return pushToast(toasts, createToastRecord({
       id,
       variant: index % 2 === 0 ? 'info' : 'warning',
       message: `Message ${index}`
     }));
-  }, []);
+  }, [persistentWarning]);
 
-  assert.deepEqual(stacked.map((toast) => toast.id), ['toast-2', 'toast-3', 'toast-4', 'toast-5']);
+  assert.deepEqual(stacked.map((toast) => toast.id), ['toast-3', 'toast-2', 'toast-4', 'toast-5']);
   assert.equal(removeToast(stacked, 'toast-4').some((toast) => toast.id === 'toast-4'), false);
 });
 
@@ -151,10 +160,13 @@ test('Epic 9 ships semantic tab, toast, and modal markup plus visible focus styl
   assert.match(rendererSource, /role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description"/);
   assert.ok(rendererSource.includes("panel.setAttribute('aria-labelledby', `tab-desktop-${tab.id} tab-mobile-${tab.id}`);"));
   assert.match(rendererSource, /role="region" aria-label="Notifications"/);
+  assert.match(rendererSource, /data-toast-dismiss-on-click="\$\{toast\.dismissOnClick \? 'true' : 'false'\}"/);
+  assert.match(rendererSource, /toast-\$\{toast\.behavior\}/);
 
   assert.match(shellCssSource, /button:focus-visible/);
   assert.match(shellCssSource, /\.tab-button:focus-visible/);
   assert.match(shellCssSource, /summary:focus-visible/);
   assert.match(shellCssSource, /#toast-region\s*\{[\s\S]*position:\s*fixed;/);
+  assert.match(shellCssSource, /\.toast-persistent\s*\{/);
 });
 

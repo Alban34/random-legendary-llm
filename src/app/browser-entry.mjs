@@ -1,6 +1,6 @@
 import { createEpic1Bundle } from './game-data-pipeline.mjs';
 import { DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from './app-tabs.mjs';
-import { createToastRecord, pushToast, removeToast } from './feedback-utils.mjs';
+import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from './feedback-utils.mjs';
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
 import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
 import {
@@ -82,26 +82,90 @@ async function boot() {
   const toastTimers = new Map();
   let nextToastId = 1;
 
+  const clearToastTimer = (id) => {
+    const record = toastTimers.get(id);
+    if (!record) {
+      return;
+    }
+
+    if (record.timeoutId) {
+      clearTimeout(record.timeoutId);
+    }
+    toastTimers.delete(id);
+  };
+
+  const scheduleToastDismissal = (toast) => {
+    if (!shouldAutoDismissToast(toast)) {
+      return;
+    }
+
+    const record = {
+      remainingMs: toast.autoDismissMs,
+      timeoutId: null,
+      startedAt: Date.now()
+    };
+
+    record.timeoutId = setTimeout(() => dismissToast(toast.id), record.remainingMs);
+    toastTimers.set(toast.id, record);
+  };
+
+  const pauseToastDismissal = (id) => {
+    const record = toastTimers.get(id);
+    if (!record?.timeoutId) {
+      return;
+    }
+
+    clearTimeout(record.timeoutId);
+    record.remainingMs = Math.max(1000, record.remainingMs - (Date.now() - record.startedAt));
+    record.timeoutId = null;
+    toastTimers.set(id, record);
+  };
+
+  const resumeToastDismissal = (id) => {
+    const record = toastTimers.get(id);
+    if (!record || record.timeoutId) {
+      return;
+    }
+
+    record.startedAt = Date.now();
+    record.timeoutId = setTimeout(() => dismissToast(id), record.remainingMs);
+    toastTimers.set(id, record);
+  };
+
   const rerender = () => {
     syncDebugGlobals(viewModel);
     renderBundle(document, viewModel, actions);
   };
 
-  const dismissToast = (id) => {
-    if (toastTimers.has(id)) {
-      clearTimeout(toastTimers.get(id));
-      toastTimers.delete(id);
-    }
+  const dismissToast = (id, options = {}) => {
+    clearToastTimer(id);
     viewModel.ui.toasts = removeToast(viewModel.ui.toasts, id);
     rerender();
+    if (options.focusToastId) {
+      queueMicrotask(() => {
+        document.querySelector(`[data-action="dismiss-toast"][data-toast-id="${options.focusToastId}"]`)?.focus();
+      });
+    }
   };
 
-  const enqueueToast = (variant, message, duration = 4000) => {
-    const toast = createToastRecord({ id: `toast-${nextToastId++}`, variant, message });
-    viewModel.ui.toasts = pushToast(viewModel.ui.toasts, toast);
+  const enqueueToast = ({ variant, message, behavior = 'transient' }) => {
+    const toast = createToastRecord({ id: `toast-${nextToastId++}`, variant, message, behavior });
+    const previousToasts = viewModel.ui.toasts;
+    const nextToasts = pushToast(previousToasts, toast);
+    const nextToastIds = new Set(nextToasts.map((entry) => entry.id));
+
+    previousToasts.forEach((entry) => {
+      if (!nextToastIds.has(entry.id)) {
+        clearToastTimer(entry.id);
+      }
+    });
+
+    viewModel.ui.toasts = nextToasts;
     rerender();
-    const timer = setTimeout(() => dismissToast(toast.id), duration);
-    toastTimers.set(toast.id, timer);
+
+    if (nextToastIds.has(toast.id)) {
+      scheduleToastDismissal(toast);
+    }
   };
 
   const focusActionButton = (actionName) => {
@@ -133,9 +197,13 @@ async function boot() {
     viewModel.persistence.lastSaveOk = result.save.ok;
     viewModel.ui.lastActionNotice = actionNotice;
     rerender();
-    result.notices.forEach((notice) => enqueueToast('warning', notice));
+    result.notices.forEach((notice) => enqueueToast({ variant: 'warning', message: notice, behavior: 'persistent' }));
     if (!result.save.ok) {
-      enqueueToast(result.save.storageAvailable === false ? 'warning' : 'error', result.save.message);
+      enqueueToast({
+        variant: result.save.storageAvailable === false ? 'warning' : 'error',
+        message: result.save.message,
+        behavior: 'persistent'
+      });
     }
     return result;
   };
@@ -168,6 +236,8 @@ async function boot() {
 
   const actions = {
     dismissToast,
+    pauseToastDismissal,
+    resumeToastDismissal,
     selectTab(tabId) {
       persistSelectedTab(tabId, `Switched to the ${normalizeSelectedTab(tabId)} tab.`);
     },
@@ -224,7 +294,7 @@ async function boot() {
       viewModel.ui.confirmResetOwnedCollection = false;
       clearGeneratedSetup();
       applyStateUpdate((currentState) => resetOwnedCollection(currentState), 'Cleared all owned collection selections.');
-      enqueueToast('success', 'Cleared all owned collection selections.');
+      enqueueToast({ variant: 'success', message: 'Cleared all owned collection selections.' });
     },
     requestResetAllState() {
       viewModel.ui.confirmResetAllState = true;
@@ -247,7 +317,7 @@ async function boot() {
       if (viewModel.ui.selectedPlayerCount !== 1) {
         viewModel.ui.lastActionNotice = 'Advanced Solo is only available for 1 player.';
         rerender();
-        enqueueToast('warning', 'Advanced Solo is only available for 1 player.');
+        enqueueToast({ variant: 'warning', message: 'Advanced Solo is only available for 1 player.' });
         return;
       }
       persistPreferences(
@@ -268,17 +338,12 @@ async function boot() {
         viewModel.ui.generatorError = null;
         viewModel.ui.generatorNotices = setup.notices;
         viewModel.ui.lastActionNotice = 'Generated a new setup without mutating persisted usage or history.';
-        if (setup.notices.length) {
-          setup.notices.forEach((notice) => enqueueToast('info', notice));
-        } else {
-          enqueueToast('success', 'Generated a fully fresh setup.');
-        }
       } catch (error) {
         viewModel.ui.currentSetup = null;
         viewModel.ui.generatorNotices = [];
         viewModel.ui.generatorError = error.message;
         viewModel.ui.lastActionNotice = 'Could not generate a legal setup for the current collection.';
-        enqueueToast('error', error.message);
+        enqueueToast({ variant: 'error', message: error.message, behavior: 'persistent' });
       }
       rerender();
     },
@@ -293,7 +358,7 @@ async function boot() {
       if (!viewModel.ui.currentSetup) {
         viewModel.ui.lastActionNotice = 'Generate a setup before using Accept & Log.';
         rerender();
-        enqueueToast('warning', 'Generate a setup before using Accept & Log.');
+        enqueueToast({ variant: 'warning', message: 'Generate a setup before using Accept & Log.' });
         return;
       }
       applyStateUpdate((currentState) => acceptGameSetup(currentState, {
@@ -301,12 +366,12 @@ async function boot() {
         advancedSolo: viewModel.ui.advancedSolo,
         setupSnapshot: buildHistoryReadySetupSnapshot(viewModel.ui.currentSetup)
       }), 'Accepted & logged the current generated setup.');
-      enqueueToast('success', 'Accepted & logged the current generated setup.');
+      enqueueToast({ variant: 'success', message: 'Accepted & logged the current generated setup.' });
     },
     resetUsageCategory(category) {
       viewModel.ui.confirmResetAllState = false;
       applyStateUpdate((currentState) => resetUsageCategory(currentState, category), `Reset ${category} usage stats.`);
-      enqueueToast('info', `Reset ${category} usage stats.`);
+      enqueueToast({ variant: 'info', message: `Reset ${category} usage stats.` });
     },
     resetAllState() {
       viewModel.ui.confirmResetAllState = false;
@@ -322,9 +387,13 @@ async function boot() {
       viewModel.ui.lastActionNotice = 'Reset the entire application state to defaults.';
       rerender();
       if (!result.save.ok) {
-        enqueueToast(result.save.storageAvailable === false ? 'warning' : 'error', result.save.message);
+        enqueueToast({
+          variant: result.save.storageAvailable === false ? 'warning' : 'error',
+          message: result.save.message,
+          behavior: 'persistent'
+        });
       } else {
-        enqueueToast('warning', 'Reset the entire application state to defaults.');
+        enqueueToast({ variant: 'warning', message: 'Reset the entire application state to defaults.' });
       }
     },
     corruptSavedState() {
@@ -335,7 +404,11 @@ async function boot() {
         ? 'Wrote corrupted JSON to browser storage. Reload the page to verify recovery.'
         : 'Could not write corrupted JSON to browser storage.';
       rerender();
-      enqueueToast(save.ok ? 'warning' : 'error', viewModel.ui.lastActionNotice);
+      enqueueToast({
+        variant: save.ok ? 'warning' : 'error',
+        message: viewModel.ui.lastActionNotice,
+        behavior: 'persistent'
+      });
     },
     injectInvalidOwnedSet() {
       const corruptedState = JSON.parse(JSON.stringify(viewModel.state));
@@ -347,7 +420,11 @@ async function boot() {
         ? 'Wrote an invalid owned set ID to storage. Reload the page to verify safe cleanup.'
         : 'Could not write an invalid owned set ID to browser storage.';
       rerender();
-      enqueueToast(save.ok ? 'warning' : 'error', viewModel.ui.lastActionNotice);
+      enqueueToast({
+        variant: save.ok ? 'warning' : 'error',
+        message: viewModel.ui.lastActionNotice,
+        behavior: 'persistent'
+      });
     },
     clearToDefaults() {
       const defaultState = createDefaultState();
@@ -356,12 +433,12 @@ async function boot() {
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the current setup controls to their default values.';
       rerender();
-      enqueueToast('info', 'Reset the current setup controls to their default values.');
+      enqueueToast({ variant: 'info', message: 'Reset the current setup controls to their default values.' });
     }
   };
 
   if (hydration.notices.length) {
-    hydration.notices.forEach((notice) => enqueueToast('warning', notice));
+    hydration.notices.forEach((notice) => enqueueToast({ variant: 'warning', message: notice, behavior: 'persistent' }));
   }
 
   rerender();
