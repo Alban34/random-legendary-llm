@@ -175,3 +175,49 @@ Improve visual flexibility and long-term maintainability by adding theme control
 3. **Verify all primary screens and components remain legible and accessible across themes**
 4. **Evaluate candidate third-party CSS approaches that can be bundled statically without runtime dependencies**
 5. **Document the styling architecture decision and any migration constraints before adoption**
+
+---
+
+## Additional backlog candidates pending review
+
+These epics come from the remaining unchecked ideas in `documentation/_next-steps.md` and are intentionally not yet sequenced in `documentation/post-v1-delivery-sequence.md`.
+
+## Epic 19 — Interface Localization
+
+**Objective**
+Make the application usable in multiple languages without destabilizing canonical game data, persisted state, or accessibility behavior.
+
+**In scope**
+- localized UI chrome and helper copy
+- locale selection and persistence
+- fallback rules for missing translations
+- locale-aware formatting for dates and numbers
+- layout and accessibility verification across languages
+
+**Stories**
+1. **Define the localization architecture, supported locales, and fallback rules**
+2. **Externalize user-facing application strings and formatting rules**
+3. **Add a language selector and persist the chosen locale**
+4. **Verify localized layouts remain readable and accessible**
+5. **Establish translation maintenance and QA safeguards**
+
+---
+
+## Epic 20 — History Grouping and Organization
+
+**Objective**
+Improve scanability for larger play histories by organizing records into clearer groups without weakening result editing, insights, or portability guarantees.
+
+**In scope**
+- grouping modes for history presentation
+- grouped section rendering and navigation
+- compatibility with legacy records and duplicate names
+- grouping controls or view toggles
+- keeping grouping state separate from the underlying persisted history model
+
+**Stories**
+1. **Define the grouping model and user-facing history contract**
+2. **Build grouped history derivations without breaking existing records**
+3. **Render grouped history sections with clear navigation and collapse behavior**
+4. **Support regrouping or filtering without breaking history actions**
+5. **Keep grouped history compatible with insights, backup, and future exports**

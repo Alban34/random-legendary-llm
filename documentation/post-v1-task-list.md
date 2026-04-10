@@ -305,7 +305,7 @@ See also: `documentation/post-v1-delivery-sequence.md`, `documentation/testing-q
 ## Epic 17 — Onboarding and Information Architecture
 
 ### Story 17.1 — Define the first-run onboarding flow and when it should appear
-- [ ] Decide whether onboarding appears on first launch, first interaction, or by user request
+- [x] Decide whether onboarding appears on first launch, first interaction, or by user request
 - [x] Define the onboarding entry, exit, skip, and replay behavior
 - [x] Identify what must be explained in the first-run experience versus the main UI copy
 - [x] Preserve compatibility with returning users and reset behavior
@@ -390,3 +390,99 @@ See also: `documentation/post-v1-delivery-sequence.md`, `documentation/testing-q
 - [x] Update future backlog assumptions that depend on the styling decision
 - [x] **Test:** verify documentation remains aligned with the implemented theme and styling architecture behavior
 - [x] **QC (Automated):** automate QC coverage or consistency checks for documentation references to the chosen styling approach
+
+---
+
+## Additional backlog candidates pending review
+
+These epics are derived from the remaining unchecked items in `documentation/_next-steps.md`.
+
+## Epic 19 — Interface Localization
+
+### Epic-wide validation gate
+- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 19 work complete
+
+### Story 19.1 — Define the localization architecture, supported locales, and fallback rules
+- [ ] Decide the initial supported locales and fallback chain
+- [ ] Define how UI copy, labels, helper text, and validation messages are keyed and stored
+- [ ] Decide whether canonical game names stay source-accurate while UI chrome is localized
+- [ ] Document locale persistence and first-run default behavior
+- [ ] **Test:** verify locale configuration, fallback behavior, and persisted preference rules stay aligned with the documented contract
+- [ ] **QC (Automated):** automate QC coverage for default-locale and fallback-locale startup behavior
+
+### Story 19.2 — Externalize user-facing application strings and formatting rules
+- [ ] Move app-shell strings, tab labels, onboarding copy, notifications, and modal copy behind locale resources
+- [ ] Localize number, date, and score formatting where appropriate
+- [ ] Keep IDs, exported schema fields, and canonical entity names stable where localization should not apply
+- [ ] Preserve accessible labels and semantic announcements across locales
+- [ ] **Test:** verify localized string lookup and formatting cover the main UI surfaces without breaking non-localized data
+- [ ] **QC (Automated):** automate QC coverage for representative screens rendered in at least two locales
+
+### Story 19.3 — Add a language selector and persist the chosen locale
+- [ ] Add a locale-selection control in an appropriate persistent UI location
+- [ ] Save and load the selected locale from browser preferences
+- [ ] Apply the selected locale on startup without leaving mixed-language UI remnants
+- [ ] Keep the locale switch understandable on desktop and mobile layouts
+- [ ] **Test:** verify locale switching updates the rendered UI and persists across reloads
+- [ ] **QC (Automated):** automate QC coverage for switching locales and reloading the app
+
+### Story 19.4 — Verify localized layouts remain readable and accessible
+- [ ] Audit buttons, cards, panels, toasts, and onboarding steps for longer translated copy
+- [ ] Prevent clipped labels, broken wrapping, and ambiguous icon-only states in supported locales
+- [ ] Preserve focus behavior, keyboard navigation, and semantic announcements after translation
+- [ ] Confirm translated empty states and errors remain actionable
+- [ ] **Test:** verify localized layouts tolerate representative long-copy strings and preserve accessibility-critical attributes
+- [ ] **QC (Automated):** automate QC coverage for desktop and mobile layouts in at least one long-text locale
+
+### Story 19.5 — Establish translation maintenance and QA safeguards
+- [ ] Define how new strings are added without leaving untranslated gaps
+- [ ] Add consistency checks for missing translation keys or unexpected fallback churn
+- [ ] Document what content is intentionally not localized in v1 of the feature
+- [ ] Keep backup, history, and analytics behavior compatible with locale-aware rendering
+- [ ] **Test:** verify missing or malformed locale entries fail safely back to the default locale
+- [ ] **QC (Automated):** automate QC coverage for one incomplete locale pack and visible fallback behavior
+
+## Epic 20 — History Grouping and Organization
+
+### Epic-wide validation gate
+- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 20 work complete
+
+### Story 20.1 — Define the grouping model and user-facing history contract
+- [ ] Decide which grouping modes are supported initially, such as mastermind, player count, play mode, or time period
+- [ ] Define the default grouping behavior and whether users can switch or disable grouping
+- [ ] Document how pending and completed results should appear inside grouped sections
+- [ ] Preserve clarity for duplicate mastermind names, legacy records, and sparse histories
+- [ ] **Test:** verify grouping definitions remain stable for representative mixed-history datasets
+- [ ] **QC (Automated):** automate QC coverage for the chosen default grouping on desktop and mobile
+
+### Story 20.2 — Build grouped history derivations without breaking existing records
+- [ ] Add selectors or helpers that transform the flat newest-first history list into grouped sections
+- [ ] Keep within-group ordering deterministic and preserve the current record detail model
+- [ ] Ensure legacy records without newer metadata still group safely
+- [ ] Avoid duplicating records across groups unless explicitly designed
+- [ ] **Test:** verify grouped history derivations for mixed play modes, results, and legacy records
+- [ ] **QC (Automated):** automate QC coverage for one restored or legacy dataset rendered through the grouped view
+
+### Story 20.3 — Render grouped history sections with clear navigation and collapse behavior
+- [ ] Add grouped section headers, counts, and collapse or expand affordances where appropriate
+- [ ] Keep individual game records readable within each group
+- [ ] Preserve responsive layout and keyboard accessibility for nested history interactions
+- [ ] Keep the ungrouped experience understandable if grouping is optional
+- [ ] **Test:** verify grouped rendering and expand-collapse behavior for short and long histories
+- [ ] **QC (Automated):** automate QC coverage for grouped history interaction on desktop and mobile viewports
+
+### Story 20.4 — Support regrouping or filtering without breaking history actions
+- [ ] Add the chosen grouping or sorting controls to the History experience
+- [ ] Ensure result editing, record expansion, and navigation still target the correct game inside grouped views
+- [ ] Preserve newest-first expectations within the active grouping mode unless intentionally overridden
+- [ ] Keep controls understandable when the history is empty or lightly populated
+- [ ] **Test:** verify regrouping or filtering updates the rendered sections without breaking record actions
+- [ ] **QC (Automated):** automate QC coverage for changing grouping modes and editing a result inside a grouped section
+
+### Story 20.5 — Keep grouped history compatible with insights, backup, and future exports
+- [ ] Confirm insights continue to derive from the underlying flat data rather than presentation-only grouping state
+- [ ] Keep backup and restore flows free of grouped UI-only state unless persistence is explicitly chosen
+- [ ] Document how grouping interacts with duplicate names, play modes, and localization-ready labels
+- [ ] Reserve room for future history filters without redesigning the grouped data model
+- [ ] **Test:** verify grouping state does not mutate persisted history records or backup payloads unintentionally
+- [ ] **QC (Automated):** automate QC coverage for grouped history after reload and after backup restore

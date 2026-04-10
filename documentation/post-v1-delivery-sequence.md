@@ -118,6 +118,34 @@ Import and export should target the most stable practical version of the persist
 - fewer schema migrations for exported files
 - better long-term portability guarantees
 
+### 9. Epic 20 — History Grouping and Organization
+**Why ninth**
+This is a targeted presentation improvement on top of a now-stable history, result, insights, and backup model. It adds immediate value for repeat users with larger histories while keeping schema risk low because the grouping state can remain UI-only.
+
+**Primary dependencies**
+- stable history/result model from Epics 11 and 12
+- stable insights expectations from Epic 14
+- confirmed backup behavior from Epic 13 so grouped views do not leak into persisted state
+
+**Expected outcome**
+- easier scanning of larger play histories
+- more flexible history navigation without rewriting stored records
+- clearer boundaries between persisted game data and presentation-only grouping state
+
+### 10. Epic 19 — Interface Localization
+**Why tenth**
+Localization is broader and more cross-cutting than history grouping. Deferring it until the major information architecture and history presentation surfaces have settled reduces churn in translation keys, layout QA, and accessibility copy across the full app.
+
+**Primary dependencies**
+- stable onboarding and shell structure from Epic 17
+- stable theme and layout behavior from Epic 18
+- settled History and Backup information architecture after Epic 20
+
+**Expected outcome**
+- multi-language UI support with clear fallback behavior
+- locale-aware formatting and persistent language preference
+- a more internationally usable app without destabilizing canonical game data or exported schemas
+
 ---
 
 ## Dependency Notes
@@ -126,6 +154,8 @@ Import and export should target the most stable practical version of the persist
 - Epic 13 can be pulled earlier if backup becomes urgent, but doing so will likely require follow-up schema-version work.
 - Epic 18 can be split if the dark-mode toggle is urgent but the CSS-library evaluation is not.
 - Epic 15 can move ahead of Epic 11 only if forced-pick behavior is explicitly scoped to the current one-handed mode.
+- Epic 20 should precede Epic 19 if grouping labels, controls, and empty states are expected to participate in localization, since that avoids translating UI that is about to be restructured.
+- Epic 19 can move ahead of Epic 20 only if localization becomes a higher product priority than history organization and the team accepts likely follow-up translation churn.
 
 ---
 
@@ -146,3 +176,7 @@ Import and export should target the most stable practical version of the persist
 ### Wave 4 — Presentation and portability hardening
 - Epic 18
 - Epic 13
+
+### Wave 5 — History refinement and internationalization
+- Epic 20
+- Epic 19
