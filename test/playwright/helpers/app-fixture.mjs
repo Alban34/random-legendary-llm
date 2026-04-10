@@ -49,11 +49,25 @@ export async function selectTab(page, tabId) {
   await page.locator(`#tab-mobile-${tabId}`).click();
 }
 
+async function ensurePreferenceControlsVisible(page) {
+  const localeSelect = page.locator('#header-locale-select');
+  if (await localeSelect.isVisible()) {
+    return;
+  }
+
+  const toggle = page.locator('[data-action="toggle-mobile-preferences"]');
+  if (await toggle.isVisible()) {
+    await toggle.click();
+  }
+}
+
 export async function selectTheme(page, themeId) {
+  await ensurePreferenceControlsVisible(page);
   await page.locator(`[data-action="set-theme"][data-theme-id="${themeId}"]`).click();
 }
 
 export async function selectLocale(page, localeId) {
+  await ensurePreferenceControlsVisible(page);
   await page.locator('#header-locale-select').selectOption(localeId);
 }
 

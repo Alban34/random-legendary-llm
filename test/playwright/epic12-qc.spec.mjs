@@ -30,8 +30,12 @@ test.describe('Epic 12 automated QC', () => {
     await acceptSetupIntoResultEntry(page, 1);
 
     const editor = page.locator('[data-result-editor]').first();
+    await expect(editor.locator('[data-result-field="outcome"]')).toBeFocused();
     await editor.locator('[data-action="save-game-result"]').click();
     await expect(editor.locator('[data-result-form-error]')).toContainText('Choose Win or Loss');
+    await expect(editor.locator('[data-result-form-error]')).toBeFocused();
+    await expect(editor.locator('[data-result-form-error]')).toHaveAttribute('role', 'alert');
+    await expect(editor.locator('[data-result-field="outcome"]')).toHaveAttribute('aria-invalid', 'true');
 
     await editor.locator('[data-result-field="outcome"]').selectOption('win');
 
@@ -46,6 +50,7 @@ test.describe('Epic 12 automated QC', () => {
 
     const firstHistoryItem = page.locator('#panel-history .history-item').first();
     await expect(page.locator('[data-result-editor]')).toHaveCount(0);
+    await expect(firstHistoryItem.locator('[data-action="edit-game-result"]')).toBeFocused();
     await expect(firstHistoryItem).toContainText('Win · Score 123');
     await expect(firstHistoryItem).toContainText('Won after stabilizing the board.');
 
@@ -60,9 +65,9 @@ test.describe('Epic 12 automated QC', () => {
 
     await page.locator('[data-action="skip-game-result"]').click();
     const firstHistoryItem = page.locator('#panel-history .history-item').first();
+    await expect(firstHistoryItem.locator('[data-action="edit-game-result"]')).toBeFocused();
     await expect(firstHistoryItem).toContainText('Pending result');
 
-    await firstHistoryItem.locator('summary').click();
     await firstHistoryItem.locator('[data-action="edit-game-result"]').click();
     await page.locator('[data-result-field="outcome"]').selectOption('loss');
     await page.locator('[data-result-field="notes"]').fill('Initial result entry.');
@@ -70,19 +75,19 @@ test.describe('Epic 12 automated QC', () => {
     await expect(firstHistoryItem).toContainText('Loss');
     await expect(firstHistoryItem).not.toContainText('Loss · Score');
 
-    await firstHistoryItem.locator('summary').click();
     await firstHistoryItem.locator('[data-action="edit-game-result"]').click();
     await page.locator('[data-result-field="score"]').fill('90');
     await page.locator('[data-action="cancel-result-entry"]').click();
+    await expect(firstHistoryItem.locator('[data-action="edit-game-result"]')).toBeFocused();
     await expect(firstHistoryItem).toContainText('Loss');
     await expect(firstHistoryItem).not.toContainText('Loss · Score');
 
-    await firstHistoryItem.locator('summary').click();
     await firstHistoryItem.locator('[data-action="edit-game-result"]').click();
     await page.locator('[data-result-field="score"]').fill('90');
     await page.locator('[data-result-field="outcome"]').selectOption('win');
     await page.locator('[data-result-field="notes"]').fill('Corrected after recounting the final total.');
     await page.locator('[data-action="save-game-result"]').click();
+    await expect(firstHistoryItem.locator('[data-action="edit-game-result"]')).toBeFocused();
     await expect(firstHistoryItem).toContainText('Win · Score 90');
     await expect(firstHistoryItem).toContainText('Corrected after recounting the final total.');
 

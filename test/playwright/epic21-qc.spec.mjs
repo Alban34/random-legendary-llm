@@ -12,6 +12,7 @@ test.describe('Epic 21 automated QC', () => {
     await gotoApp(page);
 
     await expect(page.locator('#onboarding-shell')).toBeVisible();
+    await expect(page.locator('#panel-browse .browse-hero .button-primary')).toHaveCount(1);
 
     const positions = await page.evaluate(() => {
       const onboarding = document.querySelector('#onboarding-shell');
@@ -34,36 +35,40 @@ test.describe('Epic 21 automated QC', () => {
     expect(positions.onboardingBottom).toBeLessThan(positions.browseHeroTop);
   });
 
-  test('keeps Browse sets full width and removes the Ready Tabs metric', async ({ page }) => {
+  test('keeps Browse sets full width and moves secondary help behind disclosure', async ({ page }) => {
     await gotoApp(page);
     await page.locator('#onboarding-shell [data-action="skip-onboarding"]').click();
     await reloadApp(page);
     await selectTab(page, 'browse');
 
     await expect(page.locator('#panel-browse')).not.toContainText('Ready Tabs');
+    await expect(page.locator('#panel-browse [data-browse-help-disclosure]')).not.toHaveAttribute('open', '');
 
     const layout = await page.evaluate(() => {
       const tabPanel = document.querySelector('#panel-browse');
-      const startHere = document.querySelector('#panel-browse [data-browse-start-here]');
+      const hero = document.querySelector('#panel-browse .browse-hero');
       const browseSets = document.querySelector('#panel-browse [data-browse-sets-panel]');
-      if (!tabPanel || !startHere || !browseSets) {
+      const help = document.querySelector('#panel-browse [data-browse-help-disclosure]');
+      if (!tabPanel || !hero || !browseSets || !help) {
         return null;
       }
 
       const panelRect = tabPanel.getBoundingClientRect();
-      const startRect = startHere.getBoundingClientRect();
+      const heroRect = hero.getBoundingClientRect();
       const setsRect = browseSets.getBoundingClientRect();
       return {
         panelWidth: panelRect.width,
         setsWidth: setsRect.width,
-        sameLeftEdge: Math.abs(startRect.left - setsRect.left) <= 2,
-        stacked: setsRect.top >= startRect.bottom
+        sameLeftEdge: Math.abs(heroRect.left - setsRect.left) <= 2,
+        stacked: setsRect.top >= heroRect.bottom,
+        helpClosed: !help.hasAttribute('open')
       };
     });
 
     expect(layout).not.toBeNull();
     expect(layout.sameLeftEdge).toBe(true);
     expect(layout.stacked).toBe(true);
+    expect(layout.helpClosed).toBe(true);
     expect(layout.setsWidth / layout.panelWidth).toBeGreaterThan(0.9);
   });
 

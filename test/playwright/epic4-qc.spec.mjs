@@ -1,6 +1,25 @@
 import { test, expect } from '@playwright/test';
 
-import { gotoApp, readAppState, reloadApp, selectTab, setViewport } from './helpers/app-fixture.mjs';
+import { gotoApp, readAppState, reloadApp, selectTab, setViewport, updateAppState } from './helpers/app-fixture.mjs';
+
+async function readMobileAnchorMetrics(page, selector) {
+  return page.evaluate((query) => {
+    const element = document.querySelector(query);
+    const nav = document.querySelector('#mobile-tabs');
+    if (!element || !nav) {
+      return null;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const navRect = nav.getBoundingClientRect();
+    return {
+      top: rect.top,
+      bottom: rect.bottom,
+      viewportHeight: window.innerHeight,
+      navTop: navRect.top
+    };
+  }, selector);
+}
 
 test.describe('Epic 4 automated QC', () => {
   test.beforeEach(async ({ page }) => {
@@ -13,12 +32,91 @@ test.describe('Epic 4 automated QC', () => {
     await expect(page.locator('#desktop-tabs')).toBeVisible();
     await expect(page.locator('#mobile-tabs')).toBeHidden();
     await expect(page.locator('#panel-browse')).toBeVisible();
+    await expect(page.locator('#header-locale-select')).toBeVisible();
 
     await setViewport(page, 'mobile');
     await reloadApp(page);
     await expect(page.locator('#desktop-tabs')).toBeHidden();
     await expect(page.locator('#mobile-tabs')).toBeVisible();
     await expect(page.locator('#panel-browse')).toBeVisible();
+    await expect(page.locator('[data-action="toggle-mobile-preferences"]')).toBeVisible();
+
+    const mobileShellMetrics = await page.evaluate(() => {
+      const nav = document.querySelector('#mobile-tabs');
+      const navButtons = [...document.querySelectorAll('#mobile-tabs .tab-button.mobile')];
+      const header = document.querySelector('.app-header');
+      return {
+        navHeight: nav?.getBoundingClientRect().height ?? 0,
+        wrappedRows: new Set(navButtons.map((button) => Math.round(button.getBoundingClientRect().top))).size,
+        headerHeight: header?.getBoundingClientRect().height ?? 0
+      };
+    });
+
+    expect(mobileShellMetrics.wrappedRows).toBe(1);
+    expect(mobileShellMetrics.navHeight).toBeLessThan(96);
+    expect(mobileShellMetrics.headerHeight).toBeLessThan(260);
+  });
+
+  test('trims repeated mobile copy after onboarding while keeping first-use cues and earlier task visibility across major tabs', async ({ page }) => {
+    await setViewport(page, 'mobile');
+    await reloadApp(page);
+
+    await expect(page.locator('.browse-hero-description')).toBeVisible();
+    await page.locator('#panel-browse [data-browse-help-disclosure] summary').click();
+    await expect(page.locator('#panel-browse .browse-help-description')).toBeVisible();
+
+    const firstRunBrowseToolbarMetrics = await readMobileAnchorMetrics(page, '[data-mobile-task-anchor="browse"]');
+    const firstRunBrowseCtaMetrics = await readMobileAnchorMetrics(page, '[data-browse-primary-cta]');
+    expect(firstRunBrowseToolbarMetrics).not.toBeNull();
+    expect(firstRunBrowseCtaMetrics).not.toBeNull();
+
+    await updateAppState(page, (state) => ({
+      ...state,
+      preferences: {
+        ...state.preferences,
+        onboardingCompleted: true,
+        selectedTab: 'browse'
+      }
+    }));
+    await reloadApp(page);
+
+    await expect(page.locator('.browse-hero-description')).toHaveCount(0);
+    await expect(page.locator('.browse-help-description')).toHaveCount(0);
+    await expect(page.locator('.browse-panel-description')).toHaveCount(0);
+
+    const browseToolbarMetrics = await readMobileAnchorMetrics(page, '[data-mobile-task-anchor="browse"]');
+    const browseCtaMetrics = await readMobileAnchorMetrics(page, '[data-browse-primary-cta]');
+    expect(browseToolbarMetrics).not.toBeNull();
+    expect(browseCtaMetrics).not.toBeNull();
+    expect(browseToolbarMetrics.top).toBeLessThan(firstRunBrowseToolbarMetrics.top);
+    expect(browseCtaMetrics.top).toBeLessThan(browseCtaMetrics.navTop);
+
+    await selectTab(page, 'new-game');
+    await expect(page.locator('.new-game-mode-help')).toBeVisible();
+    await expect(page.locator('.new-game-ephemeral-notice')).toHaveCount(0);
+
+    const newGameMetrics = await readMobileAnchorMetrics(page, '[data-mobile-task-anchor="new-game"]');
+    expect(newGameMetrics).not.toBeNull();
+    expect(newGameMetrics.top).toBeLessThan(newGameMetrics.viewportHeight * 0.4);
+    expect(newGameMetrics.top).toBeLessThan(newGameMetrics.navTop);
+
+    await selectTab(page, 'history');
+    await expect(page.locator('.history-panel-description')).toHaveCount(0);
+
+    const historyMetrics = await readMobileAnchorMetrics(page, '[data-history-grouping-controls]');
+    expect(historyMetrics).not.toBeNull();
+    expect(historyMetrics.top).toBeLessThan(historyMetrics.viewportHeight * 0.4);
+    expect(historyMetrics.top).toBeLessThan(historyMetrics.navTop);
+
+    await selectTab(page, 'backup');
+    await expect(page.locator('.backup-panel-description')).toHaveCount(0);
+    await expect(page.locator('.backup-usage-description')).toHaveCount(0);
+    await expect(page.locator('.backup-reuse-notice')).toHaveCount(0);
+
+    const backupMetrics = await readMobileAnchorMetrics(page, '[data-mobile-task-anchor="backup"]');
+    expect(backupMetrics).not.toBeNull();
+    expect(backupMetrics.top).toBeLessThan(backupMetrics.viewportHeight * 0.4);
+    expect(backupMetrics.top).toBeLessThan(backupMetrics.navTop);
   });
 
   test('supports keyboard-only tab navigation and persists the selected tab across reloads', async ({ page }) => {

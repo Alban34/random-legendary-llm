@@ -62,13 +62,16 @@ function syncDebugGlobals(viewModel) {
     confirmResetAllState: viewModel.ui.confirmResetAllState,
     resultEditorRecordId: viewModel.ui.resultEditorRecordId,
     resultDraft: viewModel.ui.resultDraft,
-    resultFormError: viewModel.ui.resultFormError
+    resultFormError: viewModel.ui.resultFormError,
+    resultInvalidFields: viewModel.ui.resultInvalidFields,
+    historyInsightsExpanded: viewModel.ui.historyInsightsExpanded
   };
   window.__ONBOARDING_UI__ = {
     visible: viewModel.ui.onboardingVisible,
     step: viewModel.ui.onboardingStep,
     aboutOpen: viewModel.ui.aboutPanelOpen,
-    completed: viewModel.state.preferences.onboardingCompleted
+    completed: viewModel.state.preferences.onboardingCompleted,
+    mobilePreferencesOpen: viewModel.ui.mobilePreferencesOpen
   };
   window.__PLAY_MODE_UI__ = {
     playerCount: viewModel.ui.selectedPlayerCount,
@@ -132,10 +135,15 @@ async function boot() {
       stagedBackup: null,
       confirmBackupRestoreMode: null,
       lastBackupExportFileName: null,
+      mobilePreferencesOpen: false,
       forcedPicks: createEmptyForcedPicks(),
       resultEditorRecordId: null,
+      resultEditorReturnFocusSelector: null,
       resultDraft: createEmptyResultDraft(),
       resultFormError: null,
+      resultInvalidFields: [],
+      historyExpandedRecordId: null,
+      historyInsightsExpanded: false,
       historyGroupingMode: DEFAULT_HISTORY_GROUPING_MODE,
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
@@ -245,7 +253,9 @@ async function boot() {
       return;
     }
     queueMicrotask(() => {
-      document.querySelector(`[data-action="${actionName}"]`)?.focus();
+      [...document.querySelectorAll(`[data-action="${actionName}"]`)]
+        .find((element) => !element.hidden && element.offsetParent !== null)
+        ?.focus();
     });
   };
 
@@ -254,7 +264,9 @@ async function boot() {
       return;
     }
     queueMicrotask(() => {
-      document.querySelector(selector)?.focus();
+      [...document.querySelectorAll(selector)]
+        .find((element) => !element.hidden && element.offsetParent !== null)
+        ?.focus();
     });
   };
 
@@ -319,28 +331,38 @@ async function boot() {
     viewModel.ui.onboardingVisible = !nextState.preferences.onboardingCompleted;
     viewModel.ui.onboardingStep = 0;
     viewModel.ui.aboutPanelOpen = false;
+    viewModel.ui.mobilePreferencesOpen = false;
     clearForcedPicksState();
     closeResultEditor();
     clearGeneratedSetup();
     clearBackupDraft();
+    viewModel.ui.historyExpandedRecordId = null;
+    viewModel.ui.historyInsightsExpanded = false;
     viewModel.ui.historyGroupingMode = DEFAULT_HISTORY_GROUPING_MODE;
   };
 
   const closeResultEditor = () => {
+    const returnFocusSelector = viewModel.ui.resultEditorReturnFocusSelector;
     viewModel.ui.resultEditorRecordId = null;
+    viewModel.ui.resultEditorReturnFocusSelector = null;
     viewModel.ui.resultDraft = createEmptyResultDraft();
     viewModel.ui.resultFormError = null;
+    viewModel.ui.resultInvalidFields = [];
+    return returnFocusSelector;
   };
 
-  const openResultEditor = (recordId) => {
+  const openResultEditor = (recordId, options = {}) => {
     const record = viewModel.state.history.find((entry) => entry.id === recordId);
     if (!record) {
       return false;
     }
 
     viewModel.ui.resultEditorRecordId = recordId;
+    viewModel.ui.resultEditorReturnFocusSelector = options.returnFocusSelector || `[data-action="edit-game-result"][data-record-id="${recordId}"]`;
     viewModel.ui.resultDraft = normalizeGameResultDraft(record.result);
     viewModel.ui.resultFormError = null;
+    viewModel.ui.resultInvalidFields = [];
+    viewModel.ui.historyExpandedRecordId = recordId;
     return true;
   };
 
@@ -375,6 +397,7 @@ async function boot() {
       currentState.preferences.onboardingCompleted = true;
       return currentState;
     }, actionNotice);
+    focusSelector('[data-browse-primary-cta], [data-action="select-tab"][aria-selected="true"]');
   };
 
   const actions = {
@@ -449,19 +472,23 @@ async function boot() {
       viewModel.ui.lastActionNotice = t('actions.openedWalkthrough');
       if (viewModel.ui.selectedTab !== 'browse') {
         persistSelectedTab('browse', t('actions.replayWalkthrough'));
+        focusSelector('#onboarding-step-heading');
         return;
       }
       rerender();
+      focusSelector('#onboarding-step-heading');
     },
     previousOnboardingStep() {
       viewModel.ui.onboardingStep = Math.max(0, viewModel.ui.onboardingStep - 1);
       viewModel.ui.lastActionNotice = t('actions.previousWalkthrough');
       rerender();
+      focusSelector('#onboarding-step-heading');
     },
     nextOnboardingStep() {
       viewModel.ui.onboardingStep = Math.min(4, viewModel.ui.onboardingStep + 1);
       viewModel.ui.lastActionNotice = t('actions.nextWalkthrough');
       rerender();
+      focusSelector('#onboarding-step-heading');
     },
     openOnboardingTab(tabId) {
       persistSelectedTab(tabId, t('actions.openedWalkthroughTab', { tab: viewModel.locale.getTabLabel(normalizeSelectedTab(tabId)) }));
@@ -537,6 +564,7 @@ async function boot() {
         currentState.preferences.themeId = normalizedThemeId;
         return currentState;
       }, t('actions.appliedTheme', { theme: viewModel.locale.getThemeLabel(normalizedThemeId) }));
+      enqueueToast({ variant: 'success', message: t('actions.appliedTheme', { theme: viewModel.locale.getThemeLabel(normalizedThemeId) }) });
       focusSelector(`[data-action="set-theme"][data-theme-id="${normalizedThemeId}"]`);
     },
     setLocale(localeId) {
@@ -549,7 +577,17 @@ async function boot() {
         currentState.preferences.localeId = normalizedLocaleId;
         return currentState;
       }, t('actions.appliedLocale', { locale: createLocaleTools(normalizedLocaleId).localeLabel }));
+      enqueueToast({ variant: 'success', message: t('actions.appliedLocale', { locale: createLocaleTools(normalizedLocaleId).localeLabel }) });
       focusSelector('#header-locale-select');
+    },
+    toggleMobilePreferences() {
+      viewModel.ui.mobilePreferencesOpen = !viewModel.ui.mobilePreferencesOpen;
+      rerender();
+      if (viewModel.ui.mobilePreferencesOpen) {
+        focusSelector('#header-locale-select, [data-action="set-theme"][aria-pressed="true"]');
+        return;
+      }
+      focusSelector('[data-action="toggle-mobile-preferences"]');
     },
     exportBackup() {
       const payload = createBackupPayload(viewModel.state);
@@ -737,42 +775,68 @@ async function boot() {
         ? t('actions.acceptedLoggedForced')
         : t('actions.acceptedLogged'));
       viewModel.ui.selectedTab = 'history';
-      openResultEditor(acceptedRecordId);
+      openResultEditor(acceptedRecordId, {
+        returnFocusSelector: `[data-action="edit-game-result"][data-record-id="${acceptedRecordId}"]`
+      });
       clearForcedPicksState();
       clearGeneratedSetup();
       rerender();
+      focusSelector('[data-result-field="outcome"]');
       enqueueToast({ variant: 'success', message: t('actions.acceptedToast') });
     },
     editGameResult(recordId) {
-      if (!openResultEditor(recordId)) {
+      if (!openResultEditor(recordId, {
+        returnFocusSelector: `[data-action="edit-game-result"][data-record-id="${recordId}"]`
+      })) {
         return;
       }
 
       viewModel.ui.lastActionNotice = t('actions.openedResultEditor');
       rerender();
+      focusSelector('[data-result-field="outcome"]');
     },
     setResultOutcome(outcome) {
       viewModel.ui.resultDraft.outcome = outcome;
+      const hadValidationState = viewModel.ui.resultFormError || viewModel.ui.resultInvalidFields.length;
       viewModel.ui.resultFormError = null;
+      viewModel.ui.resultInvalidFields = [];
+      if (hadValidationState) {
+        rerender();
+        focusSelector('[data-result-field="outcome"]');
+      }
     },
     setResultScore(score) {
       viewModel.ui.resultDraft.score = score;
+      const hadValidationState = viewModel.ui.resultFormError || viewModel.ui.resultInvalidFields.length;
       viewModel.ui.resultFormError = null;
+      viewModel.ui.resultInvalidFields = [];
+      if (hadValidationState) {
+        rerender();
+        focusSelector('[data-result-field="score"]');
+      }
     },
     setResultNotes(notes) {
       viewModel.ui.resultDraft.notes = notes;
+      const hadValidationState = viewModel.ui.resultFormError || viewModel.ui.resultInvalidFields.length;
       viewModel.ui.resultFormError = null;
+      viewModel.ui.resultInvalidFields = [];
+      if (hadValidationState) {
+        rerender();
+        focusSelector('[data-result-field="notes"]');
+      }
     },
     skipGameResultEntry() {
-      closeResultEditor();
+      const returnFocusSelector = closeResultEditor();
       viewModel.ui.lastActionNotice = t('actions.pendingResult');
       rerender();
+      focusSelector(returnFocusSelector);
       enqueueToast({ variant: 'info', message: t('actions.pendingResultToast') });
     },
     cancelResultEntry() {
-      closeResultEditor();
+      const returnFocusSelector = closeResultEditor();
       viewModel.ui.lastActionNotice = t('actions.closedResultEditor');
       rerender();
+      focusSelector(returnFocusSelector);
     },
     saveGameResult() {
       if (!viewModel.ui.resultEditorRecordId) {
@@ -782,12 +846,23 @@ async function boot() {
       const validation = validateGameResultDraft(viewModel.ui.resultDraft);
       if (!validation.ok) {
         viewModel.ui.resultFormError = validation.errors.map((message) => viewModel.locale.localizeValidationMessage(message)).join(' ');
+        viewModel.ui.resultInvalidFields = validation.errors.flatMap((message) => {
+          if (message.includes('Win or Loss')) {
+            return ['outcome'];
+          }
+          if (message.toLowerCase().includes('score')) {
+            return ['score'];
+          }
+          return [];
+        });
         viewModel.ui.lastActionNotice = t('actions.finishResultFields');
         rerender();
+        focusSelector('[data-result-form-error]');
         return;
       }
 
       const activeRecordId = viewModel.ui.resultEditorRecordId;
+      const returnFocusSelector = viewModel.ui.resultEditorReturnFocusSelector;
       const wasPending = viewModel.state.history.find((record) => record.id === activeRecordId)?.result?.status !== 'completed';
       applyStateUpdate((currentState) => updateGameResult(currentState, {
         recordId: activeRecordId,
@@ -800,7 +875,13 @@ async function boot() {
         : t('actions.savedCorrectedResult'));
       closeResultEditor();
       rerender();
+      focusSelector(returnFocusSelector);
       enqueueToast({ variant: 'success', message: wasPending ? t('actions.savedResultToast') : t('actions.savedCorrectedResultToast') });
+    },
+    toggleHistoryInsights() {
+      viewModel.ui.historyInsightsExpanded = !viewModel.ui.historyInsightsExpanded;
+      rerender();
+      focusSelector('[data-action="toggle-history-insights"]');
     },
     resetUsageCategory(category) {
       viewModel.ui.confirmResetAllState = false;

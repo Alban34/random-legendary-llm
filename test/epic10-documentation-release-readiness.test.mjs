@@ -18,6 +18,7 @@ const filePaths = {
   architecture: path.join(rootDir, 'documentation', 'architecture.md'),
   dataModel: path.join(rootDir, 'documentation', 'data-model.md'),
   setupRules: path.join(rootDir, 'documentation', 'setup-rules.md'),
+  uiDesign: path.join(rootDir, 'documentation', 'ui-design.md'),
   taskList: path.join(rootDir, 'documentation', 'task-list.md'),
   testingStrategy: path.join(rootDir, 'documentation', 'testing-qc-strategy.md'),
   roadmap: path.join(rootDir, 'documentation', 'roadmap.md'),
@@ -35,6 +36,7 @@ before(async () => {
     architecture,
     dataModel,
     setupRules,
+    uiDesign,
     taskList,
     testingStrategy,
     roadmap,
@@ -46,6 +48,7 @@ before(async () => {
     fs.readFile(filePaths.architecture, 'utf8'),
     fs.readFile(filePaths.dataModel, 'utf8'),
     fs.readFile(filePaths.setupRules, 'utf8'),
+    fs.readFile(filePaths.uiDesign, 'utf8'),
     fs.readFile(filePaths.taskList, 'utf8'),
     fs.readFile(filePaths.testingStrategy, 'utf8'),
     fs.readFile(filePaths.roadmap, 'utf8'),
@@ -58,6 +61,7 @@ before(async () => {
     architecture,
     dataModel,
     setupRules,
+    uiDesign,
     taskList,
     testingStrategy,
     roadmap,
@@ -101,6 +105,15 @@ test('Epic 10 architecture and data-model docs describe the shipped runtime laye
   APP_TABS.forEach((tab) => {
     assert.match(docs.architecture, new RegExp(tab.id));
   });
+
+  assert.match(docs.uiDesign, /theme and locale/i);
+  assert.match(docs.uiDesign, /5 equal-width items/i);
+  assert.match(docs.uiDesign, /first-run walkthrough/i);
+  assert.match(docs.uiDesign, /Accept & Log/i);
+  assert.match(docs.uiDesign, /Forced Picks/i);
+  assert.match(docs.uiDesign, /pending and completed results/i);
+  assert.match(docs.uiDesign, /Desktop: visible below grouped records/i);
+  assert.match(docs.uiDesign, /Mobile: collapsed behind a reveal button/i);
 });
 
 test('Epic 10 setup-rules documentation matches the runtime setup templates and acceptance behavior', () => {
@@ -144,6 +157,11 @@ test('Epic 10 final documentation files are marked complete and historical plann
   assert.match(docs.roadmap, /Documentation .*Release Readiness/i);
   assert.match(docs.roadmap, /README matches shipped behavior/i);
   assert.match(docs.roadmap, /future enhancements/i);
+  assert.match(docs.roadmap, /Historical note/i);
+  assert.match(docs.roadmap, /current shipped UX baseline/i);
+
+  assert.match(docs.taskList, /Historical note/i);
+  assert.match(docs.taskList, /current shipped UX contract/i);
 
   assert.match(docs.clarifications, /Historical note/i);
   assert.match(docs.createProject, /Historical note/i);

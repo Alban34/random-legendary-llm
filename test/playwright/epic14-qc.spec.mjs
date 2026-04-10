@@ -101,6 +101,7 @@ test.describe('Epic 14 automated QC', () => {
     await setViewport(page, 'mobile');
     await selectTab(page, 'history');
     await expect(page.locator('[data-history-insights]')).toBeVisible();
+    await page.locator('[data-action="toggle-history-insights"]').click();
     await expect(heroRankings).toContainText('Black Widow ·');
   });
 

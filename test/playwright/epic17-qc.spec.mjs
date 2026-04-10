@@ -56,8 +56,10 @@ test.describe('Epic 17 automated QC', () => {
     const walkthrough = page.locator('#onboarding-shell');
     await expect(walkthrough).toBeVisible();
 
+    await walkthrough.locator('[data-action="next-onboarding-step"]').focus();
     await walkthrough.locator('[data-action="next-onboarding-step"]').click();
     await expect(walkthrough).toContainText('Step 2 of 5');
+    await expect(walkthrough.locator('#onboarding-step-heading')).toBeFocused();
 
     await walkthrough.locator('[data-action="open-onboarding-tab"]').click();
     await expect(page.locator('#panel-collection')).toBeVisible();
@@ -70,6 +72,7 @@ test.describe('Epic 17 automated QC', () => {
     await walkthrough.locator('[data-action="next-onboarding-step"]').click();
     await walkthrough.locator('[data-action="next-onboarding-step"]').click();
     await expect(walkthrough).toContainText('Step 5 of 5');
+    await expect(walkthrough.locator('#onboarding-step-heading')).toBeFocused();
     await expect(walkthrough).toContainText('Protect your collection with Backup');
     await walkthrough.locator('[data-action="open-onboarding-tab"]').click();
     await expect(page.locator('#panel-backup')).toBeVisible();

@@ -63,13 +63,13 @@ This keeps the app easy to host statically while making Epic 2+ work much easier
 Typical flow:
 
 1. Open the app through a static HTTP server.
-2. Use the shared header controls to choose your preferred language and theme.
-3. Use the **Browse** tab to inspect included sets and add them to your collection.
+2. Use the first-run walkthrough if needed, then use the shared header controls to choose your preferred language and theme.
+3. Use the **Browse** tab to inspect included sets, replay onboarding, open About, and add sets to your collection.
 4. Review totals and legality warnings in **Collection**.
 5. Go to **New Game** to choose player count, optionally enable Advanced Solo for 1 player, then **Generate Setup**.
 6. Use **Regenerate** as much as you want without changing persisted history or usage.
-7. Use **Accept & Log** when you want the current setup to count toward usage tracking and game history.
-8. Review accepted games in **History**, regroup them by mastermind, players, play mode, or an ungrouped view, and inspect insights below the grouped history list.
+7. Use **Accept & Log** when you want the current setup to count toward usage tracking and game history, then complete or skip the immediate result-entry editor.
+8. Review accepted games in **History**, regroup them by mastermind, players, play mode, or an ungrouped view, edit pending or completed results, and inspect insights after the grouped history list.
 9. Use **Backup** to export a portable JSON backup, reset usage buckets, or import one with Merge or Replace restore modes.
 
 Important behavior:

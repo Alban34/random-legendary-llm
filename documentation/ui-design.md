@@ -42,7 +42,7 @@ Typography roles are governed by `documentation/design-system.md`.
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  ⚡ LEGENDARY RANDOMIZER       [nav tabs desktop]    │  ← sticky header, --bg-nav
+│  ⚡ LEGENDARY RANDOMIZER  [theme][locale][5 tabs]   │  ← sticky header, --bg-nav
 ├─────────────────────────────────────────────────────┤
 │                                                     │
 │   [Active Tab Panel]                                │  ← scrollable, --bg-app
@@ -55,12 +55,29 @@ Typography roles are governed by `documentation/design-system.md`.
 
 ### Desktop Navigation (≥ 768px)
 - Inline tabs in the header, right-aligned
+- Shared header preferences stay visible beside the tab row
+- Primary destinations are Browse, Collection, New Game, History, and Backup
 - Active tab: `primary` underline + stronger text weight
 - Inactive tab: `text-secondary`, hover lifts toward `text-primary`
 
 ### Mobile Navigation (< 768px)
-- Fixed bottom tab bar, 4 equal-width items with icon + label
+- Fixed bottom tab bar, 5 equal-width items with icon + label
+- Theme and locale controls move behind a lighter header disclosure instead of staying permanently expanded
 - Active item: primary-accent text, icon, and selection treatment that remains identifiable without color alone
+
+### Shared Header Controls
+- Theme and locale are part of the baseline shell, not optional polish
+- Desktop: theme buttons and locale select remain visible in the shared header
+- Mobile: a compact preferences toggle reveals theme and locale controls on demand
+- Preference changes persist immediately, restore focus to the triggering control after rerender, and surface a concise toast confirmation from any active tab
+
+### First-Run Onboarding and About
+- The first-run walkthrough appears automatically until it is skipped or completed
+- The walkthrough can be replayed from Browse at any time
+- Step progression keeps keyboard focus inside the walkthrough and the current step heading is a valid focus target after each transition
+- Completing or skipping the walkthrough does not automatically re-open it on later launches
+- A full reset clears the onboarding-completed preference and restores the first-run walkthrough
+- About remains hidden by default and is opened intentionally from Browse
 
 ---
 
@@ -78,6 +95,8 @@ Typography roles are governed by `documentation/design-system.md`.
 ## Tab 1 — Browse Extensions
 
 ```
+[Hero with one dominant CTA]
+[Optional "Start here" disclosure]
 [Search / filter bar]                [Type filter: All | Base | Large | Small | Standalone]
 
 ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
@@ -109,10 +128,12 @@ Typography roles are governed by `documentation/design-system.md`.
 ```
 
 **Interactions:**
+- First-run Browse keeps one dominant next action and moves secondary orientation into a collapsed help disclosure
+- Returning-user Browse keeps replay/About access but brings filters and the set catalog closer to the top of the page
 - Click card header → expand/collapse detail panel (accordion)
-- "Add to Collection" → filled button style, label changes to "✓ In Collection", button changes to outlined "Remove"
+- "Add to Collection" toggles ownership directly from Browse and stays synchronized with Collection
 - Type filter pills filter the grid
-- Search bar filters by set name
+- Search bar filters by set name or alias
 
 ---
 
@@ -154,7 +175,11 @@ Typography roles are governed by `documentation/design-system.md`.
   │  Player Count                                   │
   │  [1]  [2]  [3]  [4]  [5]                       │
   │                                                 │
-  │  [  ] Advanced Solo  (1-player only)            │
+  │  Play Mode                                      │
+  │  [Standard Solo] [Advanced Solo] [Two-Handed]  │
+  │                                                 │
+  │  Forced Picks                                   │
+  │  [Scheme] [Mastermind] [Hero] ...               │
   │                                                 │
   │  Setup: 3 Heroes · 1 Villain Group ·            │
   │         1 Henchman Group · 25 Wounds            │
@@ -189,14 +214,22 @@ Typography roles are governed by `documentation/design-system.md`.
   Wound Stack: 25
 
   [ 🔄 Regenerate ]    [ ✅ Accept & Log Game ]
+
+  ── Result Entry (opened from Accept & Log) ───────
+  Outcome: [Win/Loss]
+  Score:   [number]
+  Notes:   [optional]
+  [Save Result] [Skip for now] [Cancel]
 ```
 
 **Interactions:**
 - Player count buttons are mutually exclusive (styled like toggle buttons)
-- Advanced Solo checkbox only enabled when 1 player selected
+- 1-player mode exposes Standard Solo, Advanced Solo, and Two-Handed Solo
+- Forced picks are one-shot setup constraints that remain active for Generate and Regenerate, then clear after a successful Accept & Log or reload
 - "Generate Setup" validates collection size before randomizing
 - "Regenerate" re-runs the randomizer (does NOT log the previous result, does NOT mark cards as used until Accept)
-- "Accept & Log Game" saves the result to history and marks all cards as used
+- "Accept & Log Game" saves the setup to history, opens immediate result entry in History, and marks the setup as used
+- Result entry supports pending-result flows, later correction from History, focus moves into the editor on open, and invalid saves announce recoverable errors before returning focus to the correct field
 - ★ marks the forced Mastermind villain group
 
 ---
@@ -209,13 +242,17 @@ Typography roles are governed by `documentation/design-system.md`.
   ── Game History ────────────────────────────────────
 
   ▼  Dr. Doom                           [2 games]
-    ▼  Game #7 — Apr 9, 2026 · 2 Players
+    ▼  Accepted Apr 9, 2026 · 2 Players · Win · Score 77
       Mastermind: Dr. Doom  ·  Scheme: Secret Invasion...
       Heroes: Iron Man, Wolverine, Thor, Captain America, Storm
-    ▶  Game #2 — Apr 2, 2026 · 1 Player
+      [Edit result]
+    ▶  Accepted Apr 2, 2026 · 1 Player · Pending result
 
   ▶  Magneto                            [1 game]
-  ...
+
+  ── Insights ───────────────────────────────────────
+  Desktop: visible below grouped records
+  Mobile: collapsed behind a reveal button until needed
 ```
 
 **Interactions:**
@@ -223,6 +260,9 @@ Typography roles are governed by `documentation/design-system.md`.
 - Group headers can collapse or expand their records for faster scanning of long histories
 - History items collapse/expand on click
 - History is ordered newest-first
+- Accepted records stay primary; insights are secondary and appear after grouped records
+- Pending and completed results are both supported, and completed results can be corrected later
+- Opening result entry from History moves focus into the active editor, invalid saves announce errors with field-level invalid state, and save/skip/cancel return focus to the originating record action
 
 ---
 

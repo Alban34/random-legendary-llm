@@ -5,6 +5,10 @@ STATUS: Approved
 ## Overview
 A static-hosted single-page application (`index.html` + project-owned CSS, JS modules, and data assets) that lets users browse all Legendary: Marvel sets, manage their personal collection, generate legal randomized game setups, accept and log them into persistent history, review usage freshness, and reset stored state safely.
 
+Historical note:
+- This roadmap is a delivery record, not the authoritative current UX contract.
+- Use `documentation/ux-alignment/task-list.md`, `documentation/ux-alignment/epics.md`, and `documentation/ui-design.md` for the current shipped UX baseline.
+
 ---
 
 ## Milestone 1 — Data Compilation ✅ (Documentation Phase)
@@ -43,7 +47,7 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 
 **Deliverables:**
 - Sticky header with logo + tab navigation
-- Four `<section>` panels (Browse, Collection, New Game, History)
+- Five `<section>` panels (Browse, Collection, New Game, History, Backup) plus shared header theme/locale controls
 - Mobile-first responsive CSS with dark Marvel theme
 
 **Acceptance Criteria:**
@@ -156,5 +160,4 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 - Print-friendly setup summary
 - Card-level tracking within hero decks
 - PWA (offline install, service worker)
-- Dark/light theme toggle
 

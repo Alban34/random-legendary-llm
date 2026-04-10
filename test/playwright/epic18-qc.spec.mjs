@@ -89,6 +89,23 @@ test.describe('Epic 18 automated QC', () => {
     expect(reloadedTheme.colorScheme).toBe('light');
   });
 
+  test('uses a lighter mobile preference pattern and confirms theme and locale changes outside Collection', async ({ page }) => {
+    await setViewport(page, 'mobile');
+    await reloadApp(page);
+    await selectTab(page, 'history');
+
+    const preferenceToggle = page.locator('[data-action="toggle-mobile-preferences"]');
+    await expect(preferenceToggle).toBeVisible();
+    await preferenceToggle.click();
+
+    await selectTheme(page, 'light');
+    await expect(page.locator('#toast-region')).toContainText('Applied the Light theme.');
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toHaveAttribute('aria-pressed', 'true');
+
+    await selectLocale(page, 'fr-FR');
+    await expect(page.locator('#toast-region')).toContainText('Français');
+  });
+
   test('keeps primary screens legible across both supported themes on desktop and mobile', async ({ page }) => {
     await seedAllOwnedState(page);
     await selectTab(page, 'new-game');

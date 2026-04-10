@@ -53,6 +53,7 @@ test('Design system rollout adds reduced-motion and focus-restoration guardrails
   assert.match(shellCss, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(shellCss, /\.button:hover,[\s\S]*\.set-card:hover,[\s\S]*\.collection-row:hover\s*\{[\s\S]*transform:\s*none;/);
   assert.match(shellCss, /\.collection-row:focus-within,[\s\S]*\.history-item:focus-within,[\s\S]*\.history-group:focus-within/);
+  assert.match(rendererSource, /role="alert"[\s\S]*data-result-form-error/);
 
   assert.match(browserEntrySource, /const focusSelector = \(selector\) =>/);
   assert.match(browserEntrySource, /focusSelector\(`\[data-action="set-theme"\]\[data-theme-id="\$\{normalizedThemeId\}"\]`\);/);

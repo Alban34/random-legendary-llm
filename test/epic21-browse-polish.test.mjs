@@ -27,7 +27,8 @@ before(async () => {
 test('Epic 21 moves the onboarding shell above the tab panels and removes the low-value Ready Tabs metric', () => {
   assert.match(indexHtml, /<section class="stack gap-md" id="diagnostics-shell"><\/section>[\s\S]*<div class="tab-panel-shell">/);
   assert.doesNotMatch(rendererSource, /Ready Tabs/);
-  assert.match(rendererSource, /data-browse-start-here/);
+  assert.match(rendererSource, /data-browse-help-disclosure/);
+  assert.match(rendererSource, /data-browse-primary-cta/);
   assert.match(rendererSource, /data-browse-sets-panel/);
   assert.match(rendererSource, /browse-panel-full-width/);
 });

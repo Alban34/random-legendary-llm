@@ -37,6 +37,54 @@ test.describe('Epic 20 automated QC', () => {
     await expect(page.locator('[data-history-group-id]').first()).toBeVisible();
   });
 
+  test('keeps grouped records ahead of insights on desktop and mobile', async ({ page }) => {
+    await acceptSetup(page, 1, 'standard');
+    await page.locator('[data-action="skip-game-result"]').click();
+    await acceptSetup(page, 2, 'standard');
+    await page.locator('[data-action="skip-game-result"]').click();
+
+    await selectTab(page, 'history');
+    const desktopLayout = await page.evaluate(() => {
+      const firstGroup = document.querySelector('[data-history-group-id], .history-item');
+      const insights = document.querySelector('[data-history-insights]');
+      if (!firstGroup || !insights) {
+        return null;
+      }
+
+      return {
+        firstGroupTop: firstGroup.getBoundingClientRect().top,
+        insightsTop: insights.getBoundingClientRect().top
+      };
+    });
+
+    expect(desktopLayout).not.toBeNull();
+    expect(desktopLayout.firstGroupTop).toBeLessThan(desktopLayout.insightsTop);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload();
+    await page.waitForFunction(() => Boolean(window.__EPIC1) && Boolean(window.__APP_STATE__));
+    await selectTab(page, 'history');
+
+    const mobileLayout = await page.evaluate(() => {
+      const firstGroup = document.querySelector('[data-history-group-id], .history-item');
+      const insights = document.querySelector('[data-history-insights]');
+      const toggle = document.querySelector('[data-action="toggle-history-insights"]');
+      if (!firstGroup || !insights || !toggle) {
+        return null;
+      }
+
+      return {
+        firstGroupTop: firstGroup.getBoundingClientRect().top,
+        insightsTop: insights.getBoundingClientRect().top,
+        toggleLabel: toggle.textContent
+      };
+    });
+
+    expect(mobileLayout).not.toBeNull();
+    expect(mobileLayout.firstGroupTop).toBeLessThan(mobileLayout.insightsTop);
+    expect(mobileLayout.toggleLabel.length).toBeGreaterThan(0);
+  });
+
   test('switches grouping modes without mutating persisted history', async ({ page }) => {
     await acceptSetup(page, 1, 'standard');
     await page.locator('[data-action="skip-game-result"]').click();

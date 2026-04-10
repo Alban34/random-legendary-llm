@@ -2,6 +2,10 @@
 
 STATUS: Approved
 
+Historical note:
+- This file records the original implementation backlog and completion history.
+- For the current shipped UX contract and active alignment work, use `documentation/ux-alignment/task-list.md` and `documentation/ui-design.md`.
+
 ## Purpose
 
 This file is the working checklist for implementation.
@@ -189,9 +193,9 @@ See also: `documentation/testing-qc-strategy.md`
 
 ### Story 4.1 — Expand the base HTML application shell
 - [x] Create page structure and root container
-- [x] Add four main tab panels
+- [x] Add five main tab panels
 - [x] Add shared header area
-- [x] **Test:** verify all four panels render and the default panel is correct
+- [x] **Test:** verify all five panels render and the default panel is correct
 - [x] **QC (Automated):** automate QC coverage for the shell on desktop width and mobile width
 
 ### Story 4.2 — Implement responsive tab navigation for desktop and mobile

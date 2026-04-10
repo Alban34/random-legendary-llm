@@ -42,27 +42,30 @@ function getLocale(viewModel) {
 function renderHistoryResultEditor(summary, ui) {
   const locale = ui.locale;
   const isPending = !isCompletedGameResult(summary.result);
+  const errorId = `result-form-error-${summary.id}`;
+  const outcomeInvalid = ui.resultInvalidFields.includes('outcome');
+  const scoreInvalid = ui.resultInvalidFields.includes('score');
   const errorMarkup = ui.resultFormError
-    ? `<div class="notice warning" data-result-form-error>${escapeHtml(ui.resultFormError)}</div>`
+    ? `<div class="notice warning" id="${errorId}" role="alert" aria-live="assertive" tabindex="-1" data-result-form-error>${escapeHtml(ui.resultFormError)}</div>`
     : '';
 
   return `
     <section class="result-card history-result-editor" data-result-editor="${summary.id}">
-      <h3>${isPending ? locale.t('history.resultEditor.addTitle') : locale.t('history.resultEditor.editTitle')}</h3>
+      <h3 id="result-editor-heading-${summary.id}" tabindex="-1">${isPending ? locale.t('history.resultEditor.addTitle') : locale.t('history.resultEditor.editTitle')}</h3>
       <p class="muted">${isPending
         ? locale.t('history.resultEditor.pendingDescription')
         : locale.t('history.resultEditor.editDescription')}</p>
       ${errorMarkup}
       <div class="stack gap-sm">
         <label for="result-outcome-${summary.id}"><strong>${locale.t('history.resultEditor.outcome')}</strong></label>
-        <select id="result-outcome-${summary.id}" class="text-input" data-result-field="outcome">
+        <select id="result-outcome-${summary.id}" class="text-input" data-result-field="outcome" ${outcomeInvalid ? 'aria-invalid="true"' : ''} ${outcomeInvalid ? `aria-describedby="${errorId}"` : ''}>
           <option value="">${locale.t('history.resultEditor.chooseOutcome')}</option>
           ${GAME_OUTCOME_OPTIONS.map((option) => `<option value="${option.id}" ${ui.resultDraft.outcome === option.id ? 'selected' : ''}>${locale.getOutcomeLabel(option.id)}</option>`).join('')}
         </select>
       </div>
       <div class="stack gap-sm">
         <label for="result-score-${summary.id}"><strong>${locale.t('history.resultEditor.score')}</strong> <span class="muted">${locale.t('history.resultEditor.scoreHint')}</span></label>
-        <input id="result-score-${summary.id}" class="text-input" data-result-field="score" type="number" min="0" step="1" inputmode="numeric" value="${escapeHtml(ui.resultDraft.score)}" placeholder="0" />
+        <input id="result-score-${summary.id}" class="text-input" data-result-field="score" type="number" min="0" step="1" inputmode="numeric" value="${escapeHtml(ui.resultDraft.score)}" placeholder="0" ${scoreInvalid ? 'aria-invalid="true"' : ''} ${scoreInvalid ? `aria-describedby="${errorId}"` : ''} />
       </div>
       <div class="stack gap-sm">
         <label for="result-notes-${summary.id}"><strong>${locale.t('history.resultEditor.notes')}</strong> <span class="muted">${locale.t('history.resultEditor.optional')}</span></label>
@@ -89,7 +92,7 @@ function formatHistoryEntry(record, bundle, ui) {
   const resultLabel = locale.formatResultStatus(summary.result);
 
   return `
-    <details class="history-item" data-history-record-id="${summary.id}" ${isEditing ? 'open' : ''}>
+    <details class="history-item" data-history-record-id="${summary.id}" ${(isEditing || ui.historyExpandedRecordId === summary.id) ? 'open' : ''}>
       <summary>
         <strong>${summary.mastermindName}</strong>
         <span class="pill">${playerLabel}</span>
@@ -127,6 +130,7 @@ function renderHistoryGroupingControls(activeMode, locale) {
             data-action="set-history-grouping"
             data-history-grouping-mode="${mode.id}"
             aria-pressed="${activeMode === mode.id}"
+            aria-label="${locale.t('history.groupBy')} ${locale.getHistoryGroupingLabel(mode.id)}. ${locale.t('history.groupingNotice')}"
           >
             ${locale.getHistoryGroupingLabel(mode.id)}
           </button>
@@ -425,8 +429,10 @@ function renderBackupPreview(ui, locale) {
   `;
 }
 
-function renderInsightsDashboard(viewModel) {
+function renderInsightsDashboard(viewModel, options = {}) {
   const locale = getLocale(viewModel);
+  const compactViewport = Boolean(options.compactViewport);
+  const expanded = compactViewport ? Boolean(viewModel.ui.historyInsightsExpanded) : true;
   const dashboard = buildInsightsDashboard(viewModel.bundle.runtime, viewModel.state, { limit: 3 });
   const { outcome, usage, freshness, collectionCoverage } = dashboard;
   const scoredWindow = Math.min(outcome.scoredGames, 5);
@@ -448,8 +454,80 @@ function renderInsightsDashboard(viewModel) {
     });
   }
 
+  const detailMarkup = `
+    <div class="summary-grid insight-summary-grid">
+      <article class="summary-card" data-insight-card="games-logged">
+        <div class="muted">${locale.t('history.insights.gamesLogged')}</div>
+        <div class="metric-sm">${outcome.totalGames}</div>
+      </article>
+      <article class="summary-card" data-insight-card="win-rate">
+        <div class="muted">${locale.t('history.insights.winRate')}</div>
+        <div class="metric-sm">${formatInsightMetric(outcome.winRate, { suffix: '%' })}</div>
+      </article>
+      <article class="summary-card" data-insight-card="pending-results">
+        <div class="muted">${locale.t('history.insights.pendingResults')}</div>
+        <div class="metric-sm">${outcome.pendingResults}</div>
+      </article>
+      <article class="summary-card" data-insight-card="average-score">
+        <div class="muted">${locale.t('history.insights.averageScore')}</div>
+        <div class="metric-sm">${formatInsightMetric(outcome.averageScore)}</div>
+      </article>
+      <article class="summary-card" data-insight-card="best-score">
+        <div class="muted">${locale.t('history.insights.bestScore')}</div>
+        <div class="metric-sm">${formatInsightMetric(outcome.bestScore)}</div>
+      </article>
+      <article class="summary-card" data-insight-card="fresh-pool">
+        <div class="muted">${locale.t('history.insights.freshPool')}</div>
+        <div class="metric-sm">${freshness.totalNeverPlayed}/${freshness.totalEntitiesTracked}</div>
+      </article>
+      <article class="summary-card" data-insight-card="user-collection-played">
+        <div class="muted">${locale.t('history.insights.userCollectionPlayed')}</div>
+        <div class="metric-sm">${formatInsightMetric(collectionCoverage.userCollection.playedPercent, { suffix: '%' })}</div>
+        <div class="muted">${collectionCoverage.userCollection.played}/${collectionCoverage.userCollection.total}</div>
+      </article>
+      <article class="summary-card" data-insight-card="overall-collection-played">
+        <div class="muted">${locale.t('history.insights.overallCollectionPlayed')}</div>
+        <div class="metric-sm">${formatInsightMetric(collectionCoverage.overallCollection.playedPercent, { suffix: '%' })}</div>
+        <div class="muted">${collectionCoverage.overallCollection.played}/${collectionCoverage.overallCollection.total}</div>
+      </article>
+      <article class="summary-card" data-insight-card="missing-extensions">
+        <div class="muted">${locale.t('history.insights.missingExtensions')}</div>
+        <div class="metric-sm">${formatInsightMetric(collectionCoverage.missingExtensions.missingPercent, { suffix: '%' })}</div>
+        <div class="muted">${collectionCoverage.missingExtensions.missing}/${collectionCoverage.missingExtensions.total} ${locale.t('history.insights.notOwned')}</div>
+      </article>
+    </div>
+    <div class="two-col insight-coverage-grid">
+      <article class="result-card insight-ranking-card" data-insight-coverage-group="user-collection">
+        <h3>${locale.t('history.insights.userCoverage')}</h3>
+        <div class="muted">${locale.t('history.insights.userCoverageDescription')}</div>
+        ${renderCoverageList(collectionCoverage.userCollection.byType, 'playedPercent', locale)}
+      </article>
+      <article class="result-card insight-ranking-card" data-insight-coverage-group="overall-collection">
+        <h3>${locale.t('history.insights.overallCoverage')}</h3>
+        <div class="muted">${locale.t('history.insights.overallCoverageDescription')}</div>
+        ${renderCoverageList(collectionCoverage.overallCollection.byType, 'playedPercent', locale)}
+      </article>
+    </div>
+    <div class="two-col insight-ranking-grid">
+      ${usage.map((category) => `
+        <article class="result-card insight-ranking-card" data-insight-ranking-category="${category.category}">
+          <h3>${category.label}</h3>
+          <div class="muted">${locale.t('history.insights.playedSummary', { used: locale.formatNumber(category.used), total: locale.formatNumber(category.total), neverPlayed: locale.formatNumber(category.neverPlayed) })}</div>
+          <div class="stack gap-sm insight-ranking-section">
+            <strong>${locale.t('history.insights.mostPlayed')}</strong>
+            ${renderInsightRankingList(category.mostPlayed, locale.t('history.insights.noneMostPlayed', { label: category.label.toLowerCase() }), locale)}
+          </div>
+          <div class="stack gap-sm insight-ranking-section">
+            <strong>${locale.t('history.insights.leastPlayed')}</strong>
+            ${renderInsightRankingList(category.leastPlayed, locale.t('history.insights.noneLeastPlayed', { label: category.label.toLowerCase() }), locale)}
+          </div>
+        </article>
+      `).join('')}
+    </div>
+  `;
+
   return `
-    <section class="panel" data-history-insights>
+    <section class="panel history-insights-shell ${compactViewport ? 'compact' : 'expanded'}" data-history-insights>
       <div class="row space-between wrap gap-md align-center">
         <div>
           <h2>${locale.t('history.insights.title')}</h2>
@@ -457,76 +535,9 @@ function renderInsightsDashboard(viewModel) {
         </div>
         <div class="muted insight-outcome-summary">${locale.t('history.insights.summary', { wins: locale.formatNumber(outcome.wins), losses: locale.formatNumber(outcome.losses), pending: locale.formatNumber(outcome.pendingResults), scored: locale.formatNumber(outcome.scoredGames) })}</div>
       </div>
-      <div class="summary-grid insight-summary-grid">
-        <article class="summary-card" data-insight-card="games-logged">
-          <div class="muted">${locale.t('history.insights.gamesLogged')}</div>
-          <div class="metric-sm">${outcome.totalGames}</div>
-        </article>
-        <article class="summary-card" data-insight-card="win-rate">
-          <div class="muted">${locale.t('history.insights.winRate')}</div>
-          <div class="metric-sm">${formatInsightMetric(outcome.winRate, { suffix: '%' })}</div>
-        </article>
-        <article class="summary-card" data-insight-card="pending-results">
-          <div class="muted">${locale.t('history.insights.pendingResults')}</div>
-          <div class="metric-sm">${outcome.pendingResults}</div>
-        </article>
-        <article class="summary-card" data-insight-card="average-score">
-          <div class="muted">${locale.t('history.insights.averageScore')}</div>
-          <div class="metric-sm">${formatInsightMetric(outcome.averageScore)}</div>
-        </article>
-        <article class="summary-card" data-insight-card="best-score">
-          <div class="muted">${locale.t('history.insights.bestScore')}</div>
-          <div class="metric-sm">${formatInsightMetric(outcome.bestScore)}</div>
-        </article>
-        <article class="summary-card" data-insight-card="fresh-pool">
-          <div class="muted">${locale.t('history.insights.freshPool')}</div>
-          <div class="metric-sm">${freshness.totalNeverPlayed}/${freshness.totalEntitiesTracked}</div>
-        </article>
-        <article class="summary-card" data-insight-card="user-collection-played">
-          <div class="muted">${locale.t('history.insights.userCollectionPlayed')}</div>
-          <div class="metric-sm">${formatInsightMetric(collectionCoverage.userCollection.playedPercent, { suffix: '%' })}</div>
-          <div class="muted">${collectionCoverage.userCollection.played}/${collectionCoverage.userCollection.total}</div>
-        </article>
-        <article class="summary-card" data-insight-card="overall-collection-played">
-          <div class="muted">${locale.t('history.insights.overallCollectionPlayed')}</div>
-          <div class="metric-sm">${formatInsightMetric(collectionCoverage.overallCollection.playedPercent, { suffix: '%' })}</div>
-          <div class="muted">${collectionCoverage.overallCollection.played}/${collectionCoverage.overallCollection.total}</div>
-        </article>
-        <article class="summary-card" data-insight-card="missing-extensions">
-          <div class="muted">${locale.t('history.insights.missingExtensions')}</div>
-          <div class="metric-sm">${formatInsightMetric(collectionCoverage.missingExtensions.missingPercent, { suffix: '%' })}</div>
-          <div class="muted">${collectionCoverage.missingExtensions.missing}/${collectionCoverage.missingExtensions.total} ${locale.t('history.insights.notOwned')}</div>
-        </article>
-      </div>
       <div class="notice info">${helperCopy}</div>
-      <div class="two-col insight-coverage-grid">
-        <article class="result-card insight-ranking-card" data-insight-coverage-group="user-collection">
-          <h3>${locale.t('history.insights.userCoverage')}</h3>
-          <div class="muted">${locale.t('history.insights.userCoverageDescription')}</div>
-          ${renderCoverageList(collectionCoverage.userCollection.byType, 'playedPercent', locale)}
-        </article>
-        <article class="result-card insight-ranking-card" data-insight-coverage-group="overall-collection">
-          <h3>${locale.t('history.insights.overallCoverage')}</h3>
-          <div class="muted">${locale.t('history.insights.overallCoverageDescription')}</div>
-          ${renderCoverageList(collectionCoverage.overallCollection.byType, 'playedPercent', locale)}
-        </article>
-      </div>
-      <div class="two-col insight-ranking-grid">
-        ${usage.map((category) => `
-          <article class="result-card insight-ranking-card" data-insight-ranking-category="${category.category}">
-            <h3>${category.label}</h3>
-            <div class="muted">${locale.t('history.insights.playedSummary', { used: locale.formatNumber(category.used), total: locale.formatNumber(category.total), neverPlayed: locale.formatNumber(category.neverPlayed) })}</div>
-            <div class="stack gap-sm insight-ranking-section">
-              <strong>${locale.t('history.insights.mostPlayed')}</strong>
-              ${renderInsightRankingList(category.mostPlayed, locale.t('history.insights.noneMostPlayed', { label: category.label.toLowerCase() }), locale)}
-            </div>
-            <div class="stack gap-sm insight-ranking-section">
-              <strong>${locale.t('history.insights.leastPlayed')}</strong>
-              ${renderInsightRankingList(category.leastPlayed, locale.t('history.insights.noneLeastPlayed', { label: category.label.toLowerCase() }), locale)}
-            </div>
-          </article>
-        `).join('')}
-      </div>
+      ${compactViewport ? `<button type="button" class="button button-secondary history-insights-toggle" data-action="toggle-history-insights" aria-expanded="${expanded}">${expanded ? locale.t('browse.set.hideDetails') : locale.t('browse.set.showDetails')}</button>` : ''}
+      ${expanded ? `<div class="history-insights-content">${detailMarkup}</div>` : ''}
     </section>
   `;
 }
@@ -596,6 +607,33 @@ function renderLocaleControls(activeLocaleId, locale) {
         </select>
       </label>
       ${locale.hasFallbacks ? `<div class="muted" data-locale-fallback-notice>${locale.t('header.locale.fallbackNotice')}</div>` : ''}
+    </section>
+  `;
+}
+
+function renderMobilePreferenceControls(viewModel) {
+  const locale = getLocale(viewModel);
+  const activeThemeId = normalizeThemeId(viewModel.state.preferences.themeId);
+  const activeLocaleId = viewModel.state.preferences.localeId;
+  const activeLocaleLabel = getSelectableLocales().find((option) => option.id === activeLocaleId)?.nativeLabel || activeLocaleId;
+
+  return `
+    <section class="mobile-preferences-shell">
+      <button
+        type="button"
+        class="button button-secondary mobile-preferences-toggle"
+        data-action="toggle-mobile-preferences"
+        aria-expanded="${viewModel.ui.mobilePreferencesOpen}"
+      >
+        <span>${locale.t('header.theme.label')} + ${locale.t('header.locale.label')}</span>
+        <span class="muted mobile-preferences-summary">${locale.getThemeLabel(activeThemeId)} · ${activeLocaleLabel}</span>
+      </button>
+      ${viewModel.ui.mobilePreferencesOpen
+        ? `<div class="mobile-preferences-panel stack gap-md">
+            ${renderLocaleControls(activeLocaleId, locale)}
+            ${renderThemeControls(activeThemeId, locale)}
+          </div>`
+        : ''}
     </section>
   `;
 }
@@ -699,7 +737,7 @@ function renderOnboardingShell(viewModel) {
       </div>
       <div class="result-card onboarding-step-card" data-onboarding-step="${currentStep.id}">
         <div class="eyebrow">${locale.t('onboarding.stepPrefix', { current: currentStepNumber, total: ONBOARDING_STEPS.length })}</div>
-        <h3>${locale.t(`onboarding.step${currentStepNumber}.title`)}</h3>
+        <h3 id="onboarding-step-heading" tabindex="-1">${locale.t(`onboarding.step${currentStepNumber}.title`)}</h3>
         <p>${locale.t(`onboarding.step${currentStepNumber}.description`)}</p>
         <div class="button-row">
           <button type="button" class="button button-secondary" data-action="open-onboarding-tab" data-tab-id="${currentStep.tabId}">${locale.t(`onboarding.step${currentStepNumber}.action`)}</button>
@@ -1021,50 +1059,42 @@ function renderBrowseSetCard(set, viewModel) {
   `;
 }
 
-function renderBrowsePanel(viewModel) {
+function renderBrowsePanel(viewModel, options = {}) {
   const { bundle, state, ui } = viewModel;
   const locale = getLocale(viewModel);
-  const metrics = [
-    [locale.t('browse.metrics.includedSets'), bundle.counts.sets],
-    [locale.t('browse.metrics.ownedSets'), state.collection.ownedSetIds.length],
-    [locale.t('browse.metrics.historyRecords'), state.history.length]
-  ];
+  const compactViewport = Boolean(options.compactViewport);
+  const firstRun = ui.onboardingVisible || !state.preferences.onboardingCompleted;
   const browseSets = filterBrowseSets(bundle.runtime.sets, {
     searchTerm: ui.browseSearchTerm,
     typeFilter: ui.browseTypeFilter
   });
 
   return `
-    <section class="page-flow stack gap-md">
-      <section class="panel browse-hero">
+    <section class="page-flow stack gap-md ${compactViewport ? 'page-flow-compact-mobile' : ''}">
+      <section class="panel browse-hero ${firstRun ? 'browse-hero-first-run' : 'browse-hero-returning'}">
         <div class="row space-between wrap gap-md align-center">
-          <div class="browse-hero-copy panel-copy">
+          <div class="browse-hero-copy panel-copy ${compactViewport ? 'compact-mobile' : ''}">
             <div class="eyebrow">${locale.t('browse.hero.eyebrow')}</div>
             <h2>${locale.t('browse.hero.title')}</h2>
-            <p class="muted">${locale.t('browse.hero.description')}</p>
+            ${(!compactViewport || firstRun) ? `<p class="muted browse-hero-description">${locale.t('browse.hero.description')}</p>` : ''}
             <div class="button-row browse-hero-actions">
-              <button type="button" class="button button-primary" data-action="jump-tab" data-tab-id="collection">${locale.t('browse.hero.manageCollection')}</button>
-              <button type="button" class="button button-secondary" data-action="jump-tab" data-tab-id="new-game">${locale.t('browse.hero.generateGame')}</button>
+              <button type="button" class="button button-primary" data-action="jump-tab" data-tab-id="${firstRun ? 'collection' : 'new-game'}" data-browse-primary-cta>${firstRun ? locale.t('browse.hero.manageCollection') : locale.t('browse.hero.generateGame')}</button>
+              <button type="button" class="button button-secondary" data-action="jump-tab" data-tab-id="${firstRun ? 'new-game' : 'collection'}">${firstRun ? locale.t('browse.hero.generateGame') : locale.t('browse.hero.manageCollection')}</button>
               <button type="button" class="button button-secondary" data-action="start-onboarding">${locale.t('browse.hero.replayWalkthrough')}</button>
               <button type="button" class="button button-secondary" data-action="toggle-about-panel" aria-expanded="${ui.aboutPanelOpen}">${locale.t('browse.hero.aboutProject')}</button>
             </div>
           </div>
-          <div class="summary-grid browse-hero-metrics">${metrics.map(([label, value]) => `
-            <article class="summary-card metric-card">
-              <div class="muted">${label}</div>
-              <div class="metric">${value}</div>
-            </article>
-          `).join('')}</div>
-        </div>
-      </section>
-      <section class="panel" data-browse-start-here>
-        <div class="row space-between wrap gap-md align-center">
-          <div class="panel-copy">
-            <h2>${locale.t('browse.startHere.title')}</h2>
-            <p class="muted">${locale.t('browse.startHere.description')}</p>
+          <div class="summary-card browse-results-summary browse-hero-summary">
+            <div class="muted">${locale.t('browse.metrics.includedSets')}</div>
+            <div class="metric-sm">${bundle.counts.sets}</div>
+            <div class="muted">${locale.t('browse.metrics.ownedSets')} ${state.collection.ownedSetIds.length} · ${locale.t('browse.metrics.historyRecords')} ${state.history.length}</div>
           </div>
         </div>
+      </section>
+      <details class="panel browse-help-disclosure ${compactViewport ? 'compact-mobile' : ''}" data-browse-help-disclosure>
+        <summary>${locale.t('browse.startHere.title')}</summary>
         <div class="stack gap-sm browse-priority-list">
+          ${(!compactViewport || firstRun) ? `<p class="muted browse-help-description">${locale.t('browse.startHere.description')}</p>` : ''}
           <article class="summary-card browse-priority-item">
             <strong>${locale.t('browse.startHere.step1Title')}</strong>
             <div class="muted">${locale.t('browse.startHere.step1Body')}</div>
@@ -1078,12 +1108,12 @@ function renderBrowsePanel(viewModel) {
             <div class="muted">${locale.t('browse.startHere.step3Body')}</div>
           </article>
         </div>
-      </section>
+      </details>
       <section class="panel browse-panel-full-width" data-browse-sets-panel>
         <div class="row space-between wrap gap-md align-center">
-          <div class="panel-copy">
+          <div class="panel-copy ${compactViewport ? 'compact-mobile' : ''}">
             <h2>${locale.t('browse.panel.title')}</h2>
-            <p class="muted">${locale.t('browse.panel.description')}</p>
+            ${compactViewport ? '' : `<p class="muted browse-panel-description">${locale.t('browse.panel.description')}</p>`}
           </div>
           <div class="summary-card browse-results-summary">
             <div class="muted">${locale.t('browse.visibleSets')}</div>
@@ -1091,7 +1121,7 @@ function renderBrowsePanel(viewModel) {
             <div class="muted">of ${bundle.runtime.sets.length}</div>
           </div>
         </div>
-        <div class="browse-toolbar">
+        <div class="browse-toolbar" data-mobile-task-anchor="browse">
           <label class="browse-search-shell" for="browse-search-input">
             <span class="muted">${locale.t('browse.searchLabel')}</span>
             <input
@@ -1189,9 +1219,10 @@ function renderCollectionPanel(viewModel) {
   `;
 }
 
-function renderSetupControls(viewModel) {
+function renderSetupControls(viewModel, options = {}) {
   const { state, ui } = viewModel;
   const locale = getLocale(viewModel);
+  const compactViewport = Boolean(options.compactViewport);
   const availablePlayModes = getAvailablePlayModes(ui.selectedPlayerCount);
   const displayedRequirements = getDisplayedSetupRequirements({
     playerCount: ui.selectedPlayerCount,
@@ -1221,8 +1252,8 @@ function renderSetupControls(viewModel) {
   `).join('');
 
   return `
-    <div class="stack gap-md">
-      <div>
+    <div class="stack gap-md ${compactViewport ? 'page-flow-compact-mobile' : ''}">
+      <div data-mobile-task-anchor="new-game">
         <h3>${locale.t('newGame.playerCount')}</h3>
         <div class="button-row">${playerButtons}</div>
       </div>
@@ -1233,7 +1264,7 @@ function renderSetupControls(viewModel) {
       <div class="row wrap gap-sm align-center">
         <button class="button button-secondary" data-action="clear-setup-controls">${locale.t('newGame.resetControls')}</button>
       </div>
-      <div class="muted">${locale.getPlayModeHelpText(ui.selectedPlayerCount, ui.selectedPlayMode)}</div>
+      <div class="muted new-game-mode-help">${locale.getPlayModeHelpText(ui.selectedPlayerCount, ui.selectedPlayMode)}</div>
       <div class="summary-grid">
         <div class="summary-card">
           <div class="muted">${locale.t('newGame.selectedMode')}</div>
@@ -1252,7 +1283,7 @@ function renderSetupControls(viewModel) {
         <h3>${locale.t('newGame.setupRequirements')}</h3>
         <div class="muted">${locale.formatEntityCount(displayedRequirements.heroCount, 'common.heroTitle', 'common.heroes')} · ${locale.formatEntityCount(displayedRequirements.villainGroupCount, 'common.villainGroupTitle', 'common.villainGroups')} · ${locale.formatEntityCount(displayedRequirements.henchmanGroupCount, 'common.henchmanGroupTitle', 'common.henchmanGroups')} · ${locale.formatEntityCount(displayedRequirements.wounds, 'common.wound', 'common.wounds')}</div>
         ${ui.selectedPlayMode === 'two-handed-solo'
-          ? `<div class="muted">${locale.t('newGame.twoHandedHelp')}</div>`
+          ? `${compactViewport ? '' : `<div class="muted new-game-two-handed-help">${locale.t('newGame.twoHandedHelp')}</div>`}`
           : ''}
       </div>
       ${renderForcedPickControls(viewModel)}
@@ -1261,7 +1292,7 @@ function renderSetupControls(viewModel) {
         <button class="button button-secondary" data-action="regenerate-setup">${locale.t('newGame.regenerate')}</button>
         <button class="button button-success" data-action="accept-current-setup" ${ui.currentSetup ? '' : 'disabled'}>${locale.t('newGame.acceptLog')}</button>
       </div>
-      <div class="muted">${locale.t('newGame.ephemeralNotice')}</div>
+      ${compactViewport ? '' : `<div class="muted new-game-ephemeral-notice">${locale.t('newGame.ephemeralNotice')}</div>`}
     </div>
   `;
 }
@@ -1327,37 +1358,39 @@ function renderSetupResult(viewModel) {
   `;
 }
 
-function renderHistoryPanel(viewModel) {
+function renderHistoryPanel(viewModel, options = {}) {
   const { ui } = viewModel;
   const locale = getLocale(viewModel);
+  const compactViewport = Boolean(options.compactViewport);
   return `
-    <section class="page-flow stack gap-md">
+    <section class="page-flow stack gap-md ${compactViewport ? 'page-flow-compact-mobile' : ''}">
       <section class="panel">
-        <div class="panel-copy">
+        <div class="panel-copy ${compactViewport ? 'compact-mobile' : ''}">
           <h2>${locale.t('history.title')}</h2>
-          <div class="muted">${locale.t('history.description')}</div>
+          ${compactViewport ? '' : `<div class="muted history-panel-description">${locale.t('history.description')}</div>`}
         </div>
         ${renderHistoryGroupingControls(ui.historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE, locale)}
         ${renderGroupedHistory(viewModel)}
       </section>
-      ${renderInsightsDashboard(viewModel)}
+      ${renderInsightsDashboard(viewModel, options)}
     </section>
   `;
 }
 
-function renderBackupPanel(viewModel) {
+function renderBackupPanel(viewModel, options = {}) {
   const { bundle, state, ui } = viewModel;
   const locale = getLocale(viewModel);
+  const compactViewport = Boolean(options.compactViewport);
   const indicators = summarizeUsageIndicators(bundle.runtime, state);
   const resetPreview = buildFullResetPreview();
   return `
-    <section class="page-flow stack gap-md">
+    <section class="page-flow stack gap-md ${compactViewport ? 'page-flow-compact-mobile' : ''}">
       <section class="panel" data-backup-panel>
-        <div class="panel-copy">
+        <div class="panel-copy ${compactViewport ? 'compact-mobile' : ''}">
           <h2>${locale.t('backup.title')}</h2>
-          <div class="muted">${locale.t('backup.description')}</div>
+          ${compactViewport ? '' : `<div class="muted backup-panel-description">${locale.t('backup.description')}</div>`}
         </div>
-        <div class="button-row">
+        <div class="button-row" data-mobile-task-anchor="backup">
           <button class="button button-secondary" data-action="export-backup">${locale.t('backup.export')}</button>
           <button class="button button-primary" data-action="open-import-backup">${locale.t('backup.import')}</button>
         </div>
@@ -1365,9 +1398,9 @@ function renderBackupPanel(viewModel) {
         ${renderBackupPreview(ui, locale)}
       </section>
       <section class="panel">
-        <div class="panel-copy">
+        <div class="panel-copy ${compactViewport ? 'compact-mobile' : ''}">
           <h2>${locale.t('backup.usedCardTracking')}</h2>
-          <div class="muted">${locale.t('backup.usedCardDescription')}</div>
+          ${compactViewport ? '' : `<div class="muted backup-usage-description">${locale.t('backup.usedCardDescription')}</div>`}
         </div>
         <div class="stack gap-sm history-usage-indicators">
           ${indicators.map((indicator) => `
@@ -1380,7 +1413,7 @@ function renderBackupPanel(viewModel) {
             </article>
           `).join('')}
         </div>
-        <p class="muted">${locale.t('backup.lowestPlayReuse')}</p>
+        ${compactViewport ? '' : `<p class="muted backup-reuse-notice">${locale.t('backup.lowestPlayReuse')}</p>`}
         <div class="muted">${locale.t('backup.resetPreview', { historyCount: locale.formatNumber(resetPreview.history.length), ownedSetCount: locale.formatNumber(resetPreview.collection.ownedSetIds.length) })}</div>
         <div class="button-row">
           <button class="button button-danger" data-action="request-reset-all-state">${locale.t('backup.fullReset')}</button>
@@ -1390,15 +1423,15 @@ function renderBackupPanel(viewModel) {
   `;
 }
 
-function renderTabPanels(viewModel) {
+function renderTabPanels(viewModel, options = {}) {
   return {
-    browse: renderBrowsePanel(viewModel),
+    browse: renderBrowsePanel(viewModel, options),
     collection: renderCollectionPanel(viewModel),
     'new-game': `
-      <section class="two-col shell-two-col page-flow">
+      <section class="two-col shell-two-col page-flow ${options.compactViewport ? 'page-flow-compact-mobile' : ''}">
         <section class="panel">
           <h2>${getLocale(viewModel).t('newGame.panel.setupTitle')}</h2>
-          ${renderSetupControls(viewModel)}
+          ${renderSetupControls(viewModel, options)}
         </section>
         <section class="panel">
           <h2>${getLocale(viewModel).t('newGame.panel.resultTitle')}</h2>
@@ -1406,8 +1439,8 @@ function renderTabPanels(viewModel) {
         </section>
       </section>
     `,
-    history: renderHistoryPanel(viewModel),
-    backup: renderBackupPanel(viewModel)
+    history: renderHistoryPanel(viewModel, options),
+    backup: renderBackupPanel(viewModel, options)
   };
 }
 
@@ -1523,6 +1556,7 @@ function bindActionButtons(doc, actions) {
     'confirm-merge-backup': actions.confirmMergeBackup,
     'confirm-replace-backup': actions.confirmReplaceBackup,
     'toggle-about-panel': actions.toggleAboutPanel,
+    'toggle-mobile-preferences': actions.toggleMobilePreferences,
     'start-onboarding': actions.startOnboarding,
     'previous-onboarding-step': actions.previousOnboardingStep,
     'next-onboarding-step': actions.nextOnboardingStep,
@@ -1535,6 +1569,7 @@ function bindActionButtons(doc, actions) {
     'save-game-result': actions.saveGameResult,
     'skip-game-result': actions.skipGameResultEntry,
     'cancel-result-entry': actions.cancelResultEntry,
+    'toggle-history-insights': actions.toggleHistoryInsights,
     'clear-setup-controls': actions.clearToDefaults,
     'corrupt-saved-state': actions.corruptSavedState,
     'inject-invalid-owned-set': actions.injectInvalidOwnedSet
@@ -1605,11 +1640,12 @@ function bindActionButtons(doc, actions) {
 }
 
 export function renderBundle(doc, viewModel, actions) {
+  const compactViewport = doc.defaultView?.matchMedia('(max-width: 767px)').matches ?? false;
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
   const activeThemeId = normalizeThemeId(viewModel.state.preferences.themeId);
   const activeTheme = getThemeDefinition(activeThemeId);
   const locale = getLocale(viewModel);
-  const panelMarkup = renderTabPanels(viewModel);
+  const panelMarkup = renderTabPanels(viewModel, { compactViewport });
   const onboardingMarkup = renderOnboardingShell(viewModel);
 
   doc.documentElement.dataset.theme = activeThemeId;
@@ -1618,8 +1654,16 @@ export function renderBundle(doc, viewModel, actions) {
   doc.title = locale.t('app.documentTitle');
   doc.getElementById('app-title').textContent = locale.t('app.title');
   doc.getElementById('app-subtitle').textContent = locale.t('app.subtitle');
-  doc.getElementById('header-theme-controls').innerHTML = renderThemeControls(activeThemeId, locale);
-  doc.getElementById('header-locale-controls').innerHTML = renderLocaleControls(viewModel.state.preferences.localeId, locale);
+  doc.querySelector('.app-header')?.setAttribute('data-onboarding-visible', String(viewModel.ui.onboardingVisible));
+  if (compactViewport) {
+    doc.getElementById('mobile-preference-controls').innerHTML = renderMobilePreferenceControls(viewModel);
+    doc.getElementById('header-theme-controls').innerHTML = '';
+    doc.getElementById('header-locale-controls').innerHTML = '';
+  } else {
+    doc.getElementById('mobile-preference-controls').innerHTML = '';
+    doc.getElementById('header-theme-controls').innerHTML = renderThemeControls(activeThemeId, locale);
+    doc.getElementById('header-locale-controls').innerHTML = renderLocaleControls(viewModel.state.preferences.localeId, locale);
+  }
   doc.getElementById('desktop-tabs').setAttribute('aria-label', locale.t('header.primaryNav'));
   doc.getElementById('mobile-tabs').setAttribute('aria-label', locale.t('header.primaryNavMobile'));
   doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, locale, 'desktop');
