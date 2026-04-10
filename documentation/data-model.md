@@ -394,6 +394,20 @@ These are computed from `RUNTIME_DATA` plus persisted state:
 | `ownedHenchmanGroups` | all henchman groups from owned sets |
 | `ownedSchemes` | all schemes from owned sets |
 | `state` | hydrated persisted root state |
+| `insightsDashboard` | derived History-tab metrics computed from `state.history` and `state.usage` |
+
+The shipped insights dashboard derives:
+- counts from all accepted `GameRecord`s,
+- outcomes and score aggregates from completed `GameResult`s,
+- score trends from the most recent scored results,
+- played-percentage coverage for the owned collection and the full Legendary catalog,
+- and missing-extension percentage from non-base sets the user does not own,
+- and most/least-played rankings from persisted usage buckets.
+
+Ranking tie-breaking is deterministic:
+- most-played entries sort by higher `plays`, then newer `lastPlayedAt`, then display label
+- least-played entries sort by lower `plays`, then older `lastPlayedAt`, then display label
+- duplicate display names are disambiguated with their set label in the rendered output
 
 ---
 

@@ -22,7 +22,9 @@
     "test:qc:epic10": "playwright test ./test/playwright/epic10-qc.spec.mjs",
     "test:qc:headed": "playwright test --headed",
     "test:epic12": "node --test ./test/epic12-score-history.test.mjs",
+    "test:epic14": "node --test ./test/epic14-stats-dashboard.test.mjs",
     "test:qc:epic12": "playwright test ./test/playwright/epic12-qc.spec.mjs",
+    "test:qc:epic14": "playwright test ./test/playwright/epic14-qc.spec.mjs",
     "check:epic1": "node --test ./test/epic1.test.mjs",
     "check:epic2": "node --test ./test/epic2-state.test.mjs",
     "check:epic3": "node --test ./test/epic3-setup-generator.test.mjs",
@@ -38,8 +40,10 @@
     "check:qc:epic10": "playwright test ./test/playwright/epic10-qc.spec.mjs",
     "check:epic12": "node --test ./test/epic12-score-history.test.mjs",
     "check:qc:epic12": "playwright test ./test/playwright/epic12-qc.spec.mjs",
+    "check:qc:epic14": "playwright test ./test/playwright/epic14-qc.spec.mjs",
     "report:epic1": "node ./tools/run_epic1_checks.mjs",
     "build:shell": "python3 ./tools/build_epic1_index.py",
+    "check:epic14": "node --test ./test/epic14-stats-dashboard.test.mjs",
     "build:seed": "python3 ./tools/build_epic1_seed.py"
   },
   "devDependencies": {

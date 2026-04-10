@@ -262,6 +262,28 @@ Automated coverage:
 
 ---
 
+## Epic 14 — Insights and Statistics Dashboard
+
+Required tests:
+- derived outcome metrics stay stable for mixed completed, pending, scored, and scoreless-loss histories
+- score aggregates avoid divide-by-zero behavior and only use scored results where appropriate
+- ranking helpers stay deterministic for ties and preserve duplicate-name context with set labels
+- collection-coverage percentages stay correct for the owned collection, the full catalog, and missing extensions
+- sparse or empty states expose helpful insight copy without fabricating misleading metrics
+
+QC checks:
+- verify the History tab keeps game history first while exposing the insights section below it
+- verify summary cards update immediately after wins, losses, scoreless losses, and pending results are logged
+- verify duplicate-name ranking entries remain distinguishable with set context
+- verify owned-collection and full-catalog coverage percentages remain distinct when the user owns only part of the catalog
+- verify the insights layout remains readable on desktop and mobile widths
+
+Automated coverage:
+- `test/epic14-stats-dashboard.test.mjs` covers derived metrics, duplicate-name ranking stability, sparse-data behavior, and collection-coverage percentages
+- `test/playwright/epic14-qc.spec.mjs` covers empty-state insights, summary updates after logged results, duplicate-name ranking labels, collection-coverage percentages, and responsive History-tab layout
+
+---
+
 ## Epic 15 — Guided Setup Constraints and Forced Picks
 
 Required tests:

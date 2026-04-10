@@ -724,6 +724,46 @@ details summary {
   gap: 12px;
 }
 
+.insight-summary-grid {
+  margin-top: 14px;
+}
+
+.insight-outcome-summary {
+  max-width: 24rem;
+}
+
+.insight-ranking-grid {
+  align-items: start;
+  margin-top: 14px;
+}
+
+.insight-coverage-grid {
+  align-items: start;
+  margin-top: 14px;
+}
+
+.insight-ranking-card {
+  display: grid;
+  gap: 12px;
+}
+
+.insight-ranking-section {
+  gap: 8px;
+}
+
+.insight-ranking-item {
+  align-items: flex-start;
+}
+
+.insight-ranking-meta {
+  display: block;
+  margin-top: 4px;
+}
+
+.insight-coverage-item {
+  align-items: flex-start;
+}
+
 .result-pill-pending {
   border-color: rgba(245, 166, 35, 0.45);
   background: rgba(245, 166, 35, 0.12);

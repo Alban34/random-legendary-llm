@@ -6,6 +6,7 @@ import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from './forced-picks-utils.
 import { buildFullResetPreview, formatHistorySummary, summarizeUsageIndicators } from './history-utils.mjs';
 import { formatHeroTeamLabel, formatMastermindLeadLabel, formatPersistedPlayMode, getAvailablePlayModes, getDisplayedSetupRequirements, getPlayModeHelpText } from './new-game-utils.mjs';
 import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from './result-utils.mjs';
+import { buildInsightsDashboard } from './stats-utils.mjs';
 import { buildOwnedPools } from './setup-generator.mjs';
 
 function formatDuplicateEntries(bundle) {
@@ -219,6 +220,151 @@ function renderHeroResultCards(heroes) {
       <div class="muted">${formatHeroTeamLabel(hero)}</div>
     </article>
   `).join('');
+}
+
+function formatInsightMetric(value, { suffix = '', fallback = '—' } = {}) {
+  if (value === null || value === undefined) {
+    return fallback;
+  }
+
+  return `${value}${suffix}`;
+}
+
+function renderInsightRankingList(entries, emptyCopy) {
+  if (!entries.length) {
+    return `<p class="muted empty-state">${emptyCopy}</p>`;
+  }
+
+  return `
+    <ul class="clean result-list insight-ranking-list">
+      ${entries.map((entry) => `
+        <li class="result-list-item insight-ranking-item">
+          <span>
+            <strong>${escapeHtml(entry.label)}</strong>
+            <span class="muted insight-ranking-meta">${entry.lastPlayedAt ? `Last used ${new Date(entry.lastPlayedAt).toLocaleDateString()}` : 'No play date recorded'}</span>
+          </span>
+          <span class="pill">${entry.plays} play${entry.plays === 1 ? '' : 's'}</span>
+        </li>
+      `).join('')}
+    </ul>
+  `;
+}
+
+function renderCoverageList(entries, percentKey) {
+  return `
+    <ul class="clean result-list insight-coverage-list">
+      ${entries.map((entry) => `
+        <li class="result-list-item insight-coverage-item" data-insight-coverage-category="${entry.category}">
+          <span>
+            <strong>${entry.label}</strong>
+            <span class="muted insight-ranking-meta">${entry.played}/${entry.total} played</span>
+          </span>
+          <span class="pill">${formatInsightMetric(entry[percentKey], { suffix: '%' })}</span>
+        </li>
+      `).join('')}
+    </ul>
+  `;
+}
+
+function renderInsightsDashboard(viewModel) {
+  const dashboard = buildInsightsDashboard(viewModel.bundle.runtime, viewModel.state, { limit: 3 });
+  const { outcome, usage, freshness, collectionCoverage } = dashboard;
+  const scoredWindow = Math.min(outcome.scoredGames, 5);
+
+  let helperCopy = 'Accept and complete a few games to unlock richer trends.';
+  if (outcome.totalGames === 0) {
+    helperCopy = 'No games have been logged yet. Once you accept setups, this section will start showing result and freshness insights.';
+  } else if (outcome.completedResults === 0) {
+    helperCopy = 'Results are still pending. Save wins or losses in History to unlock outcome and score insights.';
+  } else if (outcome.scoredGames === 0) {
+    helperCopy = 'Completed losses can stay scoreless. Average and best score appear once at least one scored win is logged.';
+  } else if (outcome.scoredGames === 1) {
+    helperCopy = 'Only one scored game is logged so far, so the recent trend matches that single score.';
+  } else {
+    helperCopy = `Recent average across the last ${scoredWindow} scored game${scoredWindow === 1 ? '' : 's'}: ${formatInsightMetric(outcome.recentAverageScore)}.`;
+  }
+
+  return `
+    <section class="panel" data-history-insights>
+      <div class="row space-between wrap gap-md align-center">
+        <div>
+          <h2>Insights dashboard</h2>
+          <p class="muted">Track outcomes, score coverage, and the most- and least-played entities across your owned collection.</p>
+        </div>
+        <div class="muted insight-outcome-summary">Wins ${outcome.wins} · Losses ${outcome.losses} · Pending ${outcome.pendingResults} · Scored ${outcome.scoredGames}</div>
+      </div>
+      <div class="summary-grid insight-summary-grid">
+        <article class="summary-card" data-insight-card="games-logged">
+          <div class="muted">Games Logged</div>
+          <div class="metric-sm">${outcome.totalGames}</div>
+        </article>
+        <article class="summary-card" data-insight-card="win-rate">
+          <div class="muted">Win Rate</div>
+          <div class="metric-sm">${formatInsightMetric(outcome.winRate, { suffix: '%' })}</div>
+        </article>
+        <article class="summary-card" data-insight-card="pending-results">
+          <div class="muted">Pending Results</div>
+          <div class="metric-sm">${outcome.pendingResults}</div>
+        </article>
+        <article class="summary-card" data-insight-card="average-score">
+          <div class="muted">Average Score</div>
+          <div class="metric-sm">${formatInsightMetric(outcome.averageScore)}</div>
+        </article>
+        <article class="summary-card" data-insight-card="best-score">
+          <div class="muted">Best Score</div>
+          <div class="metric-sm">${formatInsightMetric(outcome.bestScore)}</div>
+        </article>
+        <article class="summary-card" data-insight-card="fresh-pool">
+          <div class="muted">Fresh Pool Remaining</div>
+          <div class="metric-sm">${freshness.totalNeverPlayed}/${freshness.totalEntitiesTracked}</div>
+        </article>
+        <article class="summary-card" data-insight-card="user-collection-played">
+          <div class="muted">Your Collection Played</div>
+          <div class="metric-sm">${formatInsightMetric(collectionCoverage.userCollection.playedPercent, { suffix: '%' })}</div>
+          <div class="muted">${collectionCoverage.userCollection.played}/${collectionCoverage.userCollection.total}</div>
+        </article>
+        <article class="summary-card" data-insight-card="overall-collection-played">
+          <div class="muted">Overall Legendary Played</div>
+          <div class="metric-sm">${formatInsightMetric(collectionCoverage.overallCollection.playedPercent, { suffix: '%' })}</div>
+          <div class="muted">${collectionCoverage.overallCollection.played}/${collectionCoverage.overallCollection.total}</div>
+        </article>
+        <article class="summary-card" data-insight-card="missing-extensions">
+          <div class="muted">Missing Extensions</div>
+          <div class="metric-sm">${formatInsightMetric(collectionCoverage.missingExtensions.missingPercent, { suffix: '%' })}</div>
+          <div class="muted">${collectionCoverage.missingExtensions.missing}/${collectionCoverage.missingExtensions.total} not owned</div>
+        </article>
+      </div>
+      <div class="notice info">${helperCopy}</div>
+      <div class="two-col insight-coverage-grid">
+        <article class="result-card insight-ranking-card" data-insight-coverage-group="user-collection">
+          <h3>Your collection coverage</h3>
+          <div class="muted">Percentage of the currently owned collection that has been played at least once.</div>
+          ${renderCoverageList(collectionCoverage.userCollection.byType, 'playedPercent')}
+        </article>
+        <article class="result-card insight-ranking-card" data-insight-coverage-group="overall-collection">
+          <h3>Overall Legendary coverage</h3>
+          <div class="muted">Percentage of the full supported Legendary: Marvel catalog that has been played at least once.</div>
+          ${renderCoverageList(collectionCoverage.overallCollection.byType, 'playedPercent')}
+        </article>
+      </div>
+      <div class="two-col insight-ranking-grid">
+        ${usage.map((category) => `
+          <article class="result-card insight-ranking-card" data-insight-ranking-category="${category.category}">
+            <h3>${category.label}</h3>
+            <div class="muted">Used ${category.used}/${category.total} · Never played ${category.neverPlayed}</div>
+            <div class="stack gap-sm insight-ranking-section">
+              <strong>Most played</strong>
+              ${renderInsightRankingList(category.mostPlayed, `No ${category.label.toLowerCase()} have been used in accepted games yet.`)}
+            </div>
+            <div class="stack gap-sm insight-ranking-section">
+              <strong>Least played used</strong>
+              ${renderInsightRankingList(category.leastPlayed, `No used ${category.label.toLowerCase()} are available to rank yet.`)}
+            </div>
+          </article>
+        `).join('')}
+      </div>
+    </section>
+  `;
 }
 
 function renderTabButtons(activeTabId, variant = 'desktop') {
@@ -967,6 +1113,14 @@ function renderHistoryPanel(viewModel) {
   return `
     <section class="stack gap-md">
       <section class="panel">
+        <h2>Game history</h2>
+        <div class="muted">Accepted setups are stored immediately. Each record can stay pending until you log a win/loss and score, then be corrected later if needed.</div>
+        ${state.history.length
+          ? state.history.map((record) => formatHistoryEntry(record, bundle, ui)).join('')
+          : '<p class="muted empty-state">No accepted games have been logged yet.</p>'}
+      </section>
+      ${renderInsightsDashboard(viewModel)}
+      <section class="panel">
         <h2>Used card tracking</h2>
         <div class="stack gap-sm history-usage-indicators">
           ${indicators.map((indicator) => `
@@ -984,13 +1138,6 @@ function renderHistoryPanel(viewModel) {
         <div class="button-row">
           <button class="button button-danger" data-action="request-reset-all-state">Full Reset — Clear all data</button>
         </div>
-      </section>
-      <section class="panel">
-        <h2>Game history</h2>
-        <div class="muted">Accepted setups are stored immediately. Each record can stay pending until you log a win/loss and score, then be corrected later if needed.</div>
-        ${state.history.length
-          ? state.history.map((record) => formatHistoryEntry(record, bundle, ui)).join('')
-          : '<p class="muted empty-state">No accepted games have been logged yet.</p>'}
       </section>
     </section>
   `;
