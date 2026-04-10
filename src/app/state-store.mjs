@@ -1,6 +1,7 @@
 import { normalizeSelectedTab } from './app-tabs.mjs';
 import { createCompletedGameResult, createPendingGameResult, sanitizeStoredGameResult } from './result-utils.mjs';
 import { resolvePlayMode } from './setup-rules.mjs';
+import { DEFAULT_THEME_ID, normalizeThemeId } from './theme-utils.mjs';
 
 export const STORAGE_KEY = 'legendary_state_v1';
 export const SCHEMA_VERSION = 1;
@@ -38,7 +39,8 @@ function createDefaultPreferences() {
     lastAdvancedSolo: false,
     lastPlayMode: 'standard',
     selectedTab: null,
-    onboardingCompleted: false
+    onboardingCompleted: false,
+    themeId: DEFAULT_THEME_ID
   };
 }
 
@@ -219,6 +221,9 @@ function sanitizePreferences(candidatePreferences, notices) {
   const onboardingCompleted = typeof candidatePreferences.onboardingCompleted === 'boolean'
     ? candidatePreferences.onboardingCompleted
     : defaultPreferences.onboardingCompleted;
+  const themeId = candidatePreferences.themeId === undefined
+    ? defaultPreferences.themeId
+    : normalizeThemeId(candidatePreferences.themeId);
 
   if (
     lastPlayerCount !== candidatePreferences.lastPlayerCount
@@ -226,11 +231,12 @@ function sanitizePreferences(candidatePreferences, notices) {
     || (candidatePreferences.lastPlayMode !== undefined && lastPlayMode !== candidatePreferences.lastPlayMode)
     || selectedTab !== candidatePreferences.selectedTab
     || onboardingCompleted !== candidatePreferences.onboardingCompleted
+    || (candidatePreferences.themeId !== undefined && themeId !== candidatePreferences.themeId)
   ) {
     notices.push('Recovered invalid preference values during state hydration.');
   }
 
-  return { lastPlayerCount, lastAdvancedSolo, lastPlayMode, selectedTab, onboardingCompleted };
+  return { lastPlayerCount, lastAdvancedSolo, lastPlayMode, selectedTab, onboardingCompleted, themeId };
 }
 
 function sanitizeStateCandidate(candidate, indexes) {

@@ -8,6 +8,7 @@ import { formatHeroTeamLabel, formatMastermindLeadLabel, formatPersistedPlayMode
 import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from './result-utils.mjs';
 import { buildInsightsDashboard } from './stats-utils.mjs';
 import { buildOwnedPools } from './setup-generator.mjs';
+import { getThemeDefinition, normalizeThemeId, THEME_OPTIONS } from './theme-utils.mjs';
 
 function formatDuplicateEntries(bundle) {
   return ['Black Widow', 'Loki', 'Thor', 'Nova', 'Venom']
@@ -385,6 +386,31 @@ function renderTabButtons(activeTabId, variant = 'desktop') {
       <span class="tab-label">${variant === 'mobile' ? tab.shortLabel : tab.label}</span>
     </button>
   `).join('');
+}
+
+function renderThemeControls(activeThemeId) {
+  return `
+    <section class="theme-switcher" aria-label="Theme selector" data-theme-switcher>
+      <div class="theme-switcher-copy">
+        <span class="theme-switcher-label">Theme</span>
+        <span class="muted theme-switcher-caption">Saved in browser preferences</span>
+      </div>
+      <div class="theme-switcher-buttons" role="group" aria-label="Choose theme">
+        ${THEME_OPTIONS.map((theme) => `
+          <button
+            type="button"
+            class="button theme-button ${activeThemeId === theme.id ? 'theme-button-active' : 'button-secondary'}"
+            data-action="set-theme"
+            data-theme-id="${theme.id}"
+            aria-pressed="${activeThemeId === theme.id}"
+            title="${theme.description}"
+          >
+            ${theme.label}
+          </button>
+        `).join('')}
+      </div>
+    </section>
+  `;
 }
 
 function escapeHtml(value) {
@@ -1188,6 +1214,10 @@ function bindActionButtons(doc, actions) {
     button.addEventListener('click', () => actions.setPlayMode(button.dataset.playMode));
   });
 
+  doc.querySelectorAll('[data-action="set-theme"]').forEach((button) => {
+    button.addEventListener('click', () => actions.setTheme(button.dataset.themeId));
+  });
+
   doc.querySelectorAll('[data-action="add-forced-pick"]').forEach((button) => {
     button.addEventListener('click', () => {
       const select = doc.querySelector(`[data-forced-pick-select="${button.dataset.field}"]`);
@@ -1329,11 +1359,16 @@ function bindActionButtons(doc, actions) {
 
 export function renderBundle(doc, viewModel, actions) {
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
+  const activeThemeId = normalizeThemeId(viewModel.state.preferences.themeId);
+  const activeTheme = getThemeDefinition(activeThemeId);
   const panelMarkup = renderTabPanels(viewModel);
   const onboardingMarkup = renderOnboardingShell(viewModel);
 
+  doc.documentElement.dataset.theme = activeThemeId;
+  doc.documentElement.style.colorScheme = activeTheme.colorScheme;
   doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer';
   doc.getElementById('app-subtitle').textContent = 'Browse sets, manage your collection, generate legal setups, and track history with browser-based persistence.';
+  doc.getElementById('header-theme-controls').innerHTML = renderThemeControls(activeThemeId);
   doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, 'desktop');
   doc.getElementById('mobile-tabs').innerHTML = renderTabButtons(activeTabId, 'mobile');
 

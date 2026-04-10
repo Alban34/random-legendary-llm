@@ -22,6 +22,7 @@ Implemented so far:
 - canonical seed data under `src/data/`
 - shared normalization and validation logic under `src/app/`
 - versioned browser-state persistence under `src/app/state-store.mjs`
+- a persisted theme switcher with the built-in Midnight and Newsprint themes
 - setup templates and generation logic under `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs`
 - shared tab-shell metadata and navigation helpers under `src/app/app-tabs.mjs`
 - Browse filtering/detail helpers under `src/app/browse-utils.mjs`
@@ -85,6 +86,7 @@ Important behavior:
 Persisted data:
 - the app stores one versioned root state object in browser storage under `legendary_state_v1`
 - that state contains collection ownership, usage statistics, accepted game history, and preferences
+- preferences now include the active theme so the theme switcher restores on reload without a visible restyle flash in normal browser conditions
 
 Reset behavior:
 - **Reset All Selections** in **Collection** clears owned sets only
@@ -92,7 +94,7 @@ Reset behavior:
 - **Full Reset — Clear all data** clears collection, usage, history, and preferences only after confirmation
 
 Current V1 limitations:
-- no score tracking, win/loss tracking, export/import, 2-handed solo, or forced-card inclusion yet
+- no export/import workflow yet
 - hero tracking is at the hero-deck level, not per individual card
 - the app must be opened through a static HTTP server rather than `file://`
 - browser QC is automated in Chromium via Playwright; runtime behavior targets modern browsers with graceful degradation when storage is unavailable

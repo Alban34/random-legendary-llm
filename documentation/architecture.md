@@ -18,6 +18,7 @@ It explains how the application should use a project-owned canonical data format
 The current release keeps the architecture described below and implements it with these primary runtime entry points:
 
 - `index.html` — static application shell and mounting points for tabs, toast region, and modal root
+- `src/app/theme-utils.mjs` — supported theme metadata and theme-ID normalization helpers
 - `src/app/browser-entry.mjs` — bootstraps canonical data, hydration, ephemeral UI state, toasts, and actions
 - `src/app/game-data-pipeline.mjs` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
 - `src/app/state-store.mjs` — owns the versioned root state persisted under `legendary_state_v1`
@@ -31,6 +32,8 @@ The shipped shell currently exposes four primary tab panels with IDs that match 
 - `collection`
 - `new-game`
 - `history`
+
+The shell also now applies a persisted `data-theme` attribute on `document.documentElement` before the module bootstrap finishes so theme preference and first paint stay aligned.
 
 ---
 

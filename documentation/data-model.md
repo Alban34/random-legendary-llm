@@ -21,7 +21,15 @@ Persisted slices in V1:
 - `collection` — owned set IDs
 - `usage` — per-category `plays` and `lastPlayedAt`
 - `history` — accepted game records stored with IDs only plus optional result data
-- `preferences` — last player count, legacy Advanced Solo flag, normalized play mode, selected tab, and onboarding completion
+- `preferences` — last player count, legacy Advanced Solo flag, normalized play mode, selected tab, onboarding completion, and the active theme ID
+
+### `ThemeId`
+
+```text
+"midnight" | "newsprint"
+```
+
+The default selection rule is `midnight` so the current shipped visual identity stays stable for existing users. Invalid or missing stored theme values recover safely to that default.
 
 Ephemeral UI-only state such as the current generated setup, active toast notifications, open confirmation modal, and transient recovery notices is intentionally kept out of persisted browser state.
 
@@ -276,7 +284,8 @@ The app should persist **one versioned root state object**.
     lastAdvancedSolo: boolean,
     lastPlayMode: PlayMode,
     selectedTab: string | null,
-    onboardingCompleted: boolean
+    onboardingCompleted: boolean,
+    themeId: ThemeId
   }
 }
 ```
@@ -301,6 +310,8 @@ Hydration rules:
 - if browser storage is unavailable entirely, the app should keep running in-memory for the current session and surface a degraded-mode warning
 
 Forced-pick selections from Epic 15 are also ephemeral UI-only state. They intentionally do not persist in browser storage and do not appear in accepted `GameRecord` snapshots.
+
+The active theme is persisted, but the startup script in `index.html` applies it before the main app boot completes so first paint stays aligned with the stored preference.
 
 ---
 

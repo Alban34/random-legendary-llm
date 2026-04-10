@@ -3,32 +3,43 @@
 STATUS: Approved
 
 ## Design Philosophy
-Dark, high-contrast Marvel aesthetic. Functional first, visually bold second. No external fonts, no framework — pure CSS with custom properties.
+Themeable Marvel-inspired UI. Functional first, visually bold second. No external fonts, no framework — pure CSS with semantic custom properties.
+
+The current supported themes are:
+- `Midnight` — the default high-contrast dark theme
+- `Newsprint` — a warm light theme for bright environments
 
 ---
 
 ## Color Tokens
 
+The styling layer now separates semantic tokens from concrete palette values. Each theme defines the same token set, and components consume those semantic variables instead of shipping duplicated per-theme rule blocks.
+
 ```css
-:root {
-  --bg-app:          #0d0d0d;   /* Page background */
-  --bg-card:         #141428;   /* Card / panel backgrounds */
-  --bg-card-hover:   #1e1e38;   /* Hover state */
-  --bg-nav:          #0a0a1a;   /* Navigation bar background */
-  --accent-red:      #e62429;   /* Primary CTA, active tabs, badges */
-  --accent-gold:     #f5a623;   /* Secondary highlights, warnings */
-  --accent-blue:     #1877f2;   /* Info badges, team colors */
-  --text-primary:    #f0f0f0;   /* Main text */
-  --text-secondary:  #a0a0c0;   /* Metadata, labels */
-  --text-muted:      #555577;   /* Disabled / placeholder */
-  --border:          #2a2a4a;   /* Card borders */
-  --border-focus:    #e62429;   /* Focus ring */
-  --success:         #2ecc71;   /* Added to collection, success states */
-  --danger:          #e74c3c;   /* Errors, destructive actions */
-  --warning:         #f39c12;   /* Near-reset, caution */
-  --shadow:          rgba(0,0,0,0.6);
+:root[data-theme="midnight"] {
+  --bg: #0d0d0d;
+  --panel: #141428;
+  --header-bg: #0a0a1a;
+  --accent: #e62429;
+  --accent-gold: #f5a623;
+  --text: #f0f0f0;
+  --muted: #a0a0c0;
+  --border: #2a2a4a;
+}
+
+:root[data-theme="newsprint"] {
+  --bg: #f2ece1;
+  --panel: #f9f3e8;
+  --header-bg: #e9dfce;
+  --accent: #b61f24;
+  --accent-gold: #b97a1b;
+  --text: #211d18;
+  --muted: #5e5448;
+  --border: #cfbfaa;
 }
 ```
+
+Theme-specific token details and the current architecture decision live in `documentation/styling-architecture.md`.
 
 ---
 

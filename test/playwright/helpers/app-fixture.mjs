@@ -49,6 +49,17 @@ export async function selectTab(page, tabId) {
   await page.locator(`#tab-mobile-${tabId}`).click();
 }
 
+export async function selectTheme(page, themeId) {
+  await page.locator(`[data-action="set-theme"][data-theme-id="${themeId}"]`).click();
+}
+
+export async function readDocumentTheme(page) {
+  return page.evaluate(() => ({
+    themeId: document.documentElement.dataset.theme,
+    colorScheme: getComputedStyle(document.documentElement).colorScheme
+  }));
+}
+
 export async function getRuntimeSnapshot(page) {
   return page.evaluate(() => ({
     sets: window.__EPIC1.source.sets,
@@ -72,4 +83,5 @@ export async function seedAllOwnedState(page) {
   await writeAppState(page, state);
   await reloadApp(page);
 }
+
 

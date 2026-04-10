@@ -4,6 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Legendary: Marvel Randomizer</title>
+  <script>
+    (() => {
+      const defaultThemeId = 'midnight';
+      const supportedThemeIds = new Set(['midnight', 'newsprint']);
+      let themeId = defaultThemeId;
+
+      try {
+        const rawState = globalThis.localStorage?.getItem('legendary_state_v1');
+        if (rawState) {
+          const parsedState = JSON.parse(rawState);
+          const candidateThemeId = parsedState?.preferences?.themeId;
+          if (typeof candidateThemeId === 'string' && supportedThemeIds.has(candidateThemeId)) {
+            themeId = candidateThemeId;
+          }
+        }
+      } catch {
+        themeId = defaultThemeId;
+      }
+
+      document.documentElement.dataset.theme = themeId;
+      document.documentElement.style.colorScheme = themeId === 'newsprint' ? 'light' : 'dark';
+    })();
+  </script>
   <link rel="stylesheet" href="./src/app/app-shell.css" />
 </head>
 <body>
@@ -13,7 +36,10 @@
         <h1 id="app-title">Legendary: Marvel Randomizer</h1>
         <p id="app-subtitle">Browse sets, manage your collection, generate legal setups, and track history with browser-based persistence.</p>
       </div>
-      <nav class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary" role="tablist"></nav>
+      <div class="header-controls">
+        <div id="header-theme-controls"></div>
+        <nav class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary" role="tablist"></nav>
+      </div>
     </div>
   </header>
   <main class="app-main">

@@ -304,6 +304,26 @@ Automated coverage:
 
 ---
 
+## Epic 18 — Theme Personalization and Styling Architecture
+
+Required tests:
+- theme utilities normalize only supported theme IDs and keep the default stable
+- persisted state roundtrips keep the selected theme and recover invalid stored theme values safely
+- the stylesheet exposes theme token sets for both supported themes without duplicating component rule blocks per theme
+- documentation stays aligned with the selected styling architecture direction and the supported theme contract
+
+QC checks:
+- verify switching themes updates the shell immediately from the shared header controls
+- verify the selected theme persists across reloads and applies on startup
+- verify Browse, New Game, and History remain readable on both desktop and mobile viewports in each supported theme
+- verify the shipped styling path still uses static local CSS without runtime third-party fetches
+
+Automated coverage:
+- `test/epic18-theme-personalization.test.mjs` covers theme utilities, persisted theme recovery, and styling-documentation alignment
+- `test/playwright/epic18-qc.spec.mjs` covers theme switching, reload persistence, cross-theme readability assertions, and responsive shell behavior
+
+---
+
 ## Epic 8 — History, Usage, and Reset Experience
 
 Required tests:

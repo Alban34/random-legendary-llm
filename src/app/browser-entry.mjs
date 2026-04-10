@@ -6,6 +6,7 @@ import { normalizeGameResultDraft, validateGameResultDraft } from './result-util
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
 import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
 import { resolvePlayMode } from './setup-rules.mjs';
+import { THEME_OPTIONS, normalizeThemeId } from './theme-utils.mjs';
 import {
   STORAGE_KEY,
   acceptGameSetup,
@@ -68,6 +69,10 @@ function syncDebugGlobals(viewModel) {
     playerCount: viewModel.ui.selectedPlayerCount,
     playMode: viewModel.ui.selectedPlayMode,
     advancedSolo: viewModel.ui.advancedSolo
+  };
+  window.__THEME_UI__ = {
+    activeThemeId: viewModel.state.preferences.themeId,
+    supportedThemes: THEME_OPTIONS.map((theme) => ({ id: theme.id, label: theme.label }))
   };
   window.__FORCED_PICKS_UI__ = viewModel.ui.forcedPicks;
   window.__TOASTS__ = viewModel.ui.toasts;
@@ -433,6 +438,17 @@ async function boot() {
         return;
       }
       persistPreferences(viewModel.ui.selectedPlayerCount, playMode, `Selected ${playMode.replaceAll('-', ' ')} mode.`);
+    },
+    setTheme(themeId) {
+      const normalizedThemeId = normalizeThemeId(themeId);
+      if (viewModel.state.preferences.themeId === normalizedThemeId) {
+        return;
+      }
+
+      applyStateUpdate((currentState) => {
+        currentState.preferences.themeId = normalizedThemeId;
+        return currentState;
+      }, `Applied the ${normalizedThemeId} theme.`);
     },
     addForcedPick(field, value) {
       if (!value) {

@@ -128,7 +128,8 @@ test('Epic 8 category resets and full reset preview/behavior stay scoped correct
       lastAdvancedSolo: false,
       lastPlayMode: 'standard',
       selectedTab: null,
-      onboardingCompleted: false
+      onboardingCompleted: false,
+      themeId: 'midnight'
     }
   });
 
