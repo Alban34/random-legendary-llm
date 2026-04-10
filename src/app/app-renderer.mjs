@@ -1,5 +1,6 @@
 import { APP_TABS, normalizeSelectedTab } from './app-tabs.mjs';
 import { BROWSE_TYPE_OPTIONS, filterBrowseSets, getBrowseTypeLabel, summarizeBrowseSet } from './browse-utils.mjs';
+import { COLLECTION_TYPE_GROUPS, getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
 
 const USAGE_LABELS = {
   heroes: 'Heroes',
@@ -133,6 +134,62 @@ function renderBrowseTypeFilters(activeTypeFilter) {
     >
       ${option.label}
     </button>
+  `).join('');
+}
+
+function formatSetCountLabel(value, singular, plural = `${singular}s`) {
+  return `${value} ${value === 1 ? singular : plural}`;
+}
+
+function renderCollectionFeasibility(viewModel) {
+  const feasibility = getCollectionFeasibility(viewModel.bundle.runtime, viewModel.state);
+
+  return feasibility.map((mode) => `
+    <article class="summary-card feasibility-card ${mode.ok ? 'is-ok' : 'is-warning'}" data-feasibility-mode="${mode.id}">
+      <div class="row space-between gap-sm wrap align-center">
+        <strong>${mode.label}</strong>
+        <span class="pill ${mode.ok ? 'feasibility-pill-ok' : 'feasibility-pill-warning'}">${mode.ok ? '✓ Legal' : '⚠ Warning'}</span>
+      </div>
+      <div class="muted feasibility-copy">${mode.ok
+        ? 'Collection currently supports this setup mode.'
+        : (mode.reasons[0] || 'Collection cannot currently support this setup mode.')}</div>
+    </article>
+  `).join('');
+}
+
+function renderCollectionGroups(viewModel) {
+  const ownedSetIds = new Set(viewModel.state.collection.ownedSetIds);
+  const groupedSets = groupSetsByType(viewModel.bundle.runtime.sets);
+
+  return groupedSets.map((group) => `
+    <section class="panel collection-group" data-collection-group="${group.id}">
+      <h3>${COLLECTION_TYPE_GROUPS.find((entry) => entry.id === group.id)?.label || group.label}</h3>
+      <div class="stack gap-sm">
+        ${group.sets.map((set) => {
+          const counts = summarizeBrowseSet(set);
+          return `
+            <label class="collection-row ${ownedSetIds.has(set.id) ? 'owned' : ''}" data-set-id="${set.id}" data-set-name="${set.name}">
+              <span class="row gap-sm align-center collection-row-main">
+                <input
+                  type="checkbox"
+                  class="collection-checkbox"
+                  data-action="toggle-owned-set"
+                  data-set-id="${set.id}"
+                  ${ownedSetIds.has(set.id) ? 'checked' : ''}
+                />
+                <span>
+                  <strong>${set.name}</strong>
+                  <span class="muted"> (${set.year})</span>
+                </span>
+              </span>
+              <span class="muted collection-row-meta">
+                ${formatSetCountLabel(counts.heroCount, 'hero', 'heroes')} · ${formatSetCountLabel(counts.mastermindCount, 'mastermind')} · ${formatSetCountLabel(counts.villainGroupCount, 'villain group')} · ${formatSetCountLabel(counts.henchmanGroupCount, 'henchman group')} · ${formatSetCountLabel(counts.schemeCount, 'scheme')}
+              </span>
+            </label>
+          `;
+        }).join('')}
+      </div>
+    </section>
   `).join('');
 }
 
@@ -298,6 +355,7 @@ function renderBrowsePanel(viewModel) {
 
 function renderCollectionPanel(viewModel) {
   const { bundle, state, persistence, ui } = viewModel;
+  const totals = summarizeOwnedCollection(bundle.runtime, state.collection.ownedSetIds);
   const persistenceNotices = [
     ...persistence.hydrateNotices,
     ...persistence.updateNotices
@@ -306,30 +364,56 @@ function renderCollectionPanel(viewModel) {
   return `
     <section class="stack gap-md">
       <section class="panel">
-        <h2>Collection and persistence status</h2>
+        <div class="row space-between wrap gap-md align-center">
+          <div>
+            <h2>My Collection</h2>
+            <p class="muted">Manage owned sets here with the same persisted ownership state used by Browse and setup generation.</p>
+          </div>
+          <div class="button-row">
+            <button class="button button-secondary" data-action="request-reset-owned-collection">Reset All Selections</button>
+          </div>
+        </div>
         <div class="stack gap-sm">
           <div class="summary-grid">
             <div class="summary-card">
-              <div class="muted">Storage availability</div>
-              <div class="metric-sm">${persistence.storageAvailable ? 'Available' : 'Unavailable'}</div>
-            </div>
-            <div class="summary-card">
-              <div class="muted">Hydrated from storage</div>
-              <div class="metric-sm">${persistence.hydratedFromStorage ? 'Yes' : 'Defaults'}</div>
-            </div>
-            <div class="summary-card">
-              <div class="muted">Recovered on load</div>
-              <div class="metric-sm">${persistence.recoveredOnLoad ? 'Yes' : 'No'}</div>
-            </div>
-            <div class="summary-card">
               <div class="muted">Owned sets</div>
-              <div class="metric-sm">${state.collection.ownedSetIds.length}</div>
+              <div class="metric-sm">${totals.setCount}</div>
+            </div>
+            <div class="summary-card">
+              <div class="muted">Heroes</div>
+              <div class="metric-sm">${totals.heroCount}</div>
+            </div>
+            <div class="summary-card">
+              <div class="muted">Masterminds</div>
+              <div class="metric-sm">${totals.mastermindCount}</div>
+            </div>
+            <div class="summary-card">
+              <div class="muted">Villain Groups</div>
+              <div class="metric-sm">${totals.villainGroupCount}</div>
+            </div>
+            <div class="summary-card">
+              <div class="muted">Henchman Groups</div>
+              <div class="metric-sm">${totals.henchmanGroupCount}</div>
+            </div>
+            <div class="summary-card">
+              <div class="muted">Schemes</div>
+              <div class="metric-sm">${totals.schemeCount}</div>
             </div>
           </div>
           <div class="summary-card">
-            <div><strong>Last save result:</strong> ${persistence.lastSaveMessage || 'No write attempted yet.'}</div>
+            <div><strong>Storage:</strong> ${persistence.storageAvailable ? 'Available' : 'Unavailable'} · ${persistence.hydratedFromStorage ? 'Hydrated from storage' : 'Using defaults'} · ${persistence.recoveredOnLoad ? 'Recovered on load' : 'No recovery needed'}</div>
             ${ui.lastActionNotice ? `<div class="muted">Latest action: ${ui.lastActionNotice}</div>` : ''}
           </div>
+          ${ui.confirmResetOwnedCollection ? `
+            <div class="notice warning" id="collection-reset-confirmation">
+              <strong>Clear all collection selections?</strong>
+              <div class="muted">This clears owned sets only. Usage statistics, history, and preferences will stay intact.</div>
+              <div class="button-row confirmation-actions">
+                <button class="button button-danger" data-action="confirm-reset-owned-collection">Confirm reset</button>
+                <button class="button button-secondary" data-action="cancel-reset-owned-collection">Cancel</button>
+              </div>
+            </div>
+          ` : ''}
           ${persistenceNotices.length
             ? persistenceNotices.map((notice) => `<div class="notice warning">${notice}</div>`).join('')
             : '<div class="notice success">No storage recovery issues are currently active.</div>'}
@@ -337,39 +421,25 @@ function renderCollectionPanel(viewModel) {
       </section>
       <section class="two-col">
         <section class="panel">
-          <h2>Usage statistics summary</h2>
-          <div class="summary-grid">
-            ${Object.entries(USAGE_LABELS).map(([category, label]) => {
-              const usedCount = Object.keys(state.usage[category]).length;
-              const totalCount = category === 'heroes'
-                ? bundle.runtime.indexes.allHeroes.length
-                : category === 'masterminds'
-                  ? bundle.runtime.indexes.allMasterminds.length
-                  : category === 'villainGroups'
-                    ? bundle.runtime.indexes.allVillainGroups.length
-                    : category === 'henchmanGroups'
-                      ? bundle.runtime.indexes.allHenchmanGroups.length
-                      : bundle.runtime.indexes.allSchemes.length;
-              return `
-                <div class="summary-card">
-                  <div class="muted">${label}</div>
-                  <div class="metric-sm">${usedCount}</div>
-                  <div class="muted">tracked · ${totalCount - usedCount} never-played</div>
-                </div>
-              `;
-            }).join('')}
+          <h2>Total available from selected collection</h2>
+          <p class="muted">These totals update immediately as ownership changes from either the Browse tab or this Collection tab.</p>
+          <div class="summary-grid collection-totals-grid">
+            <div class="summary-card"><div class="muted">Heroes</div><div class="metric-sm">${totals.heroCount}</div></div>
+            <div class="summary-card"><div class="muted">Masterminds</div><div class="metric-sm">${totals.mastermindCount}</div></div>
+            <div class="summary-card"><div class="muted">Villain Groups</div><div class="metric-sm">${totals.villainGroupCount}</div></div>
+            <div class="summary-card"><div class="muted">Henchman Groups</div><div class="metric-sm">${totals.henchmanGroupCount}</div></div>
+            <div class="summary-card"><div class="muted">Schemes</div><div class="metric-sm">${totals.schemeCount}</div></div>
           </div>
         </section>
         <section class="panel">
-          <h2>Collection notes</h2>
-          <p class="muted">Epic 5 and Epic 6 will deepen this tab with grouped collection controls, filters, and richer capacity indicators. For now, it already reflects the live persisted owned-set state from Epic 2.</p>
-          <ul class="clean note-list">
-            <li class="summary-card">Selected-tab persistence is active through <code>state.preferences.selectedTab</code>.</li>
-            <li class="summary-card">Owned-set toggles stay synchronized because all tabs read from the same hydrated root state.</li>
-            <li class="summary-card">Usage totals already reflect accepted setups from Epic 2 and Epic 3.</li>
-          </ul>
+          <h2>Capacity</h2>
+          <p class="muted">Warnings use the same legality checks as the setup generator, so thin or uneven collections surface immediately here.</p>
+          <div class="summary-grid collection-feasibility-grid">
+            ${renderCollectionFeasibility(viewModel)}
+          </div>
         </section>
       </section>
+      ${renderCollectionGroups(viewModel)}
     </section>
   `;
 }
@@ -610,6 +680,9 @@ function bindActionButtons(doc, actions) {
   }
 
   const buttonHandlers = {
+    'request-reset-owned-collection': actions.requestResetOwnedCollection,
+    'cancel-reset-owned-collection': actions.cancelResetOwnedCollection,
+    'confirm-reset-owned-collection': actions.confirmResetOwnedCollection,
     'toggle-advanced-solo': actions.toggleAdvancedSolo,
     'generate-setup': actions.generateSetup,
     'regenerate-setup': actions.regenerateSetup,
@@ -632,8 +705,8 @@ export function renderBundle(doc, viewModel, actions) {
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
   const panelMarkup = renderTabPanels(viewModel);
 
-  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 5 Browse Extensions';
-  doc.getElementById('app-subtitle').textContent = 'The current milestone now includes the Epic 5 Browse experience with searchable, filterable, expandable set cards while preserving the Epic 1–4 data, persistence, setup-generation, and shell foundations.';
+  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 6 Collection Management';
+  doc.getElementById('app-subtitle').textContent = 'The current milestone adds a real Collection workflow with grouped ownership management, live totals, and setup-feasibility indicators while preserving the Epic 1–5 foundations.';
   doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, 'desktop');
   doc.getElementById('mobile-tabs').innerHTML = renderTabButtons(activeTabId, 'mobile');
 

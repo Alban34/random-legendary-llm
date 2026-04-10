@@ -463,6 +463,12 @@ export function resetUsageCategory(state, category) {
   return nextState;
 }
 
+export function resetOwnedCollection(state) {
+  const nextState = deepClone(state);
+  nextState.collection.ownedSetIds = [];
+  return nextState;
+}
+
 export function resetAllState({ storageAdapter }) {
   const state = createDefaultState();
   const save = storageAdapter.available

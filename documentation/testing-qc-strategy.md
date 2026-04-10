@@ -198,6 +198,10 @@ Required tests:
 QC checks:
 - verify warnings for thin/uneven collections
 
+Automated coverage:
+- `test/epic6-collection-management.test.mjs` covers type grouping, owned totals, feasibility indicators, and collection-only reset behavior
+- `test/playwright/epic6-qc.spec.mjs` covers grouped collection rendering, cross-tab ownership sync, totals/feasibility updates, and reset confirmation behavior
+
 ---
 
 ## Epic 7 — New Game Setup Experience

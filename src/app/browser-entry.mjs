@@ -9,6 +9,7 @@ import {
   createDefaultState,
   hydrateState,
   resetAllState,
+  resetOwnedCollection,
   resetUsageCategory,
   toggleOwnedSet,
   updateState
@@ -33,6 +34,9 @@ function syncDebugGlobals(viewModel) {
     searchTerm: viewModel.ui.browseSearchTerm,
     typeFilter: viewModel.ui.browseTypeFilter,
     expandedSetId: viewModel.ui.expandedBrowseSetId
+  };
+  window.__COLLECTION_UI__ = {
+    confirmResetOwnedCollection: viewModel.ui.confirmResetOwnedCollection
   };
 }
 
@@ -61,6 +65,7 @@ async function boot() {
       browseSearchTerm: '',
       browseTypeFilter: 'all',
       expandedBrowseSetId: null,
+      confirmResetOwnedCollection: false,
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
       advancedSolo: hydration.state.preferences.lastAdvancedSolo
@@ -138,6 +143,7 @@ async function boot() {
     },
     toggleOwnedSet(setId) {
       clearGeneratedSetup();
+      viewModel.ui.confirmResetOwnedCollection = false;
       applyStateUpdate((currentState) => toggleOwnedSet(currentState, setId), 'Updated owned collection state. Generate a new setup to use the current collection.');
     },
     setBrowseSearchTerm(searchTerm) {
@@ -151,6 +157,21 @@ async function boot() {
     toggleBrowseSetExpanded(setId) {
       viewModel.ui.expandedBrowseSetId = viewModel.ui.expandedBrowseSetId === setId ? null : setId;
       rerender();
+    },
+    requestResetOwnedCollection() {
+      viewModel.ui.confirmResetOwnedCollection = true;
+      viewModel.ui.lastActionNotice = 'Confirm clearing the owned collection to remove all current selections.';
+      rerender();
+    },
+    cancelResetOwnedCollection() {
+      viewModel.ui.confirmResetOwnedCollection = false;
+      viewModel.ui.lastActionNotice = 'Kept the current owned collection selections.';
+      rerender();
+    },
+    confirmResetOwnedCollection() {
+      viewModel.ui.confirmResetOwnedCollection = false;
+      clearGeneratedSetup();
+      applyStateUpdate((currentState) => resetOwnedCollection(currentState), 'Cleared all owned collection selections.');
     },
     setPlayerCount(playerCount) {
       const advancedSolo = playerCount === 1 ? viewModel.ui.advancedSolo : false;

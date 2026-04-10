@@ -592,6 +592,80 @@ details summary {
   margin: 0;
 }
 
+.collection-group {
+  display: grid;
+  gap: 12px;
+}
+
+.collection-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+}
+
+.collection-row.owned {
+  border-color: rgba(46, 204, 113, 0.45);
+  background: rgba(46, 204, 113, 0.08);
+}
+
+.collection-row-main {
+  min-width: 0;
+  flex: 1 1 240px;
+}
+
+.collection-row-meta {
+  flex: 1 1 320px;
+}
+
+.collection-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  margin: 0;
+}
+
+.collection-feasibility-grid,
+.collection-totals-grid {
+  align-items: start;
+}
+
+.feasibility-card {
+  min-height: 100%;
+}
+
+.feasibility-card.is-ok {
+  border-color: rgba(46, 204, 113, 0.4);
+}
+
+.feasibility-card.is-warning {
+  border-color: rgba(245, 166, 35, 0.42);
+}
+
+.feasibility-pill-ok {
+  background: rgba(46, 204, 113, 0.16);
+  color: #a8efc5;
+}
+
+.feasibility-pill-warning {
+  background: rgba(245, 166, 35, 0.16);
+  color: #ffd28a;
+}
+
+.feasibility-copy {
+  margin-top: 8px;
+}
+
+.confirmation-actions {
+  margin-top: 12px;
+}
+
 @media (min-width: 768px) {
   body {
     padding-bottom: 0;
@@ -619,6 +693,10 @@ details summary {
 
   .browse-card-actions {
     width: 100%;
+  }
+
+  .collection-row {
+    align-items: start;
   }
 
   .app-main {
