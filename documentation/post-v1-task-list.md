@@ -1,0 +1,370 @@
+# Post-V1 Implementation Task List
+
+STATUS: Approved
+
+## Purpose
+
+This file is the working checklist for implementing the post-V1 backlog defined in `documentation/post-v1-epics.md`.
+
+Each story is broken into concrete implementation tasks and must also include test and QC coverage before it is considered complete.
+
+**Completion rule:** a story is only considered **Done** when its:
+- implementation tasks,
+- **Test** task,
+- and **QC** task
+
+are all checked.
+
+See also: `documentation/post-v1-delivery-sequence.md`, `documentation/testing-qc-strategy.md`
+
+---
+
+## Epic 11 — Alternate Solo and Multiplayer Modes
+
+### Story 11.1 — Define the rules and UX contract for two-handed solo mode
+- [ ] Confirm the exact card-count and slot rules for two-handed solo mode
+- [ ] Document whether two-handed solo behaves as a 2-player setup, a custom setup, or a separate ruleset
+- [ ] Define the user-facing label, description, and control placement for the mode
+- [ ] Identify any history, scoring, or stats implications of the new mode metadata
+- [ ] **Test:** verify the documented rules and control contract stay aligned with generator assumptions
+- [ ] **QC (Automated):** automate QC coverage to confirm the new mode messaging is visible and understandable in the New Game flow
+
+### Story 11.2 — Extend setup templates and validation for alternate play modes
+- [ ] Add setup-template support for two-handed solo mode
+- [ ] Update legality validation to evaluate collection sufficiency for the new mode
+- [ ] Ensure scheme and mastermind rule modifiers still apply correctly under the new template
+- [ ] Keep unsupported mode combinations blocked with clear reasons
+- [ ] **Test:** verify legal and illegal collections behave correctly for all supported mode combinations
+- [ ] **QC (Automated):** automate QC coverage for generating setups in standard solo, advanced solo, and two-handed solo modes
+
+### Story 11.3 — Render play-mode selection and explain its impact in the New Game flow
+- [ ] Add UI controls for selecting the supported play mode
+- [ ] Update setup-requirements messaging to reflect the chosen mode
+- [ ] Show mode-specific notes when the selected mode changes the rules materially
+- [ ] Preserve accessible control labels and keyboard interaction
+- [ ] **Test:** verify the selected mode updates requirements, generation behavior, and labels consistently
+- [ ] **QC (Automated):** automate QC coverage for mode selection on desktop and mobile viewports
+
+### Story 11.4 — Persist accepted setups with explicit play-mode metadata
+- [ ] Extend the game-record shape to include normalized play-mode metadata
+- [ ] Ensure accepted setups store the chosen mode in history
+- [ ] Preserve backward compatibility for existing history records without play-mode metadata
+- [ ] Update renderers to display mode information when present
+- [ ] **Test:** verify mixed old/new history records load safely and render correctly
+- [ ] **QC (Automated):** automate QC coverage for accepted setups that differ only by play mode
+
+### Story 11.5 — Verify history, stats, and export payloads remain compatible with the new mode model
+- [ ] Audit all history readers for assumptions about player-count-only records
+- [ ] Update any stats derivations to account for play mode explicitly
+- [ ] Reserve a stable export representation for play-mode metadata
+- [ ] Document any fallback behavior for legacy records
+- [ ] **Test:** verify history, analytics inputs, and exported payloads remain valid after mode support is introduced
+- [ ] **QC (Automated):** automate QC coverage for one imported or restored record set containing legacy and mode-aware entries
+
+---
+
+## Epic 12 — Score Logging and Results History
+
+### Story 12.1 — Define a post-game result model that extends the existing game record safely
+- [ ] Define fields for score, outcome, completion state, and optional notes
+- [ ] Decide whether result data is stored in the same record or a linked structure
+- [ ] Define validation rules for incomplete, partial, or corrected results
+- [ ] Preserve compatibility with history entries created before score support exists
+- [ ] **Test:** verify the result model accepts valid states and rejects invalid combinations
+- [ ] **QC (Automated):** automate QC coverage for representative valid and invalid result-entry states
+
+### Story 12.2 — Add score and outcome entry to the accepted game workflow
+- [ ] Add UI for recording win/loss and score after a setup is accepted or completed
+- [ ] Decide whether result entry is immediate, deferred, or both
+- [ ] Prevent invalid score submission and incomplete required fields
+- [ ] Keep the flow understandable when users skip result entry intentionally
+- [ ] **Test:** verify the result-entry flow supports save, skip, and cancel paths correctly
+- [ ] **QC (Automated):** automate QC coverage for keyboard-only score entry and validation messaging
+
+### Story 12.3 — Persist score history alongside setup history without breaking existing saved state
+- [ ] Extend storage loading and saving for result data
+- [ ] Add migration or fallback handling for saved states without score fields
+- [ ] Keep corruption recovery behavior safe if result data is malformed
+- [ ] Ensure result persistence does not mutate unrelated state slices
+- [ ] **Test:** verify save/load roundtrips for records with and without result data
+- [ ] **QC (Automated):** automate QC coverage for upgrading an older saved state into the richer history model
+
+### Story 12.4 — Render score and outcome summaries in the History experience
+- [ ] Display outcome state clearly in each game record
+- [ ] Display score information consistently when present
+- [ ] Distinguish pending-result records from completed-result records
+- [ ] Preserve readability for long history lists and compact layouts
+- [ ] **Test:** verify history rendering for win, loss, pending, and corrected-result records
+- [ ] **QC (Automated):** automate QC coverage for mixed history entries across desktop and mobile layouts
+
+### Story 12.5 — Support editing or correcting a logged result after the initial save
+- [ ] Add edit affordances for previously logged results
+- [ ] Preserve audit-safe behavior for corrected values without duplicating records unintentionally
+- [ ] Recompute derived views after a result edit
+- [ ] Confirm destructive or overwriting edits appropriately if needed
+- [ ] **Test:** verify editing a result updates the stored record and derived views without duplication
+- [ ] **QC (Automated):** automate QC coverage for correcting a result and seeing the update reflected immediately in history
+
+---
+
+## Epic 13 — Data Portability and Backup
+
+### Story 13.1 — Define a versioned import/export schema for collection, preferences, history, and scores
+- [ ] Define the exported root object shape and version marker
+- [ ] Include collection, preferences, history, score data, and future-safe metadata blocks
+- [ ] Define compatibility behavior for unknown or missing fields
+- [ ] Document the difference between internal runtime state and portable backup schema
+- [ ] **Test:** verify schema serialization and validation against representative sample payloads
+- [ ] **QC (Automated):** automate QC coverage for versioned backup fixtures with current and legacy-compatible fields
+
+### Story 13.2 — Export app data as a downloadable JSON file
+- [ ] Add an export action in the UI with clear scope messaging
+- [ ] Serialize the portable schema from the current saved state
+- [ ] Trigger a browser-safe JSON download with a useful filename
+- [ ] Avoid exporting transient UI-only state
+- [ ] **Test:** verify exported JSON contains the expected persistent data and excludes ephemeral state
+- [ ] **QC (Automated):** automate QC coverage to trigger export and validate the downloaded payload structure
+
+### Story 13.3 — Import previously exported JSON data through the UI
+- [ ] Add an import entry point and file-selection flow
+- [ ] Read JSON files safely in the browser
+- [ ] Parse and stage imported data before applying it
+- [ ] Keep the import flow accessible and recoverable after user mistakes
+- [ ] **Test:** verify valid exported files can be imported successfully into a clean or populated app state
+- [ ] **QC (Automated):** automate QC coverage for importing a valid backup and seeing the restored state rendered correctly
+
+### Story 13.4 — Validate imported payloads and show actionable recovery errors
+- [ ] Validate schema version, required sections, and key field types
+- [ ] Surface clear errors for unsupported, corrupted, or partial payloads
+- [ ] Prevent destructive writes when validation fails
+- [ ] Keep error messages specific enough for recovery without exposing internals unnecessarily
+- [ ] **Test:** verify malformed and unsupported payloads fail safely without changing saved state
+- [ ] **QC (Automated):** automate QC coverage for representative import failure cases and visible error messaging
+
+### Story 13.5 — Offer safe restore modes for replacing or merging existing local data
+- [ ] Define replace vs merge semantics for each persistent state slice
+- [ ] Add confirmation UX before applying destructive restore actions
+- [ ] Implement merge behavior that avoids duplicate history records where possible
+- [ ] Preserve user trust by previewing the chosen restore action clearly
+- [ ] **Test:** verify replace and merge paths update only the intended state slices
+- [ ] **QC (Automated):** automate QC coverage for both restore modes with overlapping history and collection data
+
+---
+
+## Epic 14 — Insights and Statistics Dashboard
+
+### Story 14.1 — Define the derived metrics that can be computed from history and usage state
+- [ ] Define the initial metrics set for counts, outcomes, freshness, and score trends
+- [ ] Identify which metrics require score data and which can rely on usage data alone
+- [ ] Define calculation windows and empty-state behavior
+- [ ] Document tie-breaking and ranking rules for repeated entities
+- [ ] **Test:** verify metric definitions produce stable expected outputs for representative sample histories
+- [ ] **QC (Automated):** automate QC coverage for edge cases such as no history, one game, and partial score coverage
+
+### Story 14.2 — Compute summary statistics for games played, outcomes, and scores
+- [ ] Implement selectors or helpers for total games, wins, losses, and score aggregates
+- [ ] Compute ratios and averages safely without divide-by-zero behavior
+- [ ] Keep derived metrics deterministic and independent of presentation order
+- [ ] Recompute summaries when history or results change
+- [ ] **Test:** verify summary statistics across mixed win/loss and scored/unscored histories
+- [ ] **QC (Automated):** automate QC coverage for summary cards updating after a new result is logged
+
+### Story 14.3 — Surface most-played and least-played cards or groups across categories
+- [ ] Define which categories appear in ranking views
+- [ ] Build ranking helpers from usage stats and accepted history
+- [ ] Handle ties and low-sample-size displays sensibly
+- [ ] Show enough context for duplicate display names from different sets
+- [ ] **Test:** verify rankings are correct and stable for duplicate names and tied play counts
+- [ ] **QC (Automated):** automate QC coverage for rankings containing duplicate-name entities from different sets
+
+### Story 14.4 — Add a dedicated stats presentation in History or a new insights view
+- [ ] Decide whether stats live in the History tab or in a separate section
+- [ ] Add summary cards, charts, or ranked lists consistent with the app design system
+- [ ] Preserve responsive layout and accessibility for data-heavy content
+- [ ] Keep stats understandable without requiring a large play history
+- [ ] **Test:** verify the stats UI renders correctly for empty, light, and heavy datasets
+- [ ] **QC (Automated):** automate QC coverage for the stats layout on mobile and desktop viewports
+
+### Story 14.5 — Handle sparse or partial data gracefully so early users still see useful feedback
+- [ ] Add empty states and explanatory helper text for thin datasets
+- [ ] Hide or soften metrics that would otherwise mislead users with too little data
+- [ ] Distinguish unavailable data from a true zero result
+- [ ] Preserve a useful first impression after only one or two logged games
+- [ ] **Test:** verify sparse-data states render helpful messaging instead of broken or misleading metrics
+- [ ] **QC (Automated):** automate QC coverage for a fresh install and a minimally populated history state
+
+---
+
+## Epic 15 — Guided Setup Constraints and Forced Picks
+
+### Story 15.1 — Define which entity categories can be forced into a generated setup
+- [ ] Decide which entity types are eligible for forced inclusion in v1 of the feature
+- [ ] Define legal combinations of forced picks across categories
+- [ ] Document collision rules when forced picks overlap with mandatory scheme or mastermind constraints
+- [ ] Define unsupported combinations and the user-facing error strategy
+- [ ] **Test:** verify the supported forced-pick matrix stays aligned with generator assumptions
+- [ ] **QC (Automated):** automate QC coverage for the user-facing explanation of supported forced-pick categories
+
+### Story 15.2 — Add UI controls for selecting, reviewing, and clearing forced picks
+- [ ] Add controls for choosing forced picks from eligible entities
+- [ ] Display active constraints clearly before generation
+- [ ] Allow removing individual forced picks and clearing all constraints
+- [ ] Keep the selection UI usable with large owned collections
+- [ ] **Test:** verify adding, removing, and clearing constraints updates the pending generation state correctly
+- [ ] **QC (Automated):** automate QC coverage for forced-pick selection flows across at least two entity categories
+
+### Story 15.3 — Update generator logic to satisfy forced picks when a legal setup exists
+- [ ] Apply forced picks before random slot-filling begins
+- [ ] Prevent duplicate-selection conflicts with forced scheme or mastermind effects
+- [ ] Keep legality-first behavior when the available pool is tight
+- [ ] Preserve deterministic handling when multiple forced rules interact
+- [ ] **Test:** verify legal forced-pick setups generate correctly across representative constraint combinations
+- [ ] **QC (Automated):** automate QC coverage for a setup that combines forced picks with mandatory mastermind or scheme groups
+
+### Story 15.4 — Explain clearly when a forced pick makes the setup impossible for the current collection or player mode
+- [ ] Detect unsatisfied forced-pick constraints before or during generation
+- [ ] Surface actionable error messaging that explains the failure reason
+- [ ] Distinguish impossible constraints from temporary randomization retries
+- [ ] Preserve existing insufficiency messaging where it still applies
+- [ ] **Test:** verify impossible constraints fail with specific and correct reasons
+- [ ] **QC (Automated):** automate QC coverage for several impossible forced-pick combinations and the resulting UI feedback
+
+### Story 15.5 — Persist or intentionally scope forced-pick preferences based on the final UX decision
+- [ ] Decide whether forced picks are one-shot, session-scoped, or persisted in preferences
+- [ ] Implement the chosen persistence or reset behavior consistently
+- [ ] Keep accepted-history snapshots free of stale UI-only constraint state
+- [ ] Document the final lifecycle of forced-pick selections in the UX copy or docs
+- [ ] **Test:** verify forced-pick lifecycle behavior across reloads and repeated generations
+- [ ] **QC (Automated):** automate QC coverage for persistence behavior after reload and after successful accept flows
+
+---
+
+## Epic 16 — Notification and Feedback Refinements
+
+### Story 16.1 — Classify notifications by persistence and dismissal behavior
+- [ ] Define notification categories for transient, persistent, and critical messages
+- [ ] Map existing app events onto the new notification classes
+- [ ] Document which messages should never produce a toast
+- [ ] Preserve semantic roles and accessibility expectations for each class
+- [ ] **Test:** verify notification classification remains consistent for the main success, info, warning, and error paths
+- [ ] **QC (Automated):** automate QC coverage for representative events in each notification category
+
+### Story 16.2 — Auto-dismiss non-critical toasts after an accessible timeout
+- [ ] Add timeout behavior for transient toasts
+- [ ] Pause or adjust dismissal timing as needed for accessibility-sensitive interactions
+- [ ] Ensure timers do not leak or remove the wrong toast when multiple are stacked
+- [ ] Keep critical errors exempt from auto-dismissal
+- [ ] **Test:** verify auto-dismiss timing works for single and stacked non-critical toasts
+- [ ] **QC (Automated):** automate QC coverage for stacked toasts that dismiss in the expected order
+
+### Story 16.3 — Allow users to dismiss transient toasts directly
+- [ ] Add an explicit dismissal affordance or interaction to non-critical toasts
+- [ ] Keep the interaction keyboard-accessible
+- [ ] Ensure dismissal does not interfere with concurrent toast timers
+- [ ] Preserve focus behavior when a toast is dismissed manually
+- [ ] **Test:** verify manual dismissal works for mouse and keyboard interaction paths
+- [ ] **QC (Automated):** automate QC coverage for manual dismissal of a stacked toast set
+
+### Story 16.4 — Suppress low-value notifications when equivalent information is already visible in the UI
+- [ ] Identify events that currently create redundant toasts
+- [ ] Remove or suppress redundant notifications without losing important feedback
+- [ ] Keep critical or exceptional fallback messaging intact
+- [ ] Confirm the remaining UI state is sufficient to explain reuse or freshness behavior
+- [ ] **Test:** verify redundant toasts are suppressed while required error messages still appear
+- [ ] **QC (Automated):** automate QC coverage for regeneration and reuse scenarios that should no longer emit informational toasts
+
+### Story 16.5 — Preserve critical error messaging until the user has a reasonable chance to acknowledge it
+- [ ] Define which error conditions are considered critical
+- [ ] Keep critical toasts persistent or require explicit dismissal
+- [ ] Distinguish critical presentation visually and semantically from transient messages
+- [ ] Ensure critical messages remain non-blocking unless escalation is explicitly intended
+- [ ] **Test:** verify critical errors remain visible while non-critical messages continue to auto-dismiss
+- [ ] **QC (Automated):** automate QC coverage for one critical collection-insufficiency error and one recoverable transient message shown in sequence
+
+---
+
+## Epic 17 — Onboarding and Information Architecture
+
+### Story 17.1 — Define the first-run onboarding flow and when it should appear
+- [ ] Decide whether onboarding appears on first launch, first interaction, or by user request
+- [ ] Define the onboarding entry, exit, skip, and replay behavior
+- [ ] Identify what must be explained in the first-run experience versus the main UI copy
+- [ ] Preserve compatibility with returning users and reset behavior
+- [ ] **Test:** verify first-run detection and replay behavior across clean, returning, and reset states
+- [ ] **QC (Automated):** automate QC coverage for first-run and returning-user onboarding visibility
+
+### Story 17.2 — Create a lightweight tutorial that introduces the main tabs and actions
+- [ ] Define the tutorial steps and the minimum useful guidance for each one
+- [ ] Build the tutorial presentation using accessible controls and clear copy
+- [ ] Allow users to skip or complete the tutorial without trapping navigation
+- [ ] Keep the tutorial resilient across mobile and desktop layouts
+- [ ] **Test:** verify tutorial progression, skip, and completion flows behave correctly
+- [ ] **QC (Automated):** automate QC coverage for the tutorial on desktop and mobile viewports
+
+### Story 17.3 — Redesign the welcome area to reduce density and improve visual hierarchy
+- [ ] Audit the current welcome content for crowding and low-priority material
+- [ ] Reorganize content into clearer groups with better spacing and hierarchy
+- [ ] Improve calls to action for the primary user journeys
+- [ ] Preserve design consistency with the existing shell and cards
+- [ ] **Test:** verify the redesigned welcome area still exposes the necessary primary actions and information
+- [ ] **QC (Automated):** automate QC coverage for the updated welcome layout at narrow and wide widths
+
+### Story 17.4 — Move developer-facing or project-background details behind an explicit About entry point
+- [ ] Separate end-user guidance from developer or project-context content
+- [ ] Add an About entry point with clear but unobtrusive placement
+- [ ] Ensure secondary information remains accessible without dominating the default screen
+- [ ] Keep the About content readable and dismissible on small screens
+- [ ] **Test:** verify project-background information is no longer shown by default and remains reachable when requested
+- [ ] **QC (Automated):** automate QC coverage for default visibility and About-panel access behavior
+
+### Story 17.5 — Persist onboarding completion so returning users are not repeatedly interrupted
+- [ ] Add a stored preference or flag for onboarding completion state
+- [ ] Respect the completion flag on startup while preserving a replay option
+- [ ] Keep onboarding-state persistence isolated from unrelated preferences
+- [ ] Ensure reset behavior handles onboarding state intentionally
+- [ ] **Test:** verify onboarding completion persists across reloads and resets according to the chosen rules
+- [ ] **QC (Automated):** automate QC coverage for onboarding persistence after completion and after full reset
+
+---
+
+## Epic 18 — Theme Personalization and Styling Architecture
+
+### Story 18.1 — Add a user-selectable theme toggle and persist the preference in browser state
+- [ ] Add a theme toggle control in an appropriate persistent UI location
+- [ ] Define the supported initial theme set and the default selection rule
+- [ ] Save and load the selected theme from browser state
+- [ ] Apply the selected theme on startup without visible flicker where feasible
+- [ ] **Test:** verify theme selection persists across reloads and applies consistently on startup
+- [ ] **QC (Automated):** automate QC coverage for switching themes and reloading the app
+
+### Story 18.2 — Refactor design tokens so multiple themes can be supported without CSS duplication
+- [ ] Audit existing CSS variables and theme assumptions
+- [ ] Separate semantic tokens from concrete palette values
+- [ ] Define theme token sets for each supported theme
+- [ ] Keep component styling reusable across themes without duplicated rule blocks
+- [ ] **Test:** verify components resolve the correct token values across supported themes
+- [ ] **QC (Automated):** automate QC coverage for representative screens under each theme token set
+
+### Story 18.3 — Verify all primary screens and components remain legible and accessible across themes
+- [ ] Review contrast-sensitive components across all major screens
+- [ ] Update badges, cards, controls, and notifications for cross-theme readability
+- [ ] Preserve visible focus states and semantic state indicators in each theme
+- [ ] Check empty states and dense content views for visual regressions
+- [ ] **Test:** verify key screens meet the chosen accessibility checks across supported themes
+- [ ] **QC (Automated):** automate QC coverage for cross-theme screenshots or assertions on the main app flows
+
+### Story 18.4 — Evaluate candidate third-party CSS approaches that can be bundled statically without runtime dependencies
+- [ ] Identify realistic CSS-library or utility-layer candidates that fit the project's constraints
+- [ ] Evaluate whether each option improves maintainability, bundle simplicity, or design flexibility
+- [ ] Confirm any candidate can be integrated at build time without runtime dependency loading
+- [ ] Document tradeoffs against keeping the current hand-authored CSS approach
+- [ ] **Test:** verify any proof-of-concept styling approach can be built into the static app without runtime fetches
+- [ ] **QC (Automated):** automate QC coverage or build validation for the selected proof-of-concept integration path
+
+### Story 18.5 — Document the styling architecture decision and any migration constraints before adoption
+- [ ] Record the final styling direction and decision rationale
+- [ ] Document migration constraints, non-goals, and rollout strategy if a new approach is chosen
+- [ ] Keep the theme model aligned with the documented design-system contract
+- [ ] Update future backlog assumptions that depend on the styling decision
+- [ ] **Test:** verify documentation remains aligned with the implemented theme and styling architecture behavior
+- [ ] **QC (Automated):** automate QC coverage or consistency checks for documentation references to the chosen styling approach
