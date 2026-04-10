@@ -440,7 +440,7 @@ async function boot() {
       rerender();
     },
     nextOnboardingStep() {
-      viewModel.ui.onboardingStep = Math.min(3, viewModel.ui.onboardingStep + 1);
+      viewModel.ui.onboardingStep = Math.min(4, viewModel.ui.onboardingStep + 1);
       viewModel.ui.lastActionNotice = t('actions.nextWalkthrough');
       rerender();
     },

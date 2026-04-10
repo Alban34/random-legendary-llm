@@ -13,7 +13,7 @@ test.describe('Epic 17 automated QC', () => {
     await gotoApp(page);
 
     await expect(page.locator('#onboarding-shell')).toBeVisible();
-    await expect(page.locator('#onboarding-shell')).toContainText('Step 1 of 4');
+    await expect(page.locator('#onboarding-shell')).toContainText('Step 1 of 5');
 
     await page.locator('#onboarding-shell [data-action="skip-onboarding"]').click();
     await expect(page.locator('#onboarding-shell')).toBeHidden();
@@ -27,7 +27,7 @@ test.describe('Epic 17 automated QC', () => {
     await selectTab(page, 'browse');
     await page.locator('#panel-browse [data-action="start-onboarding"]').click();
     await expect(page.locator('#onboarding-shell')).toBeVisible();
-    await expect(page.locator('#onboarding-shell')).toContainText('Step 1 of 4');
+    await expect(page.locator('#onboarding-shell')).toContainText('Step 1 of 5');
   });
 
   test('keeps the About surface hidden by default and exposes project details only when requested', async ({ page }) => {
@@ -57,7 +57,7 @@ test.describe('Epic 17 automated QC', () => {
     await expect(walkthrough).toBeVisible();
 
     await walkthrough.locator('[data-action="next-onboarding-step"]').click();
-    await expect(walkthrough).toContainText('Step 2 of 4');
+    await expect(walkthrough).toContainText('Step 2 of 5');
 
     await walkthrough.locator('[data-action="open-onboarding-tab"]').click();
     await expect(page.locator('#panel-collection')).toBeVisible();
@@ -68,6 +68,12 @@ test.describe('Epic 17 automated QC', () => {
     await walkthrough.locator('[data-action="next-onboarding-step"]').click();
     await walkthrough.locator('[data-action="next-onboarding-step"]').click();
     await walkthrough.locator('[data-action="next-onboarding-step"]').click();
+    await walkthrough.locator('[data-action="next-onboarding-step"]').click();
+    await expect(walkthrough).toContainText('Step 5 of 5');
+    await expect(walkthrough).toContainText('Protect your collection with Backup');
+    await walkthrough.locator('[data-action="open-onboarding-tab"]').click();
+    await expect(page.locator('#panel-backup')).toBeVisible();
+    await expect(walkthrough).toBeVisible();
     await walkthrough.locator('[data-action="complete-onboarding"]').click();
 
     await expect(walkthrough).toBeHidden();

@@ -662,6 +662,10 @@ const ONBOARDING_STEPS = [
   {
     id: 'history',
     tabId: 'history'
+  },
+  {
+    id: 'backup',
+    tabId: 'backup'
   }
 ];
 
@@ -1023,8 +1027,7 @@ function renderBrowsePanel(viewModel) {
   const metrics = [
     [locale.t('browse.metrics.includedSets'), bundle.counts.sets],
     [locale.t('browse.metrics.ownedSets'), state.collection.ownedSetIds.length],
-    [locale.t('browse.metrics.historyRecords'), state.history.length],
-    [locale.t('browse.metrics.readyTabs'), 5]
+    [locale.t('browse.metrics.historyRecords'), state.history.length]
   ];
   const browseSets = filterBrowseSets(bundle.runtime.sets, {
     searchTerm: ui.browseSearchTerm,
@@ -1054,63 +1057,61 @@ function renderBrowsePanel(viewModel) {
           `).join('')}</div>
         </div>
       </section>
-      <section class="two-col">
-        <section class="panel">
-          <div class="row space-between wrap gap-md align-center">
-            <div>
-              <h2>${locale.t('browse.startHere.title')}</h2>
-              <p class="muted">${locale.t('browse.startHere.description')}</p>
+      <section class="panel" data-browse-start-here>
+        <div class="row space-between wrap gap-md align-center">
+          <div>
+            <h2>${locale.t('browse.startHere.title')}</h2>
+            <p class="muted">${locale.t('browse.startHere.description')}</p>
+          </div>
+        </div>
+        <div class="stack gap-sm browse-priority-list">
+          <article class="summary-card browse-priority-item">
+            <strong>${locale.t('browse.startHere.step1Title')}</strong>
+            <div class="muted">${locale.t('browse.startHere.step1Body')}</div>
+          </article>
+          <article class="summary-card browse-priority-item">
+            <strong>${locale.t('browse.startHere.step2Title')}</strong>
+            <div class="muted">${locale.t('browse.startHere.step2Body')}</div>
+          </article>
+          <article class="summary-card browse-priority-item">
+            <strong>${locale.t('browse.startHere.step3Title')}</strong>
+            <div class="muted">${locale.t('browse.startHere.step3Body')}</div>
+          </article>
+        </div>
+      </section>
+      <section class="panel browse-panel-full-width" data-browse-sets-panel>
+        <div class="row space-between wrap gap-md align-center">
+          <div>
+            <h2>${locale.t('browse.panel.title')}</h2>
+            <p class="muted">${locale.t('browse.panel.description')}</p>
+          </div>
+          <div class="summary-card browse-results-summary">
+            <div class="muted">${locale.t('browse.visibleSets')}</div>
+            <div class="metric-sm">${browseSets.length}</div>
+            <div class="muted">of ${bundle.runtime.sets.length}</div>
+          </div>
+        </div>
+        <div class="browse-toolbar">
+          <label class="browse-search-shell" for="browse-search-input">
+            <span class="muted">${locale.t('browse.searchLabel')}</span>
+            <input
+              id="browse-search-input"
+              class="text-input"
+              type="search"
+              placeholder="${locale.t('browse.searchPlaceholder')}"
+              value="${escapeHtml(ui.browseSearchTerm)}"
+            />
+          </label>
+          <div class="stack gap-sm">
+            <span class="muted">${locale.t('browse.typeFilter')}</span>
+            <div class="button-row" role="group" aria-label="${locale.t('browse.typeFilter')}">
+              ${renderBrowseTypeFilters(ui.browseTypeFilter, locale)}
             </div>
           </div>
-          <div class="stack gap-sm browse-priority-list">
-            <article class="summary-card browse-priority-item">
-              <strong>${locale.t('browse.startHere.step1Title')}</strong>
-              <div class="muted">${locale.t('browse.startHere.step1Body')}</div>
-            </article>
-            <article class="summary-card browse-priority-item">
-              <strong>${locale.t('browse.startHere.step2Title')}</strong>
-              <div class="muted">${locale.t('browse.startHere.step2Body')}</div>
-            </article>
-            <article class="summary-card browse-priority-item">
-              <strong>${locale.t('browse.startHere.step3Title')}</strong>
-              <div class="muted">${locale.t('browse.startHere.step3Body')}</div>
-            </article>
-          </div>
-        </section>
-        <section class="panel">
-          <div class="row space-between wrap gap-md align-center">
-            <div>
-              <h2>${locale.t('browse.panel.title')}</h2>
-              <p class="muted">${locale.t('browse.panel.description')}</p>
-            </div>
-            <div class="summary-card browse-results-summary">
-              <div class="muted">${locale.t('browse.visibleSets')}</div>
-              <div class="metric-sm">${browseSets.length}</div>
-              <div class="muted">of ${bundle.runtime.sets.length}</div>
-            </div>
-          </div>
-          <div class="browse-toolbar">
-            <label class="browse-search-shell" for="browse-search-input">
-              <span class="muted">${locale.t('browse.searchLabel')}</span>
-              <input
-                id="browse-search-input"
-                class="text-input"
-                type="search"
-                placeholder="${locale.t('browse.searchPlaceholder')}"
-                value="${escapeHtml(ui.browseSearchTerm)}"
-              />
-            </label>
-            <div class="stack gap-sm">
-              <span class="muted">${locale.t('browse.typeFilter')}</span>
-              <div class="button-row" role="group" aria-label="${locale.t('browse.typeFilter')}">
-                ${renderBrowseTypeFilters(ui.browseTypeFilter, locale)}
-              </div>
-            </div>
-          </div>
-          ${browseSets.length
-            ? `<div class="grid collection-grid browse-set-grid">${browseSets.map((set) => renderBrowseSetCard(set, viewModel)).join('')}</div>`
-            : `<div id="browse-empty-state" class="notice info">${locale.t('browse.emptyFiltered')}</div>`}
-        </section>
+        </div>
+        ${browseSets.length
+          ? `<div class="grid collection-grid browse-set-grid">${browseSets.map((set) => renderBrowseSetCard(set, viewModel)).join('')}</div>`
+          : `<div id="browse-empty-state" class="notice info">${locale.t('browse.emptyFiltered')}</div>`}
       </section>
       ${ui.aboutPanelOpen ? renderAboutPanel(viewModel) : ''}
     </section>

@@ -384,6 +384,28 @@ Automated coverage:
 
 ---
 
+## Epic 21 — Browse and Onboarding Detail Polish
+
+Required tests:
+- the onboarding shell renders before the main tab-panel shell in the shipped page structure
+- the Browse renderer no longer includes the removed Ready Tabs metric
+- the Browse renderer exposes separate start-here and full-width set-browsing sections
+- supported locale resources can localize the onboarding eyebrow without falling back to English
+- planning docs and `_next-steps.md` stay aligned with the new polish epic
+
+QC checks:
+- verify the first-run walkthrough appears above the main tab content instead of below it
+- verify the Browse sets section uses the full available width on desktop layouts
+- verify the Start here panel remains readable while stacking above the Browse sets section
+- verify the removed Ready Tabs metric is absent from the visible Browse UI
+- verify the walkthrough eyebrow is translated in supported non-English locales
+
+Automated coverage:
+- `test/epic21-browse-polish.test.mjs` covers source-structure changes, removed metric copy, and doc alignment for Epic 21
+- `test/playwright/epic21-qc.spec.mjs` covers first-run onboarding placement, full-width Browse sets layout, and the absence of the Ready Tabs metric
+
+---
+
 ## Epic 8 — History, Usage, and Reset Experience
 
 Required tests:

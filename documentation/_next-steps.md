@@ -16,7 +16,8 @@
 - [x] Game history should be first in the History page
 - [x] Interface localisation
 - [x] Group games in history (by mastermind? player count? something else?)
-- [ ] Move the "Get comfortable with the app in under a minute" on top
-- [ ] "Browse sets" should be full width
-- [ ] "Ready Tabs" is not a relevant information, you should remove it
+- [x] Move the "Get comfortable with the app in under a minute" on top
+- [x] "Browse sets" should be full width
+- [x] "Ready Tabs" is not a relevant information, you should remove it
 - [ ] Validate with "stitch" the UX designer
+- [x] "First-run walkthrough" is not translated
