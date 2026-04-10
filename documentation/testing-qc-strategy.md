@@ -253,6 +253,10 @@ QC checks:
 - focus visibility review
 - semantic/ARIA spot check
 
+Automated coverage:
+- `test/epic9-notifications-accessibility.test.mjs` covers toast helper behavior, invalid-request/fallback messaging inputs, degraded storage recovery, and shipped semantic markup plus focus styling
+- `test/playwright/epic9-qc.spec.mjs` covers stacked toasts, targeted error/info/warning notification readability, degraded-mode storage behavior, and keyboard-only tab/modal flows
+
 ---
 
 ## Epic 10 — Final Documentation and Release Readiness
@@ -264,6 +268,10 @@ Required tests:
 
 QC checks:
 - final documentation review pass before completion
+
+Automated coverage:
+- `test/epic10-documentation-release-readiness.test.mjs` verifies README commands, architecture/data-model/setup-rules alignment with runtime symbols, Epic 10 task completion, and archival framing for planning-only docs
+- `test/playwright/epic10-qc.spec.mjs` smoke-tests the documented launch → generate → accept → persist → reset flow against the shipped browser app
 
 ---
 
@@ -301,6 +309,12 @@ Before implementation is considered complete:
 - reset flows and least-played fallback are verified through automated and logic-level coverage
 - representative inventory and rule behaviors have been cross-checked against `documentation/sources.md`
 
-Current automated browser QC command for Epic 1–8:
+Current automated browser QC command for Epic 1–10:
 - `npm run check:qc`
+
+Targeted Epic 9 browser QC command:
+- `npm run check:qc:epic9`
+
+Targeted Epic 10 browser QC command:
+- `npm run check:qc:epic10`
 

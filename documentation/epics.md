@@ -249,4 +249,4 @@ Finish all user-facing and developer-facing project documentation and align it w
 | Milestone 6 — New Game | Epic 7 |
 | Milestone 7 — History & Reset | Epic 8 |
 | Milestone 8 — Polish & Error Handling | Epic 9 |
-| Milestone 9 — Documentation Finalization | Epic 10 |
+| Milestone 9 — Documentation and Release Readiness | Epic 10 |

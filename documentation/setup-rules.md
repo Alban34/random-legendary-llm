@@ -13,6 +13,8 @@ It focuses on:
 - legality checks,
 - and selection priority rules.
 
+The shipped V1 implementation resolves these templates through `resolveSetupTemplate(playerCount, advancedSolo)` and applies them inside `generateSetup(...)` before any usage or history state is mutated.
+
 ---
 
 ## Player Count Setup Table

@@ -662,7 +662,7 @@ function renderDiagnosticsPanel(viewModel) {
       <h2>Initialization status</h2>
       <div id="status-message">${failed.length
         ? `<p class="error">Foundation loaded with ${failed.length} failing Epic 1 test(s).</p>`
-        : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, Epic 3 setup generation, Epic 4 shell/navigation, Epic 5 browse extensions, Epic 6 collection management, Epic 7 new-game experience, Epic 8 history/reset flows, and Epic 9 notifications/accessibility safeguards are loaded successfully.</p>'}</div>
+        : '<p class="status-pass">Legendary: Marvel Randomizer is loaded successfully with Epic 1–10 implementation, documentation alignment, and automated release-readiness coverage.</p>'}</div>
     </section>
     <section class="panel">
       <h2>Developer diagnostics</h2>
@@ -807,8 +807,8 @@ export function renderBundle(doc, viewModel, actions) {
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
   const panelMarkup = renderTabPanels(viewModel);
 
-  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 9 Notifications, Error Handling, and Accessibility';
-  doc.getElementById('app-subtitle').textContent = 'The current milestone adds stacked notifications, clearer invalid-state messaging, degraded browser-storage handling, and stronger keyboard/semantic accessibility on top of the Epic 1–8 foundations.';
+  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer';
+  doc.getElementById('app-subtitle').textContent = 'Browse sets, manage your collection, generate legal setups, and track history with browser-based persistence.';
   doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, 'desktop');
   doc.getElementById('mobile-tabs').innerHTML = renderTabButtons(activeTabId, 'mobile');
 

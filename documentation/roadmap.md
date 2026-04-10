@@ -3,7 +3,7 @@
 STATUS: Approved
 
 ## Overview
-A static-hosted single-page application (`index.html` + project-owned CSS, JS modules, and data assets) that lets users browse all Legendary: Marvel sets, manage their personal collection, generate fully-randomized game setups, and track used cards across sessions via `localStorage`.
+A static-hosted single-page application (`index.html` + project-owned CSS, JS modules, and data assets) that lets users browse all Legendary: Marvel sets, manage their personal collection, generate legal randomized game setups, accept and log them into persistent history, review usage freshness, and reset stored state safely.
 
 ---
 
@@ -22,7 +22,7 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 
 ---
 
-## Milestone 2 — Core Engine
+## Milestone 2 — Core Engine ✅
 **Goal:** Implement storage and randomization logic as pure, testable modules.
 
 **Deliverables:**
@@ -38,7 +38,7 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 
 ---
 
-## Milestone 3 — UI Shell
+## Milestone 3 — UI Shell ✅
 **Goal:** Expand the existing HTML shell into the full application shell, design system, and tab navigation.
 
 **Deliverables:**
@@ -50,11 +50,11 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 - Tabs switch without page reload
 - Correct panel is shown/hidden per selected tab
 - Renders correctly on 320px–1440px viewport widths
-- No layout breakage on Chrome, Firefox, Safari, Edge
+- Responsive shell behavior is covered by automated browser QC on desktop and mobile viewport sizes
 
 ---
 
-## Milestone 4 — Browse Extensions Tab
+## Milestone 4 — Browse Extensions Tab ✅
 **Goal:** Allow users to explore all available sets and toggle them into their collection.
 
 **Deliverables:**
@@ -69,7 +69,7 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 
 ---
 
-## Milestone 5 — My Collection Tab
+## Milestone 5 — My Collection Tab ✅
 **Goal:** Provide an at-a-glance summary of the user's current collection.
 
 **Deliverables:**
@@ -83,7 +83,7 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 
 ---
 
-## Milestone 6 — New Game Tab
+## Milestone 6 — New Game Tab ✅
 **Goal:** Generate and display a complete randomized game setup.
 
 **Deliverables:**
@@ -99,7 +99,7 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 
 ---
 
-## Milestone 7 — History & Reset Tab
+## Milestone 7 — History & Reset Tab ✅
 **Goal:** Let users review past games and manage the used-card tracking.
 
 **Deliverables:**
@@ -109,19 +109,19 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 
 **Acceptance Criteria:**
 - History persists across page reloads
-- Full Reset clears `legendary_state_v1` safely, plus any future app-owned persistence keys if they are introduced later
-- Per-category reset only clears that category's used list
+- Full Reset clears collection, usage, history, and preferences stored in `legendary_state_v1` only after confirmation
+- Per-category reset only clears the selected usage bucket and leaves other state intact
 
 ---
 
-## Milestone 8 — Polish & Error Handling
+## Milestone 8 — Polish & Error Handling ✅
 **Goal:** Production-quality UX and robustness.
 
 **Deliverables:**
-- Toast notification system for: auto-reset events, collection-too-small errors, save confirmations
-- Smooth CSS transitions on tab switches and card expansions
-- Graceful degradation message if `localStorage` is unavailable
-- Empty-state illustrations for empty collection and empty history
+- Toast notification system for success, info, warning, and error states
+- Keyboard-accessible confirmation modal behavior for destructive actions
+- Graceful degradation messaging if `localStorage` is unavailable
+- Semantic tab, toast, and dialog markup with visible focus treatment
 
 **Acceptance Criteria:**
 - No unhandled JS exceptions during normal operation
@@ -130,8 +130,8 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 
 ---
 
-## Milestone 9 — Documentation Finalization
-**Goal:** Complete all documentation files and user-facing README.
+## Milestone 9 — Documentation and Release Readiness ✅
+**Goal:** Complete all documentation files, user-facing README guidance, and final release-readiness validation.
 
 **Deliverables:**
 - `README.md` (user guide)
@@ -142,10 +142,12 @@ A static-hosted single-page application (`index.html` + project-owned CSS, JS mo
 - `documentation/game-data.md` (expansion catalog)
 - `documentation/game-data-normalized.md` (source-backed normalized inventory)
 - `documentation/roadmap.md` (this file)
+- Epic 10 documentation-contract tests and release-smoke browser QC
 
 **Acceptance Criteria:**
-- README is understandable by a non-technical user
-- All ⚠️ placeholders in `game-data.md` resolved with accurate data
+- README matches shipped behavior, commands, persistence model, reset flows, and current limitations
+- Architecture, data-model, setup-rules, roadmap, task list, and testing strategy stay aligned with implementation
+- Documentation and release-readiness validation run successfully through automated tests and browser QC
 
 ---
 

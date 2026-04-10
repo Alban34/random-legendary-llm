@@ -6,6 +6,8 @@ The original brief asked for a single HTML file with embedded JavaScript and CSS
 > **Implementation addendum (approved after Epic 1):**
 > The project still targets a **single-page client app with no server-side code**, but the physical implementation is now allowed to use **multiple static files** (`index.html`, CSS, ES modules, JSON data) as long as it is served by a **static HTTP server** and keeps zero runtime backend dependencies.
 
+> **Historical note:** this document is the original project brief plus approved implementation-direction addenda. The app is now implemented; planning and approval workflow requirements below are preserved as historical provenance rather than active delivery blockers.
+
 # Purpose
 
 I want to create a new project that needs to run in a single web page, without any server-side code. 
@@ -17,7 +19,7 @@ This project will allow the user to:
 
 # Constraints
 - **Superseded implementation detail:** the original brief asked for a single HTML file with embedded JavaScript and CSS. The approved implementation direction is now a **static-served multi-file SPA** with project-owned HTML, CSS, ES modules, and JSON assets.
-- The project must not use any server-side code or external libraries.
+- The project must not use any server-side code or runtime external libraries.
 - The project must use browser storage (localStorage or sessionStorage) to keep track of the cards already selected in previous games.
 - The project must provide a user interface to view existing extensions, create a collection, and start games with randomized decks.
 - **Superseded scope detail:** the original brief said 1 to 4 players. The approved setup rules and roadmap now support **1 to 5 players**, with the option to play the "advanced solo" mode for 1 player.

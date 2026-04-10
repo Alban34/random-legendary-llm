@@ -13,6 +13,25 @@ It explains how the application should use a project-owned canonical data format
 - transparent about rule interpretation,
 - and extensible for future sets and game rules.
 
+## Current shipped implementation snapshot
+
+The current release keeps the architecture described below and implements it with these primary runtime entry points:
+
+- `index.html` — static application shell and mounting points for tabs, toast region, and modal root
+- `src/app/browser-entry.mjs` — bootstraps canonical data, hydration, ephemeral UI state, toasts, and actions
+- `src/app/game-data-pipeline.mjs` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
+- `src/app/state-store.mjs` — owns the versioned root state persisted under `legendary_state_v1`
+- `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs` — resolve templates and produce legal setups
+- `src/app/app-renderer.mjs` — renders tabs, results, history, notifications, and shared confirmation modal UI
+
+The shipped runtime bundle created by `createEpic1Bundle(seed)` exposes project-owned canonical source data, normalized runtime data, summary counts, and validation test results for the browser shell.
+
+The shipped shell currently exposes four primary tab panels with IDs that match the persisted preference and renderer contracts:
+- `browse`
+- `collection`
+- `new-game`
+- `history`
+
 ---
 
 ## Architectural principles
@@ -70,7 +89,8 @@ That asset can be transformed at startup into the canonical nested runtime sourc
 At startup, the app should derive a normalized runtime model:
 
 ```text
-const RUNTIME_DATA = normalizeGameData(SOURCE_GAME_DATA);
+const EPIC1_BUNDLE = createEpic1Bundle(SEED_GAME_DATA);
+const RUNTIME_DATA = EPIC1_BUNDLE.runtime;
 ```
 
 This runtime layer is not persisted. It is rebuilt whenever the page loads.
@@ -198,13 +218,13 @@ The app should therefore use:
 
 The app should persist **one versioned root state object** in browser storage.
 
-Recommended key:
+Current key:
 
 ```text
 legendary_state_v1
 ```
 
-Recommended shape:
+Current shape:
 
 ```text
 {
@@ -238,11 +258,11 @@ Recommended shape:
 ### Epic 2 implementation boundary recommendation
 Within the current static modular app, Epic 2 should keep persistence concerns separate from data normalization and rendering.
 
-Recommended module responsibilities:
+Current module responsibilities:
 - `src/app/game-data-pipeline.mjs` — canonical data transformation, normalization, and runtime indexes only
-- `src/app/browser-entry.mjs` — bootstraps runtime data, hydrates persisted state, and wires state into rendering
+- `src/app/browser-entry.mjs` — bootstraps runtime data, hydrates persisted state, owns ephemeral UI state, and wires state into rendering
 - a dedicated Epic 2 state/storage module under `src/app/` — default-state creation, load/save/update helpers, reset helpers, and storage availability handling
-- renderer modules — consume hydrated state and surface recovery or validation messages, but do not own persistence logic
+- renderer modules — consume hydrated state and surface recovery or validation messages, notifications, and confirmation UI, but do not own persistence logic
 
 Recommended hydration order:
 1. load canonical game data and build `RUNTIME_DATA`

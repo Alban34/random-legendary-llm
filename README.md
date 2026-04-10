@@ -4,7 +4,7 @@ STATUS: Approved
 
 ## Project state
 
-The repository now contains the **Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 + Epic 8 + Epic 9 implementation foundation** for the Legendary: Marvel randomizer.
+The repository now contains the **Epic 1 through Epic 10 implementation, documentation, and release-readiness pass** for the Legendary: Marvel randomizer.
 
 Current status:
 - Epic 1 implementation, tests, and browser QC automation are complete
@@ -16,6 +16,7 @@ Current status:
 - Epic 7 New Game implementation, automated tests, and browser QC automation are complete
 - Epic 8 History/Usage/Reset implementation, automated tests, and browser QC automation are complete
 - Epic 9 Notifications/Error Handling/Accessibility implementation, automated tests, and browser QC automation are complete
+- Epic 10 Final Documentation/Release Readiness updates, automated tests, and browser QC automation are complete
 
 Implemented so far:
 - canonical seed data under `src/data/`
@@ -28,9 +29,9 @@ Implemented so far:
 - New Game display/control helpers under `src/app/new-game-utils.mjs`
 - History/usage/reset helpers under `src/app/history-utils.mjs`
 - notification/toast helpers under `src/app/feedback-utils.mjs`
-- a tabbed `index.html` shell for the browser app, including the Epic 5 Browse, Epic 6 Collection, Epic 7 New Game, Epic 8 History/Reset, and Epic 9 notifications/accessibility experience
-- npm-based Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 + Epic 8 + Epic 9 tests under `test/`
-- Playwright browser QC coverage for the Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 + Epic 8 + Epic 9 flows under `test/playwright/`
+- a tabbed `index.html` shell for the browser app with Browse, Collection, New Game, History, notifications, reset confirmation, and accessibility support
+- npm-based Epic 1 through Epic 10 tests under `test/`
+- Playwright browser QC coverage for the Epic 1 through Epic 10 flows under `test/playwright/`
 - a data-foundation summary reporter under `tools/`
 
 The app remains **fully static**:
@@ -57,6 +58,44 @@ Current entry points:
 - `src/data/canonical-game-data.json` — project-owned canonical game data asset
 
 This keeps the app easy to host statically while making Epic 2+ work much easier to maintain and test.
+
+---
+
+## Use the app
+
+Typical flow:
+
+1. Open the app through a static HTTP server.
+2. Use the **Browse** tab to inspect included sets and add them to your collection.
+3. Review totals and legality warnings in **Collection**.
+4. Go to **New Game** to choose player count, optionally enable Advanced Solo for 1 player, then **Generate Setup**.
+5. Use **Regenerate** as much as you want without changing persisted history or usage.
+6. Use **Accept & Log** when you want the current setup to count toward usage tracking and game history.
+7. Review accepted games and reset actions from **History**.
+
+Important behavior:
+- **Generate** and **Regenerate** are ephemeral; they do not change persisted state
+- **Accept & Log** updates usage statistics and appends a history record
+- if browser storage is unavailable, the app stays usable in-memory for the current session and shows a warning
+
+---
+
+## Persistence, reset behavior, and current limitations
+
+Persisted data:
+- the app stores one versioned root state object in browser storage under `legendary_state_v1`
+- that state contains collection ownership, usage statistics, accepted game history, and preferences
+
+Reset behavior:
+- **Reset All Selections** in **Collection** clears owned sets only
+- **Reset Heroes / Masterminds / Villain Groups / Henchman Groups / Schemes** in **History** clear only the selected usage bucket
+- **Full Reset — Clear all data** clears collection, usage, history, and preferences only after confirmation
+
+Current V1 limitations:
+- no score tracking, win/loss tracking, export/import, 2-handed solo, or forced-card inclusion yet
+- hero tracking is at the hero-deck level, not per individual card
+- the app must be opened through a static HTTP server rather than `file://`
+- browser QC is automated in Chromium via Playwright; runtime behavior targets modern browsers with graceful degradation when storage is unavailable
 
 ---
 
@@ -176,7 +215,21 @@ cd "/Users/afayard1/Projects/random-legendary-llm"
 npm run check:qc:epic9
 ```
 
-Run the browser QC suite for Epic 1–9:
+Run the Epic 10 documentation/release-readiness checks only:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run check:epic10
+```
+
+Run the Epic 10 browser QC only:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run check:qc:epic10
+```
+
+Run the browser QC suite for Epic 1–10:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
@@ -230,9 +283,12 @@ Project documentation lives in `documentation/`.
 - `documentation/epics.md` — implementation epics and stories
 - `documentation/task-list.md` — checkable implementation tracker
 - `documentation/testing-qc-strategy.md` — testing and quality-control policy
+- `documentation/_next-steps.md` — post-V1 ideas and future enhancements
 
 ---
 
-## Next step
+## Current release status
 
-With Epic 1 through Epic 9 implemented in code and covered by automated browser QC, the next major implementation target is **Epic 10 — Final Documentation and Release Readiness**.
+Epic 1 through Epic 10 are implemented, documented, and covered by automated logic tests plus browser QC.
+
+For future enhancements beyond the current release, see `documentation/_next-steps.md`.

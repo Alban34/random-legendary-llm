@@ -4,6 +4,8 @@
 
 This file records the clarification decisions that were needed before the documentation could move to review.
 
+> **Historical note:** this file is retained as an archival record of pre-implementation decisions. The documentation set is approved and the application has already been implemented; any workflow language below should be read as historical context rather than a current blocker.
+
 ---
 
 ## Final decisions
@@ -89,8 +91,8 @@ These decisions are now reflected in:
 
 ---
 
-## Next step
+## Historical outcome
 
-The project is now ready for **documentation review**.
+The clarification decisions above were incorporated into the approved documentation set and the shipped implementation.
 
-No code implementation should begin until you approve the documentation set.
+This file now remains for provenance only.

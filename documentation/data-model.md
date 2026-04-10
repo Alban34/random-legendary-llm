@@ -13,6 +13,18 @@ It distinguishes between:
 
 The BoardGameGeek pages remain the verification source during documentation and maintenance, but the application itself should run on its own clean canonical format.
 
+## Current shipped implementation snapshot
+
+The current release builds a bundle with `createEpic1Bundle(seed)` and persists exactly one browser-state object under `legendary_state_v1`.
+
+Persisted slices in V1:
+- `collection` — owned set IDs
+- `usage` — per-category `plays` and `lastPlayedAt`
+- `history` — accepted game records stored with IDs only
+- `preferences` — last player count, Advanced Solo flag, and selected tab
+
+Ephemeral UI-only state such as the current generated setup, active toast notifications, open confirmation modal, and transient recovery notices is intentionally kept out of persisted browser state.
+
 ---
 
 ## 1. Canonical client-shipped seed data
@@ -130,6 +142,17 @@ const RUNTIME_DATA = normalizeGameData(SOURCE_GAME_DATA);
 ```
 
 This runtime data is **not persisted**. It is rebuilt on load.
+
+The shipped runtime bundle shape is:
+
+```text
+{
+  source,
+  runtime,
+  counts,
+  tests
+}
+```
 
 ### Runtime shape
 
@@ -263,6 +286,7 @@ Hydration rules:
 - stored `ownedSetIds` must be revalidated against `RUNTIME_DATA.indexes.setsById`
 - invalid stored entity references should be removed safely rather than crashing startup
 - any recovery notice shown to the user should be treated as ephemeral UI state, not as persisted root-state data
+- if browser storage is unavailable entirely, the app should keep running in-memory for the current session and surface a degraded-mode warning
 
 ---
 
@@ -318,6 +342,8 @@ Accepted setups should be stored using IDs only.
 - avoids ambiguity with duplicate names,
 - keeps history stable if display formatting changes,
 - lets the UI resolve current labels from runtime indexes.
+
+Generate/Regenerate remain ephemeral in UI state; only Accept & Log creates a `GameRecord` and updates usage statistics.
 
 ---
 
