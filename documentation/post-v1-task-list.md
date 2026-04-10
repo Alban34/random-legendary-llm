@@ -15,11 +15,18 @@ Each story is broken into concrete implementation tasks and must also include te
 
 are all checked.
 
+For all upcoming post-V1 implementation work, completion also requires running the full automated regression suite and confirming it passes:
+- `npm test`
+- `npx playwright test`
+
 See also: `documentation/post-v1-delivery-sequence.md`, `documentation/testing-qc-strategy.md`
 
 ---
 
 ## Epic 11 — Alternate Solo and Multiplayer Modes
+
+### Epic-wide validation gate
+- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 11 work complete
 
 ### Story 11.1 — Define the rules and UX contract for two-handed solo mode
 - [ ] Confirm the exact card-count and slot rules for two-handed solo mode
@@ -65,6 +72,9 @@ See also: `documentation/post-v1-delivery-sequence.md`, `documentation/testing-q
 
 ## Epic 12 — Score Logging and Results History
 
+### Epic-wide validation gate
+- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 12 work complete
+
 ### Story 12.1 — Define a post-game result model that extends the existing game record safely
 - [ ] Define fields for score, outcome, completion state, and optional notes
 - [ ] Decide whether result data is stored in the same record or a linked structure
@@ -108,6 +118,9 @@ See also: `documentation/post-v1-delivery-sequence.md`, `documentation/testing-q
 ---
 
 ## Epic 13 — Data Portability and Backup
+
+### Epic-wide validation gate
+- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 13 work complete
 
 ### Story 13.1 — Define a versioned import/export schema for collection, preferences, history, and scores
 - [ ] Define the exported root object shape and version marker
@@ -153,6 +166,9 @@ See also: `documentation/post-v1-delivery-sequence.md`, `documentation/testing-q
 
 ## Epic 14 — Insights and Statistics Dashboard
 
+### Epic-wide validation gate
+- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 14 work complete
+
 ### Story 14.1 — Define the derived metrics that can be computed from history and usage state
 - [ ] Define the initial metrics set for counts, outcomes, freshness, and score trends
 - [ ] Identify which metrics require score data and which can rely on usage data alone
@@ -196,6 +212,9 @@ See also: `documentation/post-v1-delivery-sequence.md`, `documentation/testing-q
 ---
 
 ## Epic 15 — Guided Setup Constraints and Forced Picks
+
+### Epic-wide validation gate
+- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 15 work complete
 
 ### Story 15.1 — Define which entity categories can be forced into a generated setup
 - [ ] Decide which entity types are eligible for forced inclusion in v1 of the feature
@@ -287,47 +306,50 @@ See also: `documentation/post-v1-delivery-sequence.md`, `documentation/testing-q
 
 ### Story 17.1 — Define the first-run onboarding flow and when it should appear
 - [ ] Decide whether onboarding appears on first launch, first interaction, or by user request
-- [ ] Define the onboarding entry, exit, skip, and replay behavior
-- [ ] Identify what must be explained in the first-run experience versus the main UI copy
-- [ ] Preserve compatibility with returning users and reset behavior
-- [ ] **Test:** verify first-run detection and replay behavior across clean, returning, and reset states
-- [ ] **QC (Automated):** automate QC coverage for first-run and returning-user onboarding visibility
+- [x] Define the onboarding entry, exit, skip, and replay behavior
+- [x] Identify what must be explained in the first-run experience versus the main UI copy
+- [x] Preserve compatibility with returning users and reset behavior
+- [x] **Test:** verify first-run detection and replay behavior across clean, returning, and reset states
+- [x] **QC (Automated):** automate QC coverage for first-run and returning-user onboarding visibility
 
 ### Story 17.2 — Create a lightweight tutorial that introduces the main tabs and actions
-- [ ] Define the tutorial steps and the minimum useful guidance for each one
-- [ ] Build the tutorial presentation using accessible controls and clear copy
-- [ ] Allow users to skip or complete the tutorial without trapping navigation
-- [ ] Keep the tutorial resilient across mobile and desktop layouts
-- [ ] **Test:** verify tutorial progression, skip, and completion flows behave correctly
-- [ ] **QC (Automated):** automate QC coverage for the tutorial on desktop and mobile viewports
+- [x] Define the tutorial steps and the minimum useful guidance for each one
+- [x] Build the tutorial presentation using accessible controls and clear copy
+- [x] Allow users to skip or complete the tutorial without trapping navigation
+- [x] Keep the tutorial resilient across mobile and desktop layouts
+- [x] **Test:** verify tutorial progression, skip, and completion flows behave correctly
+- [x] **QC (Automated):** automate QC coverage for the tutorial on desktop and mobile viewports
 
 ### Story 17.3 — Redesign the welcome area to reduce density and improve visual hierarchy
-- [ ] Audit the current welcome content for crowding and low-priority material
-- [ ] Reorganize content into clearer groups with better spacing and hierarchy
-- [ ] Improve calls to action for the primary user journeys
-- [ ] Preserve design consistency with the existing shell and cards
-- [ ] **Test:** verify the redesigned welcome area still exposes the necessary primary actions and information
-- [ ] **QC (Automated):** automate QC coverage for the updated welcome layout at narrow and wide widths
+- [x] Audit the current welcome content for crowding and low-priority material
+- [x] Reorganize content into clearer groups with better spacing and hierarchy
+- [x] Improve calls to action for the primary user journeys
+- [x] Preserve design consistency with the existing shell and cards
+- [x] **Test:** verify the redesigned welcome area still exposes the necessary primary actions and information
+- [x] **QC (Automated):** automate QC coverage for the updated welcome layout at narrow and wide widths
 
 ### Story 17.4 — Move developer-facing or project-background details behind an explicit About entry point
-- [ ] Separate end-user guidance from developer or project-context content
-- [ ] Add an About entry point with clear but unobtrusive placement
-- [ ] Ensure secondary information remains accessible without dominating the default screen
-- [ ] Keep the About content readable and dismissible on small screens
-- [ ] **Test:** verify project-background information is no longer shown by default and remains reachable when requested
-- [ ] **QC (Automated):** automate QC coverage for default visibility and About-panel access behavior
+- [x] Separate end-user guidance from developer or project-context content
+- [x] Add an About entry point with clear but unobtrusive placement
+- [x] Ensure secondary information remains accessible without dominating the default screen
+- [x] Keep the About content readable and dismissible on small screens
+- [x] **Test:** verify project-background information is no longer shown by default and remains reachable when requested
+- [x] **QC (Automated):** automate QC coverage for default visibility and About-panel access behavior
 
 ### Story 17.5 — Persist onboarding completion so returning users are not repeatedly interrupted
-- [ ] Add a stored preference or flag for onboarding completion state
-- [ ] Respect the completion flag on startup while preserving a replay option
-- [ ] Keep onboarding-state persistence isolated from unrelated preferences
-- [ ] Ensure reset behavior handles onboarding state intentionally
-- [ ] **Test:** verify onboarding completion persists across reloads and resets according to the chosen rules
-- [ ] **QC (Automated):** automate QC coverage for onboarding persistence after completion and after full reset
+- [x] Add a stored preference or flag for onboarding completion state
+- [x] Respect the completion flag on startup while preserving a replay option
+- [x] Keep onboarding-state persistence isolated from unrelated preferences
+- [x] Ensure reset behavior handles onboarding state intentionally
+- [x] **Test:** verify onboarding completion persists across reloads and resets according to the chosen rules
+- [x] **QC (Automated):** automate QC coverage for onboarding persistence after completion and after full reset
 
 ---
 
 ## Epic 18 — Theme Personalization and Styling Architecture
+
+### Epic-wide validation gate
+- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 18 work complete
 
 ### Story 18.1 — Add a user-selectable theme toggle and persist the preference in browser state
 - [ ] Add a theme toggle control in an appropriate persistent UI location

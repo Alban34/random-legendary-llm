@@ -10,7 +10,7 @@
 - [ ] Add a "dark mode" toggle to the UI, and persist the user's preference in browser storage
 - [x] No need for a toast when re-using an already played card, as the card list already shows which cards have been used or not.
 - [x] Toasts should dismiss automatically after a few seconds, and should also be dismissible by the user (e.g. by clicking on them) unless they are critical errors that require user attention (e.g. "no more cards available for the selected collection and player count")
-- [ ] Add an introductory tutorial or walkthrough for first-time users, explaining the main features and how to use the app effectively
-- [ ] Improve the welcome page, it looks too crowded and overwhelming, maybe by adding some spacing, grouping related information, and using a more visually appealing layout
-- [ ] Do not display developers information by default, it should be hidden behind a "About this project" link or button, to avoid overwhelming users who just want to use the app without being interested in the development details
+- [x] Add an introductory tutorial or walkthrough for first-time users, explaining the main features and how to use the app effectively
+- [x] Improve the welcome page, it looks too crowded and overwhelming, maybe by adding some spacing, grouping related information, and using a more visually appealing layout
+- [x] Do not display developers information by default, it should be hidden behind a "About this project" link or button, to avoid overwhelming users who just want to use the app without being interested in the development details
 - [ ] Game history should be first in the History page

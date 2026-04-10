@@ -15,10 +15,14 @@ test.describe('Epic 1 automated QC', () => {
       await expect(browsePanel.getByText(setName, { exact: true })).toBeVisible();
     }
 
-    await expect(browsePanel.getByRole('heading', { name: 'Duplicate-name QC samples' })).toBeVisible();
-    await expect(browsePanel.locator('summary').filter({ hasText: 'Black Widow' })).toBeVisible();
-    await expect(browsePanel.locator('summary').filter({ hasText: 'Loki' })).toBeVisible();
-    await expect(browsePanel.locator('summary').filter({ hasText: 'Thor' })).toBeVisible();
+    await expect(page.locator('#about-panel')).toHaveCount(0);
+    await page.locator('#panel-browse [data-action="toggle-about-panel"]').click();
+    const aboutPanel = page.locator('#about-panel');
+    await expect(aboutPanel.getByRole('heading', { name: 'Data-quality samples' })).toBeVisible();
+    await aboutPanel.locator('.about-card > summary').filter({ hasText: 'Data-quality samples' }).click();
+    await expect(aboutPanel.locator('summary').filter({ hasText: 'Black Widow' })).toBeVisible();
+    await expect(aboutPanel.locator('summary').filter({ hasText: 'Loki' })).toBeVisible();
+    await expect(aboutPanel.locator('summary').filter({ hasText: 'Thor' })).toBeVisible();
 
     const duplicateCounts = await page.evaluate(() => ({
       blackWidow: window.__EPIC1.runtime.indexes.allHeroes.filter((entity) => entity.name === 'Black Widow').length,
@@ -42,7 +46,8 @@ test.describe('Epic 1 automated QC', () => {
     expect(secretInvasion.modifiers.some((modifier) => modifier.type === 'set-min-heroes' && modifier.value === 6)).toBeTruthy();
 
     await selectTab(page, 'browse');
-    await expect(page.locator('#diagnostics-shell')).toContainText('selectedTab');
+    await page.locator('#panel-browse [data-action="toggle-about-panel"]').click();
+    await expect(page.locator('#about-panel')).toContainText('selectedTab');
   });
 
   test('surfaces initialization errors with understandable browser messaging', async ({ page }) => {

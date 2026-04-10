@@ -138,8 +138,167 @@ function renderBrowseTypeFilters(activeTypeFilter) {
   `).join('');
 }
 
+const ONBOARDING_STEPS = [
+  {
+    id: 'browse',
+    tabId: 'browse',
+    eyebrow: 'Step 1',
+    title: 'Browse the full catalog first',
+    description: 'Search by set name or alias, filter by product type, and expand cards to inspect heroes, masterminds, villain groups, henchmen, and schemes.',
+    actionLabel: 'Stay in Browse'
+  },
+  {
+    id: 'collection',
+    tabId: 'collection',
+    eyebrow: 'Step 2',
+    title: 'Mark what you actually own',
+    description: 'Use Browse or Collection to toggle owned sets, then confirm the collection totals and player-count feasibility before generating setups.',
+    actionLabel: 'Open Collection'
+  },
+  {
+    id: 'new-game',
+    tabId: 'new-game',
+    eyebrow: 'Step 3',
+    title: 'Generate a legal setup',
+    description: 'Choose the player mode, generate a setup, and only use Accept & Log once you want the app to update history and freshness tracking.',
+    actionLabel: 'Open New Game'
+  },
+  {
+    id: 'history',
+    tabId: 'history',
+    eyebrow: 'Step 4',
+    title: 'Review history and resets',
+    description: 'History shows accepted games and category freshness, while reset controls let you clear usage or restart the app state intentionally.',
+    actionLabel: 'Open History'
+  }
+];
+
 function formatSetCountLabel(value, singular, plural = `${singular}s`) {
   return `${value} ${value === 1 ? singular : plural}`;
+}
+
+function renderOnboardingShell(viewModel) {
+  if (!viewModel.ui.onboardingVisible) {
+    return '';
+  }
+
+  const currentStep = ONBOARDING_STEPS[Math.max(0, Math.min(viewModel.ui.onboardingStep, ONBOARDING_STEPS.length - 1))];
+  const isLastStep = currentStep.id === ONBOARDING_STEPS[ONBOARDING_STEPS.length - 1].id;
+
+  return `
+    <section class="panel onboarding-shell" id="onboarding-shell" aria-live="polite">
+      <div class="row space-between wrap gap-md align-center">
+        <div>
+          <div class="eyebrow">First-run walkthrough</div>
+          <h2>Get comfortable with the app in under a minute</h2>
+          <p class="muted">This walkthrough is shown on first launch, can be skipped without trapping navigation, and can be replayed anytime from the Browse tab.</p>
+        </div>
+        <div class="onboarding-progress" aria-label="Walkthrough progress">
+          ${ONBOARDING_STEPS.map((step, index) => `
+            <span class="onboarding-step-pill ${index === viewModel.ui.onboardingStep ? 'active' : index < viewModel.ui.onboardingStep ? 'complete' : ''}">${step.eyebrow}</span>
+          `).join('')}
+        </div>
+      </div>
+      <div class="result-card onboarding-step-card" data-onboarding-step="${currentStep.id}">
+        <div class="eyebrow">${currentStep.eyebrow} of ${ONBOARDING_STEPS.length}</div>
+        <h3>${currentStep.title}</h3>
+        <p>${currentStep.description}</p>
+        <div class="button-row">
+          <button type="button" class="button button-secondary" data-action="open-onboarding-tab" data-tab-id="${currentStep.tabId}">${currentStep.actionLabel}</button>
+        </div>
+      </div>
+      <div class="button-row onboarding-actions">
+        <button type="button" class="button button-secondary" data-action="previous-onboarding-step" ${viewModel.ui.onboardingStep === 0 ? 'disabled' : ''}>Previous</button>
+        ${isLastStep
+          ? '<button type="button" class="button button-success" data-action="complete-onboarding">Finish walkthrough</button>'
+          : '<button type="button" class="button button-primary" data-action="next-onboarding-step">Next step</button>'}
+        <button type="button" class="button button-secondary" data-action="skip-onboarding">Skip for now</button>
+      </div>
+    </section>
+  `;
+}
+
+function renderAboutPanel(viewModel) {
+  const { bundle, state, persistence, ui } = viewModel;
+  const failed = bundle.tests.filter((test) => test.status === 'fail');
+
+  return `
+    <section class="panel about-panel" id="about-panel">
+      <div class="row space-between wrap gap-md align-center">
+        <div>
+          <div class="eyebrow">About this project</div>
+          <h2>Project details and developer diagnostics</h2>
+          <p class="muted">This section keeps implementation-oriented details available without putting them in front of players who only want to use the app.</p>
+        </div>
+        <div class="button-row">
+          <button type="button" class="button button-secondary" data-action="toggle-about-panel">Hide About</button>
+        </div>
+      </div>
+      <section class="two-col about-layout">
+        <section class="stack gap-md">
+          <details class="about-card">
+            <summary>
+              <h3>Initialization status</h3>
+            </summary>
+            <div>${failed.length
+              ? `<p class="error">Foundation loaded with ${failed.length} failing Epic 1 test(s).</p>`
+              : '<p class="status-pass">Legendary: Marvel Randomizer is loaded successfully with Epic 1–10 implementation, documentation alignment, and automated release-readiness coverage.</p>'}</div>
+          </details>
+          <details class="about-card">
+            <summary>
+              <h3>Data-quality samples</h3>
+            </summary>
+            <div class="stack gap-sm">
+              ${formatDuplicateEntries(bundle).map((entry) => `
+                <details>
+                  <summary>${entry.name} <span class="pill">${entry.all.length} entries</span></summary>
+                  <pre>${entry.all.map((entity) => `${entity.id}  ←  ${entity.setId}`).join('\n')}</pre>
+                </details>
+              `).join('')}
+            </div>
+          </details>
+          <details class="about-card">
+            <summary>
+              <h3>Epic 1 test results</h3>
+            </summary>
+            <ul class="clean">${bundle.tests.map((test) => `
+              <li class="test ${test.status}">
+                <strong class="status-${test.status}">${test.status === 'pass' ? 'PASS' : 'FAIL'}</strong>
+                — ${test.name}
+                ${test.error ? `<div class="error">${test.error}</div>` : ''}
+              </li>
+            `).join('')}</ul>
+          </details>
+        </section>
+        <section class="stack gap-md">
+          <details class="about-card">
+            <summary>
+              <h3>Runtime diagnostics</h3>
+            </summary>
+            <pre>${JSON.stringify({
+              sampleLeadResolution: bundle.runtime.indexes.allMasterminds.filter((entity) => entity.lead).slice(0, 5),
+              sampleForcedSchemes: bundle.runtime.indexes.allSchemes.filter((entity) => entity.forcedGroups.length || entity.modifiers.length).slice(0, 8),
+              storageState: {
+                storageAvailable: persistence.storageAvailable,
+                recoveredOnLoad: persistence.recoveredOnLoad,
+                ownedSetIds: state.collection.ownedSetIds,
+                historyCount: state.history.length,
+                selectedTab: ui.selectedTab,
+                onboardingCompleted: state.preferences.onboardingCompleted
+              },
+              currentSetup: ui.currentSetup ? ui.currentSetup.setupSnapshot : null
+            }, null, 2)}</pre>
+          </details>
+          <details class="about-card">
+            <summary>
+              <h3>Persisted state snapshot</h3>
+            </summary>
+            <pre>${JSON.stringify(state, null, 2)}</pre>
+          </details>
+        </section>
+      </section>
+    </section>
+  `;
 }
 
 function getActiveModalConfig(viewModel) {
@@ -339,14 +498,10 @@ function renderBrowseSetCard(set, viewModel) {
 function renderBrowsePanel(viewModel) {
   const { bundle, state, ui } = viewModel;
   const metrics = [
-    ['Sets', bundle.counts.sets],
-    ['Heroes', bundle.counts.heroes],
-    ['Masterminds', bundle.counts.masterminds],
-    ['Villain Groups', bundle.counts.villainGroups],
-    ['Henchman Groups', bundle.counts.henchmanGroups],
-    ['Schemes', bundle.counts.schemes],
+    ['Included Sets', bundle.counts.sets],
     ['Owned Sets', state.collection.ownedSetIds.length],
-    ['History Records', state.history.length]
+    ['History Records', state.history.length],
+    ['Ready Tabs', 4]
   ];
   const browseSets = filterBrowseSets(bundle.runtime.sets, {
     searchTerm: ui.browseSearchTerm,
@@ -355,13 +510,50 @@ function renderBrowsePanel(viewModel) {
 
   return `
     <section class="stack gap-md">
-      <section class="grid">${metrics.map(([label, value]) => `
-        <article class="panel metric-card">
-          <div class="muted">${label}</div>
-          <div class="metric">${value}</div>
-        </article>
-      `).join('')}</section>
+      <section class="panel browse-hero">
+        <div class="row space-between wrap gap-md align-center">
+          <div class="browse-hero-copy">
+            <div class="eyebrow">Welcome</div>
+            <h2>Plan the next Legendary session without the clutter</h2>
+            <p class="muted">Browse every set, mark the collection you own, generate a legal setup, and review play history from one static browser app.</p>
+            <div class="button-row browse-hero-actions">
+              <button type="button" class="button button-primary" data-action="jump-tab" data-tab-id="collection">Manage Collection</button>
+              <button type="button" class="button button-secondary" data-action="jump-tab" data-tab-id="new-game">Generate a Game</button>
+              <button type="button" class="button button-secondary" data-action="start-onboarding">Replay Walkthrough</button>
+              <button type="button" class="button button-secondary" data-action="toggle-about-panel" aria-expanded="${ui.aboutPanelOpen}">About this project</button>
+            </div>
+          </div>
+          <div class="summary-grid browse-hero-metrics">${metrics.map(([label, value]) => `
+            <article class="summary-card metric-card">
+              <div class="muted">${label}</div>
+              <div class="metric">${value}</div>
+            </article>
+          `).join('')}</div>
+        </div>
+      </section>
       <section class="two-col">
+        <section class="panel">
+          <div class="row space-between wrap gap-md align-center">
+            <div>
+              <h2>Start here</h2>
+              <p class="muted">Use this page as the landing zone: check what the app contains, jump into the workflow, and only open project details when you want them.</p>
+            </div>
+          </div>
+          <div class="stack gap-sm browse-priority-list">
+            <article class="summary-card browse-priority-item">
+              <strong>1. Confirm your collection</strong>
+              <div class="muted">Use Browse or Collection to add owned sets before generating games.</div>
+            </article>
+            <article class="summary-card browse-priority-item">
+              <strong>2. Generate a legal setup</strong>
+              <div class="muted">New Game respects player mode, collection size, mandatory leads, and freshness history.</div>
+            </article>
+            <article class="summary-card browse-priority-item">
+              <strong>3. Track what you played</strong>
+              <div class="muted">History and usage reset tools stay available without getting in the way of first-time users.</div>
+            </article>
+          </div>
+        </section>
         <section class="panel">
           <div class="row space-between wrap gap-md align-center">
             <div>
@@ -396,27 +588,8 @@ function renderBrowsePanel(viewModel) {
             ? `<div class="grid collection-grid browse-set-grid">${browseSets.map((set) => renderBrowseSetCard(set, viewModel)).join('')}</div>`
             : `<div id="browse-empty-state" class="notice info">No sets match the current search and filter combination.</div>`}
         </section>
-        <section class="panel">
-          <h2>Duplicate-name QC samples</h2>
-          ${formatDuplicateEntries(bundle).map((entry) => `
-            <details>
-              <summary>${entry.name} <span class="pill">${entry.all.length} entries</span></summary>
-              <pre>${entry.all.map((entity) => `${entity.id}  ←  ${entity.setId}`).join('\n')}</pre>
-            </details>
-          `).join('')}
-        </section>
       </section>
-      <section class="panel">
-        <h2>Epic 1 Test Results</h2>
-        <p class="muted">These checks validate dataset presence, ID generation, duplicate-name safety, reference resolution, runtime indexes, and representative invalid-data failure handling.</p>
-        <ul class="clean">${bundle.tests.map((test) => `
-          <li class="test ${test.status}">
-            <strong class="status-${test.status}">${test.status === 'pass' ? 'PASS' : 'FAIL'}</strong>
-            — ${test.name}
-            ${test.error ? `<div class="error">${test.error}</div>` : ''}
-          </li>
-        `).join('')}</ul>
-      </section>
+      ${ui.aboutPanelOpen ? renderAboutPanel(viewModel) : ''}
     </section>
   `;
 }
@@ -656,42 +829,6 @@ function renderHistoryPanel(viewModel) {
   `;
 }
 
-function renderDiagnosticsPanel(viewModel) {
-  const { bundle, state, persistence, ui } = viewModel;
-  const failed = bundle.tests.filter((test) => test.status === 'fail');
-
-  return `
-    <section class="panel">
-      <h2>Initialization status</h2>
-      <div id="status-message">${failed.length
-        ? `<p class="error">Foundation loaded with ${failed.length} failing Epic 1 test(s).</p>`
-        : '<p class="status-pass">Legendary: Marvel Randomizer is loaded successfully with Epic 1–10 implementation, documentation alignment, and automated release-readiness coverage.</p>'}</div>
-    </section>
-    <section class="panel">
-      <h2>Developer diagnostics</h2>
-      <details>
-        <summary>Show runtime diagnostics</summary>
-        <pre>${JSON.stringify({
-          sampleLeadResolution: bundle.runtime.indexes.allMasterminds.filter((entity) => entity.lead).slice(0, 5),
-          sampleForcedSchemes: bundle.runtime.indexes.allSchemes.filter((entity) => entity.forcedGroups.length || entity.modifiers.length).slice(0, 8),
-          storageState: {
-            storageAvailable: persistence.storageAvailable,
-            recoveredOnLoad: persistence.recoveredOnLoad,
-            ownedSetIds: state.collection.ownedSetIds,
-            historyCount: state.history.length,
-            selectedTab: ui.selectedTab
-          },
-          currentSetup: ui.currentSetup ? ui.currentSetup.setupSnapshot : null
-        }, null, 2)}</pre>
-      </details>
-      <details>
-        <summary>Show persisted state snapshot</summary>
-        <pre>${JSON.stringify(state, null, 2)}</pre>
-      </details>
-    </section>
-  `;
-}
-
 function renderTabPanels(viewModel) {
   return {
     browse: renderBrowsePanel(viewModel),
@@ -743,6 +880,14 @@ function bindActionButtons(doc, actions) {
     });
   });
 
+  doc.querySelectorAll('[data-action="jump-tab"]').forEach((button) => {
+    button.addEventListener('click', () => actions.selectTab(button.dataset.tabId));
+  });
+
+  doc.querySelectorAll('[data-action="open-onboarding-tab"]').forEach((button) => {
+    button.addEventListener('click', () => actions.openOnboardingTab(button.dataset.tabId));
+  });
+
   const browseSearchInput = doc.getElementById('browse-search-input');
   if (browseSearchInput) {
     browseSearchInput.addEventListener('input', (event) => actions.setBrowseSearchTerm(event.target.value));
@@ -756,6 +901,12 @@ function bindActionButtons(doc, actions) {
     'cancel-reset-all-state': actions.cancelResetAllState,
     'confirm-reset-all-state': actions.resetAllState,
     'toggle-advanced-solo': actions.toggleAdvancedSolo,
+    'toggle-about-panel': actions.toggleAboutPanel,
+    'start-onboarding': actions.startOnboarding,
+    'previous-onboarding-step': actions.previousOnboardingStep,
+    'next-onboarding-step': actions.nextOnboardingStep,
+    'skip-onboarding': actions.skipOnboarding,
+    'complete-onboarding': actions.completeOnboarding,
     'generate-setup': actions.generateSetup,
     'regenerate-setup': actions.regenerateSetup,
     'accept-current-setup': actions.acceptCurrentSetup,
@@ -831,6 +982,7 @@ function bindActionButtons(doc, actions) {
 export function renderBundle(doc, viewModel, actions) {
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
   const panelMarkup = renderTabPanels(viewModel);
+  const onboardingMarkup = renderOnboardingShell(viewModel);
 
   doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer';
   doc.getElementById('app-subtitle').textContent = 'Browse sets, manage your collection, generate legal setups, and track history with browser-based persistence.';
@@ -844,7 +996,8 @@ export function renderBundle(doc, viewModel, actions) {
     panel.setAttribute('aria-labelledby', `tab-desktop-${tab.id} tab-mobile-${tab.id}`);
   });
 
-  doc.getElementById('diagnostics-shell').innerHTML = renderDiagnosticsPanel(viewModel);
+  doc.getElementById('diagnostics-shell').innerHTML = onboardingMarkup;
+  doc.getElementById('diagnostics-shell').hidden = !onboardingMarkup;
   doc.getElementById('toast-region').innerHTML = renderToastRegion(viewModel);
   doc.getElementById('modal-root').innerHTML = renderActiveModal(viewModel);
 
@@ -852,6 +1005,7 @@ export function renderBundle(doc, viewModel, actions) {
 }
 
 export function renderInitializationError(doc, error) {
+  doc.getElementById('diagnostics-shell').hidden = false;
   doc.getElementById('diagnostics-shell').innerHTML = `
     <section class="panel">
       <h2>Initialization status</h2>

@@ -126,7 +126,8 @@ test('Epic 8 category resets and full reset preview/behavior stay scoped correct
     preferences: {
       lastPlayerCount: 1,
       lastAdvancedSolo: false,
-      selectedTab: null
+      selectedTab: null,
+      onboardingCompleted: false
     }
   });
 

@@ -42,6 +42,12 @@ function syncDebugGlobals(viewModel) {
   window.__HISTORY_UI__ = {
     confirmResetAllState: viewModel.ui.confirmResetAllState
   };
+  window.__ONBOARDING_UI__ = {
+    visible: viewModel.ui.onboardingVisible,
+    step: viewModel.ui.onboardingStep,
+    aboutOpen: viewModel.ui.aboutPanelOpen,
+    completed: viewModel.state.preferences.onboardingCompleted
+  };
   window.__TOASTS__ = viewModel.ui.toasts;
 }
 
@@ -74,6 +80,9 @@ async function boot() {
       confirmResetAllState: false,
       modalReturnFocusAction: null,
       toasts: [],
+      onboardingVisible: !hydration.state.preferences.onboardingCompleted,
+      onboardingStep: 0,
+      aboutPanelOpen: false,
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
       advancedSolo: hydration.state.preferences.lastAdvancedSolo
@@ -234,6 +243,15 @@ async function boot() {
     }, actionNotice);
   };
 
+  const completeOnboardingFlow = (actionNotice) => {
+    viewModel.ui.onboardingVisible = false;
+    viewModel.ui.onboardingStep = 0;
+    applyStateUpdate((currentState) => {
+      currentState.preferences.onboardingCompleted = true;
+      return currentState;
+    }, actionNotice);
+  };
+
   const actions = {
     dismissToast,
     pauseToastDismissal,
@@ -272,6 +290,43 @@ async function boot() {
     setBrowseTypeFilter(typeFilter) {
       viewModel.ui.browseTypeFilter = typeFilter;
       rerender();
+    },
+    toggleAboutPanel() {
+      viewModel.ui.aboutPanelOpen = !viewModel.ui.aboutPanelOpen;
+      viewModel.ui.lastActionNotice = viewModel.ui.aboutPanelOpen
+        ? 'Opened the About this project panel.'
+        : 'Closed the About this project panel.';
+      rerender();
+    },
+    startOnboarding() {
+      viewModel.ui.onboardingVisible = true;
+      viewModel.ui.onboardingStep = 0;
+      viewModel.ui.aboutPanelOpen = false;
+      viewModel.ui.lastActionNotice = 'Opened the introductory walkthrough.';
+      if (viewModel.ui.selectedTab !== 'browse') {
+        persistSelectedTab('browse', 'Returned to the Browse tab to replay the walkthrough.');
+        return;
+      }
+      rerender();
+    },
+    previousOnboardingStep() {
+      viewModel.ui.onboardingStep = Math.max(0, viewModel.ui.onboardingStep - 1);
+      viewModel.ui.lastActionNotice = 'Moved to the previous walkthrough step.';
+      rerender();
+    },
+    nextOnboardingStep() {
+      viewModel.ui.onboardingStep = Math.min(3, viewModel.ui.onboardingStep + 1);
+      viewModel.ui.lastActionNotice = 'Moved to the next walkthrough step.';
+      rerender();
+    },
+    openOnboardingTab(tabId) {
+      persistSelectedTab(tabId, `Opened the ${normalizeSelectedTab(tabId)} tab from the walkthrough.`);
+    },
+    skipOnboarding() {
+      completeOnboardingFlow('Skipped the walkthrough. Replay it anytime from Browse.');
+    },
+    completeOnboarding() {
+      completeOnboardingFlow('Completed the walkthrough. Replay it anytime from Browse.');
     },
     toggleBrowseSetExpanded(setId) {
       viewModel.ui.expandedBrowseSetId = viewModel.ui.expandedBrowseSetId === setId ? null : setId;
@@ -383,6 +438,9 @@ async function boot() {
       viewModel.ui.selectedTab = DEFAULT_TAB_ID;
       viewModel.ui.selectedPlayerCount = result.state.preferences.lastPlayerCount;
       viewModel.ui.advancedSolo = result.state.preferences.lastAdvancedSolo;
+      viewModel.ui.onboardingVisible = !result.state.preferences.onboardingCompleted;
+      viewModel.ui.onboardingStep = 0;
+      viewModel.ui.aboutPanelOpen = false;
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the entire application state to defaults.';
       rerender();

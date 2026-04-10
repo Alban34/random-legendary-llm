@@ -34,7 +34,8 @@ function createDefaultPreferences() {
   return {
     lastPlayerCount: 1,
     lastAdvancedSolo: false,
-    selectedTab: null
+    selectedTab: null,
+    onboardingCompleted: false
   };
 }
 
@@ -185,16 +186,20 @@ function sanitizePreferences(candidatePreferences, notices) {
   } else if (typeof candidatePreferences.selectedTab === 'string') {
     selectedTab = normalizeSelectedTab(candidatePreferences.selectedTab);
   }
+  const onboardingCompleted = typeof candidatePreferences.onboardingCompleted === 'boolean'
+    ? candidatePreferences.onboardingCompleted
+    : defaultPreferences.onboardingCompleted;
 
   if (
     lastPlayerCount !== candidatePreferences.lastPlayerCount
     || lastAdvancedSolo !== candidatePreferences.lastAdvancedSolo
     || selectedTab !== candidatePreferences.selectedTab
+    || onboardingCompleted !== candidatePreferences.onboardingCompleted
   ) {
     notices.push('Recovered invalid preference values during state hydration.');
   }
 
-  return { lastPlayerCount, lastAdvancedSolo, selectedTab };
+  return { lastPlayerCount, lastAdvancedSolo, selectedTab, onboardingCompleted };
 }
 
 function sanitizeStateCandidate(candidate, indexes) {

@@ -191,6 +191,106 @@ body {
   padding: 18px;
 }
 
+.eyebrow {
+  margin-bottom: 8px;
+  color: var(--accent-gold);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.browse-hero {
+  background:
+    radial-gradient(circle at top right, rgba(230, 36, 41, 0.18), transparent 34%),
+    linear-gradient(135deg, rgba(245, 166, 35, 0.08), transparent 42%),
+    var(--panel);
+}
+
+.browse-hero-copy {
+  max-width: 42rem;
+}
+
+.browse-hero-actions,
+.onboarding-actions {
+  margin-top: 12px;
+}
+
+.browse-hero-metrics {
+  width: min(100%, 28rem);
+  margin-bottom: 0;
+}
+
+.browse-priority-list {
+  margin-top: 8px;
+}
+
+.browse-priority-item strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.onboarding-shell {
+  background:
+    linear-gradient(145deg, rgba(230, 36, 41, 0.14), transparent 48%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 70%),
+    var(--panel);
+}
+
+.onboarding-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.onboarding-step-pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 0.82rem;
+}
+
+.onboarding-step-pill.active {
+  border-color: rgba(230, 36, 41, 0.55);
+  background: rgba(230, 36, 41, 0.18);
+  color: var(--text);
+}
+
+.onboarding-step-pill.complete {
+  border-color: rgba(46, 204, 113, 0.45);
+  color: var(--text);
+}
+
+.onboarding-step-card p {
+  margin-top: 0;
+}
+
+.about-panel {
+  background:
+    linear-gradient(180deg, rgba(24, 119, 242, 0.08), transparent 28%),
+    var(--panel);
+}
+
+.about-layout {
+  margin-top: 8px;
+}
+
+.about-card summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.about-card summary h3 {
+  margin: 0;
+}
+
+.about-card[open] {
+  background: var(--panel);
+}
+
 .panel h2,
 .panel h3 {
   margin-top: 0;
