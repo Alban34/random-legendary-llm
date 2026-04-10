@@ -1,3 +1,4 @@
+import { hasForcedPicks, normalizeForcedPicks } from './forced-picks-utils.mjs';
 import { resolveSetupTemplate, summarizeSetupTemplate } from './setup-rules.mjs';
 
 const DEFAULT_BYSTANDERS = 30;
@@ -153,22 +154,90 @@ function createIdSet(entities) {
   return new Set(entities.map((entity) => entity.id));
 }
 
-function resolveForcedCollections(scheme, mastermind, pools) {
+function appendForcedReason(map, id, reason) {
+  const existing = map.get(id);
+  if (!existing) {
+    map.set(id, { id, reasons: [reason] });
+    return;
+  }
+
+  if (!existing.reasons.includes(reason)) {
+    existing.reasons.push(reason);
+  }
+}
+
+function validateForcedPickAvailability(forcedPicks, pools, template, eligibleSchemes) {
+  const reasons = [];
+  const schemesById = Object.fromEntries(pools.schemes.map((entity) => [entity.id, entity]));
+  const mastermindsById = Object.fromEntries(pools.masterminds.map((entity) => [entity.id, entity]));
+  const heroesById = Object.fromEntries(pools.heroes.map((entity) => [entity.id, entity]));
+  const villainGroupsById = Object.fromEntries(pools.villainGroups.map((entity) => [entity.id, entity]));
+  const henchmanGroupsById = Object.fromEntries(pools.henchmanGroups.map((entity) => [entity.id, entity]));
+
+  if (forcedPicks.schemeId && !schemesById[forcedPicks.schemeId]) {
+    reasons.push(`Forced Scheme is not owned in the current collection: ${forcedPicks.schemeId}.`);
+  }
+
+  if (forcedPicks.mastermindId && !mastermindsById[forcedPicks.mastermindId]) {
+    reasons.push(`Forced Mastermind is not owned in the current collection: ${forcedPicks.mastermindId}.`);
+  }
+
+  const missingHeroIds = forcedPicks.heroIds.filter((id) => !heroesById[id]);
+  if (missingHeroIds.length) {
+    reasons.push(`Forced Heroes are not owned in the current collection: ${missingHeroIds.join(', ')}.`);
+  }
+
+  const missingVillainIds = forcedPicks.villainGroupIds.filter((id) => !villainGroupsById[id]);
+  if (missingVillainIds.length) {
+    reasons.push(`Forced Villain Groups are not owned in the current collection: ${missingVillainIds.join(', ')}.`);
+  }
+
+  const missingHenchmanIds = forcedPicks.henchmanGroupIds.filter((id) => !henchmanGroupsById[id]);
+  if (missingHenchmanIds.length) {
+    reasons.push(`Forced Henchman Groups are not owned in the current collection: ${missingHenchmanIds.join(', ')}.`);
+  }
+
+  if (forcedPicks.schemeId && !eligibleSchemes.some((scheme) => scheme.id === forcedPicks.schemeId)) {
+    reasons.push(`Forced Scheme is not legal for the selected player count: ${schemesById[forcedPicks.schemeId]?.name || forcedPicks.schemeId}.`);
+  }
+
+  if (forcedPicks.heroIds.length > template.heroCount) {
+    reasons.push(`Forced Heroes exceed the base Hero slots for this setup mode (${forcedPicks.heroIds.length}/${template.heroCount}).`);
+  }
+
+  if (forcedPicks.villainGroupIds.length > template.villainGroupCount) {
+    reasons.push(`Forced Villain Groups exceed the base Villain Group slots for this setup mode (${forcedPicks.villainGroupIds.length}/${template.villainGroupCount}).`);
+  }
+
+  if (forcedPicks.henchmanGroupIds.length > template.henchmanGroupCount) {
+    reasons.push(`Forced Henchman Groups exceed the base Henchman Group slots for this setup mode (${forcedPicks.henchmanGroupIds.length}/${template.henchmanGroupCount}).`);
+  }
+
+  return reasons;
+}
+
+function resolveForcedCollections(scheme, mastermind, pools, forcedPicks) {
   const poolVillainIds = createIdSet(pools.villainGroups);
   const poolHenchmanIds = createIdSet(pools.henchmanGroups);
   const villainMap = new Map();
   const henchmanMap = new Map();
 
+  for (const groupId of forcedPicks.villainGroupIds) {
+    appendForcedReason(villainMap, groupId, 'constraint');
+  }
+
+  for (const groupId of forcedPicks.henchmanGroupIds) {
+    appendForcedReason(henchmanMap, groupId, 'constraint');
+  }
+
   for (const group of scheme.forcedGroups || []) {
     const source = group.category === 'villains' ? villainMap : henchmanMap;
-    source.set(group.id, { id: group.id, forcedBy: 'scheme' });
+    appendForcedReason(source, group.id, 'scheme');
   }
 
   if (mastermind.lead) {
     const source = mastermind.lead.category === 'villains' ? villainMap : henchmanMap;
-    if (!source.has(mastermind.lead.id)) {
-      source.set(mastermind.lead.id, { id: mastermind.lead.id, forcedBy: 'mastermind' });
-    }
+    appendForcedReason(source, mastermind.lead.id, 'mastermind');
   }
 
   const forcedVillainIds = [...villainMap.values()];
@@ -202,7 +271,7 @@ function validateBaseCounts(pools, template) {
   return reasons;
 }
 
-export function validateSetupLegality({ runtime, state, playerCount, advancedSolo = false, playMode }) {
+export function validateSetupLegality({ runtime, state, playerCount, advancedSolo = false, playMode, forcedPicks }) {
   let template;
   try {
     template = resolveSetupTemplate(playerCount, { advancedSolo, playMode });
@@ -218,6 +287,7 @@ export function validateSetupLegality({ runtime, state, playerCount, advancedSol
 
   const pools = buildOwnedPools(runtime, state.collection.ownedSetIds);
   const reasons = [];
+  const normalizedForcedPicks = normalizeForcedPicks(forcedPicks);
 
   if (pools.sets.length === 0) {
     reasons.push('No owned sets are currently selected.');
@@ -230,12 +300,15 @@ export function validateSetupLegality({ runtime, state, playerCount, advancedSol
     reasons.push('No owned schemes are legal for the selected player count.');
   }
 
+  reasons.push(...validateForcedPickAvailability(normalizedForcedPicks, pools, template, eligibleSchemes));
+
   return {
     ok: reasons.length === 0,
     reasons,
     template,
     pools,
-    eligibleSchemes
+    eligibleSchemes,
+    forcedPicks: normalizedForcedPicks
   };
 }
 
@@ -254,23 +327,66 @@ function canSatisfyHeroRequirements(heroes, requirements) {
   return heroes.length >= requirements.heroCount;
 }
 
-function selectHeroes(heroes, requirements, usageBucket, random) {
-  if (!requirements.heroNameRequirements.length) {
-    return selectFreshItems(heroes, requirements.heroCount, usageBucket, random);
+function selectHeroes(heroes, requirements, usageBucket, random, forcedHeroIds = []) {
+  const heroMap = Object.fromEntries(heroes.map((hero) => [hero.id, hero]));
+  const forcedHeroes = forcedHeroIds.map((id) => heroMap[id]).filter(Boolean);
+  if (forcedHeroes.length !== forcedHeroIds.length) {
+    return { selected: [], usedFallback: false, fallbackItems: [], reason: 'One or more forced Heroes are unavailable in the current owned collection.' };
   }
 
-  let selected = [];
-  const selectedIds = new Set();
+  if (forcedHeroes.length > requirements.heroCount) {
+    return {
+      selected: [],
+      usedFallback: false,
+      fallbackItems: [],
+      reason: `Forced Heroes exceed the available Hero slots for this setup (${forcedHeroes.length}/${requirements.heroCount}).`
+    };
+  }
+
+  let selected = [...forcedHeroes];
+  const selectedIds = new Set(selected.map((hero) => hero.id));
+
+  if (!requirements.heroNameRequirements.length) {
+    const filler = selectFreshItems(heroes, requirements.heroCount - forcedHeroes.length, usageBucket, random, selectedIds);
+    if (filler.selected.length !== requirements.heroCount - forcedHeroes.length) {
+      return { selected: [], usedFallback: false, fallbackItems: [], reason: 'Not enough remaining Heroes are available after applying the forced picks.' };
+    }
+
+    return {
+      selected: [...forcedHeroes, ...filler.selected],
+      usedFallback: filler.usedFallback,
+      fallbackItems: filler.fallbackItems,
+      reason: null
+    };
+  }
+
   let usedFallback = false;
   let fallbackItems = [];
   const restrictedPatterns = new Set(requirements.heroNameRequirements.map((requirement) => requirement.pattern));
 
   for (const requirement of requirements.heroNameRequirements) {
     const matcher = new RegExp(requirement.pattern, 'i');
+    const alreadyMatching = selected.filter((hero) => matcher.test(hero.name)).length;
+    const requiredAdditionalMatches = Math.max(0, requirement.value - alreadyMatching);
+    const remainingSlots = requirements.heroCount - selected.length;
+    if (requiredAdditionalMatches > remainingSlots) {
+      return {
+        selected: [],
+        usedFallback: false,
+        fallbackItems: [],
+        reason: 'Forced Hero selections leave no legal way to satisfy this scheme\'s Hero requirements.'
+      };
+    }
+
     const matchingPool = heroes.filter((hero) => matcher.test(hero.name) && !selectedIds.has(hero.id));
-    const result = selectFreshItems(matchingPool, requirement.value, usageBucket, random);
-    if (result.selected.length < requirement.value) {
-      return { selected: [], usedFallback: false, fallbackItems: [] };
+    const result = selectFreshItems(matchingPool, requiredAdditionalMatches, usageBucket, random);
+    if (result.selected.length < requiredAdditionalMatches) {
+      return {
+        selected: [],
+        usedFallback: false,
+        fallbackItems: [],
+        reason: 'Forced Hero selections leave no legal way to satisfy this scheme\'s Hero requirements.'
+      };
     }
     selected.push(...result.selected);
     result.selected.forEach((hero) => selectedIds.add(hero.id));
@@ -287,21 +403,22 @@ function selectHeroes(heroes, requirements, usageBucket, random) {
   });
   const filler = selectFreshItems(generalPool, remainingHeroCount, usageBucket, random);
   if (filler.selected.length < remainingHeroCount) {
-    return { selected: [], usedFallback: false, fallbackItems: [] };
+    return { selected: [], usedFallback: false, fallbackItems: [], reason: 'Not enough remaining Heroes are available after applying the forced picks.' };
   }
 
   selected = [...selected, ...filler.selected];
   usedFallback = usedFallback || filler.usedFallback;
   fallbackItems = [...fallbackItems, ...filler.fallbackItems];
 
-  return { selected, usedFallback, fallbackItems };
+  return { selected, usedFallback, fallbackItems, reason: null };
 }
 
 function buildForcedDetails(entries, lookup) {
   return entries.map((entry) => ({
     ...lookup[entry.id],
     forced: true,
-    forcedBy: entry.forcedBy
+    forcedBy: entry.reasons.length === 1 ? entry.reasons[0] : entry.reasons,
+    forcedReasons: [...entry.reasons]
   }));
 }
 
@@ -313,17 +430,27 @@ function buildRandomDetails(entities) {
   }));
 }
 
-function buildCategorySelection(pools, requirements, scheme, mastermind, usageBucket, random) {
-  const forced = resolveForcedCollections(scheme, mastermind, pools);
+function buildCategorySelection(pools, requirements, scheme, mastermind, usageBucket, random, forcedPicks) {
+  const forced = resolveForcedCollections(scheme, mastermind, pools, forcedPicks);
   if (!forced.allAvailable) {
-    return null;
+    return { selection: null, reason: 'One or more forced Villain Group or Henchman Group picks are unavailable in the current owned collection.' };
   }
 
   const forcedVillains = buildForcedDetails(forced.forcedVillainIds, Object.fromEntries(pools.villainGroups.map((entity) => [entity.id, entity])));
   const forcedHenchmen = buildForcedDetails(forced.forcedHenchmanIds, Object.fromEntries(pools.henchmanGroups.map((entity) => [entity.id, entity])));
 
-  if (forcedVillains.length > requirements.villainGroupCount || forcedHenchmen.length > requirements.henchmanGroupCount) {
-    return null;
+  if (forcedVillains.length > requirements.villainGroupCount) {
+    return {
+      selection: null,
+      reason: `Forced Villain Groups exceed the available slots once scheme and mastermind requirements are applied (${forcedVillains.length}/${requirements.villainGroupCount}).`
+    };
+  }
+
+  if (forcedHenchmen.length > requirements.henchmanGroupCount) {
+    return {
+      selection: null,
+      reason: `Forced Henchman Groups exceed the available slots once scheme and mastermind requirements are applied (${forcedHenchmen.length}/${requirements.henchmanGroupCount}).`
+    };
   }
 
   const extraVillains = selectFreshItems(
@@ -334,7 +461,7 @@ function buildCategorySelection(pools, requirements, scheme, mastermind, usageBu
     new Set(forcedVillains.map((entity) => entity.id))
   );
   if (extraVillains.selected.length !== requirements.villainGroupCount - forcedVillains.length) {
-    return null;
+    return { selection: null, reason: 'Not enough remaining Villain Groups are available after applying the forced picks.' };
   }
 
   const extraHenchmen = selectFreshItems(
@@ -345,21 +472,26 @@ function buildCategorySelection(pools, requirements, scheme, mastermind, usageBu
     new Set(forcedHenchmen.map((entity) => entity.id))
   );
   if (extraHenchmen.selected.length !== requirements.henchmanGroupCount - forcedHenchmen.length) {
-    return null;
+    return { selection: null, reason: 'Not enough remaining Henchman Groups are available after applying the forced picks.' };
   }
 
   return {
-    villainGroups: [...forcedVillains, ...buildRandomDetails(extraVillains.selected)],
-    henchmanGroups: [...forcedHenchmen, ...buildRandomDetails(extraHenchmen.selected)],
-    fallback: {
-      villainGroups: extraVillains.fallbackItems,
-      henchmanGroups: extraHenchmen.fallbackItems
+    selection: {
+      villainGroups: [...forcedVillains, ...buildRandomDetails(extraVillains.selected)],
+      henchmanGroups: [...forcedHenchmen, ...buildRandomDetails(extraHenchmen.selected)],
+      fallback: {
+        villainGroups: extraVillains.fallbackItems,
+        henchmanGroups: extraHenchmen.fallbackItems
+      }
     }
   };
 }
 
-function createGeneratorNotices({ schemeFallback, mastermindFallback, heroFallback, categoryFallback }) {
+function createGeneratorNotices({ schemeFallback, mastermindFallback, heroFallback, categoryFallback, forcedConstraintSummary }) {
   const notices = [];
+  if (forcedConstraintSummary.length) {
+    notices.push(`Applied forced picks: ${forcedConstraintSummary.join('; ')}.`);
+  }
   if (schemeFallback.length) {
     notices.push(`Least-played fallback used for Scheme selection: ${schemeFallback.map((entity) => entity.name).join(', ')}.`);
   }
@@ -378,6 +510,32 @@ function createGeneratorNotices({ schemeFallback, mastermindFallback, heroFallba
   return notices;
 }
 
+function buildForcedConstraintSummary(forcedPicks, setup) {
+  const parts = [];
+
+  if (forcedPicks.schemeId) {
+    parts.push(`Scheme ${setup.scheme.name}`);
+  }
+
+  if (forcedPicks.mastermindId) {
+    parts.push(`Mastermind ${setup.mastermind.name}`);
+  }
+
+  if (forcedPicks.heroIds.length) {
+    parts.push(`Heroes ${setup.heroes.filter((hero) => forcedPicks.heroIds.includes(hero.id)).map((hero) => hero.name).join(', ')}`);
+  }
+
+  if (forcedPicks.villainGroupIds.length) {
+    parts.push(`Villain Groups ${setup.villainGroups.filter((group) => forcedPicks.villainGroupIds.includes(group.id)).map((group) => group.name).join(', ')}`);
+  }
+
+  if (forcedPicks.henchmanGroupIds.length) {
+    parts.push(`Henchman Groups ${setup.henchmanGroups.filter((group) => forcedPicks.henchmanGroupIds.includes(group.id)).map((group) => group.name).join(', ')}`);
+  }
+
+  return parts.filter(Boolean);
+}
+
 function summarizeRequirements(template, effectiveRequirements) {
   return {
     ...summarizeSetupTemplate(template),
@@ -389,30 +547,51 @@ function summarizeRequirements(template, effectiveRequirements) {
   };
 }
 
-export function generateSetup({ runtime, state, playerCount, advancedSolo = false, playMode, random = Math.random }) {
-  const legality = validateSetupLegality({ runtime, state, playerCount, advancedSolo, playMode });
+export function generateSetup({ runtime, state, playerCount, advancedSolo = false, playMode, forcedPicks, random = Math.random }) {
+  const legality = validateSetupLegality({ runtime, state, playerCount, advancedSolo, playMode, forcedPicks });
   if (!legality.ok) {
     throw new Error(legality.reasons.join(' '));
   }
 
-  const { template, pools, eligibleSchemes } = legality;
-  const schemeSelection = selectFreshItems(eligibleSchemes, eligibleSchemes.length, state.usage.schemes, random);
+  const { template, pools, eligibleSchemes, forcedPicks: normalizedForcedPicks } = legality;
+  const hasConstraintSelections = hasForcedPicks(normalizedForcedPicks);
+  const constraintFailureReasons = new Set();
+  const schemeSelection = normalizedForcedPicks.schemeId
+    ? {
+        selected: eligibleSchemes.filter((scheme) => scheme.id === normalizedForcedPicks.schemeId),
+        fallbackItems: []
+      }
+    : selectFreshItems(eligibleSchemes, eligibleSchemes.length, state.usage.schemes, random);
 
   for (const scheme of schemeSelection.selected) {
     const effectiveRequirements = applySchemeModifiersToTemplate(template, scheme);
     if (!canSatisfyHeroRequirements(pools.heroes, effectiveRequirements)) {
+      if (hasConstraintSelections && normalizedForcedPicks.heroIds.length) {
+        constraintFailureReasons.add('Forced Hero selections cannot satisfy the Hero requirements created by the current scheme and play mode.');
+      }
       continue;
     }
 
-    const mastermindRanking = selectFreshItems(pools.masterminds, pools.masterminds.length, state.usage.masterminds, random);
+    const mastermindRanking = normalizedForcedPicks.mastermindId
+      ? {
+          selected: pools.masterminds.filter((mastermind) => mastermind.id === normalizedForcedPicks.mastermindId),
+          fallbackItems: []
+        }
+      : selectFreshItems(pools.masterminds, pools.masterminds.length, state.usage.masterminds, random);
     for (const mastermind of mastermindRanking.selected) {
-      const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random);
-      if (!categorySelection) {
+      const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks);
+      if (!categorySelection.selection) {
+        if (categorySelection.reason) {
+          constraintFailureReasons.add(categorySelection.reason);
+        }
         continue;
       }
 
-      const heroSelection = selectHeroes(pools.heroes, effectiveRequirements, state.usage.heroes, random);
+      const heroSelection = selectHeroes(pools.heroes, effectiveRequirements, state.usage.heroes, random, normalizedForcedPicks.heroIds);
       if (heroSelection.selected.length !== effectiveRequirements.heroCount) {
+        if (heroSelection.reason) {
+          constraintFailureReasons.add(heroSelection.reason);
+        }
         continue;
       }
 
@@ -423,10 +602,17 @@ export function generateSetup({ runtime, state, playerCount, advancedSolo = fals
         : null;
 
       const notices = createGeneratorNotices({
-        schemeFallback: schemeSelection.selected[0]?.id === scheme.id && schemeSelection.fallbackItems.length ? [scheme] : [],
-        mastermindFallback: mastermindRanking.fallbackItems.some((entity) => entity.id === mastermind.id) ? [mastermind] : [],
+        forcedConstraintSummary: buildForcedConstraintSummary(normalizedForcedPicks, {
+          scheme,
+          mastermind,
+          heroes: heroSelection.selected,
+          villainGroups: categorySelection.selection.villainGroups,
+          henchmanGroups: categorySelection.selection.henchmanGroups
+        }),
+        schemeFallback: !normalizedForcedPicks.schemeId && schemeSelection.selected[0]?.id === scheme.id && schemeSelection.fallbackItems.length ? [scheme] : [],
+        mastermindFallback: !normalizedForcedPicks.mastermindId && mastermindRanking.fallbackItems.some((entity) => entity.id === mastermind.id) ? [mastermind] : [],
         heroFallback: heroSelection.fallbackItems,
-        categoryFallback: categorySelection.fallback
+        categoryFallback: categorySelection.selection.fallback
       });
 
       return {
@@ -441,20 +627,25 @@ export function generateSetup({ runtime, state, playerCount, advancedSolo = fals
           leadEntity
         },
         heroes: heroSelection.selected,
-        villainGroups: categorySelection.villainGroups,
-        henchmanGroups: categorySelection.henchmanGroups,
+        villainGroups: categorySelection.selection.villainGroups,
+        henchmanGroups: categorySelection.selection.henchmanGroups,
         setupSnapshot: {
           mastermindId: mastermind.id,
           schemeId: scheme.id,
           heroIds: heroSelection.selected.map((entity) => entity.id),
-          villainGroupIds: categorySelection.villainGroups.map((entity) => entity.id),
-          henchmanGroupIds: categorySelection.henchmanGroups.map((entity) => entity.id)
+          villainGroupIds: categorySelection.selection.villainGroups.map((entity) => entity.id),
+          henchmanGroupIds: categorySelection.selection.henchmanGroups.map((entity) => entity.id)
         },
+        forcedPicks: normalizedForcedPicks,
         notices,
         fallbackUsed: notices.length > 0,
         legalSchemesCount: eligibleSchemes.length
       };
     }
+  }
+
+  if (hasConstraintSelections && constraintFailureReasons.size) {
+    throw new Error([...constraintFailureReasons].join(' '));
   }
 
   throw new Error('No legal setup could be generated from the current owned collection for the selected play mode.');

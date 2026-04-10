@@ -299,6 +299,8 @@ Hydration rules:
 - any recovery notice shown to the user should be treated as ephemeral UI state, not as persisted root-state data
 - if browser storage is unavailable entirely, the app should keep running in-memory for the current session and surface a degraded-mode warning
 
+Forced-pick selections from Epic 15 are also ephemeral UI-only state. They intentionally do not persist in browser storage and do not appear in accepted `GameRecord` snapshots.
+
 ---
 
 ## 4. Usage tracking

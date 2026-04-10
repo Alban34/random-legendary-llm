@@ -170,6 +170,26 @@ then the generator should:
 
 ---
 
+## Guided setup constraints
+
+The generator also supports optional user-selected forced picks.
+
+Supported categories:
+- one forced Scheme
+- one forced Mastermind
+- zero or more forced Heroes
+- zero or more forced Villain Groups
+- zero or more forced Henchman Groups
+
+Behavior:
+- forced picks are applied before random slot-filling begins
+- forced picks may overlap with mandatory Scheme groups or Mastermind leads without duplicating the selected entity
+- if forced picks plus mandatory groups exceed the available slots, generation must fail with a specific reason
+- forced picks are a one-shot UI constraint: they stay active for Generate and Regenerate, then clear after a successful Accept & Log or a reload
+- forced picks are not written into accepted history snapshots
+
+---
+
 ## Hero deck abstraction
 
 For V1, the app tracks heroes at the **deck unit** level.

@@ -1,6 +1,7 @@
 import { createEpic1Bundle } from './game-data-pipeline.mjs';
 import { DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from './app-tabs.mjs';
 import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from './feedback-utils.mjs';
+import { addForcedPick, createEmptyForcedPicks, hasForcedPicks, removeForcedPick } from './forced-picks-utils.mjs';
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
 import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
 import { resolvePlayMode } from './setup-rules.mjs';
@@ -54,6 +55,7 @@ function syncDebugGlobals(viewModel) {
     playMode: viewModel.ui.selectedPlayMode,
     advancedSolo: viewModel.ui.advancedSolo
   };
+  window.__FORCED_PICKS_UI__ = viewModel.ui.forcedPicks;
   window.__TOASTS__ = viewModel.ui.toasts;
 }
 
@@ -89,6 +91,7 @@ async function boot() {
       onboardingVisible: !hydration.state.preferences.onboardingCompleted,
       onboardingStep: 0,
       aboutPanelOpen: false,
+      forcedPicks: createEmptyForcedPicks(),
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
       selectedPlayMode: resolvePlayMode(hydration.state.preferences.lastPlayerCount, {
@@ -233,6 +236,10 @@ async function boot() {
     viewModel.ui.generatorNotices = [];
   };
 
+  const clearForcedPicksState = () => {
+    viewModel.ui.forcedPicks = createEmptyForcedPicks();
+  };
+
   const persistPreferences = (playerCount, playMode, actionNotice) => {
     const normalizedPlayMode = resolvePlayMode(playerCount, { playMode });
     const advancedSolo = normalizedPlayMode === 'advanced-solo';
@@ -361,6 +368,7 @@ async function boot() {
     },
     confirmResetOwnedCollection() {
       viewModel.ui.confirmResetOwnedCollection = false;
+      clearForcedPicksState();
       clearGeneratedSetup();
       applyStateUpdate((currentState) => resetOwnedCollection(currentState), 'Cleared all owned collection selections.');
       enqueueToast({ variant: 'success', message: 'Cleared all owned collection selections.' });
@@ -391,6 +399,34 @@ async function boot() {
       }
       persistPreferences(viewModel.ui.selectedPlayerCount, playMode, `Selected ${playMode.replaceAll('-', ' ')} mode.`);
     },
+    addForcedPick(field, value) {
+      if (!value) {
+        viewModel.ui.lastActionNotice = 'Choose a card or setup entity before adding a forced pick.';
+        rerender();
+        return;
+      }
+
+      const nextForcedPicks = addForcedPick(viewModel.ui.forcedPicks, field, value);
+      const changed = JSON.stringify(nextForcedPicks) !== JSON.stringify(viewModel.ui.forcedPicks);
+      viewModel.ui.forcedPicks = nextForcedPicks;
+      clearGeneratedSetup();
+      viewModel.ui.lastActionNotice = changed
+        ? 'Updated the active forced picks for the next generated setup.'
+        : 'That forced pick was already active.';
+      rerender();
+    },
+    removeForcedPick(field, value) {
+      viewModel.ui.forcedPicks = removeForcedPick(viewModel.ui.forcedPicks, field, value);
+      clearGeneratedSetup();
+      viewModel.ui.lastActionNotice = 'Removed one forced pick from the next generated setup.';
+      rerender();
+    },
+    clearForcedPicks() {
+      clearForcedPicksState();
+      clearGeneratedSetup();
+      viewModel.ui.lastActionNotice = 'Cleared all forced picks for the next generated setup.';
+      rerender();
+    },
     generateSetup() {
       try {
         const setup = generateSetup({
@@ -398,7 +434,8 @@ async function boot() {
           state: viewModel.state,
           playerCount: viewModel.ui.selectedPlayerCount,
           advancedSolo: viewModel.ui.advancedSolo,
-          playMode: viewModel.ui.selectedPlayMode
+          playMode: viewModel.ui.selectedPlayMode,
+          forcedPicks: viewModel.ui.forcedPicks
         });
         viewModel.ui.currentSetup = setup;
         viewModel.ui.generatorError = null;
@@ -432,7 +469,10 @@ async function boot() {
         advancedSolo: viewModel.ui.advancedSolo,
         playMode: viewModel.ui.selectedPlayMode,
         setupSnapshot: buildHistoryReadySetupSnapshot(viewModel.ui.currentSetup)
-      }), 'Accepted & logged the current generated setup.');
+      }), hasForcedPicks(viewModel.ui.forcedPicks)
+        ? 'Accepted & logged the current generated setup and cleared the one-shot forced picks.'
+        : 'Accepted & logged the current generated setup.');
+      clearForcedPicksState();
       enqueueToast({ variant: 'success', message: 'Accepted & logged the current generated setup.' });
     },
     resetUsageCategory(category) {
@@ -457,6 +497,7 @@ async function boot() {
       viewModel.ui.onboardingVisible = !result.state.preferences.onboardingCompleted;
       viewModel.ui.onboardingStep = 0;
       viewModel.ui.aboutPanelOpen = false;
+      clearForcedPicksState();
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the entire application state to defaults.';
       rerender();
@@ -505,6 +546,7 @@ async function boot() {
       viewModel.ui.selectedPlayerCount = defaultState.preferences.lastPlayerCount;
       viewModel.ui.selectedPlayMode = defaultState.preferences.lastPlayMode;
       viewModel.ui.advancedSolo = defaultState.preferences.lastAdvancedSolo;
+      clearForcedPicksState();
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the current setup controls to their default values.';
       rerender();

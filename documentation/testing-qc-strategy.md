@@ -241,6 +241,26 @@ Automated coverage:
 
 ---
 
+## Epic 15 — Guided Setup Constraints and Forced Picks
+
+Required tests:
+- forced picks can target the supported setup categories and still generate legal setups when possible
+- unavailable or illegal forced picks fail with actionable legality reasons
+- impossible collisions with scheme or mastermind requirements surface specific generator errors
+- accepted game history remains free of stale forced-pick UI state
+
+QC checks:
+- verify the New Game screen clearly explains which categories can be forced
+- verify active constraints can be reviewed, removed individually, and cleared in bulk
+- verify successful and impossible constrained setups produce understandable feedback
+- verify one-shot constraints clear after accept and after reload
+
+Automated coverage:
+- `test/epic15-forced-picks.test.mjs` covers constraint legality, supported-category generation, collision messaging, and history safety
+- `test/playwright/epic15-qc.spec.mjs` covers forced-pick selection flows, legal constrained generation, impossible combinations, and one-shot lifecycle behavior
+
+---
+
 ## Epic 8 — History, Usage, and Reset Experience
 
 Required tests:

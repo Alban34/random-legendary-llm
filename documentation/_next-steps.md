@@ -4,7 +4,7 @@
 - [ ] Add possibility to save the score of a given game, and to keep track of the score history across games
 - [ ] Add possibility to export the collection and score history as a JSON file, and to import it back to the app
 - [ ] Add stats on games played, win/loss ratio, most played cards, etc.
-- [ ] Add a "forced" mode where the user can select a card that must be included in the next setup, and the app will generate a setup that includes that card if possible
+- [x] Add a "forced" mode where the user can select a card that must be included in the next setup, and the app will generate a setup that includes that card if possible
 - [x] Toasts should be floating from the bottom of the screen, not taking space in the layout, and should stack if multiple toasts are triggered at the same time
 - [ ] Investigate if using 3rd party CSS libs could improve visual and simplify code, while keeping the "no external dependencies at runtime" constraint (e.g. by inlining the CSS in a static file)
 - [ ] Add a "dark mode" toggle to the UI, and persist the user's preference in browser storage
@@ -15,3 +15,4 @@
 - [x] Do not display developers information by default, it should be hidden behind a "About this project" link or button, to avoid overwhelming users who just want to use the app without being interested in the development details
 - [ ] Game history should be first in the History page
 - [ ] Interface localisation (fr, es, de, it)
+- [ ] Group games in history (by mastermind? player count? something else?)

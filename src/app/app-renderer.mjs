@@ -2,8 +2,10 @@ import { APP_TABS, normalizeSelectedTab } from './app-tabs.mjs';
 import { BROWSE_TYPE_OPTIONS, filterBrowseSets, getBrowseTypeLabel, summarizeBrowseSet } from './browse-utils.mjs';
 import { COLLECTION_TYPE_GROUPS, getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
 import { TOAST_VARIANTS } from './feedback-utils.mjs';
+import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from './forced-picks-utils.mjs';
 import { buildFullResetPreview, formatHistorySummary, summarizeUsageIndicators } from './history-utils.mjs';
 import { formatHeroTeamLabel, formatMastermindLeadLabel, formatPersistedPlayMode, getAvailablePlayModes, getDisplayedSetupRequirements, getPlayModeHelpText } from './new-game-utils.mjs';
+import { buildOwnedPools } from './setup-generator.mjs';
 
 function formatDuplicateEntries(bundle) {
   return ['Black Widow', 'Loki', 'Thor', 'Nova', 'Venom']
@@ -54,9 +56,106 @@ function formatSetupGroupList(groups) {
   return groups.map((group) => `
     <li class="result-list-item">
       <span>${group.name}</span>
-      ${group.forced ? `<span class="pill">Forced by ${group.forcedBy === 'mastermind' ? 'Mastermind lead' : 'Scheme'}</span>` : ''}
+      ${group.forced ? `<span class="pill">Forced by ${Array.isArray(group.forcedBy)
+        ? group.forcedBy.map((value) => value === 'mastermind' ? 'Mastermind lead' : value === 'scheme' ? 'Scheme' : 'Forced pick').join(' + ')
+        : group.forcedBy === 'mastermind'
+          ? 'Mastermind lead'
+          : group.forcedBy === 'scheme'
+            ? 'Scheme'
+            : 'Forced pick'}</span>` : ''}
     </li>
   `).join('');
+}
+
+function getForcedPickEntityIndexes(indexes) {
+  return {
+    schemeId: indexes.schemesById,
+    mastermindId: indexes.mastermindsById,
+    heroIds: indexes.heroesById,
+    villainGroupIds: indexes.villainGroupsById,
+    henchmanGroupIds: indexes.henchmanGroupsById
+  };
+}
+
+function getOwnedForcedPickOptions(viewModel) {
+  const pools = buildOwnedPools(viewModel.bundle.runtime, viewModel.state.collection.ownedSetIds);
+  return {
+    schemeId: [...pools.schemes].sort((left, right) => left.name.localeCompare(right.name)),
+    mastermindId: [...pools.masterminds].sort((left, right) => left.name.localeCompare(right.name)),
+    heroIds: [...pools.heroes].sort((left, right) => left.name.localeCompare(right.name)),
+    villainGroupIds: [...pools.villainGroups].sort((left, right) => left.name.localeCompare(right.name)),
+    henchmanGroupIds: [...pools.henchmanGroups].sort((left, right) => left.name.localeCompare(right.name))
+  };
+}
+
+function renderForcedPickControls(viewModel) {
+  const options = getOwnedForcedPickOptions(viewModel);
+  const entityIndexes = getForcedPickEntityIndexes(viewModel.bundle.runtime.indexes);
+  const hasActiveForcedPicks = hasForcedPicks(viewModel.ui.forcedPicks);
+
+  const controlMarkup = FORCED_PICK_FIELD_CONFIGS.map((config) => {
+    const activeIds = config.multi
+      ? viewModel.ui.forcedPicks[config.field]
+      : viewModel.ui.forcedPicks[config.field] ? [viewModel.ui.forcedPicks[config.field]] : [];
+    const availableOptions = config.multi
+      ? options[config.field].filter((entity) => !activeIds.includes(entity.id))
+      : options[config.field];
+
+    return `
+      <div class="stack gap-sm">
+        <label for="forced-pick-${config.field}"><strong>${config.label}</strong></label>
+        <div class="button-row wrap">
+          <select id="forced-pick-${config.field}" data-forced-pick-select="${config.field}" ${availableOptions.length ? '' : 'disabled'}>
+            <option value="">Choose ${config.label.toLowerCase()}</option>
+            ${availableOptions.map((entity) => `<option value="${entity.id}">${escapeHtml(entity.name)}</option>`).join('')}
+          </select>
+          <button
+            type="button"
+            class="button button-secondary"
+            data-action="add-forced-pick"
+            data-field="${config.field}"
+            ${availableOptions.length ? '' : 'disabled'}
+          >
+            ${config.multi ? `Add ${config.label}` : `Set ${config.label}`}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const activeMarkup = FORCED_PICK_FIELD_CONFIGS.flatMap((config) => {
+    const activeIds = config.multi
+      ? viewModel.ui.forcedPicks[config.field]
+      : viewModel.ui.forcedPicks[config.field] ? [viewModel.ui.forcedPicks[config.field]] : [];
+
+    return activeIds.map((id) => {
+      const entity = entityIndexes[config.field][id];
+      const label = entity ? entity.name : `${id} (not currently owned)`;
+      return `
+        <li class="result-list-item" data-forced-pick-field="${config.field}" data-forced-pick-id="${id}">
+          <span><strong>${config.label}:</strong> ${escapeHtml(label)}</span>
+          <button type="button" class="button button-secondary" data-action="remove-forced-pick" data-field="${config.field}" data-entity-id="${id}">Remove</button>
+        </li>
+      `;
+    });
+  }).join('');
+
+  return `
+    <section class="result-card" data-forced-picks-panel>
+      <h3>Forced picks</h3>
+      <div class="muted">Force owned Schemes, Masterminds, Heroes, Villain Groups, or Henchman Groups into the next generated setup when legal. These one-shot constraints stay active for Generate and Regenerate, then clear after a successful Accept &amp; Log or a reload.</div>
+      <div class="stack gap-md">${controlMarkup}</div>
+      <div class="stack gap-sm">
+        <div class="row space-between wrap gap-sm align-center">
+          <strong>Active constraints</strong>
+          <button type="button" class="button button-secondary" data-action="clear-forced-picks" ${hasActiveForcedPicks ? '' : 'disabled'}>Clear all</button>
+        </div>
+        ${hasActiveForcedPicks
+          ? `<ul class="clean result-list">${activeMarkup}</ul>`
+          : '<p class="muted empty-state">No forced picks are active.</p>'}
+      </div>
+    </section>
+  `;
 }
 
 function formatEntityCards(entities) {
@@ -740,6 +839,7 @@ function renderSetupControls(viewModel) {
           ? '<div class="muted">Two-Handed Solo uses the standard 2-player setup counts while keeping history labeled as a solo game.</div>'
           : ''}
       </div>
+      ${renderForcedPickControls(viewModel)}
       <div class="button-row">
         <button class="button button-primary" data-action="generate-setup">Generate Setup</button>
         <button class="button button-secondary" data-action="regenerate-setup">Regenerate</button>
@@ -890,6 +990,17 @@ function bindActionButtons(doc, actions) {
     button.addEventListener('click', () => actions.setPlayMode(button.dataset.playMode));
   });
 
+  doc.querySelectorAll('[data-action="add-forced-pick"]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const select = doc.querySelector(`[data-forced-pick-select="${button.dataset.field}"]`);
+      actions.addForcedPick(button.dataset.field, select?.value || '');
+    });
+  });
+
+  doc.querySelectorAll('[data-action="remove-forced-pick"]').forEach((button) => {
+    button.addEventListener('click', () => actions.removeForcedPick(button.dataset.field, button.dataset.entityId));
+  });
+
   doc.querySelectorAll('[data-action="select-tab"]').forEach((button) => {
     button.addEventListener('click', () => actions.selectTab(button.dataset.tabId));
     button.addEventListener('keydown', (event) => {
@@ -926,6 +1037,7 @@ function bindActionButtons(doc, actions) {
     'next-onboarding-step': actions.nextOnboardingStep,
     'skip-onboarding': actions.skipOnboarding,
     'complete-onboarding': actions.completeOnboarding,
+    'clear-forced-picks': actions.clearForcedPicks,
     'generate-setup': actions.generateSetup,
     'regenerate-setup': actions.regenerateSetup,
     'accept-current-setup': actions.acceptCurrentSetup,
