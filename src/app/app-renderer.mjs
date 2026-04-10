@@ -1,6 +1,7 @@
 import { APP_TABS, normalizeSelectedTab } from './app-tabs.mjs';
 import { BROWSE_TYPE_OPTIONS, filterBrowseSets, getBrowseTypeLabel, summarizeBrowseSet } from './browse-utils.mjs';
 import { COLLECTION_TYPE_GROUPS, getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
+import { TOAST_VARIANTS } from './feedback-utils.mjs';
 import { buildFullResetPreview, formatHistorySummary, summarizeUsageIndicators } from './history-utils.mjs';
 import { formatHeroTeamLabel, formatMastermindLeadLabel, getDisplayedSetupRequirements, isAdvancedSoloAvailable } from './new-game-utils.mjs';
 
@@ -139,6 +140,70 @@ function renderBrowseTypeFilters(activeTypeFilter) {
 
 function formatSetCountLabel(value, singular, plural = `${singular}s`) {
   return `${value} ${value === 1 ? singular : plural}`;
+}
+
+function getActiveModalConfig(viewModel) {
+  if (viewModel.ui.confirmResetOwnedCollection) {
+    return {
+      title: '⚠️ Are you sure?',
+      description: 'This will clear all owned collection selections. Usage statistics, history, and preferences will stay intact.',
+      confirmAction: 'confirm-reset-owned-collection',
+      cancelAction: 'cancel-reset-owned-collection',
+      confirmLabel: 'Yes, Clear Collection'
+    };
+  }
+
+  if (viewModel.ui.confirmResetAllState) {
+    return {
+      title: '⚠️ Are you sure?',
+      description: 'This will delete all game history and reset all card tracking. This cannot be undone.',
+      confirmAction: 'confirm-reset-all-state',
+      cancelAction: 'cancel-reset-all-state',
+      confirmLabel: 'Yes, Reset All'
+    };
+  }
+
+  return null;
+}
+
+function renderToastRegion(viewModel) {
+  if (!viewModel.ui.toasts.length) {
+    return '';
+  }
+
+  return `
+    <div class="toast-stack" role="region" aria-label="Notifications">
+      ${viewModel.ui.toasts.map((toast) => `
+        <article class="toast toast-${toast.variant}" role="${toast.live === 'assertive' ? 'alert' : 'status'}" aria-live="${toast.live}" data-toast-id="${toast.id}">
+          <div class="toast-copy">
+            <div class="toast-title">${toast.icon} ${toast.label}</div>
+            <div>${toast.message}</div>
+          </div>
+          <button type="button" class="button button-secondary toast-dismiss" data-action="dismiss-toast" data-toast-id="${toast.id}" aria-label="Dismiss ${toast.label} notification">Dismiss</button>
+        </article>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderActiveModal(viewModel) {
+  const modal = getActiveModalConfig(viewModel);
+  if (!modal) {
+    return '';
+  }
+
+  return `
+    <div class="modal-backdrop">
+      <section class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description" tabindex="-1">
+        <h2 id="modal-title">${modal.title}</h2>
+        <p id="modal-description">${modal.description}</p>
+        <div class="button-row confirmation-actions">
+          <button type="button" class="button button-secondary" data-action="${modal.cancelAction}" data-modal-focus="cancel">Cancel</button>
+          <button type="button" class="button button-danger" data-action="${modal.confirmAction}" data-modal-focus="confirm">${modal.confirmLabel}</button>
+        </div>
+      </section>
+    </div>
+  `;
 }
 
 function renderCollectionFeasibility(viewModel) {
@@ -404,16 +469,6 @@ function renderCollectionPanel(viewModel) {
             <div><strong>Storage:</strong> ${persistence.storageAvailable ? 'Available' : 'Unavailable'} · ${persistence.hydratedFromStorage ? 'Hydrated from storage' : 'Using defaults'} · ${persistence.recoveredOnLoad ? 'Recovered on load' : 'No recovery needed'}</div>
             ${ui.lastActionNotice ? `<div class="muted">Latest action: ${ui.lastActionNotice}</div>` : ''}
           </div>
-          ${ui.confirmResetOwnedCollection ? `
-            <div class="notice warning" id="collection-reset-confirmation">
-              <strong>Clear all collection selections?</strong>
-              <div class="muted">This clears owned sets only. Usage statistics, history, and preferences will stay intact.</div>
-              <div class="button-row confirmation-actions">
-                <button class="button button-danger" data-action="confirm-reset-owned-collection">Confirm reset</button>
-                <button class="button button-secondary" data-action="cancel-reset-owned-collection">Cancel</button>
-              </div>
-            </div>
-          ` : ''}
           ${persistenceNotices.length
             ? persistenceNotices.map((notice) => `<div class="notice warning">${notice}</div>`).join('')
             : '<div class="notice success">No storage recovery issues are currently active.</div>'}
@@ -583,20 +638,10 @@ function renderHistoryPanel(viewModel) {
           `).join('')}
         </div>
         <p class="muted">Lowest-play reuse activates automatically when a category runs out of never-played options.</p>
-        ${ui.confirmResetAllState ? `
-          <div class="notice warning" id="history-full-reset-confirmation">
-            <strong>This will delete all game history and reset all card tracking. Are you sure?</strong>
-            <div class="muted">Preview after reset: ${resetPreview.history.length} history entries, ${resetPreview.collection.ownedSetIds.length} owned sets, and clean usage buckets.</div>
-            <div class="button-row confirmation-actions">
-              <button class="button button-danger" data-action="confirm-reset-all-state">Confirm full reset</button>
-              <button class="button button-secondary" data-action="cancel-reset-all-state">Cancel</button>
-            </div>
-          </div>
-        ` : `
-          <div class="button-row">
-            <button class="button button-danger" data-action="request-reset-all-state">Full Reset — Clear all data</button>
-          </div>
-        `}
+        <div class="muted">Reset preview: ${resetPreview.history.length} history entries, ${resetPreview.collection.ownedSetIds.length} owned sets, and clean usage buckets after a full reset.</div>
+        <div class="button-row">
+          <button class="button button-danger" data-action="request-reset-all-state">Full Reset — Clear all data</button>
+        </div>
       </section>
       <section class="panel">
         <h2>Game history</h2>
@@ -617,7 +662,7 @@ function renderDiagnosticsPanel(viewModel) {
       <h2>Initialization status</h2>
       <div id="status-message">${failed.length
         ? `<p class="error">Foundation loaded with ${failed.length} failing Epic 1 test(s).</p>`
-        : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, Epic 3 setup generation, Epic 4 shell/navigation, Epic 5 browse extensions, Epic 6 collection management, Epic 7 new-game experience, and Epic 8 history/reset flows are loaded successfully.</p>'}</div>
+        : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, Epic 3 setup generation, Epic 4 shell/navigation, Epic 5 browse extensions, Epic 6 collection management, Epic 7 new-game experience, Epic 8 history/reset flows, and Epic 9 notifications/accessibility safeguards are loaded successfully.</p>'}</div>
     </section>
     <section class="panel">
       <h2>Developer diagnostics</h2>
@@ -722,14 +767,48 @@ function bindActionButtons(doc, actions) {
       button.addEventListener('click', () => handler());
     }
   });
+
+  doc.querySelectorAll('[data-action="dismiss-toast"]').forEach((button) => {
+    button.addEventListener('click', () => actions.dismissToast(button.dataset.toastId));
+  });
+
+  const modalDialog = doc.querySelector('#modal-root [role="dialog"]');
+  if (modalDialog) {
+    modalDialog.addEventListener('keydown', (event) => {
+      const focusables = [...modalDialog.querySelectorAll('button:not([disabled])')];
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        const cancelButton = modalDialog.querySelector('[data-modal-focus="cancel"]');
+        cancelButton?.click();
+        return;
+      }
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const confirmButton = modalDialog.querySelector('[data-modal-focus="confirm"]');
+        confirmButton?.click();
+        return;
+      }
+      if (event.key === 'Tab' && focusables.length) {
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    });
+  }
 }
 
 export function renderBundle(doc, viewModel, actions) {
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
   const panelMarkup = renderTabPanels(viewModel);
 
-  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 8 History, Usage, and Reset';
-  doc.getElementById('app-subtitle').textContent = 'The current milestone completes the History tab with readable usage indicators, expandable accepted-game summaries, per-category resets, and a confirmation-gated full reset on top of the Epic 1–7 foundations.';
+  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 9 Notifications, Error Handling, and Accessibility';
+  doc.getElementById('app-subtitle').textContent = 'The current milestone adds stacked notifications, clearer invalid-state messaging, degraded browser-storage handling, and stronger keyboard/semantic accessibility on top of the Epic 1–8 foundations.';
   doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, 'desktop');
   doc.getElementById('mobile-tabs').innerHTML = renderTabButtons(activeTabId, 'mobile');
 
@@ -737,10 +816,12 @@ export function renderBundle(doc, viewModel, actions) {
     const panel = doc.getElementById(`panel-${tab.id}`);
     panel.innerHTML = panelMarkup[tab.id];
     panel.hidden = tab.id !== activeTabId;
-    panel.setAttribute('aria-labelledby', `tab-desktop-${tab.id}`);
+    panel.setAttribute('aria-labelledby', `tab-desktop-${tab.id} tab-mobile-${tab.id}`);
   });
 
   doc.getElementById('diagnostics-shell').innerHTML = renderDiagnosticsPanel(viewModel);
+  doc.getElementById('toast-region').innerHTML = renderToastRegion(viewModel);
+  doc.getElementById('modal-root').innerHTML = renderActiveModal(viewModel);
 
   bindActionButtons(doc, actions);
 }

@@ -80,13 +80,13 @@ test.describe('Epic 8 automated QC', () => {
     await selectTab(page, 'history');
 
     await page.locator('[data-action="request-reset-all-state"]').click();
-    await expect(page.locator('#history-full-reset-confirmation')).toBeVisible();
-    await page.locator('[data-action="cancel-reset-all-state"]').click();
-    await expect(page.locator('#history-full-reset-confirmation')).toBeHidden();
+    await expect(page.locator('#modal-root [role="dialog"]')).toBeVisible();
+    await page.locator('#modal-root [data-action="cancel-reset-all-state"]').click();
+    await expect(page.locator('#modal-root [role="dialog"]')).toBeHidden();
     await expect(page.locator('#panel-history .history-item')).toHaveCount(1);
 
     await page.locator('[data-action="request-reset-all-state"]').click();
-    await page.locator('[data-action="confirm-reset-all-state"]').click();
+    await page.locator('#modal-root [data-action="confirm-reset-all-state"]').click();
     await page.waitForFunction(() => window.__ACTIVE_TAB__ === 'browse');
 
     const resetState = await readAppState(page);

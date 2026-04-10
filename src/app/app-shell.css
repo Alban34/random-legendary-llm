@@ -441,6 +441,89 @@ details summary {
   border-color: rgba(245, 166, 35, 0.4);
 }
 
+#toast-region {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 30;
+  pointer-events: none;
+}
+
+.toast-stack {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  width: min(100%, 36rem);
+  margin-inline: auto;
+}
+
+.toast {
+  width: min(100%, 36rem);
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: auto;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  box-shadow: 0 10px 24px var(--shadow);
+}
+
+.toast-success {
+  border-color: rgba(46, 204, 113, 0.45);
+}
+
+.toast-info {
+  border-color: rgba(24, 119, 242, 0.45);
+}
+
+.toast-warning {
+  border-color: rgba(245, 166, 35, 0.45);
+}
+
+.toast-error {
+  border-color: rgba(231, 76, 60, 0.5);
+}
+
+.toast-copy {
+  min-width: 0;
+}
+
+.toast-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.toast-dismiss {
+  flex: 0 0 auto;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 40;
+}
+
+.modal-dialog {
+  width: min(100%, 32rem);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  padding: 20px;
+}
+
+.modal-dialog p {
+  color: var(--muted);
+}
+
 .history-item {
   margin-bottom: 10px;
 }
@@ -724,6 +807,10 @@ details summary {
   .mobile-tab-nav {
     display: none;
   }
+
+  #toast-region {
+    bottom: 24px;
+  }
 }
 
 @media (max-width: 767px) {
@@ -738,6 +825,10 @@ details summary {
 
   .collection-row {
     align-items: start;
+  }
+
+  .toast {
+    width: 100%;
   }
 
   .app-main {

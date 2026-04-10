@@ -70,14 +70,14 @@ test.describe('Epic 6 automated QC', () => {
     await getCollectionRow(page, 'Dark City').locator('.collection-checkbox').click();
 
     await page.locator('#panel-collection [data-action="request-reset-owned-collection"]').click();
-    await expect(page.locator('#collection-reset-confirmation')).toBeVisible();
+    await expect(page.locator('#modal-root [role="dialog"]')).toBeVisible();
 
-    await page.locator('#panel-collection [data-action="cancel-reset-owned-collection"]').click();
-    await expect(page.locator('#collection-reset-confirmation')).toBeHidden();
+    await page.locator('#modal-root [data-action="cancel-reset-owned-collection"]').click();
+    await expect(page.locator('#modal-root [role="dialog"]')).toBeHidden();
     await expect(getCollectionRow(page, 'Core Set').locator('.collection-checkbox')).toBeChecked();
 
     await page.locator('#panel-collection [data-action="request-reset-owned-collection"]').click();
-    await page.locator('#panel-collection [data-action="confirm-reset-owned-collection"]').click();
+    await page.locator('#modal-root [data-action="confirm-reset-owned-collection"]').click();
     await expect(getCollectionRow(page, 'Core Set').locator('.collection-checkbox')).not.toBeChecked();
     await expect(getCollectionRow(page, 'Dark City').locator('.collection-checkbox')).not.toBeChecked();
 

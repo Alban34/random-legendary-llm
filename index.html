@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legendary: Marvel Randomizer — Epic 4 Foundation</title>
+  <title>Legendary: Marvel Randomizer — Epic 9 Notifications, Error Handling, and Accessibility</title>
   <link rel="stylesheet" href="./src/app/app-shell.css" />
 </head>
 <body>
   <header class="app-header">
     <div class="header-inner">
       <div class="header-copy">
-        <h1 id="app-title">Legendary: Marvel Randomizer — Epic 4 Foundation</h1>
-        <p id="app-subtitle">This milestone expands the current implementation into a real tabbed application shell with responsive navigation, persistent active-tab state, reusable UI primitives, and a developer diagnostics area outside the main workflow tabs.</p>
+        <h1 id="app-title">Legendary: Marvel Randomizer — Epic 9 Notifications, Error Handling, and Accessibility</h1>
+        <p id="app-subtitle">This milestone adds stacked notifications, clearer invalid-state messaging, degraded browser-storage handling, and stronger keyboard/semantic accessibility on top of the Epic 1–8 foundations.</p>
       </div>
-      <nav class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary"></nav>
+      <nav class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary" role="tablist"></nav>
     </div>
   </header>
   <main class="app-main">
+    <section id="toast-region" aria-live="polite" aria-atomic="false"></section>
     <div class="tab-panel-shell">
       <section class="tab-panel" id="panel-browse" role="tabpanel"></section>
       <section class="tab-panel" id="panel-collection" role="tabpanel" hidden></section>
@@ -26,7 +27,8 @@
     <section class="stack gap-md" id="diagnostics-shell"></section>
   </main>
 
-  <nav class="mobile-tab-nav" id="mobile-tabs" aria-label="Primary mobile"></nav>
+  <nav class="mobile-tab-nav" id="mobile-tabs" aria-label="Primary mobile" role="tablist"></nav>
+  <div id="modal-root"></div>
 
   <script type="module" src="./src/app/browser-entry.mjs"></script>
 </body>

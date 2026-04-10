@@ -107,7 +107,7 @@ test.describe('Epic 2 automated QC', () => {
     }
 
     await page.locator('#panel-history [data-action="request-reset-all-state"]').click();
-    await page.locator('#panel-history [data-action="confirm-reset-all-state"]').click();
+    await page.locator('#modal-root [data-action="confirm-reset-all-state"]').click();
     await page.waitForFunction(() => window.__ACTIVE_TAB__ === 'browse');
     const resetState = await readAppState(page);
     expect(resetState.collection.ownedSetIds).toHaveLength(0);

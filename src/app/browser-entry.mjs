@@ -1,5 +1,6 @@
 import { createEpic1Bundle } from './game-data-pipeline.mjs';
 import { DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from './app-tabs.mjs';
+import { createToastRecord, pushToast, removeToast } from './feedback-utils.mjs';
 import { renderBundle, renderInitializationError } from './app-renderer.mjs';
 import { buildHistoryReadySetupSnapshot, generateSetup } from './setup-generator.mjs';
 import {
@@ -41,6 +42,7 @@ function syncDebugGlobals(viewModel) {
   window.__HISTORY_UI__ = {
     confirmResetAllState: viewModel.ui.confirmResetAllState
   };
+  window.__TOASTS__ = viewModel.ui.toasts;
 }
 
 async function boot() {
@@ -70,15 +72,51 @@ async function boot() {
       expandedBrowseSetId: null,
       confirmResetOwnedCollection: false,
       confirmResetAllState: false,
+      modalReturnFocusAction: null,
+      toasts: [],
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
       advancedSolo: hydration.state.preferences.lastAdvancedSolo
     }
   };
+  const toastTimers = new Map();
+  let nextToastId = 1;
 
   const rerender = () => {
     syncDebugGlobals(viewModel);
     renderBundle(document, viewModel, actions);
+  };
+
+  const dismissToast = (id) => {
+    if (toastTimers.has(id)) {
+      clearTimeout(toastTimers.get(id));
+      toastTimers.delete(id);
+    }
+    viewModel.ui.toasts = removeToast(viewModel.ui.toasts, id);
+    rerender();
+  };
+
+  const enqueueToast = (variant, message, duration = 4000) => {
+    const toast = createToastRecord({ id: `toast-${nextToastId++}`, variant, message });
+    viewModel.ui.toasts = pushToast(viewModel.ui.toasts, toast);
+    rerender();
+    const timer = setTimeout(() => dismissToast(toast.id), duration);
+    toastTimers.set(toast.id, timer);
+  };
+
+  const focusActionButton = (actionName) => {
+    if (!actionName) {
+      return;
+    }
+    queueMicrotask(() => {
+      document.querySelector(`[data-action="${actionName}"]`)?.focus();
+    });
+  };
+
+  const focusModalCancelButton = () => {
+    queueMicrotask(() => {
+      document.querySelector('#modal-root [data-modal-focus="cancel"]')?.focus();
+    });
   };
 
   const applyStateUpdate = (updater, actionNotice) => {
@@ -95,6 +133,11 @@ async function boot() {
     viewModel.persistence.lastSaveOk = result.save.ok;
     viewModel.ui.lastActionNotice = actionNotice;
     rerender();
+    result.notices.forEach((notice) => enqueueToast('warning', notice));
+    if (!result.save.ok) {
+      enqueueToast(result.save.storageAvailable === false ? 'warning' : 'error', result.save.message);
+    }
+    return result;
   };
 
   const clearGeneratedSetup = () => {
@@ -124,6 +167,7 @@ async function boot() {
   };
 
   const actions = {
+    dismissToast,
     selectTab(tabId) {
       persistSelectedTab(tabId, `Switched to the ${normalizeSelectedTab(tabId)} tab.`);
     },
@@ -165,28 +209,35 @@ async function boot() {
     },
     requestResetOwnedCollection() {
       viewModel.ui.confirmResetOwnedCollection = true;
+      viewModel.ui.modalReturnFocusAction = 'request-reset-owned-collection';
       viewModel.ui.lastActionNotice = 'Confirm clearing the owned collection to remove all current selections.';
       rerender();
+      focusModalCancelButton();
     },
     cancelResetOwnedCollection() {
       viewModel.ui.confirmResetOwnedCollection = false;
       viewModel.ui.lastActionNotice = 'Kept the current owned collection selections.';
       rerender();
+      focusActionButton(viewModel.ui.modalReturnFocusAction);
     },
     confirmResetOwnedCollection() {
       viewModel.ui.confirmResetOwnedCollection = false;
       clearGeneratedSetup();
       applyStateUpdate((currentState) => resetOwnedCollection(currentState), 'Cleared all owned collection selections.');
+      enqueueToast('success', 'Cleared all owned collection selections.');
     },
     requestResetAllState() {
       viewModel.ui.confirmResetAllState = true;
+      viewModel.ui.modalReturnFocusAction = 'request-reset-all-state';
       viewModel.ui.lastActionNotice = 'Confirm the full reset to clear collection, usage, history, and preferences.';
       rerender();
+      focusModalCancelButton();
     },
     cancelResetAllState() {
       viewModel.ui.confirmResetAllState = false;
       viewModel.ui.lastActionNotice = 'Kept the current persisted application state.';
       rerender();
+      focusActionButton(viewModel.ui.modalReturnFocusAction);
     },
     setPlayerCount(playerCount) {
       const advancedSolo = playerCount === 1 ? viewModel.ui.advancedSolo : false;
@@ -196,6 +247,7 @@ async function boot() {
       if (viewModel.ui.selectedPlayerCount !== 1) {
         viewModel.ui.lastActionNotice = 'Advanced Solo is only available for 1 player.';
         rerender();
+        enqueueToast('warning', 'Advanced Solo is only available for 1 player.');
         return;
       }
       persistPreferences(
@@ -216,11 +268,17 @@ async function boot() {
         viewModel.ui.generatorError = null;
         viewModel.ui.generatorNotices = setup.notices;
         viewModel.ui.lastActionNotice = 'Generated a new setup without mutating persisted usage or history.';
+        if (setup.notices.length) {
+          setup.notices.forEach((notice) => enqueueToast('info', notice));
+        } else {
+          enqueueToast('success', 'Generated a fully fresh setup.');
+        }
       } catch (error) {
         viewModel.ui.currentSetup = null;
         viewModel.ui.generatorNotices = [];
         viewModel.ui.generatorError = error.message;
         viewModel.ui.lastActionNotice = 'Could not generate a legal setup for the current collection.';
+        enqueueToast('error', error.message);
       }
       rerender();
     },
@@ -235,6 +293,7 @@ async function boot() {
       if (!viewModel.ui.currentSetup) {
         viewModel.ui.lastActionNotice = 'Generate a setup before using Accept & Log.';
         rerender();
+        enqueueToast('warning', 'Generate a setup before using Accept & Log.');
         return;
       }
       applyStateUpdate((currentState) => acceptGameSetup(currentState, {
@@ -242,10 +301,12 @@ async function boot() {
         advancedSolo: viewModel.ui.advancedSolo,
         setupSnapshot: buildHistoryReadySetupSnapshot(viewModel.ui.currentSetup)
       }), 'Accepted & logged the current generated setup.');
+      enqueueToast('success', 'Accepted & logged the current generated setup.');
     },
     resetUsageCategory(category) {
       viewModel.ui.confirmResetAllState = false;
       applyStateUpdate((currentState) => resetUsageCategory(currentState, category), `Reset ${category} usage stats.`);
+      enqueueToast('info', `Reset ${category} usage stats.`);
     },
     resetAllState() {
       viewModel.ui.confirmResetAllState = false;
@@ -260,6 +321,11 @@ async function boot() {
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the entire application state to defaults.';
       rerender();
+      if (!result.save.ok) {
+        enqueueToast(result.save.storageAvailable === false ? 'warning' : 'error', result.save.message);
+      } else {
+        enqueueToast('warning', 'Reset the entire application state to defaults.');
+      }
     },
     corruptSavedState() {
       const save = storageAdapter.setItem(STORAGE_KEY, '{ this-is-not-valid-json');
@@ -269,6 +335,7 @@ async function boot() {
         ? 'Wrote corrupted JSON to browser storage. Reload the page to verify recovery.'
         : 'Could not write corrupted JSON to browser storage.';
       rerender();
+      enqueueToast(save.ok ? 'warning' : 'error', viewModel.ui.lastActionNotice);
     },
     injectInvalidOwnedSet() {
       const corruptedState = JSON.parse(JSON.stringify(viewModel.state));
@@ -280,6 +347,7 @@ async function boot() {
         ? 'Wrote an invalid owned set ID to storage. Reload the page to verify safe cleanup.'
         : 'Could not write an invalid owned set ID to browser storage.';
       rerender();
+      enqueueToast(save.ok ? 'warning' : 'error', viewModel.ui.lastActionNotice);
     },
     clearToDefaults() {
       const defaultState = createDefaultState();
@@ -288,8 +356,13 @@ async function boot() {
       clearGeneratedSetup();
       viewModel.ui.lastActionNotice = 'Reset the current setup controls to their default values.';
       rerender();
+      enqueueToast('info', 'Reset the current setup controls to their default values.');
     }
   };
+
+  if (hydration.notices.length) {
+    hydration.notices.forEach((notice) => enqueueToast('warning', notice));
+  }
 
   rerender();
 }
