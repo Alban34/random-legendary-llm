@@ -4,7 +4,7 @@ STATUS: Approved
 
 ## Project state
 
-The repository now contains the **Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 implementation foundation** for the Legendary: Marvel randomizer.
+The repository now contains the **Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 implementation foundation** for the Legendary: Marvel randomizer.
 
 Current status:
 - Epic 1 implementation, tests, and browser QC automation are complete
@@ -13,6 +13,7 @@ Current status:
 - Epic 4 implementation, automated tests, and browser QC automation are complete
 - Epic 5 Browse implementation, automated tests, and browser QC automation are complete
 - Epic 6 Collection implementation, automated tests, and browser QC automation are complete
+- Epic 7 New Game implementation, automated tests, and browser QC automation are complete
 
 Implemented so far:
 - canonical seed data under `src/data/`
@@ -22,9 +23,10 @@ Implemented so far:
 - shared tab-shell metadata and navigation helpers under `src/app/app-tabs.mjs`
 - Browse filtering/detail helpers under `src/app/browse-utils.mjs`
 - Collection grouping/totals/feasibility helpers under `src/app/collection-utils.mjs`
-- a tabbed `index.html` shell for the browser app, including the Epic 5 Browse and Epic 6 Collection experiences
-- npm-based Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 tests under `test/`
-- Playwright browser QC coverage for the Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 flows under `test/playwright/`
+- New Game display/control helpers under `src/app/new-game-utils.mjs`
+- a tabbed `index.html` shell for the browser app, including the Epic 5 Browse, Epic 6 Collection, and Epic 7 New Game experiences
+- npm-based Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 tests under `test/`
+- Playwright browser QC coverage for the Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 flows under `test/playwright/`
 - a data-foundation summary reporter under `tools/`
 
 The app remains **fully static**:
@@ -142,7 +144,14 @@ cd "/Users/afayard1/Projects/random-legendary-llm"
 npm run check:epic6
 ```
 
-Run the browser QC suite for Epic 1–6:
+Run the Epic 7 New Game checks only:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run check:epic7
+```
+
+Run the browser QC suite for Epic 1–7:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
@@ -201,4 +210,4 @@ Project documentation lives in `documentation/`.
 
 ## Next step
 
-With Epic 1, Epic 2, Epic 3, Epic 4, Epic 5, and Epic 6 implemented in code and covered by automated browser QC, the next major implementation target is **Epic 7 — New Game Setup Experience**.
+With Epic 1, Epic 2, Epic 3, Epic 4, Epic 5, Epic 6, and Epic 7 implemented in code and covered by automated browser QC, the next major implementation target is **Epic 8 — History, Usage, and Reset Experience**.

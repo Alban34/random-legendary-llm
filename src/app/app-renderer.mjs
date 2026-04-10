@@ -1,6 +1,7 @@
 import { APP_TABS, normalizeSelectedTab } from './app-tabs.mjs';
 import { BROWSE_TYPE_OPTIONS, filterBrowseSets, getBrowseTypeLabel, summarizeBrowseSet } from './browse-utils.mjs';
 import { COLLECTION_TYPE_GROUPS, getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
+import { formatHeroTeamLabel, formatMastermindLeadLabel, getDisplayedSetupRequirements, isAdvancedSoloAvailable } from './new-game-utils.mjs';
 
 const USAGE_LABELS = {
   heroes: 'Heroes',
@@ -69,6 +70,15 @@ function formatSetupGroupList(groups) {
 
 function formatEntityCards(entities) {
   return entities.map((entity) => `<span class="entity-chip">${entity.name}</span>`).join('');
+}
+
+function renderHeroResultCards(heroes) {
+  return heroes.map((hero) => `
+    <article class="result-card hero-result-card" data-hero-id="${hero.id}">
+      <h3>${hero.name}</h3>
+      <div class="muted">${formatHeroTeamLabel(hero)}</div>
+    </article>
+  `).join('');
 }
 
 function renderTabButtons(activeTabId, variant = 'desktop') {
@@ -446,6 +456,12 @@ function renderCollectionPanel(viewModel) {
 
 function renderSetupControls(viewModel) {
   const { state, ui } = viewModel;
+  const advancedSoloAvailable = isAdvancedSoloAvailable(ui.selectedPlayerCount);
+  const displayedRequirements = getDisplayedSetupRequirements({
+    playerCount: ui.selectedPlayerCount,
+    advancedSolo: ui.advancedSolo,
+    currentSetup: ui.currentSetup
+  });
   const playerButtons = [1, 2, 3, 4, 5].map((playerCount) => `
     <button
       class="button ${ui.selectedPlayerCount === playerCount ? 'button-primary' : 'button-secondary'}"
@@ -463,11 +479,12 @@ function renderSetupControls(viewModel) {
         <div class="button-row">${playerButtons}</div>
       </div>
       <div class="row wrap gap-sm align-center">
-        <button class="button ${ui.advancedSolo ? 'button-primary' : 'button-secondary'}" data-action="toggle-advanced-solo">
+        <button class="button ${ui.advancedSolo ? 'button-primary' : 'button-secondary'} ${advancedSoloAvailable ? '' : 'button-disabled'}" data-action="toggle-advanced-solo" ${advancedSoloAvailable ? '' : 'disabled'}>
           ${ui.advancedSolo ? 'Advanced Solo ✓' : 'Advanced Solo'}
         </button>
         <button class="button button-secondary" data-action="clear-setup-controls">Reset controls</button>
       </div>
+      <div class="muted">${advancedSoloAvailable ? 'Advanced Solo is available only in 1-player mode.' : 'Advanced Solo is disabled until you switch back to 1 player.'}</div>
       <div class="summary-grid">
         <div class="summary-card">
           <div class="muted">Selected mode</div>
@@ -482,10 +499,14 @@ function renderSetupControls(viewModel) {
           <div class="metric-sm">${state.preferences.lastPlayerCount}P${state.preferences.lastAdvancedSolo ? ' + AS' : ''}</div>
         </div>
       </div>
+      <div class="result-card current-requirements-card" id="setup-requirements-card">
+        <h3>Setup requirements</h3>
+        <div class="muted">${formatSetCountLabel(displayedRequirements.heroCount, 'Hero', 'Heroes')} · ${formatSetCountLabel(displayedRequirements.villainGroupCount, 'Villain Group')} · ${formatSetCountLabel(displayedRequirements.henchmanGroupCount, 'Henchman Group')} · ${formatSetCountLabel(displayedRequirements.wounds, 'Wound', 'Wounds')}</div>
+      </div>
       <div class="button-row">
         <button class="button button-primary" data-action="generate-setup">Generate Setup</button>
         <button class="button button-secondary" data-action="regenerate-setup">Regenerate</button>
-        <button class="button button-success" data-action="accept-current-setup">Accept &amp; Log</button>
+        <button class="button button-success" data-action="accept-current-setup" ${ui.currentSetup ? '' : 'disabled'}>Accept &amp; Log</button>
       </div>
       <div class="muted">Generate and Regenerate keep the current setup ephemeral. Only Accept &amp; Log updates usage stats and history.</div>
     </div>
@@ -519,27 +540,28 @@ function renderSetupResult(viewModel) {
         <div class="summary-card"><div class="muted">Henchman Groups</div><div class="metric-sm">${currentSetup.requirements.henchmanGroupCount}</div></div>
         <div class="summary-card"><div class="muted">Wounds</div><div class="metric-sm">${currentSetup.requirements.wounds}</div></div>
       </div>
-      <div class="result-card">
+      <div class="result-card" data-result-section="mastermind">
         <h3>Mastermind</h3>
         <div><strong>${currentSetup.mastermind.name}</strong></div>
-        <div class="muted">${currentSetup.mastermind.leadEntity ? `Lead: ${currentSetup.mastermind.leadEntity.name} (${currentSetup.mastermind.lead.category})` : 'No mandatory lead'}</div>
+        <div class="muted">${formatMastermindLeadLabel(currentSetup.mastermind)}</div>
+        ${currentSetup.mastermind.leadEntity ? '<div class="pill">★ Mandatory lead</div>' : ''}
         ${currentSetup.mastermind.notes.length ? `<div class="muted">${currentSetup.mastermind.notes.join(' ')}</div>` : ''}
       </div>
-      <div class="result-card">
+      <div class="result-card" data-result-section="scheme">
         <h3>Scheme</h3>
         <div><strong>${currentSetup.scheme.name}</strong></div>
         <div class="muted">Mode: ${currentSetup.template.modeLabel} · Bystanders: ${currentSetup.requirements.bystanders}</div>
-        ${currentSetup.scheme.notes.length ? `<div class="muted">${currentSetup.scheme.notes.join(' ')}</div>` : ''}
+        ${currentSetup.scheme.notes.length ? `<div class="notice info">⚠ Special: ${currentSetup.scheme.notes.join(' ')}</div>` : ''}
       </div>
-      <div class="result-card">
+      <div class="result-card" data-result-section="heroes">
         <h3>Heroes</h3>
-        <div class="entity-chip-row">${formatEntityCards(currentSetup.heroes)}</div>
+        <div class="new-game-hero-grid">${renderHeroResultCards(currentSetup.heroes)}</div>
       </div>
-      <div class="result-card">
+      <div class="result-card" data-result-section="villain-groups">
         <h3>Villain Groups</h3>
         <ul class="clean result-list">${formatSetupGroupList(currentSetup.villainGroups)}</ul>
       </div>
-      <div class="result-card">
+      <div class="result-card" data-result-section="henchman-groups">
         <h3>Henchman Groups</h3>
         <ul class="clean result-list">${formatSetupGroupList(currentSetup.henchmanGroups)}</ul>
       </div>
@@ -596,7 +618,7 @@ function renderDiagnosticsPanel(viewModel) {
       <h2>Initialization status</h2>
       <div id="status-message">${failed.length
         ? `<p class="error">Foundation loaded with ${failed.length} failing Epic 1 test(s).</p>`
-        : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, Epic 3 setup generation, Epic 4 shell/navigation, and Epic 5 browse extensions are loaded successfully.</p>'}</div>
+        : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, Epic 3 setup generation, Epic 4 shell/navigation, Epic 5 browse extensions, Epic 6 collection management, and Epic 7 new-game experience are loaded successfully.</p>'}</div>
     </section>
     <section class="panel">
       <h2>Developer diagnostics</h2>
@@ -705,8 +727,8 @@ export function renderBundle(doc, viewModel, actions) {
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
   const panelMarkup = renderTabPanels(viewModel);
 
-  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 6 Collection Management';
-  doc.getElementById('app-subtitle').textContent = 'The current milestone adds a real Collection workflow with grouped ownership management, live totals, and setup-feasibility indicators while preserving the Epic 1–5 foundations.';
+  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 7 New Game Experience';
+  doc.getElementById('app-subtitle').textContent = 'The current milestone expands the New Game workflow with mode-aware setup requirements, richer result rendering, clearer special-rule cues, and accept/regenerate behavior on top of the Epic 1–6 foundations.';
   doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, 'desktop');
   doc.getElementById('mobile-tabs').innerHTML = renderTabButtons(activeTabId, 'mobile');
 

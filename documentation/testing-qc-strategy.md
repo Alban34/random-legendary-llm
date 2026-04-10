@@ -29,7 +29,7 @@ A story can move to **Done** only when all of the following are true:
 
 1. the implementation task(s) for that story are complete,
 2. the story's matching test task(s) are complete,
-3. relevant manual QC checks have been executed,
+3. relevant automated QC coverage has been executed,
 4. no blocking errors remain in edited files,
 5. the behavior matches the approved specifications.
 
@@ -63,7 +63,7 @@ Used for:
 
 Preferred form:
 - Playwright browser QC specs for stable user-visible flows
-- targeted manual scenario checklist only where automation is not yet practical
+- targeted follow-up coverage only where automation is not yet practical
 
 ### 3. End-to-end scenario verification
 Used for:
@@ -75,7 +75,7 @@ Used for:
 
 Preferred form:
 - scripted Playwright walkthroughs with expected outcomes
-- manual spot checks for any flows not yet automated
+- focused supplemental checks for any flows not yet automated
 
 ---
 
@@ -216,6 +216,10 @@ Required tests:
 QC checks:
 - verify result clarity for both normal and edge-case setups
 
+Automated coverage:
+- `test/epic7-new-game-experience.test.mjs` covers New Game control helpers, visible requirements, special-rule rendering inputs, and Accept & Log persistence behavior
+- `test/playwright/epic7-qc.spec.mjs` covers player-count controls, displayed requirements, full result rendering, scheme/mastermind cues, regenerate ephemerality, and Accept & Log browser flows
+
 ---
 
 ## Epic 8 — History, Usage, and Reset Experience
@@ -290,9 +294,9 @@ Before implementation is considered complete:
 - root `README.md` matches the shipped behavior
 - the app runs as a static-served single page without server-side dependencies
 - local persistence works across reloads
-- reset flows and least-played fallback are verified manually and logically
+- reset flows and least-played fallback are verified through automated and logic-level coverage
 - representative inventory and rule behaviors have been cross-checked against `documentation/sources.md`
 
-Current automated browser QC command for Epic 1–4:
+Current automated browser QC command for Epic 1–7:
 - `npm run check:qc`
 
