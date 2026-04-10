@@ -23,7 +23,7 @@ Must
 ## Evidence
 - The header actions set success copy through ui.lastActionNotice, but the visible Latest action line is rendered only in the Collection panel.
 - In src/app/browser-entry.mjs, setTheme() and setLocale() both call applyStateUpdate(...) and rerender the shell without restoring focus to the triggering control.
-- Runtime check after activating the Newsprint theme returned activeTag BODY while the theme changed successfully.
+- Runtime check after activating the Light theme returned activeTag BODY while the theme changed successfully.
 - Runtime check after selecting fr-FR returned activeTag BODY while the document language and title updated successfully.
 
 ## Why it matters

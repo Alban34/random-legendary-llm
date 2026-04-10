@@ -1,5 +1,5 @@
 :root,
-:root[data-theme='midnight'] {
+:root[data-theme='dark'] {
   color-scheme: dark;
   --bg: #0d0d0d;
   --panel: #141428;
@@ -65,7 +65,7 @@
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-:root[data-theme='newsprint'] {
+:root[data-theme='light'] {
   color-scheme: light;
   --bg: #f2ece1;
   --panel: #f9f3e8;

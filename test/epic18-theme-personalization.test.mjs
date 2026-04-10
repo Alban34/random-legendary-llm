@@ -58,11 +58,13 @@ before(async () => {
 });
 
 test('Epic 18 theme utilities normalize supported IDs and expose stable theme metadata', () => {
-  assert.equal(DEFAULT_THEME_ID, 'midnight');
-  assert.deepEqual(THEME_OPTIONS.map((theme) => theme.id), ['midnight', 'newsprint']);
-  assert.equal(normalizeThemeId('newsprint'), 'newsprint');
+  assert.equal(DEFAULT_THEME_ID, 'dark');
+  assert.deepEqual(THEME_OPTIONS.map((theme) => theme.id), ['dark', 'light']);
+  assert.equal(normalizeThemeId('light'), 'light');
+  assert.equal(normalizeThemeId('newsprint'), 'light');
+  assert.equal(normalizeThemeId('midnight'), 'dark');
   assert.equal(normalizeThemeId('not-a-theme'), DEFAULT_THEME_ID);
-  assert.equal(getThemeDefinition('newsprint').colorScheme, 'light');
+  assert.equal(getThemeDefinition('light').colorScheme, 'light');
   assert.equal(getThemeDefinition('unknown').id, DEFAULT_THEME_ID);
 });
 
@@ -70,14 +72,14 @@ test('Epic 18 persists the selected theme and safely recovers invalid stored the
   const state = createDefaultState();
   assert.equal(state.preferences.themeId, DEFAULT_THEME_ID);
 
-  state.preferences.themeId = 'newsprint';
+  state.preferences.themeId = 'light';
   const storage = createMemoryStorage();
   const storageAdapter = createStorageAdapter(storage);
   const save = saveState({ storageAdapter, state });
   assert.equal(save.ok, true);
 
   const loaded = loadState({ storageAdapter, indexes: minimalIndexes });
-  assert.equal(loaded.state.preferences.themeId, 'newsprint');
+  assert.equal(loaded.state.preferences.themeId, 'light');
 
   storage.setItem('legendary_state_v1', JSON.stringify({
     ...state,
@@ -93,12 +95,12 @@ test('Epic 18 persists the selected theme and safely recovers invalid stored the
 });
 
 test('Epic 18 stylesheet and docs describe the supported themes and hand-authored CSS decision', () => {
-  assert.match(shellCss, /:root\[data-theme='newsprint'\]/);
-  assert.match(shellCss, /:root\[data-theme='midnight'\]/);
+  assert.match(shellCss, /:root\[data-theme='light'\]/);
+  assert.match(shellCss, /:root\[data-theme='dark'\]/);
   assert.match(shellCss, /theme-switcher/);
 
-  assert.match(stylingArchitectureDoc, /Midnight/);
-  assert.match(stylingArchitectureDoc, /Newsprint/);
+  assert.match(stylingArchitectureDoc, /Dark/);
+  assert.match(stylingArchitectureDoc, /Light/);
   assert.match(stylingArchitectureDoc, /hand-authored CSS custom properties/i);
   assert.match(stylingArchitectureDoc, /Open Props/);
   assert.match(stylingArchitectureDoc, /Pico CSS/);

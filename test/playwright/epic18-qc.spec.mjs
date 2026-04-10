@@ -67,24 +67,24 @@ test.describe('Epic 18 automated QC', () => {
     await expect(page.locator('#header-theme-controls')).toContainText('Theme');
 
     const defaultTheme = await readDocumentTheme(page);
-    expect(defaultTheme.themeId).toBe('midnight');
+    expect(defaultTheme.themeId).toBe('dark');
     expect(defaultTheme.colorScheme).toBe('dark');
 
-    await selectTheme(page, 'newsprint');
-    await expect(page.locator('[data-action="set-theme"][data-theme-id="newsprint"]')).toHaveAttribute('aria-pressed', 'true');
+    await selectTheme(page, 'light');
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toHaveAttribute('aria-pressed', 'true');
 
     const switchedTheme = await readDocumentTheme(page);
-    expect(switchedTheme.themeId).toBe('newsprint');
+    expect(switchedTheme.themeId).toBe('light');
     expect(switchedTheme.colorScheme).toBe('light');
 
     const switchedState = await readAppState(page);
-    expect(switchedState.preferences.themeId).toBe('newsprint');
+    expect(switchedState.preferences.themeId).toBe('light');
 
     await reloadApp(page);
-    await expect(page.locator('[data-action="set-theme"][data-theme-id="newsprint"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toHaveAttribute('aria-pressed', 'true');
 
     const reloadedTheme = await readDocumentTheme(page);
-    expect(reloadedTheme.themeId).toBe('newsprint');
+    expect(reloadedTheme.themeId).toBe('light');
     expect(reloadedTheme.colorScheme).toBe('light');
   });
 
@@ -98,7 +98,7 @@ test.describe('Epic 18 automated QC', () => {
       await setViewport(page, viewport);
       await reloadApp(page);
 
-      for (const themeId of ['midnight', 'newsprint']) {
+      for (const themeId of ['dark', 'light']) {
         await selectTheme(page, themeId);
         await selectTab(page, 'browse');
         await expect(page.locator('#panel-browse .panel').first()).toBeVisible();

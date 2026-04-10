@@ -7,8 +7,8 @@ STATUS: Approved
 Epic 18 keeps the project on **hand-authored CSS custom properties** rather than adopting a third-party styling framework.
 
 The shipped theme model now supports two built-in themes:
-- `midnight` (`Midnight`) — the default high-contrast dark theme that preserves the app's established look
-- `newsprint` (`Newsprint`) — a warm light theme for brighter environments
+- `dark` (`Dark`) — the default high-contrast dark theme that preserves the app's established look
+- `light` (`Light`) — a warm light theme for brighter environments
 
 The app applies the active theme by setting `data-theme` on `document.documentElement`, and `index.html` performs an early browser-storage read so the saved preference is applied before the main stylesheet paints.
 
@@ -73,8 +73,9 @@ Decision:
 
 The supported theme contract is:
 - preferences persist `themeId`
-- supported values are `midnight` and `newsprint`
-- invalid or unknown stored values recover to `midnight`
+- supported values are `dark` and `light`
+- legacy persisted values `midnight` and `newsprint` normalize to `dark` and `light`
+- invalid or unknown stored values recover to `dark`
 - component rules consume semantic tokens rather than per-theme duplicated blocks
 - the startup path avoids runtime CSS fetches beyond the local stylesheet already shipped with the app
 

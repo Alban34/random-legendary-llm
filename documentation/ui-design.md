@@ -6,8 +6,8 @@ STATUS: Approved
 Themeable Marvel-inspired UI. Functional first, visually bold second. No external fonts, no framework — pure CSS with semantic custom properties.
 
 The current supported themes are:
-- `Midnight` — the default high-contrast dark theme
-- `Newsprint` — a warm light theme for bright environments
+- `Dark` — the default high-contrast dark theme
+- `Light` — a warm light theme for bright environments
 
 ---
 
@@ -16,7 +16,7 @@ The current supported themes are:
 The styling layer now separates semantic tokens from concrete palette values. Each theme defines the same token set, and components consume those semantic variables instead of shipping duplicated per-theme rule blocks.
 
 ```css
-:root[data-theme="midnight"] {
+:root[data-theme="dark"] {
   --bg: #0d0d0d;
   --panel: #141428;
   --header-bg: #0a0a1a;
@@ -27,7 +27,7 @@ The styling layer now separates semantic tokens from concrete palette values. Ea
   --border: #2a2a4a;
 }
 
-:root[data-theme="newsprint"] {
+:root[data-theme="light"] {
   --bg: #f2ece1;
   --panel: #f9f3e8;
   --header-bg: #e9dfce;

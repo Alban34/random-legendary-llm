@@ -85,7 +85,7 @@ test('Epic 2 default root state matches the expected schema', () => {
     lastPlayMode: 'standard',
     selectedTab: null,
     onboardingCompleted: false,
-    themeId: 'midnight',
+    themeId: 'dark',
     localeId: 'en-US'
   });
 });

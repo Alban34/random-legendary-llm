@@ -26,10 +26,10 @@ Persisted slices in V1:
 ### `ThemeId`
 
 ```text
-"midnight" | "newsprint"
+"dark" | "light"
 ```
 
-The default selection rule is `midnight` so the current shipped visual identity stays stable for existing users. Invalid or missing stored theme values recover safely to that default.
+The default selection rule is `dark` so the current shipped visual identity stays stable for existing users. Legacy stored values `midnight` and `newsprint` normalize safely to `dark` and `light`, and invalid or missing stored theme values recover safely to the default.
 
 ### `LocaleId`
 

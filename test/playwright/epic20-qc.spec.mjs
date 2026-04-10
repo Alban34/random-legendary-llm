@@ -75,7 +75,7 @@ test.describe('Epic 20 automated QC', () => {
   test('resets to the default grouping after reload and after backup restore', async ({ page }) => {
     await acceptSetup(page, 1, 'standard');
     await page.locator('[data-action="skip-game-result"]').click();
-    await selectTheme(page, 'newsprint');
+    await selectTheme(page, 'light');
 
     const savedState = await readAppState(page);
     await selectTab(page, 'history');

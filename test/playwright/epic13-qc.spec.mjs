@@ -34,7 +34,7 @@ test.describe('Epic 13 automated QC', () => {
 
   test('exports a versioned JSON backup from the dedicated Backup tab', async ({ page }) => {
     await seedAllOwnedState(page);
-    await selectTheme(page, 'newsprint');
+    await selectTheme(page, 'light');
     await acceptSetup(page, 1);
     await selectTab(page, 'backup');
 
@@ -54,12 +54,12 @@ test.describe('Epic 13 automated QC', () => {
     expect(payload.version).toBe(BACKUP_SCHEMA_VERSION);
     expect(payload.data.collection.ownedSetIds.length).toBeGreaterThan(0);
     expect(payload.data.history.length).toBe(1);
-    expect(payload.data.preferences.themeId).toBe('newsprint');
+    expect(payload.data.preferences.themeId).toBe('light');
   });
 
   test('imports a valid backup preview and can replace current app data safely', async ({ page }) => {
     await seedAllOwnedState(page);
-    await selectTheme(page, 'newsprint');
+    await selectTheme(page, 'light');
     await acceptSetup(page, 2);
     const backupPayload = createBackupPayload(await readAppState(page), { exportedAt: '2026-04-10T18:00:00.000Z' });
 
@@ -76,7 +76,7 @@ test.describe('Epic 13 automated QC', () => {
     const restoredState = await readAppState(page);
     expect(restoredState.collection.ownedSetIds.length).toBe(backupPayload.data.collection.ownedSetIds.length);
     expect(restoredState.history).toHaveLength(1);
-    expect(restoredState.preferences.themeId).toBe('newsprint');
+    expect(restoredState.preferences.themeId).toBe('light');
   });
 
   test('merges an imported backup with overlapping local data without duplicating shared records', async ({ page }) => {
@@ -86,7 +86,7 @@ test.describe('Epic 13 automated QC', () => {
 
     const importedState = JSON.parse(JSON.stringify(currentState));
     importedState.collection.ownedSetIds = [...new Set([...currentState.collection.ownedSetIds.slice(0, 1), 'dark-city'])];
-    importedState.preferences.themeId = 'newsprint';
+    importedState.preferences.themeId = 'light';
     importedState.history.push({
       ...currentState.history[0],
       id: 'backup-extra-record',
@@ -103,7 +103,7 @@ test.describe('Epic 13 automated QC', () => {
     const mergedState = await readAppState(page);
     expect(mergedState.collection.ownedSetIds).toContain('dark-city');
     expect(mergedState.history).toHaveLength(2);
-    expect(mergedState.preferences.themeId).toBe('newsprint');
+    expect(mergedState.preferences.themeId).toBe('light');
   });
 
   test('shows actionable import errors for unsupported backup files without mutating saved state', async ({ page }) => {

@@ -95,10 +95,10 @@ test.describe('Epic 4 automated QC', () => {
     expect(focusOutline).toBe('solid');
 
     await page.keyboard.press('Tab');
-    await expect(page.locator('[data-action="set-theme"][data-theme-id="midnight"]')).toBeFocused();
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="dark"]')).toBeFocused();
 
     await page.keyboard.press('Tab');
-    await expect(page.locator('[data-action="set-theme"][data-theme-id="newsprint"]')).toBeFocused();
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toBeFocused();
 
     await page.keyboard.press('Tab');
     await expect(page.locator('#tab-desktop-browse')).toBeFocused();

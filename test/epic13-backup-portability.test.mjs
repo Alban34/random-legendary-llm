@@ -50,7 +50,7 @@ before(async () => {
 test('Epic 13 creates a versioned portable backup payload with metadata and a useful filename', () => {
   let state = createDefaultState();
   state.collection.ownedSetIds = ['core-set'];
-  state.preferences.themeId = 'newsprint';
+  state.preferences.themeId = 'light';
   state = acceptGameSetup(state, createSampleSetup(0));
 
   const payload = createBackupPayload(state, { exportedAt: '2026-04-10T12:45:30.000Z' });
@@ -59,14 +59,14 @@ test('Epic 13 creates a versioned portable backup payload with metadata and a us
   assert.equal(payload.metadata.storageKey, 'legendary_state_v1');
   assert.equal(payload.data.collection.ownedSetIds[0], 'core-set');
   assert.equal(payload.data.history.length, 1);
-  assert.equal(payload.data.preferences.themeId, 'newsprint');
+  assert.equal(payload.data.preferences.themeId, 'light');
   assert.match(buildBackupFilename(payload.exportedAt), /^legendary-marvel-randomizer-backup-2026-04-10T12-45-30-000Z\.json$/);
 });
 
 test('Epic 13 parses valid current and legacy-compatible backup payloads and summarizes them safely', () => {
   let state = createDefaultState();
   state.collection.ownedSetIds = ['core-set', 'dark-city'];
-  state.preferences.themeId = 'newsprint';
+  state.preferences.themeId = 'light';
   state = acceptGameSetup(state, createSampleSetup(0));
   state = updateGameResult(state, {
     recordId: state.history[0].id,
@@ -87,7 +87,7 @@ test('Epic 13 parses valid current and legacy-compatible backup payloads and sum
   delete legacyPayload.data.history[0].result;
   const parsedLegacy = parseBackupPayload(legacyPayload, { indexes: bundle.runtime.indexes });
   assert.equal(parsedLegacy.ok, true);
-  assert.equal(parsedLegacy.importedState.preferences.themeId, 'midnight');
+  assert.equal(parsedLegacy.importedState.preferences.themeId, 'dark');
   assert.equal(parsedLegacy.importedState.history[0].result.status, 'pending');
 
   assert.deepEqual(summarizeBackupState(parsed.importedState), {
@@ -100,7 +100,7 @@ test('Epic 13 parses valid current and legacy-compatible backup payloads and sum
       henchmanGroups: 1,
       schemes: 1
     },
-    themeId: 'newsprint',
+    themeId: 'light',
     selectedTab: null,
     playMode: 'standard'
   });
@@ -136,12 +136,12 @@ test('Epic 13 rejects malformed or unsupported backup payloads before mutating a
 test('Epic 13 merge semantics union collection, dedupe history, keep stronger usage stats, and apply imported preferences', () => {
   let currentState = createDefaultState();
   currentState.collection.ownedSetIds = ['core-set'];
-  currentState.preferences.themeId = 'midnight';
+  currentState.preferences.themeId = 'dark';
   currentState = acceptGameSetup(currentState, createSampleSetup(0));
 
   const importedState = JSON.parse(JSON.stringify(currentState));
   importedState.collection.ownedSetIds = ['core-set', 'dark-city'];
-  importedState.preferences.themeId = 'newsprint';
+  importedState.preferences.themeId = 'light';
   importedState.preferences.selectedTab = 'history';
   importedState.usage.heroes[currentState.history[0].setupSnapshot.heroIds[0]].plays = 4;
   importedState.usage.heroes[currentState.history[0].setupSnapshot.heroIds[0]].lastPlayedAt = '2026-04-11T09:00:00.000Z';
@@ -159,7 +159,7 @@ test('Epic 13 merge semantics union collection, dedupe history, keep stronger us
   const mergedState = mergeImportedState(currentState, importedState);
   assert.deepEqual(mergedState.collection.ownedSetIds, ['core-set', 'dark-city']);
   assert.equal(mergedState.history.length, 2);
-  assert.equal(mergedState.preferences.themeId, 'newsprint');
+  assert.equal(mergedState.preferences.themeId, 'light');
   assert.equal(mergedState.usage.heroes[currentState.history[0].setupSnapshot.heroIds[0]].plays, 4);
   assert.equal(mergedState.usage.heroes[currentState.history[0].setupSnapshot.heroIds[0]].lastPlayedAt, '2026-04-11T09:00:00.000Z');
 });
