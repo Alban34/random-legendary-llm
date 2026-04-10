@@ -4,7 +4,7 @@ STATUS: Approved
 
 ## Project state
 
-The repository now contains the **Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 implementation foundation** for the Legendary: Marvel randomizer.
+The repository now contains the **Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 + Epic 8 implementation foundation** for the Legendary: Marvel randomizer.
 
 Current status:
 - Epic 1 implementation, tests, and browser QC automation are complete
@@ -14,6 +14,7 @@ Current status:
 - Epic 5 Browse implementation, automated tests, and browser QC automation are complete
 - Epic 6 Collection implementation, automated tests, and browser QC automation are complete
 - Epic 7 New Game implementation, automated tests, and browser QC automation are complete
+- Epic 8 History/Usage/Reset implementation, automated tests, and browser QC automation are complete
 
 Implemented so far:
 - canonical seed data under `src/data/`
@@ -24,9 +25,10 @@ Implemented so far:
 - Browse filtering/detail helpers under `src/app/browse-utils.mjs`
 - Collection grouping/totals/feasibility helpers under `src/app/collection-utils.mjs`
 - New Game display/control helpers under `src/app/new-game-utils.mjs`
-- a tabbed `index.html` shell for the browser app, including the Epic 5 Browse, Epic 6 Collection, and Epic 7 New Game experiences
-- npm-based Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 tests under `test/`
-- Playwright browser QC coverage for the Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 flows under `test/playwright/`
+- History/usage/reset helpers under `src/app/history-utils.mjs`
+- a tabbed `index.html` shell for the browser app, including the Epic 5 Browse, Epic 6 Collection, Epic 7 New Game, and Epic 8 History/Reset experiences
+- npm-based Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 + Epic 8 tests under `test/`
+- Playwright browser QC coverage for the Epic 1 + Epic 2 + Epic 3 + Epic 4 + Epic 5 + Epic 6 + Epic 7 + Epic 8 flows under `test/playwright/`
 - a data-foundation summary reporter under `tools/`
 
 The app remains **fully static**:
@@ -151,7 +153,14 @@ cd "/Users/afayard1/Projects/random-legendary-llm"
 npm run check:epic7
 ```
 
-Run the browser QC suite for Epic 1–7:
+Run the Epic 8 History/Reset checks only:
+
+```sh
+cd "/Users/afayard1/Projects/random-legendary-llm"
+npm run check:epic8
+```
+
+Run the browser QC suite for Epic 1–8:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
@@ -210,4 +219,4 @@ Project documentation lives in `documentation/`.
 
 ## Next step
 
-With Epic 1, Epic 2, Epic 3, Epic 4, Epic 5, Epic 6, and Epic 7 implemented in code and covered by automated browser QC, the next major implementation target is **Epic 8 — History, Usage, and Reset Experience**.
+With Epic 1, Epic 2, Epic 3, Epic 4, Epic 5, Epic 6, Epic 7, and Epic 8 implemented in code and covered by automated browser QC, the next major implementation target is **Epic 9 — Notifications, Error Handling, and Accessibility**.

@@ -445,6 +445,18 @@ details summary {
   margin-bottom: 10px;
 }
 
+.history-usage-indicators {
+  gap: 12px;
+}
+
+.history-usage-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .result-list {
   gap: 8px;
 }
@@ -492,6 +504,10 @@ details summary {
 
 .history-meta {
   margin-top: 8px;
+}
+
+#history-full-reset-confirmation {
+  margin-top: 12px;
 }
 
 .empty-state {

@@ -1,15 +1,8 @@
 import { APP_TABS, normalizeSelectedTab } from './app-tabs.mjs';
 import { BROWSE_TYPE_OPTIONS, filterBrowseSets, getBrowseTypeLabel, summarizeBrowseSet } from './browse-utils.mjs';
 import { COLLECTION_TYPE_GROUPS, getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
+import { buildFullResetPreview, formatHistorySummary, summarizeUsageIndicators } from './history-utils.mjs';
 import { formatHeroTeamLabel, formatMastermindLeadLabel, getDisplayedSetupRequirements, isAdvancedSoloAvailable } from './new-game-utils.mjs';
-
-const USAGE_LABELS = {
-  heroes: 'Heroes',
-  masterminds: 'Masterminds',
-  villainGroups: 'Villain Groups',
-  henchmanGroups: 'Henchman Groups',
-  schemes: 'Schemes'
-};
 
 function formatDuplicateEntries(bundle) {
   return ['Black Widow', 'Loki', 'Thor', 'Nova', 'Venom']
@@ -22,23 +15,20 @@ function formatDuplicateEntries(bundle) {
 }
 
 function formatHistoryEntry(record, bundle) {
-  const indexes = bundle.runtime.indexes;
-  const heroNames = record.setupSnapshot.heroIds.map((id) => indexes.heroesById[id].name).join(', ');
-  const villainNames = record.setupSnapshot.villainGroupIds.map((id) => indexes.villainGroupsById[id].name).join(', ');
-  const henchmanNames = record.setupSnapshot.henchmanGroupIds.map((id) => indexes.henchmanGroupsById[id].name).join(', ');
+  const summary = formatHistorySummary(record, bundle.runtime.indexes);
 
   return `
-    <details class="history-item">
+    <details class="history-item" data-history-record-id="${summary.id}">
       <summary>
-        <strong>${indexes.mastermindsById[record.setupSnapshot.mastermindId].name}</strong>
-        <span class="pill">${record.playerCount} player${record.playerCount === 1 ? '' : 's'}</span>
+        <strong>${summary.mastermindName}</strong>
+        <span class="pill">${summary.playerLabel}</span>
         ${record.advancedSolo ? '<span class="pill">Advanced Solo</span>' : ''}
       </summary>
-      <div class="history-meta muted">Accepted ${new Date(record.createdAt).toLocaleString()}</div>
-      <div class="history-meta"><strong>Scheme:</strong> ${indexes.schemesById[record.setupSnapshot.schemeId].name}</div>
-      <div class="history-meta"><strong>Heroes:</strong> ${heroNames}</div>
-      <div class="history-meta"><strong>Villain Groups:</strong> ${villainNames}</div>
-      <div class="history-meta"><strong>Henchman Groups:</strong> ${henchmanNames}</div>
+      <div class="history-meta muted">Accepted ${new Date(summary.createdAt).toLocaleString()} · ${summary.modeLabel}</div>
+      <div class="history-meta"><strong>Scheme:</strong> ${summary.schemeName}</div>
+      <div class="history-meta"><strong>Heroes:</strong> ${summary.heroNames.join(', ')}</div>
+      <div class="history-meta"><strong>Villain Groups:</strong> ${summary.villainGroupNames.join(', ')}</div>
+      <div class="history-meta"><strong>Henchman Groups:</strong> ${summary.henchmanGroupNames.join(', ')}</div>
     </details>
   `;
 }
@@ -574,36 +564,45 @@ function renderSetupResult(viewModel) {
 }
 
 function renderHistoryPanel(viewModel) {
-  const { bundle, state } = viewModel;
+  const { bundle, state, ui } = viewModel;
+  const indicators = summarizeUsageIndicators(bundle.runtime, state);
+  const resetPreview = buildFullResetPreview();
   return `
     <section class="stack gap-md">
       <section class="panel">
-        <h2>Accepted game history</h2>
+        <h2>Used card tracking</h2>
+        <div class="stack gap-sm history-usage-indicators">
+          ${indicators.map((indicator) => `
+            <article class="summary-card history-usage-row" data-usage-category="${indicator.category}">
+              <div>
+                <strong>${indicator.label}</strong>
+                <div class="muted">Never played: ${indicator.neverPlayed}/${indicator.total}</div>
+              </div>
+              <button class="button button-secondary" data-action="reset-usage" data-category="${indicator.category}">Reset ${indicator.label}</button>
+            </article>
+          `).join('')}
+        </div>
+        <p class="muted">Lowest-play reuse activates automatically when a category runs out of never-played options.</p>
+        ${ui.confirmResetAllState ? `
+          <div class="notice warning" id="history-full-reset-confirmation">
+            <strong>This will delete all game history and reset all card tracking. Are you sure?</strong>
+            <div class="muted">Preview after reset: ${resetPreview.history.length} history entries, ${resetPreview.collection.ownedSetIds.length} owned sets, and clean usage buckets.</div>
+            <div class="button-row confirmation-actions">
+              <button class="button button-danger" data-action="confirm-reset-all-state">Confirm full reset</button>
+              <button class="button button-secondary" data-action="cancel-reset-all-state">Cancel</button>
+            </div>
+          </div>
+        ` : `
+          <div class="button-row">
+            <button class="button button-danger" data-action="request-reset-all-state">Full Reset — Clear all data</button>
+          </div>
+        `}
+      </section>
+      <section class="panel">
+        <h2>Game history</h2>
         ${state.history.length
           ? state.history.map((record) => formatHistoryEntry(record, bundle)).join('')
           : '<p class="muted empty-state">No accepted games have been logged yet.</p>'}
-      </section>
-      <section class="panel">
-        <h2>Usage and reset actions</h2>
-        <div class="stack gap-md">
-          <div>
-            <h3>Persistence demo actions</h3>
-            <div class="button-row">
-              <button class="button button-secondary" data-action="corrupt-saved-state">Write corrupted JSON</button>
-              <button class="button button-secondary" data-action="inject-invalid-owned-set">Write invalid owned set ID</button>
-              <button class="button button-danger" data-action="reset-all-state">Reset all state</button>
-            </div>
-          </div>
-          <div>
-            <h3>Per-category usage resets</h3>
-            <div class="button-row">
-              ${Object.entries(USAGE_LABELS).map(([category, label]) => `
-                <button class="button button-secondary" data-action="reset-usage" data-category="${category}">${label}</button>
-              `).join('')}
-            </div>
-          </div>
-          <p class="muted">Use the storage corruption actions, then reload the page, to verify the Epic 2 recovery behavior. Use Generate / Regenerate / Accept &amp; Log in the New Game tab to exercise the Epic 3 engine.</p>
-        </div>
       </section>
     </section>
   `;
@@ -618,7 +617,7 @@ function renderDiagnosticsPanel(viewModel) {
       <h2>Initialization status</h2>
       <div id="status-message">${failed.length
         ? `<p class="error">Foundation loaded with ${failed.length} failing Epic 1 test(s).</p>`
-        : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, Epic 3 setup generation, Epic 4 shell/navigation, Epic 5 browse extensions, Epic 6 collection management, and Epic 7 new-game experience are loaded successfully.</p>'}</div>
+        : '<p class="status-pass">Epic 1 data foundation, Epic 2 persistence, Epic 3 setup generation, Epic 4 shell/navigation, Epic 5 browse extensions, Epic 6 collection management, Epic 7 new-game experience, and Epic 8 history/reset flows are loaded successfully.</p>'}</div>
     </section>
     <section class="panel">
       <h2>Developer diagnostics</h2>
@@ -705,12 +704,14 @@ function bindActionButtons(doc, actions) {
     'request-reset-owned-collection': actions.requestResetOwnedCollection,
     'cancel-reset-owned-collection': actions.cancelResetOwnedCollection,
     'confirm-reset-owned-collection': actions.confirmResetOwnedCollection,
+    'request-reset-all-state': actions.requestResetAllState,
+    'cancel-reset-all-state': actions.cancelResetAllState,
+    'confirm-reset-all-state': actions.resetAllState,
     'toggle-advanced-solo': actions.toggleAdvancedSolo,
     'generate-setup': actions.generateSetup,
     'regenerate-setup': actions.regenerateSetup,
     'accept-current-setup': actions.acceptCurrentSetup,
     'clear-setup-controls': actions.clearToDefaults,
-    'reset-all-state': actions.resetAllState,
     'corrupt-saved-state': actions.corruptSavedState,
     'inject-invalid-owned-set': actions.injectInvalidOwnedSet
   };
@@ -727,8 +728,8 @@ export function renderBundle(doc, viewModel, actions) {
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);
   const panelMarkup = renderTabPanels(viewModel);
 
-  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 7 New Game Experience';
-  doc.getElementById('app-subtitle').textContent = 'The current milestone expands the New Game workflow with mode-aware setup requirements, richer result rendering, clearer special-rule cues, and accept/regenerate behavior on top of the Epic 1–6 foundations.';
+  doc.getElementById('app-title').textContent = 'Legendary: Marvel Randomizer — Epic 8 History, Usage, and Reset';
+  doc.getElementById('app-subtitle').textContent = 'The current milestone completes the History tab with readable usage indicators, expandable accepted-game summaries, per-category resets, and a confirmation-gated full reset on top of the Epic 1–7 foundations.';
   doc.getElementById('desktop-tabs').innerHTML = renderTabButtons(activeTabId, 'desktop');
   doc.getElementById('mobile-tabs').innerHTML = renderTabButtons(activeTabId, 'mobile');
 

@@ -234,6 +234,10 @@ Required tests:
 QC checks:
 - verify history labels remain clear with duplicate character names
 
+Automated coverage:
+- `test/epic8-history-usage-reset.test.mjs` covers usage indicators, readable history summaries, and reset preview/behavior logic
+- `test/playwright/epic8-qc.spec.mjs` covers usage indicators, newest-first history rendering, expand/collapse behavior, per-category resets, and full reset confirmation flows
+
 ---
 
 ## Epic 9 — Notifications, Error Handling, and Accessibility
@@ -297,6 +301,6 @@ Before implementation is considered complete:
 - reset flows and least-played fallback are verified through automated and logic-level coverage
 - representative inventory and rule behaviors have been cross-checked against `documentation/sources.md`
 
-Current automated browser QC command for Epic 1–7:
+Current automated browser QC command for Epic 1–8:
 - `npm run check:qc`
 

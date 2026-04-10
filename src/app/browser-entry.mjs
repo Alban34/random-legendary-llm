@@ -38,6 +38,9 @@ function syncDebugGlobals(viewModel) {
   window.__COLLECTION_UI__ = {
     confirmResetOwnedCollection: viewModel.ui.confirmResetOwnedCollection
   };
+  window.__HISTORY_UI__ = {
+    confirmResetAllState: viewModel.ui.confirmResetAllState
+  };
 }
 
 async function boot() {
@@ -66,6 +69,7 @@ async function boot() {
       browseTypeFilter: 'all',
       expandedBrowseSetId: null,
       confirmResetOwnedCollection: false,
+      confirmResetAllState: false,
       selectedTab: normalizeSelectedTab(hydration.state.preferences.selectedTab),
       selectedPlayerCount: hydration.state.preferences.lastPlayerCount,
       advancedSolo: hydration.state.preferences.lastAdvancedSolo
@@ -144,6 +148,7 @@ async function boot() {
     toggleOwnedSet(setId) {
       clearGeneratedSetup();
       viewModel.ui.confirmResetOwnedCollection = false;
+      viewModel.ui.confirmResetAllState = false;
       applyStateUpdate((currentState) => toggleOwnedSet(currentState, setId), 'Updated owned collection state. Generate a new setup to use the current collection.');
     },
     setBrowseSearchTerm(searchTerm) {
@@ -172,6 +177,16 @@ async function boot() {
       viewModel.ui.confirmResetOwnedCollection = false;
       clearGeneratedSetup();
       applyStateUpdate((currentState) => resetOwnedCollection(currentState), 'Cleared all owned collection selections.');
+    },
+    requestResetAllState() {
+      viewModel.ui.confirmResetAllState = true;
+      viewModel.ui.lastActionNotice = 'Confirm the full reset to clear collection, usage, history, and preferences.';
+      rerender();
+    },
+    cancelResetAllState() {
+      viewModel.ui.confirmResetAllState = false;
+      viewModel.ui.lastActionNotice = 'Kept the current persisted application state.';
+      rerender();
     },
     setPlayerCount(playerCount) {
       const advancedSolo = playerCount === 1 ? viewModel.ui.advancedSolo : false;
@@ -229,9 +244,11 @@ async function boot() {
       }), 'Accepted & logged the current generated setup.');
     },
     resetUsageCategory(category) {
+      viewModel.ui.confirmResetAllState = false;
       applyStateUpdate((currentState) => resetUsageCategory(currentState, category), `Reset ${category} usage stats.`);
     },
     resetAllState() {
+      viewModel.ui.confirmResetAllState = false;
       const result = resetAllState({ storageAdapter });
       viewModel.state = result.state;
       viewModel.persistence.updateNotices = result.notices;

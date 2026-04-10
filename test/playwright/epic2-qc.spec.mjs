@@ -5,7 +5,8 @@ import {
   readAppState,
   reloadApp,
   seedAllOwnedState,
-  selectTab
+  selectTab,
+  STORAGE_KEY
 } from './helpers/app-fixture.mjs';
 
 async function toggleOwnedSet(page, setName) {
@@ -105,7 +106,8 @@ test.describe('Epic 2 automated QC', () => {
       await expect(page.locator('#panel-history')).toContainText(label);
     }
 
-    await page.locator('#panel-history [data-action="reset-all-state"]').click();
+    await page.locator('#panel-history [data-action="request-reset-all-state"]').click();
+    await page.locator('#panel-history [data-action="confirm-reset-all-state"]').click();
     await page.waitForFunction(() => window.__ACTIVE_TAB__ === 'browse');
     const resetState = await readAppState(page);
     expect(resetState.collection.ownedSetIds).toHaveLength(0);
@@ -117,13 +119,18 @@ test.describe('Epic 2 automated QC', () => {
     await seedAllOwnedState(page);
     await selectTab(page, 'history');
 
-    await page.locator('#panel-history [data-action="corrupt-saved-state"]').click();
+    await page.evaluate((storageKey) => {
+      localStorage.setItem(storageKey, '{ this-is-not-valid-json');
+    }, STORAGE_KEY);
     await reloadApp(page);
     await selectTab(page, 'collection');
     await expect(page.locator('#panel-collection')).toContainText('Recovered browser state because the saved JSON was corrupted.');
 
-    await selectTab(page, 'history');
-    await page.locator('#panel-history [data-action="inject-invalid-owned-set"]').click();
+    const validState = await readAppState(page);
+    validState.collection.ownedSetIds.push('definitely-missing-set');
+    await page.evaluate(([storageKey, nextState]) => {
+      localStorage.setItem(storageKey, JSON.stringify(nextState, null, 2));
+    }, [STORAGE_KEY, validState]);
     await reloadApp(page);
     await selectTab(page, 'collection');
     await expect(page.locator('#panel-collection')).toContainText('Removed invalid stored set IDs during state hydration.');

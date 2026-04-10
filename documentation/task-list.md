@@ -361,40 +361,40 @@ See also: `documentation/testing-qc-strategy.md`
 ## Epic 8 — History, Usage, and Reset Experience
 
 ### Story 8.1 — Render per-category freshness and usage indicators
-- [ ] Show never-played counts per category
-- [ ] Show clear labels for reset actions
-- [ ] Explain least-played fallback in the UI
-- [ ] **Test:** verify indicators reflect actual usage stats from persisted state
-- [ ] **QC (Automated):** automate QC coverage for indicator changes after several accepted games
+- [x] Show never-played counts per category
+- [x] Show clear labels for reset actions
+- [x] Explain least-played fallback in the UI
+- [x] **Test:** verify indicators reflect actual usage stats from persisted state
+- [x] **QC (Automated):** automate QC coverage for indicator changes after several accepted games
 
 ### Story 8.2 — Render accepted game history in newest-first order
-- [ ] Render summary rows for history records
-- [ ] Resolve IDs back to display names
-- [ ] Show player count and mode metadata
-- [ ] **Test:** verify history ordering, label resolution, and summary metadata
-- [ ] **QC (Automated):** automate QC coverage for history readability with multiple accepted games
+- [x] Render summary rows for history records
+- [x] Resolve IDs back to display names
+- [x] Show player count and mode metadata
+- [x] **Test:** verify history ordering, label resolution, and summary metadata
+- [x] **QC (Automated):** automate QC coverage for history readability with multiple accepted games
 
 ### Story 8.3 — Expand and collapse history records
-- [ ] Add expandable history item behavior
-- [ ] Show full setup details inside expanded items
-- [ ] **Test:** verify expand/collapse works correctly for multiple history entries
-- [ ] **QC (Automated):** automate QC coverage for one collapsed and one expanded entry on mobile and desktop widths
+- [x] Add expandable history item behavior
+- [x] Show full setup details inside expanded items
+- [x] **Test:** verify expand/collapse works correctly for multiple history entries
+- [x] **QC (Automated):** automate QC coverage for one collapsed and one expanded entry on mobile and desktop widths
 
 ### Story 8.4 — Reset a single category of usage stats
-- [ ] Add reset button for heroes
-- [ ] Add reset button for masterminds
-- [ ] Add reset button for villain groups
-- [ ] Add reset button for henchman groups
-- [ ] Add reset button for schemes
-- [ ] **Test:** verify each category reset affects only its own usage stats and indicators
-- [ ] **QC (Automated):** automate QC coverage for at least two category resets after accepted games exist
+- [x] Add reset button for heroes
+- [x] Add reset button for masterminds
+- [x] Add reset button for villain groups
+- [x] Add reset button for henchman groups
+- [x] Add reset button for schemes
+- [x] **Test:** verify each category reset affects only its own usage stats and indicators
+- [x] **QC (Automated):** automate QC coverage for at least two category resets after accepted games exist
 
 ### Story 8.5 — Reset the full application state with confirmation
-- [ ] Add full reset action
-- [ ] Show confirmation modal
-- [ ] Clear collection, usage, history, and preferences on confirm
-- [ ] **Test:** verify full reset clears all persisted state only after confirmation
-- [ ] **QC (Automated):** automate QC coverage to confirm the app returns to a clean initial state after reset
+- [x] Add full reset action
+- [x] Show confirmation modal
+- [x] Clear collection, usage, history, and preferences on confirm
+- [x] **Test:** verify full reset clears all persisted state only after confirmation
+- [x] **QC (Automated):** automate QC coverage to confirm the app returns to a clean initial state after reset
 
 ---
 
