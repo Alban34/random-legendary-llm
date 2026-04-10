@@ -686,7 +686,7 @@ function renderOnboardingShell(viewModel) {
   return `
     <section class="panel onboarding-shell" id="onboarding-shell" aria-live="polite">
       <div class="row space-between wrap gap-md align-center">
-        <div>
+        <div class="panel-copy">
           <div class="eyebrow">${locale.t('onboarding.titleEyebrow')}</div>
           <h2>${locale.t('onboarding.title')}</h2>
           <p class="muted">${locale.t('onboarding.description')}</p>
@@ -724,7 +724,7 @@ function renderAboutPanel(viewModel) {
   return `
     <section class="panel about-panel" id="about-panel">
       <div class="row space-between wrap gap-md align-center">
-        <div>
+        <div class="panel-copy">
           <div class="eyebrow">${locale.t('about.eyebrow')}</div>
           <h2>${locale.t('about.title')}</h2>
           <p class="muted">${locale.t('about.description')}</p>
@@ -1035,10 +1035,10 @@ function renderBrowsePanel(viewModel) {
   });
 
   return `
-    <section class="stack gap-md">
+    <section class="page-flow stack gap-md">
       <section class="panel browse-hero">
         <div class="row space-between wrap gap-md align-center">
-          <div class="browse-hero-copy">
+          <div class="browse-hero-copy panel-copy">
             <div class="eyebrow">${locale.t('browse.hero.eyebrow')}</div>
             <h2>${locale.t('browse.hero.title')}</h2>
             <p class="muted">${locale.t('browse.hero.description')}</p>
@@ -1059,7 +1059,7 @@ function renderBrowsePanel(viewModel) {
       </section>
       <section class="panel" data-browse-start-here>
         <div class="row space-between wrap gap-md align-center">
-          <div>
+          <div class="panel-copy">
             <h2>${locale.t('browse.startHere.title')}</h2>
             <p class="muted">${locale.t('browse.startHere.description')}</p>
           </div>
@@ -1081,7 +1081,7 @@ function renderBrowsePanel(viewModel) {
       </section>
       <section class="panel browse-panel-full-width" data-browse-sets-panel>
         <div class="row space-between wrap gap-md align-center">
-          <div>
+          <div class="panel-copy">
             <h2>${locale.t('browse.panel.title')}</h2>
             <p class="muted">${locale.t('browse.panel.description')}</p>
           </div>
@@ -1128,10 +1128,10 @@ function renderCollectionPanel(viewModel) {
   ];
 
   return `
-    <section class="stack gap-md">
+    <section class="page-flow stack gap-md">
       <section class="panel">
         <div class="row space-between wrap gap-md align-center">
-          <div>
+          <div class="panel-copy">
             <h2>${locale.t('collection.title')}</h2>
             <p class="muted">${locale.t('collection.description')}</p>
           </div>
@@ -1162,8 +1162,10 @@ function renderCollectionPanel(viewModel) {
       </section>
       <section class="two-col">
         <section class="panel">
-          <h2>${locale.t('collection.totals.title')}</h2>
-          <p class="muted">${locale.t('collection.totals.description')}</p>
+          <div class="panel-copy">
+            <h2>${locale.t('collection.totals.title')}</h2>
+            <p class="muted">${locale.t('collection.totals.description')}</p>
+          </div>
           <div class="summary-grid collection-totals-grid">
             <div class="summary-card"><div class="muted">${locale.t('common.heroes')}</div><div class="metric-sm">${totals.heroCount}</div></div>
             <div class="summary-card"><div class="muted">${locale.t('common.masterminds')}</div><div class="metric-sm">${totals.mastermindCount}</div></div>
@@ -1173,8 +1175,10 @@ function renderCollectionPanel(viewModel) {
           </div>
         </section>
         <section class="panel">
-          <h2>${locale.t('collection.capacity.title')}</h2>
-          <p class="muted">${locale.t('collection.capacity.description')}</p>
+          <div class="panel-copy">
+            <h2>${locale.t('collection.capacity.title')}</h2>
+            <p class="muted">${locale.t('collection.capacity.description')}</p>
+          </div>
           <div class="summary-grid collection-feasibility-grid">
             ${renderCollectionFeasibility(viewModel)}
           </div>
@@ -1327,10 +1331,12 @@ function renderHistoryPanel(viewModel) {
   const { ui } = viewModel;
   const locale = getLocale(viewModel);
   return `
-    <section class="stack gap-md">
+    <section class="page-flow stack gap-md">
       <section class="panel">
-        <h2>${locale.t('history.title')}</h2>
-        <div class="muted">${locale.t('history.description')}</div>
+        <div class="panel-copy">
+          <h2>${locale.t('history.title')}</h2>
+          <div class="muted">${locale.t('history.description')}</div>
+        </div>
         ${renderHistoryGroupingControls(ui.historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE, locale)}
         ${renderGroupedHistory(viewModel)}
       </section>
@@ -1345,10 +1351,12 @@ function renderBackupPanel(viewModel) {
   const indicators = summarizeUsageIndicators(bundle.runtime, state);
   const resetPreview = buildFullResetPreview();
   return `
-    <section class="stack gap-md">
+    <section class="page-flow stack gap-md">
       <section class="panel" data-backup-panel>
-        <h2>${locale.t('backup.title')}</h2>
-        <div class="muted">${locale.t('backup.description')}</div>
+        <div class="panel-copy">
+          <h2>${locale.t('backup.title')}</h2>
+          <div class="muted">${locale.t('backup.description')}</div>
+        </div>
         <div class="button-row">
           <button class="button button-secondary" data-action="export-backup">${locale.t('backup.export')}</button>
           <button class="button button-primary" data-action="open-import-backup">${locale.t('backup.import')}</button>
@@ -1357,8 +1365,10 @@ function renderBackupPanel(viewModel) {
         ${renderBackupPreview(ui, locale)}
       </section>
       <section class="panel">
-        <h2>${locale.t('backup.usedCardTracking')}</h2>
-        <div class="muted">${locale.t('backup.usedCardDescription')}</div>
+        <div class="panel-copy">
+          <h2>${locale.t('backup.usedCardTracking')}</h2>
+          <div class="muted">${locale.t('backup.usedCardDescription')}</div>
+        </div>
         <div class="stack gap-sm history-usage-indicators">
           ${indicators.map((indicator) => `
             <article class="summary-card history-usage-row" data-usage-category="${indicator.category}">
@@ -1385,7 +1395,7 @@ function renderTabPanels(viewModel) {
     browse: renderBrowsePanel(viewModel),
     collection: renderCollectionPanel(viewModel),
     'new-game': `
-      <section class="two-col shell-two-col">
+      <section class="two-col shell-two-col page-flow">
         <section class="panel">
           <h2>${getLocale(viewModel).t('newGame.panel.setupTitle')}</h2>
           ${renderSetupControls(viewModel)}

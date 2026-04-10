@@ -249,6 +249,15 @@ async function boot() {
     });
   };
 
+  const focusSelector = (selector) => {
+    if (!selector) {
+      return;
+    }
+    queueMicrotask(() => {
+      document.querySelector(selector)?.focus();
+    });
+  };
+
   const focusModalCancelButton = () => {
     queueMicrotask(() => {
       document.querySelector('#modal-root [data-modal-focus="cancel"]')?.focus();
@@ -374,6 +383,7 @@ async function boot() {
     resumeToastDismissal,
     selectTab(tabId) {
       persistSelectedTab(tabId, t('actions.switchedTab', { tab: viewModel.locale.getTabLabel(normalizeSelectedTab(tabId)) }));
+      focusSelector(`[data-action="select-tab"][data-tab-id="${normalizeSelectedTab(tabId)}"][aria-selected="true"]`);
     },
     setHistoryGrouping(mode) {
       viewModel.ui.historyGroupingMode = HISTORY_GROUPING_MODES.some((entry) => entry.id === mode)
@@ -383,23 +393,32 @@ async function boot() {
         mode: viewModel.locale.getHistoryGroupingLabel(viewModel.ui.historyGroupingMode)
       });
       rerender();
+      focusSelector(`[data-action="set-history-grouping"][data-history-grouping-mode="${viewModel.ui.historyGroupingMode}"]`);
     },
     handleTabKeydown(tabId, key) {
       const normalizedTabId = normalizeSelectedTab(tabId);
       if (key === 'ArrowRight' || key === 'ArrowDown') {
-        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'next'), t('actions.keyboardTabs'));
+        const nextTabId = getAdjacentTabId(normalizedTabId, 'next');
+        persistSelectedTab(nextTabId, t('actions.keyboardTabs'));
+        focusSelector(`[data-action="select-tab"][data-tab-id="${nextTabId}"][aria-selected="true"]`);
         return;
       }
       if (key === 'ArrowLeft' || key === 'ArrowUp') {
-        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'previous'), t('actions.keyboardTabs'));
+        const previousTabId = getAdjacentTabId(normalizedTabId, 'previous');
+        persistSelectedTab(previousTabId, t('actions.keyboardTabs'));
+        focusSelector(`[data-action="select-tab"][data-tab-id="${previousTabId}"][aria-selected="true"]`);
         return;
       }
       if (key === 'Home') {
-        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'first'), t('actions.keyboardFirstTab'));
+        const firstTabId = getAdjacentTabId(normalizedTabId, 'first');
+        persistSelectedTab(firstTabId, t('actions.keyboardFirstTab'));
+        focusSelector(`[data-action="select-tab"][data-tab-id="${firstTabId}"][aria-selected="true"]`);
         return;
       }
       if (key === 'End') {
-        persistSelectedTab(getAdjacentTabId(normalizedTabId, 'last'), t('actions.keyboardLastTab'));
+        const lastTabId = getAdjacentTabId(normalizedTabId, 'last');
+        persistSelectedTab(lastTabId, t('actions.keyboardLastTab'));
+        focusSelector(`[data-action="select-tab"][data-tab-id="${lastTabId}"][aria-selected="true"]`);
       }
     },
     toggleOwnedSet(setId) {
@@ -518,6 +537,7 @@ async function boot() {
         currentState.preferences.themeId = normalizedThemeId;
         return currentState;
       }, t('actions.appliedTheme', { theme: viewModel.locale.getThemeLabel(normalizedThemeId) }));
+      focusSelector(`[data-action="set-theme"][data-theme-id="${normalizedThemeId}"]`);
     },
     setLocale(localeId) {
       const normalizedLocaleId = normalizeLocaleId(localeId);
@@ -529,6 +549,7 @@ async function boot() {
         currentState.preferences.localeId = normalizedLocaleId;
         return currentState;
       }, t('actions.appliedLocale', { locale: createLocaleTools(normalizedLocaleId).localeLabel }));
+      focusSelector('#header-locale-select');
     },
     exportBackup() {
       const payload = createBackupPayload(viewModel.state);

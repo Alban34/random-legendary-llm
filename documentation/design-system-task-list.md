@@ -65,161 +65,161 @@ See also: `documentation/design-system-epics.md`, `documentation/design-system.m
 ## Epic DS2 — Typography, Layout, and Shell Rhythm
 
 ### Epic-wide validation gate
-- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS2 work complete
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS2 work complete
 
 ### Story DS2.1 — Implement the approved typography stacks and type scale
-- [ ] Apply the approved heading, body, and monospace font stacks through shared typography tokens
-- [ ] Implement the design-system type scale for app titles, section headings, card titles, metadata, and labels
-- [ ] Normalize letter spacing, line height, and uppercase usage for navigation and badge text
-- [ ] Remove one-off font-size decisions that conflict with the governed type scale
-- [ ] **Test:** verify major shell surfaces use the intended typography roles consistently across tabs
-- [ ] **QC (Automated):** add browser QC that spot-checks heading, body, and metadata hierarchy on representative screens
+- [x] Apply the approved heading, body, and monospace font stacks through shared typography tokens
+- [x] Implement the design-system type scale for app titles, section headings, card titles, metadata, and labels
+- [x] Normalize letter spacing, line height, and uppercase usage for navigation and badge text
+- [x] Remove one-off font-size decisions that conflict with the governed type scale
+- [x] **Test:** verify major shell surfaces use the intended typography roles consistently across tabs
+- [x] **QC (Automated):** add browser QC that spot-checks heading, body, and metadata hierarchy on representative screens
 
 ### Story DS2.2 — Apply shared spacing, radius, border, and elevation rules to the shell
-- [ ] Replace inconsistent shell padding and gap values with governed spacing tokens
-- [ ] Apply the approved radius and border treatments to major panels and control groups
-- [ ] Standardize panel shadows and remove exaggerated elevation differences between similar surfaces
-- [ ] Ensure sticky header and mobile navigation surfaces use the approved separation treatment from content
-- [ ] **Test:** verify shell containers, panels, and control groups consume the approved spacing and elevation tokens
-- [ ] **QC (Automated):** add browser QC for shell spacing and panel treatment on desktop and mobile viewports
+- [x] Replace inconsistent shell padding and gap values with governed spacing tokens
+- [x] Apply the approved radius and border treatments to major panels and control groups
+- [x] Standardize panel shadows and remove exaggerated elevation differences between similar surfaces
+- [x] Ensure sticky header and mobile navigation surfaces use the approved separation treatment from content
+- [x] **Test:** verify shell containers, panels, and control groups consume the approved spacing and elevation tokens
+- [x] **QC (Automated):** add browser QC for shell spacing and panel treatment on desktop and mobile viewports
 
 ### Story DS2.3 — Refine responsive layout density for desktop and mobile screens
-- [ ] Audit each major tab for unnecessary top spacing or low-value chrome before core controls
-- [ ] Tune mobile density so task controls appear earlier without creating cramped touch targets
-- [ ] Tune desktop density so multi-column layouts improve scanning without fragmenting the workflow
-- [ ] Validate that theme, locale, and longer-copy states still fit within the revised layout rhythm
-- [ ] **Test:** verify the responsive layout remains stable across supported breakpoints, themes, and locales
-- [ ] **QC (Automated):** add viewport-based QC that checks content ordering and spacing on desktop and mobile
+- [x] Audit each major tab for unnecessary top spacing or low-value chrome before core controls
+- [x] Tune mobile density so task controls appear earlier without creating cramped touch targets
+- [x] Tune desktop density so multi-column layouts improve scanning without fragmenting the workflow
+- [x] Validate that theme, locale, and longer-copy states still fit within the revised layout rhythm
+- [x] **Test:** verify the responsive layout remains stable across supported breakpoints, themes, and locales
+- [x] **QC (Automated):** add viewport-based QC that checks content ordering and spacing on desktop and mobile
 
 ### Story DS2.4 — Standardize page-section and panel rhythm across the main tabs
-- [ ] Define a shared pattern for page-intro spacing, section headings, and panel stacking
-- [ ] Apply that pattern consistently to Browse, Collection, New Game, History, and Backup
-- [ ] Reduce screen-specific layout exceptions that create different visual grammar for similar sections
-- [ ] Ensure empty, sparse-data, and dense-data states still follow the same panel rhythm rules
-- [ ] **Test:** verify major tabs share a consistent section rhythm without obscuring tab-specific needs
-- [ ] **QC (Automated):** add browser QC that compares representative tab layouts for structural consistency
+- [x] Define a shared pattern for page-intro spacing, section headings, and panel stacking
+- [x] Apply that pattern consistently to Browse, Collection, New Game, History, and Backup
+- [x] Reduce screen-specific layout exceptions that create different visual grammar for similar sections
+- [x] Ensure empty, sparse-data, and dense-data states still follow the same panel rhythm rules
+- [x] **Test:** verify major tabs share a consistent section rhythm without obscuring tab-specific needs
+- [x] **QC (Automated):** add browser QC that compares representative tab layouts for structural consistency
 
 ---
 
 ## Epic DS3 — Shared Component Library and State Patterns
 
 ### Epic-wide validation gate
-- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS3 work complete
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS3 work complete
 
 ### Story DS3.1 — Standardize navigation, tab, and segmented-control states
-- [ ] Define the approved default, hover, focus, selected, and disabled states for top navigation and bottom-tab navigation
-- [ ] Apply the same state language to player-count selectors and other segmented controls where appropriate
-- [ ] Ensure active-state cues remain clear without relying on color alone
-- [ ] Verify current-tab clarity survives theme changes, localization, and narrow viewports
-- [ ] **Test:** verify navigation and segmented controls expose the same state hierarchy across desktop and mobile
-- [ ] **QC (Automated):** add keyboard and viewport QC for active, hover, focus, and selected navigation states
+- [x] Define the approved default, hover, focus, selected, and disabled states for top navigation and bottom-tab navigation
+- [x] Apply the same state language to player-count selectors and other segmented controls where appropriate
+- [x] Ensure active-state cues remain clear without relying on color alone
+- [x] Verify current-tab clarity survives theme changes, localization, and narrow viewports
+- [x] **Test:** verify navigation and segmented controls expose the same state hierarchy across desktop and mobile
+- [x] **QC (Automated):** add keyboard and viewport QC for active, hover, focus, and selected navigation states
 
 ### Story DS3.2 — Standardize buttons, cards, panels, badges, and tags
-- [ ] Define primary, secondary, tertiary, and danger button treatments using the governed token system
-- [ ] Standardize card and panel framing for browse results, setup results, history entries, and backup sections
-- [ ] Standardize badge and tag treatments for set types, statuses, warnings, and forced conditions
-- [ ] Remove one-off styling that makes similar components look unrelated across tabs
-- [ ] **Test:** verify shared component classes or patterns render consistently in every tab that uses them
-- [ ] **QC (Automated):** add browser QC that compares reused buttons, cards, and badges across at least three surfaces
+- [x] Define primary, secondary, tertiary, and danger button treatments using the governed token system
+- [x] Standardize card and panel framing for browse results, setup results, history entries, and backup sections
+- [x] Standardize badge and tag treatments for set types, statuses, warnings, and forced conditions
+- [x] Remove one-off styling that makes similar components look unrelated across tabs
+- [x] **Test:** verify shared component classes or patterns render consistently in every tab that uses them
+- [x] **QC (Automated):** add browser QC that compares reused buttons, cards, and badges across at least three surfaces
 
 ### Story DS3.3 — Standardize form controls, filters, and structured-list treatments
-- [ ] Apply shared input, select, checkbox, toggle, and pill-filter styling rules across the app
-- [ ] Standardize validation, help text, and selected-state presentation for filters and forms
-- [ ] Standardize list-row and table-like treatments for history records, import previews, and data summaries
-- [ ] Ensure dense informational rows remain scannable in both themes and at mobile widths
-- [ ] **Test:** verify forms, filters, and structured lists use the same tokenized control rules across screens
-- [ ] **QC (Automated):** add browser QC for filter bars, collection toggles, structured history rows, and import-preview styling
+- [x] Apply shared input, select, checkbox, toggle, and pill-filter styling rules across the app
+- [x] Standardize validation, help text, and selected-state presentation for filters and forms
+- [x] Standardize list-row and table-like treatments for history records, import previews, and data summaries
+- [x] Ensure dense informational rows remain scannable in both themes and at mobile widths
+- [x] **Test:** verify forms, filters, and structured lists use the same tokenized control rules across screens
+- [x] **QC (Automated):** add browser QC for filter bars, collection toggles, structured history rows, and import-preview styling
 
 ### Story DS3.4 — Standardize alerts, notifications, and confirmation-dialog treatments
-- [ ] Define the visual contract for info, success, warning, and error notifications
-- [ ] Standardize inline alerts, toast notifications, and destructive confirmations around a shared semantic pattern
-- [ ] Ensure destructive dialogs restate consequences clearly and visibly differentiate the confirm action from cancel
-- [ ] Remove notification styling that depends on color alone to communicate meaning
-- [ ] **Test:** verify alert and dialog patterns remain understandable across themes and interaction states
-- [ ] **QC (Automated):** add browser QC for toast appearance, inline errors, and destructive confirmation dialogs
+- [x] Define the visual contract for info, success, warning, and error notifications
+- [x] Standardize inline alerts, toast notifications, and destructive confirmations around a shared semantic pattern
+- [x] Ensure destructive dialogs restate consequences clearly and visibly differentiate the confirm action from cancel
+- [x] Remove notification styling that depends on color alone to communicate meaning
+- [x] **Test:** verify alert and dialog patterns remain understandable across themes and interaction states
+- [x] **QC (Automated):** add browser QC for toast appearance, inline errors, and destructive confirmation dialogs
 
 ### Story DS3.5 — Apply shared motion and feedback patterns to interactive components
-- [ ] Implement governed motion tokens for hover, panel expansion, toast entry, and modal transitions
-- [ ] Remove oversized translations or timing differences that make similar interactions feel unrelated
-- [ ] Ensure hover and pressed states reinforce action affordance without delaying comprehension
-- [ ] Provide reduced-motion fallbacks for each animated pattern
-- [ ] **Test:** verify motion timing and reduced-motion behavior follow the documented design-system contract
-- [ ] **QC (Automated):** add QC that runs key interaction flows with and without reduced-motion preferences
+- [x] Implement governed motion tokens for hover, panel expansion, toast entry, and modal transitions
+- [x] Remove oversized translations or timing differences that make similar interactions feel unrelated
+- [x] Ensure hover and pressed states reinforce action affordance without delaying comprehension
+- [x] Provide reduced-motion fallbacks for each animated pattern
+- [x] **Test:** verify motion timing and reduced-motion behavior follow the documented design-system contract
+- [x] **QC (Automated):** add QC that runs key interaction flows with and without reduced-motion preferences
 
 ---
 
 ## Epic DS4 — Accessibility and Cross-Theme Quality
 
 ### Epic-wide validation gate
-- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS4 work complete
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS4 work complete
 
 ### Story DS4.1 — Enforce accessible contrast and semantic state communication across components
-- [ ] Audit text, icon, chip, and button contrast across both built-in themes
-- [ ] Fix any state that depends on color alone by adding text, icon, underline, border, or structural cues
-- [ ] Validate warning and danger states against real component backgrounds instead of isolated swatches
-- [ ] Ensure small labels and metadata remain readable in dense panels
-- [ ] **Test:** verify representative components meet the documented contrast and non-color state requirements in both themes
-- [ ] **QC (Automated):** add browser or documentation QC that flags low-contrast or color-only state regressions where practical
+- [x] Audit text, icon, chip, and button contrast across both built-in themes
+- [x] Fix any state that depends on color alone by adding text, icon, underline, border, or structural cues
+- [x] Validate warning and danger states against real component backgrounds instead of isolated swatches
+- [x] Ensure small labels and metadata remain readable in dense panels
+- [x] **Test:** verify representative components meet the documented contrast and non-color state requirements in both themes
+- [x] **QC (Automated):** add browser or documentation QC that flags low-contrast or color-only state regressions where practical
 
 ### Story DS4.2 — Implement consistent keyboard focus and focus-restoration patterns
-- [ ] Apply the governed focus-ring treatment to every interactive component family
-- [ ] Normalize focus visibility for filled buttons, tabs, pills, cards, and dialog actions
-- [ ] Preserve or restore focus correctly after rerenders, dialogs, theme changes, locale changes, and tab switches
-- [ ] Ensure focus indicators remain visible against both dark and light theme surfaces
-- [ ] **Test:** verify keyboard-only navigation exposes visible focus and predictable focus recovery across the main flows
-- [ ] **QC (Automated):** add browser QC for focus visibility and post-action focus restoration on representative interactions
+- [x] Apply the governed focus-ring treatment to every interactive component family
+- [x] Normalize focus visibility for filled buttons, tabs, pills, cards, and dialog actions
+- [x] Preserve or restore focus correctly after rerenders, dialogs, theme changes, locale changes, and tab switches
+- [x] Ensure focus indicators remain visible against both dark and light theme surfaces
+- [x] **Test:** verify keyboard-only navigation exposes visible focus and predictable focus recovery across the main flows
+- [x] **QC (Automated):** add browser QC for focus visibility and post-action focus restoration on representative interactions
 
 ### Story DS4.3 — Support reduced-motion and text-scaling resilience in the visual system
-- [ ] Audit the shell and shared components for motion that should change under `prefers-reduced-motion`
-- [ ] Provide reduced-motion fallbacks for panel transitions, toast entry, and modal appearance
-- [ ] Audit layout resilience at increased text size up to 200 percent
-- [ ] Fix clipping, overlap, or hidden-action issues caused by larger text and denser translations
-- [ ] **Test:** verify key screens remain usable with reduced motion enabled and larger text sizes applied
-- [ ] **QC (Automated):** add browser QC for reduced-motion mode and enlarged-text viewport checks where practical
+- [x] Audit the shell and shared components for motion that should change under `prefers-reduced-motion`
+- [x] Provide reduced-motion fallbacks for panel transitions, toast entry, and modal appearance
+- [x] Audit layout resilience at increased text size up to 200 percent
+- [x] Fix clipping, overlap, or hidden-action issues caused by larger text and denser translations
+- [x] **Test:** verify key screens remain usable with reduced motion enabled and larger text sizes applied
+- [x] **QC (Automated):** add browser QC for reduced-motion mode and enlarged-text viewport checks where practical
 
 ### Story DS4.4 — Verify the design system across Dark and Light on desktop and mobile
-- [ ] Build a representative cross-theme review matrix for Browse, Collection, New Game, History, and Backup
-- [ ] Review desktop and mobile states for token consistency, readability, and state clarity
-- [ ] Fix theme-specific regressions that expose missing semantic tokens or component assumptions
-- [ ] Document any remaining theme exceptions explicitly instead of leaving them implicit
-- [ ] **Test:** verify the primary user journeys remain visually and functionally coherent in both themes on desktop and mobile
-- [ ] **QC (Automated):** add cross-theme browser QC for representative flows on desktop and mobile viewports
+- [x] Build a representative cross-theme review matrix for Browse, Collection, New Game, History, and Backup
+- [x] Review desktop and mobile states for token consistency, readability, and state clarity
+- [x] Fix theme-specific regressions that expose missing semantic tokens or component assumptions
+- [x] Document any remaining theme exceptions explicitly instead of leaving them implicit
+- [x] **Test:** verify the primary user journeys remain visually and functionally coherent in both themes on desktop and mobile
+- [x] **QC (Automated):** add cross-theme browser QC for representative flows on desktop and mobile viewports
 
 ---
 
 ## Epic DS5 — Documentation Adoption and Regression Guardrails
 
 ### Epic-wide validation gate
-- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS5 work complete
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic DS5 work complete
 
 ### Story DS5.1 — Publish the canonical design-system documentation and token reference
-- [ ] Finalize the design-system specification as the authoritative token and component contract
-- [ ] Publish the semantic token tables, typography guidance, spacing scale, and component-state rules
-- [ ] Add implementation handoff examples that map cleanly to CSS custom properties
-- [ ] Mark older visual guidance as supporting or historical where it should no longer be authoritative
-- [ ] **Test:** verify the published design-system docs match the token names and component rules used in the codebase
-- [ ] **QC (Automated):** extend documentation-contract checks so the design-system doc remains aligned with shipped styling decisions
+- [x] Finalize the design-system specification as the authoritative token and component contract
+- [x] Publish the semantic token tables, typography guidance, spacing scale, and component-state rules
+- [x] Add implementation handoff examples that map cleanly to CSS custom properties
+- [x] Mark older visual guidance as supporting or historical where it should no longer be authoritative
+- [x] **Test:** verify the published design-system docs match the token names and component rules used in the codebase
+- [x] **QC (Automated):** extend documentation-contract checks so the design-system doc remains aligned with shipped styling decisions
 
 ### Story DS5.2 — Align existing UI and styling documentation with the new design-system contract
-- [ ] Audit `documentation/ui-design.md`, `documentation/styling-architecture.md`, and related docs for outdated or conflicting visual rules
-- [ ] Update those documents so they reference the same token contract, themes, and component patterns
-- [ ] Remove ambiguity about which document is authoritative for token definitions versus screen-specific guidance
-- [ ] Preserve historical context only where it helps explain a deliberate architecture decision
-- [ ] **Test:** verify the visual documentation set describes one consistent styling contract after alignment
-- [ ] **QC (Automated):** add documentation-readiness checks that fail when major theme or token descriptions diverge across docs
+- [x] Audit `documentation/ui-design.md`, `documentation/styling-architecture.md`, and related docs for outdated or conflicting visual rules
+- [x] Update those documents so they reference the same token contract, themes, and component patterns
+- [x] Remove ambiguity about which document is authoritative for token definitions versus screen-specific guidance
+- [x] Preserve historical context only where it helps explain a deliberate architecture decision
+- [x] **Test:** verify the visual documentation set describes one consistent styling contract after alignment
+- [x] **QC (Automated):** add documentation-readiness checks that fail when major theme or token descriptions diverge across docs
 
 ### Story DS5.3 — Plan screen-by-screen adoption of the design-system component patterns
-- [ ] Break down the rollout sequence for applying the design-system changes across Browse, Collection, New Game, History, and Backup
-- [ ] Identify screens or components with the highest styling debt or the largest visual inconsistency risk
-- [ ] Define migration order that keeps shared primitives ahead of screen-specific polish
-- [ ] Record any dependencies on accessibility fixes, localization edge cases, or theme-specific cleanup
-- [ ] **Test:** verify the rollout sequence is implementable without requiring a full visual rewrite in a single step
-- [ ] **QC (Automated):** add or update planning checks if the repository uses documentation coverage for delivery sequencing
+- [x] Break down the rollout sequence for applying the design-system changes across Browse, Collection, New Game, History, and Backup
+- [x] Identify screens or components with the highest styling debt or the largest visual inconsistency risk
+- [x] Define migration order that keeps shared primitives ahead of screen-specific polish
+- [x] Record any dependencies on accessibility fixes, localization edge cases, or theme-specific cleanup
+- [x] **Test:** verify the rollout sequence is implementable without requiring a full visual rewrite in a single step
+- [x] **QC (Automated):** add or update planning checks if the repository uses documentation coverage for delivery sequencing
 
 ### Story DS5.4 — Add regression checks that protect key design-system contracts
-- [ ] Identify the highest-value contracts to protect automatically, such as theme switching, focus visibility, and shared component reuse
-- [ ] Extend existing tests or browser QC to cover those contracts explicitly
-- [ ] Add documentation alignment checks for design-system-specific tokens and component states where practical
-- [ ] Document what remains manual visual review versus what is enforced automatically
-- [ ] **Test:** verify the new regression checks fail when a representative design-system contract is intentionally broken in a local test scenario
-- [ ] **QC (Automated):** run the updated automated checks and confirm they protect the intended design-system contracts without excessive brittleness
+- [x] Identify the highest-value contracts to protect automatically, such as theme switching, focus visibility, and shared component reuse
+- [x] Extend existing tests or browser QC to cover those contracts explicitly
+- [x] Add documentation alignment checks for design-system-specific tokens and component states where practical
+- [x] Document what remains manual visual review versus what is enforced automatically
+- [x] **Test:** verify the new regression checks fail when a representative design-system contract is intentionally broken in a local test scenario
+- [x] **QC (Automated):** run the updated automated checks and confirm they protect the intended design-system contracts without excessive brittleness

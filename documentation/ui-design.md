@@ -8,38 +8,18 @@ Themeable Marvel-inspired UI. Functional first, visually bold second. No externa
 Canonical token definitions now live in `documentation/design-system.md`. This document remains the screen-level UI specification and examples reference.
 
 The current supported themes are:
-- `Dark` — the default high-contrast dark theme
-- `Light` — a warm light theme for bright environments
+- `dark` — the default high-contrast dark theme
+- `light` — a warm light theme for bright environments
 
 ---
 
 ## Color Tokens
 
-The styling layer now separates semantic tokens from concrete palette values. Each theme defines the same token set, and components consume those semantic variables instead of shipping duplicated per-theme rule blocks.
+The styling layer separates semantic tokens from concrete palette values. Each built-in theme implements the same governed token families, and component selectors consume semantic variables instead of shipping duplicated per-theme rule blocks.
 
-```css
-:root[data-theme="dark"] {
-  --bg: #0d0d0d;
-  --panel: #141428;
-  --header-bg: #0a0a1a;
-  --accent: #e62429;
-  --accent-gold: #f5a623;
-  --text: #f0f0f0;
-  --muted: #a0a0c0;
-  --border: #2a2a4a;
-}
+Use `documentation/design-system.md` as the canonical source for the current color tables, semantic token names, and component-state rules.
 
-:root[data-theme="light"] {
-  --bg: #f2ece1;
-  --panel: #f9f3e8;
-  --header-bg: #e9dfce;
-  --accent: #b61f24;
-  --accent-gold: #b97a1b;
-  --text: #211d18;
-  --muted: #5e5448;
-  --border: #cfbfaa;
-}
-```
+Screen-level examples in this document may still show compatibility aliases such as `--bg`, `--panel`, `--text`, and `--accent`, but those aliases resolve from the governed semantic layer in `src/app/app-shell.css`.
 
 Theme-specific token details and the current architecture decision live in `documentation/styling-architecture.md`.
 
@@ -47,19 +27,12 @@ Theme-specific token details and the current architecture decision live in `docu
 
 ## Typography
 
-```css
-font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-```
+Typography roles are governed by `documentation/design-system.md`.
 
-| Element | Size | Weight | Color |
-|---------|------|--------|-------|
-| App title | 1.5rem | 700 | `--accent-red` |
-| Tab label | 0.9rem | 600 | `--text-secondary` → `--text-primary` (active) |
-| Section heading | 1.25rem | 700 | `--text-primary` |
-| Card title | 1rem | 600 | `--text-primary` |
-| Card metadata | 0.8rem | 400 | `--text-secondary` |
-| Badge | 0.7rem | 700 | white on colored background |
-| Button | 0.875rem | 600 | — |
+- Headline surfaces use the approved heading stack through the shared `display-*` and `heading-*` roles.
+- Body copy, helper text, and dense metadata use the shared `body-*` roles.
+- Tabs, pills, badges, and compact status labels use the `label` role with controlled uppercase and tracking.
+- App shell examples in this document should be interpreted through those governed roles rather than as standalone one-off font sizes.
 
 ---
 
@@ -82,12 +55,12 @@ font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 
 ### Desktop Navigation (≥ 768px)
 - Inline tabs in the header, right-aligned
-- Active tab: `--accent-red` underline + `--text-primary`
-- Inactive tab: `--text-secondary`, hover lifts to `--text-primary`
+- Active tab: `primary` underline + stronger text weight
+- Inactive tab: `text-secondary`, hover lifts toward `text-primary`
 
 ### Mobile Navigation (< 768px)
 - Fixed bottom tab bar, 4 equal-width items with icon + label
-- Active item: `--accent-red` text + icon
+- Active item: primary-accent text, icon, and selection treatment that remains identifiable without color alone
 
 ---
 

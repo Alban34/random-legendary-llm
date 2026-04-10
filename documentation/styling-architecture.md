@@ -14,6 +14,8 @@ The app applies the active theme by setting `data-theme` on `document.documentEl
 
 Canonical token definitions and governance rules live in `documentation/design-system.md`.
 
+`documentation/ui-design.md` remains the screen-level companion reference and `documentation/design-system-adoption-plan.md` records the rollout order for applying the shared primitives across Browse, Collection, New Game, History, and Backup.
+
 ## Why the current approach stays in place
 
 The project constraints still matter more than raw styling ergonomics:

@@ -108,6 +108,69 @@ Automated coverage:
 - `test/design-system-epic1-foundation.test.mjs` covers the governed token layer and design-system documentation contract
 - `test/playwright/epic18-qc.spec.mjs` continues to cover browser theme switching, persistence, and cross-theme legibility
 
+## Design System Epic DS2 — Typography, Layout, and Shell Rhythm
+
+Required tests:
+- shared typography roles exist for display, heading, body, and label usage
+- the shell, panels, cards, and control groups consume governed spacing, radius, and elevation tokens
+- responsive spacing remains stable across mobile and desktop widths
+- major tabs share a consistent panel and section rhythm
+
+QC checks:
+- verify representative tabs preserve heading/body/metadata hierarchy on desktop and mobile
+- verify shell density still fits translated copy and sticky navigation without wasted vertical chrome
+
+Automated coverage:
+- `test/design-system-rollout.test.mjs` covers typography utilities and tokenized shell primitives
+- `test/playwright/epic18-qc.spec.mjs` covers representative heading, panel, and spacing checks across tabs and viewports
+
+## Design System Epic DS3 — Shared Component Library and State Patterns
+
+Required tests:
+- navigation, segmented controls, buttons, cards, badges, inputs, alerts, and dialogs reuse shared state patterns
+- selected and disabled states remain understandable without relying on color alone
+- motion timing stays within the documented design-system contract
+- reduced-motion fallbacks disable hover lift and transition-heavy feedback safely
+
+QC checks:
+- compare reused button, card, badge, and structured-row treatments across at least three surfaces
+- verify destructive dialogs and notices remain visually distinct in both themes
+
+Automated coverage:
+- `test/design-system-rollout.test.mjs` covers shared component-state hooks and reduced-motion CSS
+- `test/playwright/epic18-qc.spec.mjs` covers component consistency, dialog hierarchy, and reduced-motion browser behavior
+
+## Design System Epic DS4 — Accessibility and Cross-Theme Quality
+
+Required tests:
+- representative panels, buttons, and badges remain readable in both built-in themes
+- focus rings stay visible across buttons, tabs, cards, rows, and dialog actions
+- focus restoration remains predictable after tab changes, theme changes, locale changes, and dialog dismissal
+- enlarged text up to 200 percent keeps key actions visible and usable
+
+QC checks:
+- verify the Browse, Collection, New Game, History, and Backup flows stay coherent on desktop and mobile in both themes
+- verify reduced-motion mode and enlarged-text mode do not hide critical actions
+
+Automated coverage:
+- `test/design-system-rollout.test.mjs` covers focus-restoration hooks and rollout-plan documentation
+- `test/playwright/epic18-qc.spec.mjs` covers cross-theme review, focus recovery, reduced motion, and enlarged-text checks
+
+## Design System Epic DS5 — Documentation Adoption and Regression Guardrails
+
+Required tests:
+- the design-system and supporting docs describe the same token, typography, and component contract used in shipped CSS
+- the screen-by-screen rollout sequence stays aligned with the design-system adoption plan
+- automated guardrails explicitly protect focus visibility, theme coherence, and shared primitive reuse
+
+QC checks:
+- verify design-system documentation still identifies the canonical contract clearly after implementation changes
+- verify supporting docs remain screen-level references rather than competing sources of truth
+
+Automated coverage:
+- `test/design-system-rollout.test.mjs` covers documentation alignment and rollout-plan presence
+- `test/playwright/epic18-qc.spec.mjs` covers the highest-value browser-level design-system contracts
+
 ---
 
 ## Required test categories by epic

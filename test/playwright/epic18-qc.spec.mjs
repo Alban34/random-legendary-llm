@@ -6,6 +6,7 @@ import {
   readDocumentTheme,
   reloadApp,
   seedAllOwnedState,
+  selectLocale,
   selectTab,
   selectTheme,
   setViewport
@@ -94,27 +95,81 @@ test.describe('Epic 18 automated QC', () => {
     await page.locator('[data-action="generate-setup"]').click();
     await selectTab(page, 'history');
 
+    const surfaces = [
+      ['browse', '#panel-browse [data-browse-sets-panel]'],
+      ['collection', '#panel-collection .collection-group'],
+      ['new-game', '#panel-new-game #setup-requirements-card'],
+      ['history', '#panel-history [data-history-insights]'],
+      ['backup', '#panel-backup [data-backup-panel]']
+    ];
+
     for (const viewport of ['desktop', 'mobile']) {
       await setViewport(page, viewport);
       await reloadApp(page);
 
       for (const themeId of ['dark', 'light']) {
         await selectTheme(page, themeId);
-        await selectTab(page, 'browse');
-        await expect(page.locator('#panel-browse .panel').first()).toBeVisible();
         await expect(page.locator('[data-action="set-theme"][data-theme-id="' + themeId + '"]')).toHaveAttribute('aria-pressed', 'true');
 
-        const browseMetrics = await captureThemeSurfaceMetrics(page);
-        expect(browseMetrics.bodyContrast).toBeGreaterThan(4.5);
-        expect(browseMetrics.panelContrast).toBeGreaterThan(4.5);
-        expect(browseMetrics.buttonContrast).toBeGreaterThan(3);
+        for (const [tabId, selector] of surfaces) {
+          await selectTab(page, tabId);
+          await expect(page.locator(selector).first()).toBeVisible();
 
-        await selectTab(page, 'history');
-        await expect(page.locator('[data-history-insights]')).toBeVisible();
-        const historyMetrics = await captureThemeSurfaceMetrics(page);
-        expect(historyMetrics.bodyContrast).toBeGreaterThan(4.5);
-        expect(historyMetrics.panelContrast).toBeGreaterThan(4.5);
+          const metrics = await captureThemeSurfaceMetrics(page);
+          expect(metrics.bodyContrast).toBeGreaterThan(4.5);
+          expect(metrics.panelContrast).toBeGreaterThan(4.5);
+          expect(metrics.buttonContrast).toBeGreaterThan(3);
+        }
       }
     }
+  });
+
+  test('restores focus predictably after theme, locale, and tab changes', async ({ page }) => {
+    await page.locator('[data-action="set-theme"][data-theme-id="light"]').focus();
+    await selectTheme(page, 'light');
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toBeFocused();
+
+    await page.locator('#header-locale-select').focus();
+    await selectLocale(page, 'fr-FR');
+    await expect(page.locator('#header-locale-select')).toBeFocused();
+
+    await page.locator('#tab-desktop-browse').focus();
+    await page.locator('#tab-desktop-browse').press('ArrowRight');
+    await expect(page.locator('#tab-desktop-collection')).toBeFocused();
+    await expect(page.locator('#tab-desktop-collection')).toHaveAttribute('aria-selected', 'true');
+  });
+
+  test('supports reduced motion and enlarged text without hiding core actions', async ({ page }) => {
+    await seedAllOwnedState(page);
+    await setViewport(page, 'mobile');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await reloadApp(page);
+
+    const skipOnboardingButton = page.locator('[data-action="skip-onboarding"]');
+    if (await skipOnboardingButton.isVisible()) {
+      await skipOnboardingButton.click();
+    }
+
+    await selectTab(page, 'new-game');
+
+    const reducedMotionStyles = await page.evaluate(() => {
+      const button = document.querySelector('[data-action="generate-setup"]');
+      return getComputedStyle(button).transitionDuration;
+    });
+    expect(reducedMotionStyles === '0.01ms' || reducedMotionStyles === '1e-05s').toBe(true);
+
+    await page.hover('[data-action="generate-setup"]');
+    const hoveredTransform = await page.evaluate(() => getComputedStyle(document.querySelector('[data-action="generate-setup"]')).transform);
+    expect(hoveredTransform).toBe('none');
+
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = '200%';
+    });
+
+    await expect(page.locator('[data-action="generate-setup"]')).toBeVisible();
+    await expect(page.locator('[data-action="accept-current-setup"]')).toBeVisible();
+
+    await page.locator('[data-action="generate-setup"]').click();
+    await expect(page.locator('#panel-new-game [data-result-section="mastermind"]')).toBeVisible();
   });
 });

@@ -64,7 +64,7 @@ test.describe('Epic 4 automated QC', () => {
     expect(shellStyles.headerPosition).toBe('sticky');
     expect(shellStyles.activeTabBackground).not.toBe('rgba(0, 0, 0, 0)');
     expect(shellStyles.buttonRadius).toBe('999px');
-    expect(shellStyles.panelRadius).toBe('14px');
+    expect(shellStyles.panelRadius).toBe('16px');
 
     await selectTab(page, 'browse');
     await expect(page.locator('#panel-browse .panel').first()).toBeVisible();
