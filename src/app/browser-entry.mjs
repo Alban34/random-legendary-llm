@@ -564,7 +564,8 @@ async function boot() {
         currentState.preferences.themeId = normalizedThemeId;
         return currentState;
       }, t('actions.appliedTheme', { theme: viewModel.locale.getThemeLabel(normalizedThemeId) }));
-      enqueueToast({ variant: 'success', message: t('actions.appliedTheme', { theme: viewModel.locale.getThemeLabel(normalizedThemeId) }) });
+      // Theme changes provide instant visual feedback via aria-pressed state and page re-theming;
+      // no supplemental toast notification is needed (Story 24.1/24.2).
       focusSelector(`[data-action="set-theme"][data-theme-id="${normalizedThemeId}"]`);
     },
     setLocale(localeId) {
@@ -742,13 +743,6 @@ async function boot() {
         enqueueToast({ variant: 'error', message: error.message, behavior: 'persistent' });
       }
       rerender();
-    },
-    regenerateSetup() {
-      actions.generateSetup();
-      if (!viewModel.ui.generatorError) {
-        viewModel.ui.lastActionNotice = t('actions.regeneratedSetup');
-        rerender();
-      }
     },
     acceptCurrentSetup() {
       if (!viewModel.ui.currentSetup) {

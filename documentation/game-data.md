@@ -78,10 +78,12 @@ The documentation and future implementation will use the following rules:
 
 | Set Family | Included Sets | Notes |
 |------------|---------------|-------|
-| Base Game | 1 | `Core Set` is the starting collection anchor |
+| Base Game | 2 | `Core Set` and `Villains` are both classified as base games (Epic 22) |
 | Large Expansions | 8 | Includes `Dark City`, `Civil War`, `World War Hulk`, `X-Men`, `Venom`, and others classified as large in this project |
 | Small Expansions | 22 | Includes both comic-themed and MCU-branded small boxes / decks |
-| Standalone-Compatible | 2 | Includes `Revelations` and `Villains` |
+| Standalone-Compatible | 1 | `Revelations`; `Villains` was reclassified to base game in Epic 22 |
+
+> **Pending:** small and large expansion assignments for some sets are awaiting user-provided corrections and are intentionally deferred.
 
 > Classification in this project is a planning metadata layer for the UI and collection filters. The authoritative inventory and rule references come from the BoardGameGeek sources listed in `documentation/sources.md`.
 

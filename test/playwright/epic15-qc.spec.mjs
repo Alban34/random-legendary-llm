@@ -9,7 +9,15 @@ import {
   selectTab
 } from './helpers/app-fixture.mjs';
 
+async function openForcedPicksPanel(page) {
+  await page.evaluate(() => {
+    const details = document.querySelector('#panel-new-game details');
+    if (details) details.open = true;
+  });
+}
+
 async function addForcedPick(page, field, value) {
+  await openForcedPicksPanel(page);
   await page.selectOption(`[data-forced-pick-select="${field}"]`, value);
   await page.locator(`[data-action="add-forced-pick"][data-field="${field}"]`).click();
 }
@@ -29,13 +37,16 @@ test.describe('Epic 15 automated QC', () => {
     await addForcedPick(page, 'mastermindId', mastermind.id);
     await addForcedPick(page, 'heroIds', hero.id);
 
+    await openForcedPicksPanel(page);
     await expect(page.locator('[data-forced-picks-panel]')).toContainText(mastermind.name);
     await expect(page.locator(`[data-forced-pick-field="heroIds"][data-forced-pick-id="${hero.id}"]`)).toContainText(hero.name);
 
     await page.locator(`[data-action="remove-forced-pick"][data-field="heroIds"][data-entity-id="${hero.id}"]`).click();
     await expect(page.locator(`[data-forced-pick-field="heroIds"][data-forced-pick-id="${hero.id}"]`)).toHaveCount(0);
 
+    await openForcedPicksPanel(page);
     await page.locator('[data-action="clear-forced-picks"]').click();
+    await openForcedPicksPanel(page);
     await expect(page.locator('[data-forced-picks-panel]')).toContainText('No forced picks are active.');
   });
 
@@ -72,6 +83,7 @@ test.describe('Epic 15 automated QC', () => {
     await page.locator('[data-action="generate-setup"]').click();
     await expect(page.locator('#panel-new-game .notice.warning')).toContainText('Forced Villain Groups exceed the available slots');
 
+    await openForcedPicksPanel(page);
     await page.locator('[data-action="clear-forced-picks"]').click();
     await page.locator('[data-action="set-player-count"][data-player-count="1"]').click();
     await addForcedPick(page, 'heroIds', hero.id);
@@ -79,6 +91,7 @@ test.describe('Epic 15 automated QC', () => {
     await page.waitForFunction(() => window.__CURRENT_SETUP__ !== null);
     await page.locator('[data-action="accept-current-setup"]').click();
     await selectTab(page, 'new-game');
+    await openForcedPicksPanel(page);
     await expect(page.locator('[data-forced-picks-panel]')).toContainText('No forced picks are active.');
 
     const state = await readAppState(page);
@@ -88,6 +101,7 @@ test.describe('Epic 15 automated QC', () => {
     await addForcedPick(page, 'heroIds', hero.id);
     await reloadApp(page);
     await selectTab(page, 'new-game');
+    await openForcedPicksPanel(page);
     await expect(page.locator('[data-forced-picks-panel]')).toContainText('No forced picks are active.');
   });
 });

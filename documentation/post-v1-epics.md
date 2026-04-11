@@ -253,7 +253,7 @@ These epics are derived from the newly added unchecked items in `documentation/_
 ## Epic 22 — Set Catalog Ordering and Taxonomy Cleanup
 
 **Status**
-In Review
+Done
 
 **Objective**
 Make set browsing and collection management easier to scan by applying consistent alphabetical ordering and correcting the set-type taxonomy used across the app.
@@ -277,10 +277,10 @@ Make set browsing and collection management easier to scan by applying consisten
 ## Epic 23 — Stats and Secondary Information Simplification
 
 **Status**
-In Review
+Done
 
 **Objective**
-Reduce information density in the stats and maintenance surfaces so practical gameplay information stays prominent and low-value technical status copy recedes.
+Reduce information density in the stats and maintenance surfaces so practical gameplay information stays prominent and low-value technical status copy recedes. The guiding principle is to surface only user-actionable information: messages and indicators that do not require a user response are suppressed so the interface communicates necessity rather than status.
 
 **In scope**
 - full-width collapsible stats sections
@@ -301,7 +301,7 @@ Reduce information density in the stats and maintenance surfaces so practical ga
 ## Epic 24 — Toast Behavior and Feedback Channel Cleanup
 
 **Status**
-In Review
+Done
 
 **Objective**
 Make feedback quieter and more natural by reserving toasts for meaningful events and refining how the toast stack enters, exits, and anchors to the viewport.
@@ -325,7 +325,7 @@ Make feedback quieter and more natural by reserving toasts for meaningful events
 ## Epic 25 — Header and New Game Action Density Refinement
 
 **Status**
-In Review
+Done
 
 **Objective**
 Reduce persistent chrome weight and bring the primary setup action closer to the user so the shell feels more task-focused without losing important context.

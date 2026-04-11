@@ -92,7 +92,7 @@ The normalized result must support flattened runtime indexes such as:
 | `Civil War` | `civil-war` | 2016 | `large-expansion` | 16 | 5 | 7 | 2 | 8 |
 | `Deadpool` | `deadpool` | 2017 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `Champions` | `champions` | 2018 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
-| `Villains` | `villains` | 2014 | `standalone` | 15 | 4 | 7 | 4 | 8 |
+| `Villains` | `villains` | 2014 | `base` | 15 | 4 | 7 | 4 | 8 |
 | `Marvel Studios, Phase 1` | `marvel-studios-phase-1` | 2019 | `small-expansion` | 7 | 3 | 5 | 4 | 8 |
 | `Marvel Studios' Guardians of the Galaxy` | `marvel-studios-guardians-of-the-galaxy` | 2019 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `World War Hulk` | `world-war-hulk` | 2019 | `large-expansion` | 15 | 6 | 7 | 3 | 8 |
@@ -110,6 +110,8 @@ The normalized result must support flattened runtime indexes such as:
 | `The New Mutants` | `the-new-mutants` | 2021 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `X-Men` | `x-men` | 2022 | `large-expansion` | 15 | 6 | 7 | 5 | 8 |
 | `Revelations` | `revelations` | 2022 | `standalone` | 9 | 3 | 4 | 2 | 4 |
+
+> **Taxonomy note (Epic 22):** `Villains` was reclassified from `standalone` to `base` to align with the corrected base-game grouping (Core Set and Villains are both base games). `Revelations` remains `standalone`. Small and large expansion assignments for some sets are **pending user-provided corrections** and will be confirmed in a future update; current assignments reflect the best available classification.
 | `Messiah Complex` | `messiah-complex` | 2023 | `small-expansion` | 8 | 3 | 4 | 2 | 4 |
 | `Marvel Noir` | `marvel-noir` | 2023 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `Spider-Man Homecoming` | `spider-man-homecoming` | 2024 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |

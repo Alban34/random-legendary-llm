@@ -99,7 +99,7 @@ test.describe('Epic 18 automated QC', () => {
     await preferenceToggle.click();
 
     await selectTheme(page, 'light');
-    await expect(page.locator('#toast-region')).toContainText('Applied the Light theme.');
+    // Epic 24 (Story 24.2): theme changes no longer emit a toast; verify via aria-pressed instead
     await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toHaveAttribute('aria-pressed', 'true');
 
     await selectLocale(page, 'fr-FR');

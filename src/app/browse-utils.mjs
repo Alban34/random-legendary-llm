@@ -1,15 +1,16 @@
 import { slugify } from './game-data-pipeline.mjs';
 
+// TODO: small/large expansion reclassifications need user-provided corrections before they can be applied
 export const BROWSE_TYPE_OPTIONS = [
   { id: 'all', label: 'All' },
-  { id: 'base', label: 'Base' },
+  { id: 'base', label: 'Base Game' },
   { id: 'large-expansion', label: 'Large' },
   { id: 'small-expansion', label: 'Small' },
   { id: 'standalone', label: 'Standalone' }
 ];
 
 const TYPE_LABELS = {
-  base: 'Base',
+  base: 'Base Game',
   'large-expansion': 'Large Expansion',
   'small-expansion': 'Small Expansion',
   standalone: 'Standalone'
@@ -45,9 +46,11 @@ export function matchesBrowseSearch(set, searchTerm) {
 }
 
 export function filterBrowseSets(sets, { searchTerm = '', typeFilter = 'all' } = {}) {
-  return sets.filter((set) => {
-    const matchesType = typeFilter === 'all' || set.type === typeFilter;
-    return matchesType && matchesBrowseSearch(set, searchTerm);
-  });
+  return sets
+    .filter((set) => {
+      const matchesType = typeFilter === 'all' || set.type === typeFilter;
+      return matchesType && matchesBrowseSearch(set, searchTerm);
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 

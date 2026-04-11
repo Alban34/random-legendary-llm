@@ -18,6 +18,8 @@ import { buildInsightsDashboard } from './stats-utils.mjs';
 import { buildOwnedPools } from './setup-generator.mjs';
 import { getThemeDefinition, normalizeThemeId, THEME_OPTIONS } from './theme-utils.mjs';
 
+const APP_VERSION = '0.1.0';
+
 function formatDuplicateEntries(bundle) {
   return ['Black Widow', 'Loki', 'Thor', 'Nova', 'Venom']
     .map((name) => {
@@ -120,7 +122,6 @@ function renderHistoryGroupingControls(activeMode, locale) {
     <div class="stack gap-sm" data-history-grouping-controls>
       <div class="row space-between wrap gap-sm align-center">
         <strong>${locale.t('history.groupBy')}</strong>
-        <span class="muted">${locale.t('history.groupingNotice')}</span>
       </div>
       <div class="button-row wrap">
         ${HISTORY_GROUPING_MODES.map((mode) => `
@@ -130,7 +131,7 @@ function renderHistoryGroupingControls(activeMode, locale) {
             data-action="set-history-grouping"
             data-history-grouping-mode="${mode.id}"
             aria-pressed="${activeMode === mode.id}"
-            aria-label="${locale.t('history.groupBy')} ${locale.getHistoryGroupingLabel(mode.id)}. ${locale.t('history.groupingNotice')}"
+            aria-label="${locale.t('history.groupBy')} ${locale.getHistoryGroupingLabel(mode.id)}"
           >
             ${locale.getHistoryGroupingLabel(mode.id)}
           </button>
@@ -508,20 +509,22 @@ function renderInsightsDashboard(viewModel, options = {}) {
         ${renderCoverageList(collectionCoverage.overallCollection.byType, 'playedPercent', locale)}
       </article>
     </div>
-    <div class="two-col insight-ranking-grid">
+    <div class="stats-category-panels">
       ${usage.map((category) => `
-        <article class="result-card insight-ranking-card" data-insight-ranking-category="${category.category}">
-          <h3>${category.label}</h3>
-          <div class="muted">${locale.t('history.insights.playedSummary', { used: locale.formatNumber(category.used), total: locale.formatNumber(category.total), neverPlayed: locale.formatNumber(category.neverPlayed) })}</div>
-          <div class="stack gap-sm insight-ranking-section">
-            <strong>${locale.t('history.insights.mostPlayed')}</strong>
-            ${renderInsightRankingList(category.mostPlayed, locale.t('history.insights.noneMostPlayed', { label: category.label.toLowerCase() }), locale)}
+        <details class="stats-category-panel" data-stats-category="${category.category}">
+          <summary class="stats-category-summary">${category.label}</summary>
+          <div class="stats-category-body">
+            <div class="muted">${locale.t('history.insights.playedSummary', { used: locale.formatNumber(category.used), total: locale.formatNumber(category.total), neverPlayed: locale.formatNumber(category.neverPlayed) })}</div>
+            <div class="stack gap-sm insight-ranking-section">
+              <strong>${locale.t('history.insights.mostPlayed')}</strong>
+              ${renderInsightRankingList(category.mostPlayed, locale.t('history.insights.noneMostPlayed', { label: category.label.toLowerCase() }), locale)}
+            </div>
+            <div class="stack gap-sm insight-ranking-section">
+              <strong>${locale.t('history.insights.leastPlayed')}</strong>
+              ${renderInsightRankingList(category.leastPlayed, locale.t('history.insights.noneLeastPlayed', { label: category.label.toLowerCase() }), locale)}
+            </div>
           </div>
-          <div class="stack gap-sm insight-ranking-section">
-            <strong>${locale.t('history.insights.leastPlayed')}</strong>
-            ${renderInsightRankingList(category.leastPlayed, locale.t('history.insights.noneLeastPlayed', { label: category.label.toLowerCase() }), locale)}
-          </div>
-        </article>
+        </details>
       `).join('')}
     </div>
   `;
@@ -1182,7 +1185,7 @@ function renderCollectionPanel(viewModel) {
             <div class="summary-card"><div class="muted">${locale.t('common.schemes')}</div><div class="metric-sm">${totals.schemeCount}</div></div>
           </div>
           <div class="summary-card">
-            <div><strong>${locale.t('collection.storage')}:</strong> ${persistence.storageAvailable ? locale.t('collection.storage.available') : locale.t('collection.storage.unavailable')} · ${persistence.hydratedFromStorage ? locale.t('collection.storage.hydrated') : locale.t('collection.storage.defaults')} · ${persistence.recoveredOnLoad ? locale.t('collection.storage.recovered') : locale.t('collection.storage.clean')}</div>
+            ${!persistence.storageAvailable ? `<div><strong>${locale.t('collection.storage')}:</strong> ${locale.t('collection.storage.unavailable')}</div>` : ''}
             ${ui.lastActionNotice ? `<div class="muted">${locale.t('collection.latestAction')} ${ui.lastActionNotice}</div>` : ''}
           </div>
           ${persistenceNotices.length
@@ -1286,13 +1289,15 @@ function renderSetupControls(viewModel, options = {}) {
           ? `${compactViewport ? '' : `<div class="muted new-game-two-handed-help">${locale.t('newGame.twoHandedHelp')}</div>`}`
           : ''}
       </div>
-      ${renderForcedPickControls(viewModel)}
       <div class="button-row">
-        <button class="button button-primary" data-action="generate-setup">${locale.t('newGame.generate')}</button>
-        <button class="button button-secondary" data-action="regenerate-setup">${locale.t('newGame.regenerate')}</button>
+        <button class="button button-primary" data-action="generate-setup">${ui.currentSetup ? locale.t('newGame.reroll') : locale.t('newGame.generate')}</button>
         <button class="button button-success" data-action="accept-current-setup" ${ui.currentSetup ? '' : 'disabled'}>${locale.t('newGame.acceptLog')}</button>
       </div>
       ${compactViewport ? '' : `<div class="muted new-game-ephemeral-notice">${locale.t('newGame.ephemeralNotice')}</div>`}
+      <details>
+        <summary>${locale.t('newGame.forcedPicks.title')}</summary>
+        ${renderForcedPickControls(viewModel)}
+      </details>
     </div>
   `;
 }
@@ -1564,7 +1569,6 @@ function bindActionButtons(doc, actions) {
     'complete-onboarding': actions.completeOnboarding,
     'clear-forced-picks': actions.clearForcedPicks,
     'generate-setup': actions.generateSetup,
-    'regenerate-setup': actions.regenerateSetup,
     'accept-current-setup': actions.acceptCurrentSetup,
     'save-game-result': actions.saveGameResult,
     'skip-game-result': actions.skipGameResultEntry,
@@ -1654,6 +1658,8 @@ export function renderBundle(doc, viewModel, actions) {
   doc.title = locale.t('app.documentTitle');
   doc.getElementById('app-title').textContent = locale.t('app.title');
   doc.getElementById('app-subtitle').textContent = locale.t('app.subtitle');
+  const appVersionEl = doc.getElementById('app-version');
+  if (appVersionEl) appVersionEl.textContent = 'v' + APP_VERSION;
   doc.querySelector('.app-header')?.setAttribute('data-onboarding-visible', String(viewModel.ui.onboardingVisible));
   if (compactViewport) {
     doc.getElementById('mobile-preference-controls').innerHTML = renderMobilePreferenceControls(viewModel);

@@ -40,7 +40,6 @@ test.describe('Epic 2 automated QC', () => {
     }
 
     await selectTab(page, 'collection');
-    await expect(page.locator('#panel-collection')).toContainText('Hydrated from storage');
     await expect(page.locator('#panel-collection')).toContainText('Owned sets');
     await expect(page.locator('#panel-collection')).toContainText('3');
   });

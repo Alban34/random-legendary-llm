@@ -105,7 +105,7 @@ test.describe('Epic 7 automated QC', () => {
     expect(afterGenerate.history).toHaveLength(0);
     expect(Object.keys(afterGenerate.usage.heroes)).toHaveLength(0);
 
-    await page.locator('[data-action="regenerate-setup"]').click();
+    await page.locator('[data-action="generate-setup"]').click();
     await page.waitForFunction((previousSnapshot) => window.__CURRENT_SETUP__ !== null && JSON.stringify(window.__CURRENT_SETUP__.setupSnapshot) !== previousSnapshot, firstSetupSnapshot);
     const afterRegenerate = await readAppState(page);
     expect(afterRegenerate.history).toHaveLength(0);

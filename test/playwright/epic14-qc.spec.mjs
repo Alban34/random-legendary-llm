@@ -95,7 +95,7 @@ test.describe('Epic 14 automated QC', () => {
 
     await setViewport(page, 'desktop');
     await selectTab(page, 'history');
-    const heroRankings = page.locator('[data-insight-ranking-category="heroes"]');
+    const heroRankings = page.locator('[data-stats-category="heroes"]');
     await expect(heroRankings).toContainText('Black Widow ·');
 
     await setViewport(page, 'mobile');

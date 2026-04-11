@@ -86,6 +86,8 @@ That canonical source remains nested by set.
 }
 ```
 
+> **Epic 22 taxonomy update:** `Villains` was reclassified from `"standalone"` to `"base"`. Both `Core Set` and `Villains` are now base games. `"standalone"` remains a valid type for `Revelations`. Small and large expansion assignments for some sets are pending user-provided corrections (intentionally deferred).
+
 ### `Hero`
 
 ```text

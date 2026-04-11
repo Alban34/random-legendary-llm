@@ -42,7 +42,7 @@ Typography roles are governed by `documentation/design-system.md`.
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  ⚡ LEGENDARY RANDOMIZER  [theme][locale][5 tabs]   │  ← sticky header, --bg-nav
+│  ⚡ LEGENDARY RANDOMIZER v0.1.0  [theme][locale][5 tabs]  │  ← sticky, compact header
 ├─────────────────────────────────────────────────────┤
 │                                                     │
 │   [Active Tab Panel]                                │  ← scrollable, --bg-app
@@ -67,9 +67,13 @@ Typography roles are governed by `documentation/design-system.md`.
 
 ### Shared Header Controls
 - Theme and locale are part of the baseline shell, not optional polish
+- The app title (`h1`) is rendered at a compact size (1.1rem) to reduce persistent chrome weight; the app version is displayed inline beside the title as a muted `.app-version` element
 - Desktop: theme buttons and locale select remain visible in the shared header
 - Mobile: a compact preferences toggle reveals theme and locale controls on demand
-- Preference changes persist immediately, restore focus to the triggering control after rerender, and surface a concise toast confirmation from any active tab
+- Preference changes persist immediately and restore focus to the triggering control after rerender
+- Theme changes are confirmed visually (the UI repaints immediately) without emitting a toast; locale and other higher-impact preference changes surface a concise toast from any active tab
+
+> **Design rationale (Epic 25):** The header was compacted — smaller `h1`, reduced padding, version display added — to reclaim vertical space on mobile and shift visual emphasis to the active task panel rather than persistent shell chrome. Theme and locale controls remain discoverable but are no longer the dominant visual element in the header.
 
 ### First-Run Onboarding and About
 - The first-run walkthrough appears automatically until it is skipped or completed
@@ -97,7 +101,7 @@ Typography roles are governed by `documentation/design-system.md`.
 ```
 [Hero with one dominant CTA]
 [Optional "Start here" disclosure]
-[Search / filter bar]                [Type filter: All | Base | Large | Small | Standalone]
+[Search / filter bar]                [Type filter: All | Base Game | Large | Small | Standalone]
 
 ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
 │ SET NAME     │  │ SET NAME     │  │ SET NAME     │
@@ -178,13 +182,12 @@ Typography roles are governed by `documentation/design-system.md`.
   │  Play Mode                                      │
   │  [Standard Solo] [Advanced Solo] [Two-Handed]  │
   │                                                 │
-  │  Forced Picks                                   │
-  │  [Scheme] [Mastermind] [Hero] ...               │
-  │                                                 │
   │  Setup: 3 Heroes · 1 Villain Group ·            │
   │         1 Henchman Group · 25 Wounds            │
   │                                                 │
-  │           [ ⚡ GENERATE SETUP ]                 │
+  │   [ ⚡ Generate Setup ]  [ ✅ Accept & Log ]    │
+  │                                                 │
+  │  ▶ Forced Picks  (disclosure, collapsed)        │
   └─────────────────────────────────────────────────┘
 
   ── Result ──────────────────────────────────────────
@@ -213,8 +216,6 @@ Typography roles are governed by `documentation/design-system.md`.
 
   Wound Stack: 25
 
-  [ 🔄 Regenerate ]    [ ✅ Accept & Log Game ]
-
   ── Result Entry (opened from Accept & Log) ───────
   Outcome: [Win/Loss]
   Score:   [number]
@@ -225,12 +226,16 @@ Typography roles are governed by `documentation/design-system.md`.
 **Interactions:**
 - Player count buttons are mutually exclusive (styled like toggle buttons)
 - 1-player mode exposes Standard Solo, Advanced Solo, and Two-Handed Solo
-- Forced picks are one-shot setup constraints that remain active for Generate and Regenerate, then clear after a successful Accept & Log or reload
-- "Generate Setup" validates collection size before randomizing
-- "Regenerate" re-runs the randomizer (does NOT log the previous result, does NOT mark cards as used until Accept)
-- "Accept & Log Game" saves the setup to history, opens immediate result entry in History, and marks the setup as used
+- A single primary button handles both first generation and all subsequent rerolls. Its label is context-sensitive: "Generate Setup" before any result is present, "New Setup" once a setup is already displayed
+- The primary action button appears directly below the setup-requirements summary, before optional content, so users can act without scrolling past forced picks
+- Forced picks are presented in a native `<details>` disclosure element below the primary action row; users who need forced picks can expand the disclosure without it adding visual weight for users who do not
+- Forced picks are one-shot setup constraints that remain active across all rerolls, then clear after a successful Accept & Log or reload
+- "Generate Setup" / "New Setup" validates collection size before randomizing
+- "Accept & Log Game" saves the setup to history, opens immediate result entry in History, and marks the setup as used; it is disabled until a setup is present
 - Result entry supports pending-result flows, later correction from History, focus moves into the editor on open, and invalid saves announce recoverable errors before returning focus to the correct field
 - ★ marks the forced Mastermind villain group
+
+> **Design rationale (Epic 25):** Generate and Regenerate were merged into one context-sensitive action because they produce identical outcomes — both randomize a new setup from the current constraints. A dedicated "Regenerate" label implied a behaviorally distinct path when none exists. Forced picks moved below the primary action so the button is reached without scrolling through optional configuration. Both changes reduce action-density confusion and bring the mandatory step earlier in the visual flow.
 
 ---
 
@@ -253,6 +258,12 @@ Typography roles are governed by `documentation/design-system.md`.
   ── Insights ───────────────────────────────────────
   Desktop: visible below grouped records
   Mobile: collapsed behind a reveal button until needed
+
+  Per-category stats (heroes, masterminds, villain groups,
+  henchman groups, schemes) are each a full-width collapsible
+  panel rendered with native <details>/<summary> elements.
+  Summary counts remain visible in the closed state so users
+  can scan without opening every section.
 ```
 
 **Interactions:**
@@ -297,6 +308,7 @@ Typography roles are governed by `documentation/design-system.md`.
 - Individual Reset buttons clear only that category's play counts (no confirmation needed)
 - Full Reset shows a modal confirmation: "This will delete all game history and reset all card tracking. Are you sure?"
 - Import preview stages the backup before any merge or replace action is applied
+- Storage-health status is only surfaced when storage is unavailable or degraded; no indicator is shown during normal healthy operation
 
 ---
 
@@ -309,7 +321,7 @@ Typography roles are governed by `documentation/design-system.md`.
 │    Reusing the least-played options...   │
 └─────────────────────────────────────────┘
 ```
-- Appears top-center, auto-dismisses after 4 seconds
+- Appears bottom-anchored (fixed to the viewport bottom edge, outside the layout flow), auto-dismisses after 4 seconds
 - Types: `info` (blue), `success` (green), `warning` (gold), `error` (red)
 - Stacks vertically if multiple appear
 
@@ -353,8 +365,8 @@ Typography roles are governed by `documentation/design-system.md`.
 |---------|-----------|
 | Tab switch | Fade in (150ms ease) |
 | Card expand | max-height slide (200ms ease) |
-| Toast appear | Slide down + fade in (200ms) |
-| Toast dismiss | Fade out (300ms) |
+| Toast appear | Slide up from below viewport + fade in (200ms); fades in only when `prefers-reduced-motion` is set |
+| Toast dismiss | Slide down out of viewport + fade out (300ms); fades out only when `prefers-reduced-motion` is set |
 | Button hover | background lightens (100ms) |
 | Generate Setup result | Fade + translate up (250ms) |
 | Modal open | Scale from 0.9 + fade (200ms) |

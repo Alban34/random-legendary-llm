@@ -69,8 +69,7 @@ test.describe('Epic 5 automated QC', () => {
 
     await searchInput.fill('');
     await page.locator('[data-action="set-browse-type-filter"][data-type-filter="standalone"]').click();
-    await expect(page.locator('#panel-browse .set-card')).toHaveCount(2);
-    await expect(getSetCard(page, 'Villains')).toBeVisible();
+    await expect(page.locator('#panel-browse .set-card')).toHaveCount(1);
     await expect(getSetCard(page, 'Revelations')).toBeVisible();
   });
 

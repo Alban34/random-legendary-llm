@@ -35,5 +35,7 @@ Keyboard, switch, and screen-reader users lose their place immediately after cha
 - Add a header-adjacent status message or success toast for theme and locale changes so confirmation is available from any tab, not only Collection.
 - Keep the confirmation channel polite rather than assertive because these are user-initiated preference changes.
 
+**Resolution note (Epic 24):** Theme switching was intentionally made silent — no toast is emitted on theme change; the visual repaint provides implicit confirmation. Focus restoration for both theme and locale controls was delivered. Locale-switch confirmation via toast remains a valid open goal.
+
 ## Expected UX improvement
 Header preference changes will feel reliable and reversible: keyboard users stay anchored in the control group, assistive technology users receive a clear confirmation, and users on non-Collection tabs no longer have to infer whether the change persisted.

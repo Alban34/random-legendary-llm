@@ -32,9 +32,9 @@ test('Epic 5 browse filtering keeps every included set available with stable typ
 
   assert.equal(allVisible.length, sets.length);
   assert.equal(new Set(allVisible.map((set) => set.id)).size, sets.length);
-  assert.equal(base.length, 1);
-  assert.deepEqual(base.map((set) => set.name), ['Core Set']);
-  assert.deepEqual(standalone.map((set) => set.name), ['Villains', 'Revelations']);
+  assert.equal(base.length, 2);
+  assert.deepEqual(base.map((set) => set.name), ['Core Set', 'Villains']);
+  assert.deepEqual(standalone.map((set) => set.name), ['Revelations']);
   assert.equal(getBrowseTypeLabel('large-expansion'), 'Large Expansion');
   assert.equal(getBrowseTypeLabel('small-expansion'), 'Small Expansion');
 });

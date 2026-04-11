@@ -46,6 +46,8 @@ These are global, high-frequency controls. Losing focus after activation is diso
 ### Recommended change
 Restore focus to the triggering theme button or locale select after rerender, and surface a header-adjacent confirmation message or polite toast that is available from any tab.
 
+**Partial resolution (Epic 24):** Theme switching is now silent — the UI repaints immediately and no toast is emitted. Focus restoration for theme and locale controls was also addressed. Locale-change confirmation via toast remains in scope for future review.
+
 ### Expected UX improvement
 Theme and language changes will feel anchored, reversible, and trustworthy across the whole app.
 
@@ -120,6 +122,8 @@ Users come to History mainly to review, scan, and edit played games. When analyt
 ### Recommended change
 Keep grouped records primary, then reveal insights below them, behind a collapsible section, or in a secondary presentation mode.
 
+**Partial resolution (Epic 23):** Per-category stats are now full-width collapsible panels appearing after grouped records. Insights stay secondary and mobile already collapses them behind a reveal button. Remaining hierarchy refinements (KPI prominence, record density) are deferred to future iterations.
+
 ### Expected UX improvement
 History becomes faster to resume and more aligned with its core purpose while preserving the value of the insights layer.
 
@@ -159,6 +163,8 @@ Compress the header, shorten or hide the descriptive app blurb after first run, 
 ### Expected UX improvement
 Mobile tabs will feel faster, less crowded, and more task-focused.
 
+**Partial resolution (Epic 25):** The header `h1` font size was reduced to 1.1rem and header padding was tightened. The app version now appears as a compact muted inline element beside the title. The primary New Game action (Generate Setup / New Setup) was moved above the forced-picks disclosure so users reach the critical control earlier without scrolling. Theme and locale controls remain in their responsive positions but the overall header footprint is materially smaller.
+
 ### Issue
 Onboarding progression breaks keyboard continuity.
 
@@ -193,6 +199,8 @@ The app would feel more decisive, lighter, and more polished without sacrificing
 
 ### Recommended change
 Trim repeated helper copy after first successful use, reduce the visual weight of secondary summaries, and use progressive disclosure more aggressively for low-frequency explanation.
+
+**Partial resolution (Epic 23):** The grouping-notice technical disclaimer was removed from the history surface. Storage-health status is now suppressed during normal operation and only surfaces when the app requires user action. Remaining helper copy in Browse summaries and Backup is deferred to future iterations.
 
 ## 7. Assumptions and gaps
 

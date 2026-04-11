@@ -547,48 +547,48 @@ These epics are derived from the newly added unchecked items in `documentation/_
 Approved
 
 ### Epic-wide validation gate
-- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 22 work complete
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 22 work complete
 
 ### Story 22.1 — Define the corrected set taxonomy and ordering contract
-- [ ] Audit the current set ordering rules across Browse, Collection, and any set-selection controls
-- [ ] Define the authoritative alphabetical ordering behavior, including tie-breaking and locale-safe sorting assumptions
-- [ ] Confirm the corrected taxonomy, including treating Core and Villains as base games
-- [ ] Capture unresolved classification corrections that need source-review or user-provided clarification before implementation
-- [ ] Add any required documentation-update follow-up for the revised taxonomy and sorting contract
-- [ ] **Test:** verify the documented ordering and taxonomy rules stay internally consistent across planning references
-- [ ] **QC (Automated):** add planning coverage that fails if set-ordering and taxonomy assumptions drift across docs
+- [x] Audit the current set ordering rules across Browse, Collection, and any set-selection controls
+- [x] Define the authoritative alphabetical ordering behavior, including tie-breaking and locale-safe sorting assumptions
+- [x] Confirm the corrected taxonomy, including treating Core and Villains as base games
+- [x] Capture unresolved classification corrections that need source-review or user-provided clarification before implementation
+- [x] Add any required documentation-update follow-up for the revised taxonomy and sorting contract
+- [x] **Test:** verify the documented ordering and taxonomy rules stay internally consistent across planning references
+- [x] **QC (Automated):** add planning coverage that fails if set-ordering and taxonomy assumptions drift across docs
 
 ### Story 22.2 — Apply alphabetical ordering consistently across set-driven surfaces
-- [ ] Identify every user-facing set list that should follow the shared alphabetical ordering contract
-- [ ] Apply the chosen ordering consistently to Browse set grids, collection checklists, and set-picking controls where relevant
-- [ ] Preserve any intentional non-alphabetical grouping only where it clearly improves usability and is explicitly documented
-- [ ] Verify the new ordering does not destabilize selection, filtering, or persisted ownership behavior
-- [ ] **Test:** verify representative set lists render in the documented alphabetical order
-- [ ] **QC (Automated):** automate QC coverage for alphabetized set ordering in at least Browse and Collection surfaces
+- [x] Identify every user-facing set list that should follow the shared alphabetical ordering contract
+- [x] Apply the chosen ordering consistently to Browse set grids, collection checklists, and set-picking controls where relevant
+- [x] Preserve any intentional non-alphabetical grouping only where it clearly improves usability and is explicitly documented
+- [x] Verify the new ordering does not destabilize selection, filtering, or persisted ownership behavior
+- [x] **Test:** verify representative set lists render in the documented alphabetical order
+- [x] **QC (Automated):** automate QC coverage for alphabetized set ordering in at least Browse and Collection surfaces
 
 ### Story 22.3 — Reclassify sets into the corrected base-game and expansion groupings
-- [ ] Review the current set-type assignments against the agreed corrected taxonomy
-- [ ] Reclassify Core and Villains into the shared base-game grouping
-- [ ] Correct any mistaken small-expansion and large-expansion assignments in the shipped catalog model
-- [ ] Verify category totals, filters, and badges still behave coherently after the reclassification
-- [ ] **Test:** verify representative sets resolve to the corrected base-game, small-expansion, or large-expansion grouping
-- [ ] **QC (Automated):** automate QC coverage for the corrected grouping labels in Browse and Collection views
+- [x] Review the current set-type assignments against the agreed corrected taxonomy
+- [x] Reclassify Core and Villains into the shared base-game grouping
+- [x] Correct any mistaken small-expansion and large-expansion assignments in the shipped catalog model
+- [x] Verify category totals, filters, and badges still behave coherently after the reclassification
+- [x] **Test:** verify representative sets resolve to the corrected base-game, small-expansion, or large-expansion grouping
+- [x] **QC (Automated):** automate QC coverage for the corrected grouping labels in Browse and Collection views
 
 ### Story 22.4 — Verify taxonomy and ordering remain clear across Browse and Collection experiences
-- [ ] Review Browse filters, grouping labels, and helper copy after the taxonomy and ordering changes
-- [ ] Review Collection grouping, counts, and empty states for clarity after the reclassification
-- [ ] Remove or rewrite any wording that still reflects superseded classification rules
-- [ ] Add any required follow-up documentation tasks if taxonomy decisions affect user guidance or reference docs
-- [ ] **Test:** verify Browse and Collection contracts remain understandable after the catalog cleanup
-- [ ] **QC (Automated):** automate QC coverage for taxonomy-aware Browse and Collection interactions after the cleanup
+- [x] Review Browse filters, grouping labels, and helper copy after the taxonomy and ordering changes
+- [x] Review Collection grouping, counts, and empty states for clarity after the reclassification
+- [x] Remove or rewrite any wording that still reflects superseded classification rules
+- [x] Add any required follow-up documentation tasks if taxonomy decisions affect user guidance or reference docs
+- [x] **Test:** verify Browse and Collection contracts remain understandable after the catalog cleanup
+- [x] **QC (Automated):** automate QC coverage for taxonomy-aware Browse and Collection interactions after the cleanup
 
 ### Story 22.5 — Update supporting documentation and QA expectations for the revised catalog contract
-- [ ] Update planning or UX documentation that describes set ordering or grouping behavior
-- [ ] Update any data-reference or design documentation that names the old classification model
-- [ ] Align regression and QC expectations with the corrected ordering and taxonomy behavior
-- [ ] Record any remaining manual-review items if final expansion classifications still need external confirmation
-- [ ] **Test:** verify planning and UX docs reference Epic 22 consistently and do not conflict on taxonomy or ordering
-- [ ] **QC (Automated):** automate documentation-consistency checks for the revised catalog contract
+- [x] Update planning or UX documentation that describes set ordering or grouping behavior
+- [x] Update any data-reference or design documentation that names the old classification model
+- [x] Align regression and QC expectations with the corrected ordering and taxonomy behavior
+- [x] Record any remaining manual-review items if final expansion classifications still need external confirmation
+- [x] **Test:** verify planning and UX docs reference Epic 22 consistently and do not conflict on taxonomy or ordering
+- [x] **QC (Automated):** automate documentation-consistency checks for the revised catalog contract
 
 ## Epic 23 — Stats and Secondary Information Simplification
 
@@ -596,48 +596,48 @@ Approved
 Approved
 
 ### Epic-wide validation gate
-- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 23 work complete
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 23 work complete
 
 ### Story 23.1 — Define a record-first stats layout with collapsible full-width sections
-- [ ] Audit the current stats surface for narrow tiles, repeated headings, and low-value supporting copy
-- [ ] Define the revised hierarchy so per-category stats sections are full width and individually collapsible
-- [ ] Decide the default expanded or collapsed behavior for sparse and dense histories
-- [ ] Ensure the new layout contract keeps recent-game review and result actions easy to reach
-- [ ] Add any required documentation follow-up for the revised stats hierarchy
-- [ ] **Test:** verify the planned stats hierarchy remains consistent with the intended History-first UX direction
-- [ ] **QC (Automated):** add planning coverage for the revised full-width collapsible stats contract
+- [x] Audit the current stats surface for narrow tiles, repeated headings, and low-value supporting copy
+- [x] Define the revised hierarchy so per-category stats sections are full width and individually collapsible
+- [x] Decide the default expanded or collapsed behavior for sparse and dense histories
+- [x] Ensure the new layout contract keeps recent-game review and result actions easy to reach
+- [x] Add any required documentation follow-up for the revised stats hierarchy
+- [x] **Test:** verify the planned stats hierarchy remains consistent with the intended History-first UX direction
+- [x] **QC (Automated):** add planning coverage for the revised full-width collapsible stats contract
 
 ### Story 23.2 — Rebuild per-category stats tiles into full-width collapsible panels
-- [ ] Replace narrow category tiles with full-width stats sections for heroes, masterminds, and other tracked categories
-- [ ] Add accessible expand and collapse affordances for each category section
-- [ ] Keep key summary numbers visible enough that users can scan without opening every panel
-- [ ] Preserve stable layout behavior across desktop and mobile viewports
-- [ ] **Test:** verify collapsible category panels render correctly for empty, sparse, and dense stats data
-- [ ] **QC (Automated):** automate QC coverage for expanding and collapsing multiple stats sections on desktop and mobile
+- [x] Replace narrow category tiles with full-width stats sections for heroes, masterminds, and other tracked categories
+- [x] Add accessible expand and collapse affordances for each category section
+- [x] Keep key summary numbers visible enough that users can scan without opening every panel
+- [x] Preserve stable layout behavior across desktop and mobile viewports
+- [x] **Test:** verify collapsible category panels render correctly for empty, sparse, and dense stats data
+- [x] **QC (Automated):** automate QC coverage for expanding and collapsing multiple stats sections on desktop and mobile
 
 ### Story 23.3 — Remove low-value technical messaging from user-facing surfaces
-- [ ] Audit current user-facing copy for technical disclaimers that do not help users decide what to do next
-- [ ] Remove or rewrite messages such as presentation-only grouping disclaimers when they add more noise than clarity
-- [ ] Preserve only the technical detail that is necessary for trust, recovery, or data-safety understanding
-- [ ] Add documentation tasks where copy removals require updated UX or support references
-- [ ] **Test:** verify the remaining copy still explains important state boundaries without unnecessary technical detail
-- [ ] **QC (Automated):** automate QC coverage to confirm removed technical copy no longer appears in the visible UI
+- [x] Audit current user-facing copy for technical disclaimers that do not help users decide what to do next
+- [x] Remove or rewrite messages such as presentation-only grouping disclaimers when they add more noise than clarity
+- [x] Preserve only the technical detail that is necessary for trust, recovery, or data-safety understanding
+- [x] Add documentation tasks where copy removals require updated UX or support references
+- [x] **Test:** verify the remaining copy still explains important state boundaries without unnecessary technical detail
+- [x] **QC (Automated):** automate QC coverage to confirm removed technical copy no longer appears in the visible UI
 
 ### Story 23.4 — Show storage status only when the app needs the user to act
-- [ ] Review the current storage-health messaging and identify which states are informational versus actionable
-- [ ] Hide healthy-storage indicators that merely announce normal behavior
-- [ ] Keep storage warnings and recovery guidance visible only when persistence is unavailable, degraded, or needs attention
-- [ ] Preserve accessible status announcement behavior for genuine storage problems
-- [ ] **Test:** verify storage status appears only for warning or error conditions and stays absent during healthy operation
-- [ ] **QC (Automated):** automate QC coverage for healthy, degraded, and unavailable storage scenarios
+- [x] Review the current storage-health messaging and identify which states are informational versus actionable
+- [x] Hide healthy-storage indicators that merely announce normal behavior
+- [x] Keep storage warnings and recovery guidance visible only when persistence is unavailable, degraded, or needs attention
+- [x] Preserve accessible status announcement behavior for genuine storage problems
+- [x] **Test:** verify storage status appears only for warning or error conditions and stays absent during healthy operation
+- [x] **QC (Automated):** automate QC coverage for healthy, degraded, and unavailable storage scenarios
 
 ### Story 23.5 — Update documentation and QA expectations for the simplified information model
-- [ ] Update UX and planning docs that describe the stats layout, technical helper copy, or storage-status behavior
-- [ ] Align automation expectations with collapsible stats panels and issue-only storage messaging
-- [ ] Record any remaining follow-up questions if simplification creates new copy or accessibility review needs
-- [ ] Confirm doc updates cover the intent behind reduced technical messaging, not only the visual changes
-- [ ] **Test:** verify Epic 23 planning and UX references describe the same simplified information model
-- [ ] **QC (Automated):** automate documentation-consistency checks for stats hierarchy and storage-status expectations
+- [x] Update UX and planning docs that describe the stats layout, technical helper copy, or storage-status behavior
+- [x] Align automation expectations with collapsible stats panels and issue-only storage messaging
+- [x] Record any remaining follow-up questions if simplification creates new copy or accessibility review needs
+- [x] Confirm doc updates cover the intent behind reduced technical messaging, not only the visual changes
+- [x] **Test:** verify Epic 23 planning and UX references describe the same simplified information model
+- [x] **QC (Automated):** automate documentation-consistency checks for stats hierarchy and storage-status expectations
 
 ## Epic 24 — Toast Behavior and Feedback Channel Cleanup
 
@@ -645,48 +645,48 @@ Approved
 Approved
 
 ### Epic-wide validation gate
-- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 24 work complete
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 24 work complete
 
 ### Story 24.1 — Define which preference changes should avoid toast notifications entirely
-- [ ] Audit the events that currently emit toasts for preference or shell changes
-- [ ] Decide which preference changes should use silent visual feedback instead of a toast
-- [ ] Confirm that theme switching should not produce a toast in the default interaction path
-- [ ] Preserve explicit feedback rules for changes that still need confirmation because they are less obvious or higher impact
-- [ ] Add any required documentation follow-up for the refined notification rules
-- [ ] **Test:** verify the notification rules distinguish silent preference changes from meaningful toast-worthy events
-- [ ] **QC (Automated):** add planning coverage for the refined toast-emission contract
+- [x] Audit the events that currently emit toasts for preference or shell changes
+- [x] Decide which preference changes should use silent visual feedback instead of a toast
+- [x] Confirm that theme switching should not produce a toast in the default interaction path
+- [x] Preserve explicit feedback rules for changes that still need confirmation because they are less obvious or higher impact
+- [x] Add any required documentation follow-up for the refined notification rules
+- [x] **Test:** verify the notification rules distinguish silent preference changes from meaningful toast-worthy events
+- [x] **QC (Automated):** add planning coverage for the refined toast-emission contract
 
 ### Story 24.2 — Remove theme-switch toasts while preserving clear preference feedback where needed
-- [ ] Remove toast emission from theme-toggle actions
-- [ ] Keep any remaining confirmation channel concise, accessible, and non-disruptive if the UX still needs one
-- [ ] Verify theme changes remain understandable from every major tab without relying on transient toast feedback
-- [ ] Ensure the quieted behavior stays compatible with locale switching and other shared-header preferences
-- [ ] **Test:** verify theme changes no longer emit toasts while the selected theme still updates clearly and persistently
-- [ ] **QC (Automated):** automate QC coverage for quiet theme switching across desktop and mobile layouts
+- [x] Remove toast emission from theme-toggle actions
+- [x] Keep any remaining confirmation channel concise, accessible, and non-disruptive if the UX still needs one
+- [x] Verify theme changes remain understandable from every major tab without relying on transient toast feedback
+- [x] Ensure the quieted behavior stays compatible with locale switching and other shared-header preferences
+- [x] **Test:** verify theme changes no longer emit toasts while the selected theme still updates clearly and persistently
+- [x] **QC (Automated):** automate QC coverage for quiet theme switching across desktop and mobile layouts
 
 ### Story 24.3 — Render bottom-anchored toasts that animate in and out from outside the window
-- [ ] Anchor the toast stack at the bottom of the viewport rather than inside the layout flow
-- [ ] Update enter motion so toasts rise in from beyond the visible window edge
-- [ ] Update exit motion so dismissed toasts leave the screen in the same direction
-- [ ] Preserve stacked-toast spacing, timing, and dismissal behavior during the motion changes
-- [ ] **Test:** verify toast placement and motion remain stable for single and stacked notifications
-- [ ] **QC (Automated):** automate QC coverage for bottom-edge toast entry and exit behavior across representative viewports
+- [x] Anchor the toast stack at the bottom of the viewport rather than inside the layout flow
+- [x] Update enter motion so toasts rise in from beyond the visible window edge
+- [x] Update exit motion so dismissed toasts leave the screen in the same direction
+- [x] Preserve stacked-toast spacing, timing, and dismissal behavior during the motion changes
+- [x] **Test:** verify toast placement and motion remain stable for single and stacked notifications
+- [x] **QC (Automated):** automate QC coverage for bottom-edge toast entry and exit behavior across representative viewports
 
 ### Story 24.4 — Verify toast motion, stacking, and accessibility remain stable across viewports
-- [ ] Review motion timing and easing so the revised toast behavior feels intentional rather than distracting
-- [ ] Ensure the bottom toast stack does not cover essential controls or trap focus on small screens
-- [ ] Preserve semantic roles, reduced-motion compatibility, and manual dismissal affordances
-- [ ] Add any required follow-up documentation tasks if the refined toast behavior changes UX guidance or accessibility notes
-- [ ] **Test:** verify bottom-anchored toasts remain accessible and non-disruptive under reduced-motion and stacked-notification scenarios
-- [ ] **QC (Automated):** automate QC coverage for reduced-motion, stacking order, and mobile overlap behavior
+- [x] Review motion timing and easing so the revised toast behavior feels intentional rather than distracting
+- [x] Ensure the bottom toast stack does not cover essential controls or trap focus on small screens
+- [x] Preserve semantic roles, reduced-motion compatibility, and manual dismissal affordances
+- [x] Add any required follow-up documentation tasks if the refined toast behavior changes UX guidance or accessibility notes
+- [x] **Test:** verify bottom-anchored toasts remain accessible and non-disruptive under reduced-motion and stacked-notification scenarios
+- [x] **QC (Automated):** automate QC coverage for reduced-motion, stacking order, and mobile overlap behavior
 
 ### Story 24.5 — Update documentation and QA expectations for the refined toast contract
-- [ ] Update UX, accessibility, or planning docs that describe toast behavior or preference-change confirmations
-- [ ] Align automated coverage expectations with quiet theme switching and bottom-edge toast animation
-- [ ] Record any remaining open questions about which shared-header changes deserve visible confirmation
-- [ ] Ensure documentation makes the refined toast contract easy to preserve during future UX work
-- [ ] **Test:** verify Epic 24 planning and UX docs reference the same toast and feedback behavior
-- [ ] **QC (Automated):** automate documentation-consistency checks for the refined toast contract
+- [x] Update UX, accessibility, or planning docs that describe toast behavior or preference-change confirmations
+- [x] Align automated coverage expectations with quiet theme switching and bottom-edge toast animation
+- [x] Record any remaining open questions about which shared-header changes deserve visible confirmation
+- [x] Ensure documentation makes the refined toast contract easy to preserve during future UX work
+- [x] **Test:** verify Epic 24 planning and UX docs reference the same toast and feedback behavior
+- [x] **QC (Automated):** automate documentation-consistency checks for the refined toast contract
 
 ## Epic 25 — Header and New Game Action Density Refinement
 
@@ -694,45 +694,45 @@ Approved
 Approved
 
 ### Epic-wide validation gate
-- [ ] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 25 work complete
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 25 work complete
 
 ### Story 25.1 — Define the revised header hierarchy including a compact version display
-- [ ] Audit the current header for permanently visible elements, duplicate labels, and avoidable vertical cost
-- [ ] Define where the app version should appear so it remains visible without becoming dominant
-- [ ] Decide how the version display should behave across desktop and mobile shells
-- [ ] Confirm the revised header contract still supports onboarding, About access, and shared preferences cleanly
-- [ ] Add any required documentation tasks for the revised header information hierarchy
-- [ ] **Test:** verify the planned header contract preserves required controls while reducing visual weight
-- [ ] **QC (Automated):** add planning coverage for the compact header and version-display rules
+- [x] Audit the current header for permanently visible elements, duplicate labels, and avoidable vertical cost
+- [x] Define where the app version should appear so it remains visible without becoming dominant
+- [x] Decide how the version display should behave across desktop and mobile shells
+- [x] Confirm the revised header contract still supports onboarding, About access, and shared preferences cleanly
+- [x] Add any required documentation tasks for the revised header information hierarchy
+- [x] **Test:** verify the planned header contract preserves required controls while reducing visual weight
+- [x] **QC (Automated):** add planning coverage for the compact header and version-display rules
 
 ### Story 25.2 — Reduce header footprint while keeping theme and locale controls discoverable
-- [ ] Reassess the placement and density of theme and locale controls in the persistent header
-- [ ] Introduce a lighter header presentation that keeps preferences accessible without dominating the top of the screen
-- [ ] Preserve keyboard, touch, and screen-reader access to the shared preferences after the compaction
-- [ ] Verify the compact header remains stable across locales with longer labels and across supported themes
-- [ ] **Test:** verify the revised header uses less space while keeping preference changes discoverable and usable
-- [ ] **QC (Automated):** automate QC coverage for compact-header behavior on desktop and mobile viewports
+- [x] Reassess the placement and density of theme and locale controls in the persistent header
+- [x] Introduce a lighter header presentation that keeps preferences accessible without dominating the top of the screen
+- [x] Preserve keyboard, touch, and screen-reader access to the shared preferences after the compaction
+- [x] Verify the compact header remains stable across locales with longer labels and across supported themes
+- [x] **Test:** verify the revised header uses less space while keeping preference changes discoverable and usable
+- [x] **QC (Automated):** automate QC coverage for compact-header behavior on desktop and mobile viewports
 
 ### Story 25.3 — Consolidate Generate and Regenerate into one clearer action model
-- [ ] Define the single primary action contract for first generation and subsequent rerolls
-- [ ] Remove redundant button labeling that suggests two different behaviors when the workflow is effectively the same
-- [ ] Preserve any distinct secondary actions that still matter, such as accepting or clearing a pending setup
-- [ ] Update helper copy and state labels so the one-button model remains obvious after a setup is already visible
-- [ ] **Test:** verify the revised generation controls expose one clear reroll path without changing persistence behavior
-- [ ] **QC (Automated):** automate QC coverage for first-generation and subsequent reroll flows using the consolidated action model
+- [x] Define the single primary action contract for first generation and subsequent rerolls
+- [x] Remove redundant button labeling that suggests two different behaviors when the workflow is effectively the same
+- [x] Preserve any distinct secondary actions that still matter, such as accepting or clearing a pending setup
+- [x] Update helper copy and state labels so the one-button model remains obvious after a setup is already visible
+- [x] **Test:** verify the revised generation controls expose one clear reroll path without changing persistence behavior
+- [x] **QC (Automated):** automate QC coverage for first-generation and subsequent reroll flows using the consolidated action model
 
 ### Story 25.4 — Move the primary setup action higher in the New Game flow
-- [ ] Audit which optional information blocks currently push the primary generate action too far down the screen
-- [ ] Reorder or condense the New Game layout so the primary action appears earlier without hiding important setup choices
-- [ ] Keep optional explanatory content accessible through secondary placement, disclosure, or more compact presentation
-- [ ] Verify the revised layout reduces scroll cost on desktop and mobile while preserving accessibility
-- [ ] **Test:** verify the primary setup action becomes reachable earlier in the scroll path without breaking setup clarity
-- [ ] **QC (Automated):** automate QC coverage for earlier primary-action visibility on desktop and mobile New Game layouts
+- [x] Audit which optional information blocks currently push the primary generate action too far down the screen
+- [x] Reorder or condense the New Game layout so the primary action appears earlier without hiding important setup choices
+- [x] Keep optional explanatory content accessible through secondary placement, disclosure, or more compact presentation
+- [x] Verify the revised layout reduces scroll cost on desktop and mobile while preserving accessibility
+- [x] **Test:** verify the primary setup action becomes reachable earlier in the scroll path without breaking setup clarity
+- [x] **QC (Automated):** automate QC coverage for earlier primary-action visibility on desktop and mobile New Game layouts
 
 ### Story 25.5 — Update documentation and QA expectations for the revised shell and setup-action hierarchy
-- [ ] Update UX and planning docs that describe the header footprint, shared preferences placement, version display, or New Game control hierarchy
-- [ ] Align automated coverage with the compact shell and one-button generation model
-- [ ] Record any remaining follow-up decisions if the new header design affects onboarding or mobile-shell guidance
-- [ ] Ensure the documentation explains why the setup action and header hierarchy were simplified, not only what moved
-- [ ] **Test:** verify Epic 25 planning and UX docs describe the same revised shell and New Game action contract
-- [ ] **QC (Automated):** automate documentation-consistency checks for the compact header and setup-action hierarchy
+- [x] Update UX and planning docs that describe the header footprint, shared preferences placement, version display, or New Game control hierarchy
+- [x] Align automated coverage with the compact shell and one-button generation model
+- [x] Record any remaining follow-up decisions if the new header design affects onboarding or mobile-shell guidance
+- [x] Ensure the documentation explains why the setup action and header hierarchy were simplified, not only what moved
+- [x] **Test:** verify Epic 25 planning and UX docs describe the same revised shell and New Game action contract
+- [x] **QC (Automated):** automate documentation-consistency checks for the compact header and setup-action hierarchy

@@ -186,7 +186,7 @@ test.describe('Epic 3 automated QC', () => {
     expect(result.setup.notices.some((notice) => notice.includes('Least-played fallback used for Hero selection'))).toBeTruthy();
     expect(JSON.stringify(await readAppState(page))).toBe(stateBefore);
 
-    await page.locator('#panel-new-game [data-action="regenerate-setup"]').click();
+    await page.locator('#panel-new-game [data-action="generate-setup"]').click();
     await page.waitForFunction(() => window.__CURRENT_SETUP__ !== null);
     result = await page.evaluate(() => ({ notices: window.__CURRENT_SETUP__.notices }));
     expect(result.notices.some((notice) => notice.includes('Least-played fallback used for Hero selection'))).toBeTruthy();
