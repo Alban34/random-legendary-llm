@@ -1,0 +1,1545 @@
+{
+  "schemaId": "legendary-marvel-randomizer-backup",
+  "version": 1,
+  "exportedAt": "2026-04-11T07:52:18.190Z",
+  "metadata": {
+    "appId": "legendary-marvel-randomizer",
+    "storageKey": "legendary_state_v1",
+    "stateSchemaVersion": 1
+  },
+  "data": {
+    "collection": {
+      "ownedSetIds": [
+        "ant-man",
+        "captain-america-75th-anniversary",
+        "champions",
+        "civil-war",
+        "core-set",
+        "dark-city",
+        "doctor-strange-and-the-shadows-of-nightmare",
+        "fantastic-four",
+        "guardians-of-the-galaxy",
+        "heroes-of-asgard",
+        "paint-the-town-red",
+        "s-h-i-e-l-d",
+        "secret-wars-volume-2",
+        "the-new-mutants",
+        "venom",
+        "world-war-hulk"
+      ]
+    },
+    "usage": {
+      "heroes": {
+        "core-set-captain-america": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:00:00.000Z"
+        },
+        "core-set-cyclops": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "dark-city-domino": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:34:00.000Z"
+        },
+        "dark-city-iron-fist": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:00:00.000Z"
+        },
+        "core-set-hawkeye": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "core-set-thor": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:15:00.000Z"
+        },
+        "dark-city-blade": {
+          "plays": 3,
+          "lastPlayedAt": "2026-04-11T00:27:00.000Z"
+        },
+        "core-set-storm": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:20:00.000Z"
+        },
+        "fantastic-four-human-torch": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:02:00.000Z"
+        },
+        "fantastic-four-invisible-woman": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:02:00.000Z"
+        },
+        "fantastic-four-mr-fantastic": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:02:00.000Z"
+        },
+        "fantastic-four-silver-surfer": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:02:00.000Z"
+        },
+        "fantastic-four-thing": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:02:00.000Z"
+        },
+        "core-set-gambit": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:03:00.000Z"
+        },
+        "dark-city-colossus": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:22:00.000Z"
+        },
+        "dark-city-wolverine": {
+          "plays": 3,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "ant-man-jocasta": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:04:00.000Z"
+        },
+        "dark-city-elektra": {
+          "plays": 3,
+          "lastPlayedAt": "2026-04-11T00:27:00.000Z"
+        },
+        "doctor-strange-and-the-shadows-of-nightmare-doctor-strange": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:04:00.000Z"
+        },
+        "dark-city-ghost-rider": {
+          "plays": 5,
+          "lastPlayedAt": "2026-04-11T00:32:00.000Z"
+        },
+        "dark-city-nightcrawler": {
+          "plays": 7,
+          "lastPlayedAt": "2026-04-11T00:31:00.000Z"
+        },
+        "heroes-of-asgard-valkyrie": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:18:00.000Z"
+        },
+        "core-set-deadpool": {
+          "plays": 5,
+          "lastPlayedAt": "2026-04-11T00:31:00.000Z"
+        },
+        "core-set-iron-man": {
+          "plays": 8,
+          "lastPlayedAt": "2026-04-11T00:31:00.000Z"
+        },
+        "champions-totally-awesome-hulk": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:07:00.000Z"
+        },
+        "guardians-of-the-galaxy-rocket-raccoon": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:24:00.000Z"
+        },
+        "core-set-rogue": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:08:00.000Z"
+        },
+        "dark-city-cable": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:08:00.000Z"
+        },
+        "dark-city-forge": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:10:00.000Z"
+        },
+        "dark-city-bishop": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:27:00.000Z"
+        },
+        "core-set-spider-man": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:18:00.000Z"
+        },
+        "dark-city-professor-x": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:30:00.000Z"
+        },
+        "core-set-black-widow": {
+          "plays": 3,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "dark-city-daredevil": {
+          "plays": 5,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "dark-city-iceman": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "core-set-hulk": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:32:00.000Z"
+        },
+        "heroes-of-asgard-thor": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:12:00.000Z"
+        },
+        "core-set-nick-fury": {
+          "plays": 3,
+          "lastPlayedAt": "2026-04-11T00:24:00.000Z"
+        },
+        "dark-city-punisher": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:22:00.000Z"
+        },
+        "heroes-of-asgard-lady-sif": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:25:00.000Z"
+        },
+        "core-set-emma-frost": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:28:00.000Z"
+        },
+        "champions-gwenpool": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:24:00.000Z"
+        },
+        "dark-city-angel": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:30:00.000Z"
+        },
+        "doctor-strange-and-the-shadows-of-nightmare-the-ancient-one": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:23:00.000Z"
+        },
+        "core-set-wolverine": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:25:00.000Z"
+        },
+        "guardians-of-the-galaxy-star-lord": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:25:00.000Z"
+        },
+        "champions-nova": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:28:00.000Z"
+        },
+        "ant-man-black-knight": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:29:00.000Z"
+        },
+        "dark-city-jean-grey": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:30:00.000Z"
+        },
+        "ant-man-wonder-man": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:34:00.000Z"
+        },
+        "champions-viv-vision": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:34:00.000Z"
+        }
+      },
+      "masterminds": {
+        "core-set-dr-doom": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:22:00.000Z"
+        },
+        "dark-city-stryfe": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:23:00.000Z"
+        },
+        "fantastic-four-mole-man": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:02:00.000Z"
+        },
+        "doctor-strange-and-the-shadows-of-nightmare-nightmare": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:04:00.000Z"
+        },
+        "ant-man-morgan-le-fay": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:16:00.000Z"
+        },
+        "dark-city-mephisto": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:31:00.000Z"
+        },
+        "champions-fin-fang-foom": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:07:00.000Z"
+        },
+        "dark-city-mr-sinister": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:30:00.000Z"
+        },
+        "dark-city-apocalypse": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:27:00.000Z"
+        },
+        "dark-city-kingpin": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:18:00.000Z"
+        },
+        "core-set-red-skull": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "doctor-strange-and-the-shadows-of-nightmare-dormammu": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:12:00.000Z"
+        },
+        "core-set-loki": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:19:00.000Z"
+        },
+        "guardians-of-the-galaxy-supreme-intelligence-of-the-kree": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:17:00.000Z"
+        },
+        "core-set-magneto": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:32:00.000Z"
+        },
+        "ant-man-ultron": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:28:00.000Z"
+        },
+        "heroes-of-asgard-malekith-the-accursed": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:29:00.000Z"
+        },
+        "the-new-mutants-belasco-demon-lord-of-limbo": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:34:00.000Z"
+        }
+      },
+      "villainGroups": {
+        "core-set-hydra": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:34:00.000Z"
+        },
+        "core-set-spider-foes": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:19:00.000Z"
+        },
+        "core-set-skrulls": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:20:00.000Z"
+        },
+        "dark-city-streets-of-new-york": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:03:00.000Z"
+        },
+        "ant-man-ultron-s-legacy": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:04:00.000Z"
+        },
+        "ant-man-queen-s-vengeance": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:16:00.000Z"
+        },
+        "dark-city-four-horsemen": {
+          "plays": 5,
+          "lastPlayedAt": "2026-04-11T00:31:00.000Z"
+        },
+        "guardians-of-the-galaxy-infinity-gems": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:28:00.000Z"
+        },
+        "dark-city-emissaries-of-evil": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:08:00.000Z"
+        },
+        "dark-city-mlf": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:27:00.000Z"
+        },
+        "dark-city-underworld": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:10:00.000Z"
+        },
+        "core-set-enemies-of-asgard": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "guardians-of-the-galaxy-kree-starforce": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:17:00.000Z"
+        },
+        "paint-the-town-red-maximum-carnage": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:17:00.000Z"
+        },
+        "core-set-masters-of-evil": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:21:00.000Z"
+        },
+        "core-set-radiation": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:32:00.000Z"
+        },
+        "the-new-mutants-hellions": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:23:00.000Z"
+        },
+        "dark-city-marauders": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:25:00.000Z"
+        },
+        "the-new-mutants-demons-of-limbo": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:29:00.000Z"
+        },
+        "core-set-brotherhood": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:30:00.000Z"
+        }
+      },
+      "henchmanGroups": {
+        "dark-city-maggia-goons": {
+          "plays": 7,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "core-set-doombot-legion": {
+          "plays": 11,
+          "lastPlayedAt": "2026-04-11T00:31:00.000Z"
+        },
+        "core-set-hand-ninjas": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:10:00.000Z"
+        },
+        "core-set-sentinels": {
+          "plays": 3,
+          "lastPlayedAt": "2026-04-11T00:25:00.000Z"
+        },
+        "dark-city-phalanx": {
+          "plays": 6,
+          "lastPlayedAt": "2026-04-11T00:32:00.000Z"
+        },
+        "core-set-savage-land-mutates": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:34:00.000Z"
+        }
+      },
+      "schemes": {
+        "dark-city-x-cutioner-s-song": {
+          "plays": 3,
+          "lastPlayedAt": "2026-04-11T00:15:00.000Z"
+        },
+        "core-set-secret-invasion-of-the-skrull-shapeshifters": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:02:00.000Z"
+        },
+        "core-set-unleash-the-power-of-the-cosmic-cube": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:03:00.000Z"
+        },
+        "guardians-of-the-galaxy-intergalactic-kree-nega-bomb": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:04:00.000Z"
+        },
+        "ant-man-pull-earth-into-medieval-times": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:16:00.000Z"
+        },
+        "core-set-replace-earth-s-leaders-with-killbots": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:31:00.000Z"
+        },
+        "guardians-of-the-galaxy-forge-the-infinity-gauntlet": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:28:00.000Z"
+        },
+        "dark-city-transform-citizens-into-demons": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:08:00.000Z"
+        },
+        "dark-city-organized-crime-wave": {
+          "plays": 4,
+          "lastPlayedAt": "2026-04-11T00:27:00.000Z"
+        },
+        "core-set-midtown-bank-robbery": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:10:00.000Z"
+        },
+        "dark-city-detonate-the-helicarrier": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:33:00.000Z"
+        },
+        "dark-city-save-humanity": {
+          "plays": 3,
+          "lastPlayedAt": "2026-04-11T00:19:00.000Z"
+        },
+        "dark-city-steal-the-weaponized-plutonium": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:17:00.000Z"
+        },
+        "ant-man-trap-heroes-in-the-microverse": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:18:00.000Z"
+        },
+        "core-set-the-legacy-virus": {
+          "plays": 2,
+          "lastPlayedAt": "2026-04-11T00:32:00.000Z"
+        },
+        "core-set-portals-to-the-dark-dimension": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:22:00.000Z"
+        },
+        "paint-the-town-red-invade-the-daily-bugle-news-hq": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:23:00.000Z"
+        },
+        "ant-man-transform-commuters-into-giant-ants": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:25:00.000Z"
+        },
+        "the-new-mutants-the-demon-bear-saga": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:29:00.000Z"
+        },
+        "dark-city-capture-baby-hope": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:30:00.000Z"
+        },
+        "dark-city-massive-earthquake-generator": {
+          "plays": 1,
+          "lastPlayedAt": "2026-04-11T00:34:00.000Z"
+        }
+      }
+    },
+    "history": [
+      {
+        "id": "ffa15600-c11b-4515-a5d8-a5a8c05c6c05|1",
+        "createdAt": "2026-04-11T00:34:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "the-new-mutants-belasco-demon-lord-of-limbo",
+          "schemeId": "dark-city-massive-earthquake-generator",
+          "heroIds": [
+            "ant-man-wonder-man",
+            "champions-viv-vision",
+            "dark-city-domino"
+          ],
+          "villainGroupIds": [
+            "core-set-hydra"
+          ],
+          "henchmanGroupIds": [
+            "core-set-savage-land-mutates"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 35,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:34:00.000Z"
+        }
+      },
+      {
+        "id": "f9e9d1fd-006c-44c5-a912-626f50714b54|1",
+        "createdAt": "2026-04-11T00:33:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-red-skull",
+          "schemeId": "dark-city-detonate-the-helicarrier",
+          "heroIds": [
+            "core-set-black-widow",
+            "core-set-cyclops",
+            "core-set-hawkeye",
+            "dark-city-daredevil",
+            "dark-city-iceman",
+            "dark-city-wolverine"
+          ],
+          "villainGroupIds": [
+            "core-set-enemies-of-asgard"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-maggia-goons"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 32,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:33:00.000Z"
+        }
+      },
+      {
+        "id": "efd3e5c7-4b33-434a-ba51-576472895273|1",
+        "createdAt": "2026-04-11T00:32:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-magneto",
+          "schemeId": "core-set-the-legacy-virus",
+          "heroIds": [
+            "core-set-hulk",
+            "dark-city-ghost-rider",
+            "dark-city-iceman"
+          ],
+          "villainGroupIds": [
+            "core-set-radiation"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-phalanx"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 10,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:32:00.000Z"
+        }
+      },
+      {
+        "id": "eb7b4bbe-eadb-4cdb-9f6e-ae565aca9e7e|1",
+        "createdAt": "2026-04-11T00:31:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-mephisto",
+          "schemeId": "core-set-replace-earth-s-leaders-with-killbots",
+          "heroIds": [
+            "core-set-deadpool",
+            "core-set-iron-man",
+            "dark-city-nightcrawler"
+          ],
+          "villainGroupIds": [
+            "dark-city-four-horsemen"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 40,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:31:00.000Z"
+        }
+      },
+      {
+        "id": "e4c520c0-c31d-4a42-9294-1265cb1d70af|1",
+        "createdAt": "2026-04-11T00:30:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-mr-sinister",
+          "schemeId": "dark-city-capture-baby-hope",
+          "heroIds": [
+            "dark-city-angel",
+            "dark-city-jean-grey",
+            "dark-city-professor-x"
+          ],
+          "villainGroupIds": [
+            "core-set-brotherhood"
+          ],
+          "henchmanGroupIds": [
+            "core-set-savage-land-mutates"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 32,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:30:00.000Z"
+        }
+      },
+      {
+        "id": "df3e3769-f211-4469-8b5b-999378689fca|1",
+        "createdAt": "2026-04-11T00:29:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "heroes-of-asgard-malekith-the-accursed",
+          "schemeId": "the-new-mutants-the-demon-bear-saga",
+          "heroIds": [
+            "ant-man-black-knight",
+            "core-set-iron-man",
+            "dark-city-iceman"
+          ],
+          "villainGroupIds": [
+            "the-new-mutants-demons-of-limbo"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-phalanx"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 17,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:29:00.000Z"
+        }
+      },
+      {
+        "id": "d6603b1a-541a-45d9-9445-fba014875579|1",
+        "createdAt": "2026-04-11T00:28:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "ant-man-ultron",
+          "schemeId": "guardians-of-the-galaxy-forge-the-infinity-gauntlet",
+          "heroIds": [
+            "champions-nova",
+            "core-set-emma-frost",
+            "dark-city-nightcrawler"
+          ],
+          "villainGroupIds": [
+            "guardians-of-the-galaxy-infinity-gems"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 8,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:28:00.000Z"
+        }
+      },
+      {
+        "id": "d3f2b306-e156-4438-a2d5-83b527d30795|1",
+        "createdAt": "2026-04-11T00:27:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-apocalypse",
+          "schemeId": "dark-city-organized-crime-wave",
+          "heroIds": [
+            "dark-city-bishop",
+            "dark-city-blade",
+            "dark-city-elektra"
+          ],
+          "villainGroupIds": [
+            "dark-city-mlf"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-maggia-goons"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:27:00.000Z"
+        }
+      },
+      {
+        "id": "cba45ef5-ad94-4b18-8038-a7d6caf74b6a|1",
+        "createdAt": "2026-04-11T00:26:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-mephisto",
+          "schemeId": "core-set-replace-earth-s-leaders-with-killbots",
+          "heroIds": [
+            "core-set-deadpool",
+            "core-set-iron-man",
+            "dark-city-nightcrawler"
+          ],
+          "villainGroupIds": [
+            "dark-city-four-horsemen"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 11,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:26:00.000Z"
+        }
+      },
+      {
+        "id": "c16f45e5-f625-4efe-8e16-bd75eeb5e9cc|1",
+        "createdAt": "2026-04-11T00:25:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "ant-man-ultron",
+          "schemeId": "ant-man-transform-commuters-into-giant-ants",
+          "heroIds": [
+            "core-set-wolverine",
+            "guardians-of-the-galaxy-star-lord",
+            "heroes-of-asgard-lady-sif"
+          ],
+          "villainGroupIds": [
+            "dark-city-marauders"
+          ],
+          "henchmanGroupIds": [
+            "core-set-sentinels"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 15,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:25:00.000Z"
+        }
+      },
+      {
+        "id": "bfd5bd05-7e64-4dc7-856b-a45b30da909f|1",
+        "createdAt": "2026-04-11T00:24:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-red-skull",
+          "schemeId": "dark-city-organized-crime-wave",
+          "heroIds": [
+            "champions-gwenpool",
+            "core-set-nick-fury",
+            "guardians-of-the-galaxy-rocket-raccoon"
+          ],
+          "villainGroupIds": [
+            "dark-city-marauders"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-maggia-goons"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:24:00.000Z"
+        }
+      },
+      {
+        "id": "b98f7f6b-fe5d-46c7-b7f6-629b1af688ff|1",
+        "createdAt": "2026-04-11T00:23:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-stryfe",
+          "schemeId": "paint-the-town-red-invade-the-daily-bugle-news-hq",
+          "heroIds": [
+            "core-set-iron-man",
+            "dark-city-bishop",
+            "doctor-strange-and-the-shadows-of-nightmare-the-ancient-one"
+          ],
+          "villainGroupIds": [
+            "the-new-mutants-hellions"
+          ],
+          "henchmanGroupIds": [
+            "core-set-savage-land-mutates"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 19,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:23:00.000Z"
+        }
+      },
+      {
+        "id": "b4d414eb-a113-4341-b903-7abc952531a7|1",
+        "createdAt": "2026-04-11T00:22:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-dr-doom",
+          "schemeId": "core-set-portals-to-the-dark-dimension",
+          "heroIds": [
+            "dark-city-angel",
+            "dark-city-colossus",
+            "dark-city-punisher"
+          ],
+          "villainGroupIds": [
+            "core-set-radiation"
+          ],
+          "henchmanGroupIds": [
+            "core-set-savage-land-mutates"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 19,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:22:00.000Z"
+        }
+      },
+      {
+        "id": "ab0c29cf-6d9b-4423-add3-5edb06618ae0|1",
+        "createdAt": "2026-04-11T00:21:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-magneto",
+          "schemeId": "dark-city-organized-crime-wave",
+          "heroIds": [
+            "champions-gwenpool",
+            "dark-city-daredevil",
+            "dark-city-ghost-rider"
+          ],
+          "villainGroupIds": [
+            "core-set-masters-of-evil"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-maggia-goons"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 19,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:21:00.000Z"
+        }
+      },
+      {
+        "id": "a9b4946e-d29c-4516-a156-dbb9808dfb73|1",
+        "createdAt": "2026-04-11T00:20:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-red-skull",
+          "schemeId": "core-set-the-legacy-virus",
+          "heroIds": [
+            "core-set-black-widow",
+            "core-set-emma-frost",
+            "core-set-storm"
+          ],
+          "villainGroupIds": [
+            "core-set-skrulls"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 18,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:20:00.000Z"
+        }
+      },
+      {
+        "id": "94cacf37-54d0-4cdc-962d-cbace26ce089|1",
+        "createdAt": "2026-04-11T00:19:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-loki",
+          "schemeId": "dark-city-save-humanity",
+          "heroIds": [
+            "core-set-iron-man",
+            "core-set-nick-fury",
+            "dark-city-daredevil"
+          ],
+          "villainGroupIds": [
+            "core-set-spider-foes"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-phalanx"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:19:00.000Z"
+        }
+      },
+      {
+        "id": "8953d335-5655-44c0-b918-e2a2dee20218|1",
+        "createdAt": "2026-04-11T00:18:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-kingpin",
+          "schemeId": "ant-man-trap-heroes-in-the-microverse",
+          "heroIds": [
+            "core-set-deadpool",
+            "core-set-spider-man",
+            "heroes-of-asgard-valkyrie"
+          ],
+          "villainGroupIds": [
+            "core-set-masters-of-evil"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:18:00.000Z"
+        }
+      },
+      {
+        "id": "81cafe51-2e20-43a0-b099-2d62e4f5aa24|1",
+        "createdAt": "2026-04-11T00:17:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "guardians-of-the-galaxy-supreme-intelligence-of-the-kree",
+          "schemeId": "dark-city-steal-the-weaponized-plutonium",
+          "heroIds": [
+            "dark-city-bishop",
+            "dark-city-punisher",
+            "heroes-of-asgard-lady-sif"
+          ],
+          "villainGroupIds": [
+            "guardians-of-the-galaxy-kree-starforce",
+            "paint-the-town-red-maximum-carnage"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-phalanx"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:17:00.000Z"
+        }
+      },
+      {
+        "id": "63dced64-38a8-4428-b38e-1eb1247fb9dc|1",
+        "createdAt": "2026-04-11T00:16:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "ant-man-morgan-le-fay",
+          "schemeId": "ant-man-pull-earth-into-medieval-times",
+          "heroIds": [
+            "dark-city-ghost-rider",
+            "dark-city-nightcrawler",
+            "heroes-of-asgard-valkyrie"
+          ],
+          "villainGroupIds": [
+            "ant-man-queen-s-vengeance"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 6,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:16:00.000Z"
+        }
+      },
+      {
+        "id": "4db1a6ca-4178-45c2-aace-203593badbf4|1",
+        "createdAt": "2026-04-11T00:15:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-stryfe",
+          "schemeId": "dark-city-x-cutioner-s-song",
+          "heroIds": [
+            "core-set-hawkeye",
+            "core-set-thor",
+            "dark-city-blade"
+          ],
+          "villainGroupIds": [
+            "core-set-spider-foes"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 27,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:15:00.000Z"
+        }
+      },
+      {
+        "id": "4c297e11-87b0-4c1c-b958-0e2b81c55a61|1",
+        "createdAt": "2026-04-11T00:14:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-loki",
+          "schemeId": "dark-city-save-humanity",
+          "heroIds": [
+            "core-set-iron-man",
+            "core-set-nick-fury",
+            "dark-city-daredevil"
+          ],
+          "villainGroupIds": [
+            "core-set-spider-foes"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-phalanx"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:14:00.000Z"
+        }
+      },
+      {
+        "id": "4b9f2581-cd4b-481f-852a-dcf2f35fe201|1",
+        "createdAt": "2026-04-11T00:13:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-mephisto",
+          "schemeId": "core-set-replace-earth-s-leaders-with-killbots",
+          "heroIds": [
+            "core-set-deadpool",
+            "core-set-iron-man",
+            "dark-city-nightcrawler"
+          ],
+          "villainGroupIds": [
+            "dark-city-four-horsemen"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 10,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:13:00.000Z"
+        }
+      },
+      {
+        "id": "39d48078-266d-4932-a82a-c5b0438df749|1",
+        "createdAt": "2026-04-11T00:12:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "doctor-strange-and-the-shadows-of-nightmare-dormammu",
+          "schemeId": "dark-city-save-humanity",
+          "heroIds": [
+            "core-set-hulk",
+            "heroes-of-asgard-thor",
+            "heroes-of-asgard-valkyrie"
+          ],
+          "villainGroupIds": [
+            "dark-city-four-horsemen"
+          ],
+          "henchmanGroupIds": [
+            "core-set-sentinels"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:12:00.000Z"
+        }
+      },
+      {
+        "id": "37f389ed-2a85-4935-ad1c-551b342519d4|1",
+        "createdAt": "2026-04-11T00:11:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-red-skull",
+          "schemeId": "dark-city-detonate-the-helicarrier",
+          "heroIds": [
+            "core-set-black-widow",
+            "core-set-cyclops",
+            "core-set-hawkeye",
+            "dark-city-daredevil",
+            "dark-city-iceman",
+            "dark-city-wolverine"
+          ],
+          "villainGroupIds": [
+            "core-set-enemies-of-asgard"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-maggia-goons"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 32,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:11:00.000Z"
+        }
+      },
+      {
+        "id": "3347f969-2620-4315-a16b-2e4a9bd48721|1",
+        "createdAt": "2026-04-11T00:10:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-kingpin",
+          "schemeId": "core-set-midtown-bank-robbery",
+          "heroIds": [
+            "core-set-spider-man",
+            "dark-city-forge",
+            "dark-city-professor-x"
+          ],
+          "villainGroupIds": [
+            "dark-city-underworld"
+          ],
+          "henchmanGroupIds": [
+            "core-set-hand-ninjas"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:10:00.000Z"
+        }
+      },
+      {
+        "id": "2e034198-0086-42cf-871f-cc022c9463fe|1",
+        "createdAt": "2026-04-11T00:09:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-apocalypse",
+          "schemeId": "dark-city-organized-crime-wave",
+          "heroIds": [
+            "core-set-cyclops",
+            "dark-city-bishop",
+            "dark-city-elektra"
+          ],
+          "villainGroupIds": [
+            "dark-city-mlf"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-maggia-goons"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:09:00.000Z"
+        }
+      },
+      {
+        "id": "2d2cf664-4ca8-4915-b266-226d204fd543|1",
+        "createdAt": "2026-04-11T00:08:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-mr-sinister",
+          "schemeId": "dark-city-transform-citizens-into-demons",
+          "heroIds": [
+            "core-set-rogue",
+            "dark-city-cable",
+            "dark-city-forge"
+          ],
+          "villainGroupIds": [
+            "dark-city-emissaries-of-evil"
+          ],
+          "henchmanGroupIds": [
+            "core-set-hand-ninjas"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 50,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:08:00.000Z"
+        }
+      },
+      {
+        "id": "2aa254d5-49fc-40f8-bd57-22fedb31001d|1",
+        "createdAt": "2026-04-11T00:07:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "champions-fin-fang-foom",
+          "schemeId": "guardians-of-the-galaxy-forge-the-infinity-gauntlet",
+          "heroIds": [
+            "champions-totally-awesome-hulk",
+            "dark-city-ghost-rider",
+            "guardians-of-the-galaxy-rocket-raccoon"
+          ],
+          "villainGroupIds": [
+            "guardians-of-the-galaxy-infinity-gems"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-phalanx"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:07:00.000Z"
+        }
+      },
+      {
+        "id": "2731a094-671e-4b9d-88e5-fcf896131615|1",
+        "createdAt": "2026-04-11T00:06:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-mephisto",
+          "schemeId": "core-set-replace-earth-s-leaders-with-killbots",
+          "heroIds": [
+            "core-set-deadpool",
+            "core-set-iron-man",
+            "dark-city-nightcrawler"
+          ],
+          "villainGroupIds": [
+            "dark-city-four-horsemen"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:06:00.000Z"
+        }
+      },
+      {
+        "id": "25757651-fefd-455c-a47f-c4ddb9a1178d|1",
+        "createdAt": "2026-04-11T00:05:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "ant-man-morgan-le-fay",
+          "schemeId": "ant-man-pull-earth-into-medieval-times",
+          "heroIds": [
+            "dark-city-ghost-rider",
+            "dark-city-nightcrawler",
+            "heroes-of-asgard-valkyrie"
+          ],
+          "villainGroupIds": [
+            "ant-man-queen-s-vengeance"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 29,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:05:00.000Z"
+        }
+      },
+      {
+        "id": "1f4a649e-3a06-428c-b16e-5c417e7abb21|1",
+        "createdAt": "2026-04-11T00:04:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "doctor-strange-and-the-shadows-of-nightmare-nightmare",
+          "schemeId": "guardians-of-the-galaxy-intergalactic-kree-nega-bomb",
+          "heroIds": [
+            "ant-man-jocasta",
+            "dark-city-elektra",
+            "doctor-strange-and-the-shadows-of-nightmare-doctor-strange"
+          ],
+          "villainGroupIds": [
+            "ant-man-ultron-s-legacy"
+          ],
+          "henchmanGroupIds": [
+            "core-set-sentinels"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:04:00.000Z"
+        }
+      },
+      {
+        "id": "11807b04-bb90-4db5-b2b3-f81471902ae5|1",
+        "createdAt": "2026-04-11T00:03:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-stryfe",
+          "schemeId": "core-set-unleash-the-power-of-the-cosmic-cube",
+          "heroIds": [
+            "core-set-gambit",
+            "dark-city-colossus",
+            "dark-city-wolverine"
+          ],
+          "villainGroupIds": [
+            "dark-city-streets-of-new-york"
+          ],
+          "henchmanGroupIds": [
+            "core-set-hand-ninjas"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 23,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:03:00.000Z"
+        }
+      },
+      {
+        "id": "079918f4-fe17-4eed-b414-8742b3d516e4|1",
+        "createdAt": "2026-04-11T00:02:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "fantastic-four-mole-man",
+          "schemeId": "core-set-secret-invasion-of-the-skrull-shapeshifters",
+          "heroIds": [
+            "core-set-storm",
+            "fantastic-four-human-torch",
+            "fantastic-four-invisible-woman",
+            "fantastic-four-mr-fantastic",
+            "fantastic-four-silver-surfer",
+            "fantastic-four-thing"
+          ],
+          "villainGroupIds": [
+            "core-set-skrulls"
+          ],
+          "henchmanGroupIds": [
+            "core-set-hand-ninjas"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 26,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:02:00.000Z"
+        }
+      },
+      {
+        "id": "074e9f7d-9e39-43c3-a7ed-94549f487d9a|1",
+        "createdAt": "2026-04-11T00:01:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "dark-city-stryfe",
+          "schemeId": "dark-city-x-cutioner-s-song",
+          "heroIds": [
+            "core-set-hawkeye",
+            "core-set-thor",
+            "dark-city-blade"
+          ],
+          "villainGroupIds": [
+            "core-set-spider-foes"
+          ],
+          "henchmanGroupIds": [
+            "core-set-doombot-legion"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "loss",
+          "score": null,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:01:00.000Z"
+        }
+      },
+      {
+        "id": "01d07365-42fe-41fa-976c-3b8d4ff1bcbb|1",
+        "createdAt": "2026-04-11T00:00:00.000Z",
+        "playerCount": 1,
+        "advancedSolo": false,
+        "playMode": "standard",
+        "setupSnapshot": {
+          "mastermindId": "core-set-dr-doom",
+          "schemeId": "dark-city-x-cutioner-s-song",
+          "heroIds": [
+            "core-set-captain-america",
+            "core-set-cyclops",
+            "dark-city-domino",
+            "dark-city-iron-fist"
+          ],
+          "villainGroupIds": [
+            "core-set-hydra"
+          ],
+          "henchmanGroupIds": [
+            "dark-city-maggia-goons"
+          ]
+        },
+        "result": {
+          "status": "completed",
+          "outcome": "win",
+          "score": 35,
+          "notes": "",
+          "updatedAt": "2026-04-11T00:00:00.000Z"
+        }
+      }
+    ],
+    "preferences": {
+      "lastPlayerCount": 1,
+      "lastAdvancedSolo": false,
+      "lastPlayMode": "standard",
+      "selectedTab": "backup",
+      "onboardingCompleted": true,
+      "themeId": "light",
+      "localeId": "en-US"
+    }
+  }
+}

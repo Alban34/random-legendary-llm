@@ -243,3 +243,104 @@ Resolve remaining low-risk UX rough edges in the Browse and onboarding surfaces 
 4. **Keep the revised Browse hierarchy readable and stable across supported viewports**
 5. **Align backlog and QC documentation with the polish changes once shipped**
 6. **Translate residual onboarding chrome that still falls back to English in supported locales**
+
+---
+
+## Additional backlog candidates in review
+
+These epics are derived from the newly added unchecked items in `documentation/_next-steps.md`.
+
+## Epic 22 — Set Catalog Ordering and Taxonomy Cleanup
+
+**Status**
+In Review
+
+**Objective**
+Make set browsing and collection management easier to scan by applying consistent alphabetical ordering and correcting the set-type taxonomy used across the app.
+
+**In scope**
+- alphabetical ordering for set-driven lists and controls
+- corrected set classification rules
+- base-game grouping for Core and Villains
+- review of small and large expansion assignments
+- documentation and QA alignment for the revised catalog contract
+
+**Stories**
+1. **Define the corrected set taxonomy and ordering contract**
+2. **Apply alphabetical ordering consistently across set-driven surfaces**
+3. **Reclassify sets into the corrected base-game and expansion groupings**
+4. **Verify taxonomy and ordering remain clear across Browse and Collection experiences**
+5. **Update supporting documentation and QA expectations for the revised catalog contract**
+
+---
+
+## Epic 23 — Stats and Secondary Information Simplification
+
+**Status**
+In Review
+
+**Objective**
+Reduce information density in the stats and maintenance surfaces so practical gameplay information stays prominent and low-value technical status copy recedes.
+
+**In scope**
+- full-width collapsible stats sections
+- simplified stats information hierarchy
+- removal of unnecessary technical copy
+- storage issue visibility only when an actionable problem exists
+- documentation alignment for the simplified user-facing contract
+
+**Stories**
+1. **Define a record-first stats layout with collapsible full-width sections**
+2. **Rebuild per-category stats tiles into full-width collapsible panels**
+3. **Remove low-value technical messaging from user-facing surfaces**
+4. **Show storage status only when the app needs the user to act**
+5. **Update documentation and QA expectations for the simplified information model**
+
+---
+
+## Epic 24 — Toast Behavior and Feedback Channel Cleanup
+
+**Status**
+In Review
+
+**Objective**
+Make feedback quieter and more natural by reserving toasts for meaningful events and refining how the toast stack enters, exits, and anchors to the viewport.
+
+**In scope**
+- suppression of theme-switch toasts
+- bottom-anchored toast placement
+- enter and exit motion from outside the viewport
+- stacked-toast stability
+- accessibility and documentation alignment for refined feedback behavior
+
+**Stories**
+1. **Define which preference changes should avoid toast notifications entirely**
+2. **Remove theme-switch toasts while preserving clear preference feedback where needed**
+3. **Render bottom-anchored toasts that animate in and out from outside the window**
+4. **Verify toast motion, stacking, and accessibility remain stable across viewports**
+5. **Update documentation and QA expectations for the refined toast contract**
+
+---
+
+## Epic 25 — Header and New Game Action Density Refinement
+
+**Status**
+In Review
+
+**Objective**
+Reduce persistent chrome weight and bring the primary setup action closer to the user so the shell feels more task-focused without losing important context.
+
+**In scope**
+- compact header hierarchy
+- app version display in the header
+- lighter presentation of locale and theme controls
+- consolidation of Generate and Regenerate behavior
+- higher-visibility New Game primary action placement
+- documentation and QA alignment for the revised shell contract
+
+**Stories**
+1. **Define the revised header hierarchy including a compact version display**
+2. **Reduce header footprint while keeping theme and locale controls discoverable**
+3. **Consolidate Generate and Regenerate into one clearer action model**
+4. **Move the primary setup action higher in the New Game flow**
+5. **Update documentation and QA expectations for the revised shell and setup-action hierarchy**

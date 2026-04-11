@@ -19,5 +19,15 @@
 - [x] Move the "Get comfortable with the app in under a minute" on top
 - [x] "Browse sets" should be full width
 - [x] "Ready Tabs" is not a relevant information, you should remove it
-- [ ] Validate with "stitch" the UX designer
 - [x] "First-run walkthrough" is not translated
+- [ ] Order set in alphabetical order
+- [ ] Improve layout of stats: I would like heroes, masterminds, etc. tiles being full width and collapsible
+- [ ] Revisit and remove unecessary technical information (such as "Presentation only. Grouping never changes saved history or backups.")
+- [ ] Toast is not needed when switching dark/light mode
+- [ ] Toasts should be displayed on the bottom, raise from "outside" the window and disappear the same way
+- [ ] Storage issue information should appear only if there is actually an issue, no need to indicate that everything is green
+- [ ] The classification of expansions should be revisited: Core and Villains should be both "Base games", there are mistakes in small and large expansions, if you need me to fix this, I can help.
+- [ ] The generate and re-generate buttons do not make sense as they are doing the same thing in the end: there should be only one
+- [ ] The generate button is too far below, the user needs to scroll down through optional information before reaching this mandatory button, this is not convenient, you should find a better layout
+- [ ] The version of the app should be displayed in the header
+- [ ] The header is too big in my opinion (mainly because of the language and theme selections), you should revisit this to improve the usability

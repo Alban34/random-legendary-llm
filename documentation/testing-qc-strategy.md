@@ -33,6 +33,12 @@ A story can move to **Done** only when all of the following are true:
 4. no blocking errors remain in edited files,
 5. the behavior matches the approved specifications.
 
+Additional workflow rules for implementation epics:
+
+6. if the implemented story changed files under `/src`, run the story-specific automated checks needed to satisfy that story's documented **Test** and **QC** tasks,
+7. if the completed epic changed files under `/src`, run the full regression suite before marking the epic complete,
+8. documentation-only, planning-only, prompt-only, or agent-only changes that do not modify `/src` do not require the full regression suite.
+
 ---
 
 ## Test pyramid for this project
@@ -88,6 +94,10 @@ Every story must satisfy this Definition of Done:
 - matching **QC** task checked
 - any discovered defect fixed or explicitly deferred
 - task list updated accordingly
+
+When a story changes files under `/src`, its **QC** task should be satisfied through targeted automated checks that are appropriate for that story's scope.
+
+When the epic containing that story changes files under `/src`, the epic is not complete until the full regression suite also passes.
 
 ---
 
