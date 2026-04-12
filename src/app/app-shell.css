@@ -370,7 +370,7 @@ html {
 .header-inner {
   display: flex;
   gap: var(--space-5);
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
   max-width: var(--layout-max-width);
   margin-inline: auto;
@@ -394,7 +394,7 @@ html {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  align-items: end;
+  align-items: center;
   gap: var(--space-3);
   width: 100%;
 }
@@ -402,7 +402,7 @@ html {
 .app-header h1 {
   margin: 0 0 var(--space-1);
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   line-height: var(--type-heading-md-line);
   letter-spacing: 0.03em;
   color: var(--accent);

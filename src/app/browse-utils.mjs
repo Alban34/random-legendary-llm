@@ -1,19 +1,16 @@
 import { slugify } from './game-data-pipeline.mjs';
 
-// TODO: small/large expansion reclassifications need user-provided corrections before they can be applied
 export const BROWSE_TYPE_OPTIONS = [
   { id: 'all', label: 'All' },
   { id: 'base', label: 'Base Game' },
   { id: 'large-expansion', label: 'Large' },
-  { id: 'small-expansion', label: 'Small' },
-  { id: 'standalone', label: 'Standalone' }
+  { id: 'small-expansion', label: 'Small' }
 ];
 
 const TYPE_LABELS = {
   base: 'Base Game',
   'large-expansion': 'Large Expansion',
-  'small-expansion': 'Small Expansion',
-  standalone: 'Standalone'
+  'small-expansion': 'Small Expansion'
 };
 
 export function getBrowseTypeLabel(type) {

@@ -59,16 +59,16 @@ test.describe('Epic 5 automated QC', () => {
     await expect(page.locator('#panel-browse .set-card')).toHaveCount(1);
     await expect(getSetCard(page, 'S.H.I.E.L.D.')).toBeVisible();
 
-    await page.locator('[data-action="set-browse-type-filter"][data-type-filter="large-expansion"]').click();
+    await page.locator('[data-action="set-browse-type-filter"][data-type-filter="small-expansion"]').click();
     await expect(page.locator('#panel-browse .set-card')).toHaveCount(1);
-    await expect(getSetCard(page, 'S.H.I.E.L.D.')).toContainText('Large Expansion');
+    await expect(getSetCard(page, 'S.H.I.E.L.D.')).toContainText('Small Expansion');
 
     await searchInput.fill('definitely-no-matches');
     await expect(page.locator('#browse-empty-state')).toBeVisible();
     await expect(page.locator('#panel-browse .set-card')).toHaveCount(0);
 
-    await searchInput.fill('');
-    await page.locator('[data-action="set-browse-type-filter"][data-type-filter="standalone"]').click();
+    await searchInput.fill('Revelations');
+    await page.locator('[data-action="set-browse-type-filter"][data-type-filter="small-expansion"]').click();
     await expect(page.locator('#panel-browse .set-card')).toHaveCount(1);
     await expect(getSetCard(page, 'Revelations')).toBeVisible();
   });

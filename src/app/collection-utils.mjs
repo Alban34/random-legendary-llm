@@ -3,8 +3,7 @@ import { buildOwnedPools, validateSetupLegality } from './setup-generator.mjs';
 export const COLLECTION_TYPE_GROUPS = [
   { id: 'base', label: 'Base' },
   { id: 'large-expansion', label: 'Large Expansions' },
-  { id: 'small-expansion', label: 'Small Expansions' },
-  { id: 'standalone', label: 'Standalone' }
+  { id: 'small-expansion', label: 'Small Expansions' }
 ];
 
 export const COLLECTION_FEASIBILITY_MODES = [

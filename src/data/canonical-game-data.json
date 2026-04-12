@@ -111,7 +111,7 @@
     {
       "name": "S.H.I.E.L.D.",
       "year": 2019,
-      "type": "large-expansion",
+      "type": "small-expansion",
       "aliases": [
         "SHIELD"
       ]
@@ -173,7 +173,7 @@
     {
       "name": "Venom",
       "year": 2021,
-      "type": "large-expansion",
+      "type": "small-expansion",
       "aliases": []
     },
     {
@@ -191,7 +191,7 @@
     {
       "name": "Revelations",
       "year": 2022,
-      "type": "standalone",
+      "type": "small-expansion",
       "aliases": []
     },
     {

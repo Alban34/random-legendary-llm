@@ -27,8 +27,9 @@ test.describe('Epic 25 — Header and New Game Action Density Refinement', () =>
     });
 
     expect(h1FontSize).not.toBeNull();
-    // Old size was 1.75rem = 28px at 16px base. New size (1.1rem) must be notably smaller.
-    expect(h1FontSize).toBeLessThan(22);
+    // Old size was 1.75rem = 28px at 16px base. Epic 27.2 raised it to 1.4rem (~22.4px), larger than the previous 1.1rem.
+    expect(h1FontSize).toBeGreaterThanOrEqual(22);
+    expect(h1FontSize).toBeLessThan(28);
   });
 
   test('header is more compact — padding is smaller than the old large padding', async ({ page }) => {

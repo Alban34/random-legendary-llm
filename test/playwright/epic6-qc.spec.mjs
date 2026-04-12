@@ -18,7 +18,7 @@ test.describe('Epic 6 automated QC', () => {
 
   test('renders grouped collection rows by set type with representative checklist metadata', async ({ page }) => {
     const groupHeadings = await page.locator('#panel-collection .collection-group h3').allTextContents();
-    expect(groupHeadings).toEqual(['Base', 'Large Expansions', 'Small Expansions', 'Standalone']);
+    expect(groupHeadings).toEqual(['Base', 'Large Expansions', 'Small Expansions']);
 
     const coreRow = getCollectionRow(page, 'Core Set');
     await expect(coreRow).toContainText('(2012)');

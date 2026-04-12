@@ -67,13 +67,13 @@ Typography roles are governed by `documentation/design-system.md`.
 
 ### Shared Header Controls
 - Theme and locale are part of the baseline shell, not optional polish
-- The app title (`h1`) is rendered at a compact size (1.1rem) to reduce persistent chrome weight; the app version is displayed inline beside the title as a muted `.app-version` element
+- The app title (`h1`) is rendered at 1.4rem to give the title appropriate visual weight relative to the header controls; the app version is displayed inline beside the title as a muted `.app-version` element
 - Desktop: theme buttons and locale select remain visible in the shared header
 - Mobile: a compact preferences toggle reveals theme and locale controls on demand
 - Preference changes persist immediately and restore focus to the triggering control after rerender
 - Theme changes are confirmed visually (the UI repaints immediately) without emitting a toast; locale and other higher-impact preference changes surface a concise toast from any active tab
 
-> **Design rationale (Epic 25):** The header was compacted — smaller `h1`, reduced padding, version display added — to reclaim vertical space on mobile and shift visual emphasis to the active task panel rather than persistent shell chrome. Theme and locale controls remain discoverable but are no longer the dominant visual element in the header.
+> **Design rationale (Epic 25 / Epic 27):** The header was initially compacted — smaller `h1`, reduced padding, version display added — to reclaim vertical space on mobile and shift visual emphasis to the active task panel rather than persistent shell chrome. Epic 27 subsequently raised the `h1` font-size to 1.4rem and vertically centred the title with the language and theme controls to give the title appropriate visual weight. Theme and locale controls remain discoverable but are no longer the dominant visual element in the header.
 
 ### First-Run Onboarding and About
 - The first-run walkthrough appears automatically until it is skipped or completed

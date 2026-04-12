@@ -47,15 +47,17 @@ test('Epic 22.1 — TYPE_LABELS base entry uses "Base Game"', () => {
   assert.match(browseUtilsSource, /base:\s*'Base Game'/);
 });
 
-test('Epic 22.1 — browse-utils documents the outstanding small/large expansion TODO', () => {
-  // A TODO comment must be present to record the unresolved expansion reclassifications
-  assert.match(browseUtilsSource, /TODO.*small\/large expansion reclassifications/i);
+test('Epic 22.1 / 26.3 — browse-utils no longer has an outstanding small/large expansion TODO (resolved in Epic 26)', () => {
+  // Epic 26.3 applied the S.H.I.E.L.D. and Venom reclassifications, so the TODO is removed
+  assert.doesNotMatch(browseUtilsSource, /TODO.*small\/large expansion reclassifications/i);
 });
 
-test('Epic 22.4 — standalone filter option is retained (Revelations remains standalone)', () => {
-  // Revelations is still standalone, so the standalone filter must not be removed
-  assert.match(browseUtilsSource, /id:\s*'standalone'/);
-  assert.match(gameDataSource, /"Revelations"[\s\S]{0,60}"type": "standalone"/);
+test('Epic 22.4 / 26.4 — Revelations is now classified as small-expansion (standalone type retired)', () => {
+  // Revelations was reclassified in Epic 26.4; standalone type is now removed from the catalog
+  assert.match(gameDataSource, /"Revelations"[\s\S]{0,60}"type": "small-expansion"/);
+  assert.doesNotMatch(gameDataSource, /"Revelations"[\s\S]{0,60}"type": "standalone"/);
+  // The standalone filter option must now be absent from browse-utils
+  assert.doesNotMatch(browseUtilsSource, /id:\s*'standalone'/);
 });
 
 test('Epic 22 stories 22.1–22.4 are checked in post-v1-task-list.md', () => {

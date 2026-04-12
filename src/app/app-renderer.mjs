@@ -1355,10 +1355,6 @@ function renderSetupResult(viewModel) {
         <h3>${locale.t('newGame.result.henchmanGroups')}</h3>
         <ul class="clean result-list">${formatSetupGroupList(currentSetup.henchmanGroups, locale)}</ul>
       </div>
-      <details>
-        <summary>${locale.t('newGame.result.snapshot')}</summary>
-        <pre>${JSON.stringify(currentSetup.setupSnapshot, null, 2)}</pre>
-      </details>
     </div>
   `;
 }
