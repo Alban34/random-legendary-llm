@@ -18,7 +18,7 @@ before(async () => {
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'browser-entry.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'post-v1-task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
   ]);
 });
 

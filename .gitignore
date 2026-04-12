@@ -32,3 +32,4 @@ cmake-build-*/
 out/
 node_modules
 test-results
+personal-data/

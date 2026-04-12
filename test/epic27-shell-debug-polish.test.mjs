@@ -18,7 +18,7 @@ before(async () => {
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'post-v1-task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
   ]);
 });
 
@@ -71,7 +71,7 @@ test('Story 27.3 — app-version element is still present (compact version displ
   assert.match(rendererSource, /app-version/, 'app-version reference must remain');
 });
 
-test('Epic 27 stories are marked complete in post-v1-task-list.md', () => {
+test('Epic 27 stories are marked complete in task-list.md', () => {
   assert.match(postV1TaskList, /## Epic 27 — Remaining Shell and Debug Polish/);
   assert.match(postV1TaskList, /- \[x\] Locate every render path that conditionally or unconditionally shows the "Show history-ready setup snapshot"/);
   assert.match(postV1TaskList, /- \[x\] Remove the control, trigger button, and panel output from all production-rendered surfaces/);
@@ -80,7 +80,7 @@ test('Epic 27 stories are marked complete in post-v1-task-list.md', () => {
   assert.match(postV1TaskList, /- \[x\] Apply vertical-alignment rules so the title sits at the same baseline or midpoint/);
 });
 
-test('Epic 27 full regression gate is marked in post-v1-task-list.md', () => {
+test('Epic 27 full regression gate is marked in task-list.md', () => {
   assert.match(
     postV1TaskList,
     /- \[x\] \*\*Full regression gate:\*\* run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 27 work complete/

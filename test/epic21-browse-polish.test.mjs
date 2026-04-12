@@ -18,8 +18,8 @@ before(async () => {
   [indexHtml, rendererSource, postV1Epics, postV1TaskList, nextSteps] = await Promise.all([
     fs.readFile(path.join(rootDir, 'index.html'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'post-v1-epics.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'post-v1-task-list.md'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'documentation', 'epics.md'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', '_next-steps.md'), 'utf8')
   ]);
 });

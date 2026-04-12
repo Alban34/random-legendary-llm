@@ -18,7 +18,7 @@ before(async () => {
     fs.readFile(path.join(rootDir, 'src', 'app', 'browse-utils.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'data', 'canonical-game-data.json'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'post-v1-task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
   ]);
 });
 
@@ -60,7 +60,7 @@ test('Epic 22.4 / 26.4 — Revelations is now classified as small-expansion (sta
   assert.doesNotMatch(browseUtilsSource, /id:\s*'standalone'/);
 });
 
-test('Epic 22 stories 22.1–22.4 are checked in post-v1-task-list.md', () => {
+test('Epic 22 stories 22.1–22.4 are checked in task-list.md', () => {
   // Story 22.1 tasks
   assert.match(postV1TaskList, /- \[x\] Audit the current set ordering rules across Browse/);
   assert.match(postV1TaskList, /- \[x\] Define the authoritative alphabetical ordering behavior/);
@@ -78,6 +78,6 @@ test('Epic 22 stories 22.1–22.4 are checked in post-v1-task-list.md', () => {
   assert.match(postV1TaskList, /- \[x\] Review Browse filters, grouping labels, and helper copy after the taxonomy and ordering changes/);
 });
 
-test('Epic 22 full regression gate is checked in post-v1-task-list.md', () => {
+test('Epic 22 full regression gate is checked in task-list.md', () => {
   assert.match(postV1TaskList, /- \[x\] \*\*Full regression gate:\*\* run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 22 work complete/);
 });

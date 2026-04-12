@@ -20,7 +20,7 @@ before(async () => {
     fs.readFile(path.join(rootDir, 'src', 'app', 'browse-utils.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'collection-utils.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'correction-manifest-26.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'post-v1-task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
   ]);
 });
 
@@ -69,7 +69,7 @@ test('Story 26.5 — alphabetical order in filterBrowseSets is preserved', () =>
   assert.match(browseUtilsSource, /localeCompare/);
 });
 
-test('Epic 26 stories are marked complete in post-v1-task-list.md', () => {
+test('Epic 26 stories are marked complete in task-list.md', () => {
   assert.match(postV1TaskList, /## Epic 26 — Remaining Set Classification Data Corrections/);
   assert.match(postV1TaskList, /- \[x\] Read all set entries in the catalog data source and list their current type assignments/);
   assert.match(postV1TaskList, /- \[x\] Cross-reference each assignment against the published Legendary ruleset/);
@@ -78,6 +78,6 @@ test('Epic 26 stories are marked complete in post-v1-task-list.md', () => {
   assert.match(postV1TaskList, /- \[x\] Run through all corrected sets in Browse and confirm each appears in the expected category group/);
 });
 
-test('Epic 26 full regression gate is marked in post-v1-task-list.md', () => {
+test('Epic 26 full regression gate is marked in task-list.md', () => {
   assert.match(postV1TaskList, /- \[x\] \*\*Full regression gate:\*\* run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 26 work complete/);
 });

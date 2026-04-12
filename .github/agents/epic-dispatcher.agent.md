@@ -45,7 +45,7 @@ A request is NOT in Feature List Mode when all `- [ ]` items are already mapped 
 3. **Receive the planning summary.** Wait for `Epic Product Owner` to return a planning summary listing all new epic numbers, titles, and story titles.
 4. **Hire `Epic Frontend Expert` for task breakdown.** Pass:
    - The planning summary from the PO.
-   - The path of the task list file (default: `documentation/post-v1-task-list.md`).
+   - The path of the task list file (default: `documentation/task-list.md`).
    - Instruction to append concrete implementation tasks, a **Test** task, and a **QC (Automated)** task for every story in every new epic.
    - Instruction that all new task list story sections do **not** carry `Status: In Review` — only the epic-level block in the epics file does.
 5. **Verify output status.** After `Epic Frontend Expert` returns, confirm that every new epic block in the epics file carries `Status: In Review` and that no individual story or task list section has been incorrectly marked with it. If any epic is missing the status marker, or any story carries it, recall the relevant agent to correct it.
@@ -68,7 +68,7 @@ A request is NOT in Feature List Mode when all `- [ ]` items are already mapped 
 ## Scope Identification
 This section applies to the **standard implementation workflow** only. In Feature List Mode, scope identification is deferred to `Epic Product Owner`.
 
-Before planning any work, read the task list file (typically `documentation/post-v1-task-list.md`) and identify the remaining scope precisely:
+Before planning any work, read the task list file (typically `documentation/task-list.md`) and identify the remaining scope precisely:
 - Tasks marked `- [ ]` are **pending** and must be implemented.
 - Tasks marked `- [x]` are **already done** and must be skipped entirely — do not re-implement, re-test, or re-document them.
 - Build your implementation plan exclusively from the `- [ ]` items.
