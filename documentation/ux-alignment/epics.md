@@ -11,7 +11,7 @@ It is intended to:
 - keep UX-alignment work grouped separately from the broader product roadmap,
 - and provide story-level planning before detailed implementation tasks are created.
 
-See also: `documentation/ux-review.md`, `documentation/ux-reports/`, `documentation/post-v1-epics.md`
+See also: `documentation/ux-review.md`, `documentation/ux-reports/`, `documentation/epics.md`
 
 ---
 

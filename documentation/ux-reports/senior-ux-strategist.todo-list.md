@@ -11,8 +11,8 @@ Documentation-first UX review of intended user flows, terminology, constraints, 
 - [x] Review `documentation/architecture.md` for shell information architecture, persistence, and shipped-snapshot behavior
 - [x] Review `documentation/ui-design.md` for shell, navigation, screen, and component contracts
 - [x] Review `documentation/roadmap.md` for the approved baseline milestone framing
-- [x] Review `documentation/post-v1-roadmap.md` for the adopted post-v1 UX scope
-- [x] Review `documentation/post-v1-epics.md` for current feature-level UX expectations
+- [x] Review `documentation/roadmap.md` for the adopted post-v1 UX scope
+- [x] Review `documentation/epics.md` for current feature-level UX expectations
 - [x] Review `documentation/clarifications.md` for terminology and constraint decisions
 - [x] Review `documentation/setup-rules.md` for New Game, acceptance, result-logging, and forced-pick behavior
 - [x] Review `documentation/styling-architecture.md` for the current theme contract

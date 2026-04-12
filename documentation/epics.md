@@ -405,3 +405,216 @@ Improve visual flexibility and long-term maintainability by adding theme control
 3. **Verify all primary screens and components remain legible and accessible across themes**
 4. **Evaluate candidate third-party CSS approaches that can be bundled statically without runtime dependencies**
 5. **Document the styling architecture decision and any migration constraints before adoption**
+
+---
+
+## Epic 19 — Interface Localization
+
+**Objective**
+Make the application usable in multiple languages without destabilizing canonical game data, persisted state, or accessibility behavior.
+
+**In scope**
+- localized UI chrome and helper copy
+- locale selection and persistence
+- fallback rules for missing translations
+- locale-aware formatting for dates and numbers
+- layout and accessibility verification across languages
+
+**Stories**
+1. **Define the localization architecture, supported locales, and fallback rules**
+2. **Externalize user-facing application strings and formatting rules**
+3. **Add a language selector and persist the chosen locale**
+4. **Verify localized layouts remain readable and accessible**
+5. **Establish translation maintenance and QA safeguards**
+
+---
+
+## Epic 20 — History Grouping and Organization
+
+**Objective**
+Improve scanability for larger play histories by organizing records into clearer groups without weakening result editing, insights, or portability guarantees.
+
+**In scope**
+- grouping modes for history presentation
+- grouped section rendering and navigation
+- compatibility with legacy records and duplicate names
+- grouping controls or view toggles
+- keeping grouping state separate from the underlying persisted history model
+
+**Stories**
+1. **Define the grouping model and user-facing history contract**
+2. **Build grouped history derivations without breaking existing records**
+3. **Render grouped history sections with clear navigation and collapse behavior**
+4. **Support regrouping or filtering without breaking history actions**
+5. **Keep grouped history compatible with insights, backup, and future exports**
+
+---
+
+## Epic 21 — Browse and Onboarding Detail Polish
+
+**Objective**
+Resolve remaining low-risk UX rough edges in the Browse and onboarding surfaces so the landing experience feels more intentional and less cluttered.
+
+**In scope**
+- onboarding shell placement in the page flow
+- Browse page section stacking and width usage
+- removal of low-value summary metrics
+- residual untranslated onboarding chrome in supported locales
+- keeping the revised landing layout stable on desktop and mobile
+
+**Stories**
+1. **Move the onboarding walkthrough shell above the main tab content when it is visible**
+2. **Restructure the Browse page so the set-browsing section spans the full available width**
+3. **Remove low-value Browse summary metrics that do not help users act**
+4. **Keep the revised Browse hierarchy readable and stable across supported viewports**
+5. **Align backlog and QC documentation with the polish changes once shipped**
+6. **Translate residual onboarding chrome that still falls back to English in supported locales**
+
+---
+
+## Epic 22 — Set Catalog Ordering and Taxonomy Cleanup
+
+**Status**
+Done
+
+**Objective**
+Make set browsing and collection management easier to scan by applying consistent alphabetical ordering and correcting the set-type taxonomy used across the app.
+
+**In scope**
+- alphabetical ordering for set-driven lists and controls
+- corrected set classification rules
+- base-game grouping for Core and Villains
+- review of small and large expansion assignments
+- documentation and QA alignment for the revised catalog contract
+
+**Stories**
+1. **Define the corrected set taxonomy and ordering contract**
+2. **Apply alphabetical ordering consistently across set-driven surfaces**
+3. **Reclassify sets into the corrected base-game and expansion groupings**
+4. **Verify taxonomy and ordering remain clear across Browse and Collection experiences**
+5. **Update supporting documentation and QA expectations for the revised catalog contract**
+
+---
+
+## Epic 23 — Stats and Secondary Information Simplification
+
+**Status**
+Done
+
+**Objective**
+Reduce information density in the stats and maintenance surfaces so practical gameplay information stays prominent and low-value technical status copy recedes. The guiding principle is to surface only user-actionable information: messages and indicators that do not require a user response are suppressed so the interface communicates necessity rather than status.
+
+**In scope**
+- full-width collapsible stats sections
+- simplified stats information hierarchy
+- removal of unnecessary technical copy
+- storage issue visibility only when an actionable problem exists
+- documentation alignment for the simplified user-facing contract
+
+**Stories**
+1. **Define a record-first stats layout with collapsible full-width sections**
+2. **Rebuild per-category stats tiles into full-width collapsible panels**
+3. **Remove low-value technical messaging from user-facing surfaces**
+4. **Show storage status only when the app needs the user to act**
+5. **Update documentation and QA expectations for the simplified information model**
+
+---
+
+## Epic 24 — Toast Behavior and Feedback Channel Cleanup
+
+**Status**
+Done
+
+**Objective**
+Make feedback quieter and more natural by reserving toasts for meaningful events and refining how the toast stack enters, exits, and anchors to the viewport.
+
+**In scope**
+- suppression of theme-switch toasts
+- bottom-anchored toast placement
+- enter and exit motion from outside the viewport
+- stacked-toast stability
+- accessibility and documentation alignment for refined feedback behavior
+
+**Stories**
+1. **Define which preference changes should avoid toast notifications entirely**
+2. **Remove theme-switch toasts while preserving clear preference feedback where needed**
+3. **Render bottom-anchored toasts that animate in and out from outside the window**
+4. **Verify toast motion, stacking, and accessibility remain stable across viewports**
+5. **Update documentation and QA expectations for the refined toast contract**
+
+---
+
+## Epic 25 — Header and New Game Action Density Refinement
+
+**Status**
+Done
+
+**Objective**
+Reduce persistent chrome weight and bring the primary setup action closer to the user so the shell feels more task-focused without losing important context.
+
+**In scope**
+- compact header hierarchy
+- app version display in the header
+- lighter presentation of locale and theme controls
+- consolidation of Generate and Regenerate behavior
+- higher-visibility New Game primary action placement
+- documentation and QA alignment for the revised shell contract
+
+**Stories**
+1. **Define the revised header hierarchy including a compact version display**
+2. **Reduce header footprint while keeping theme and locale controls discoverable**
+3. **Consolidate Generate and Regenerate into one clearer action model**
+4. **Move the primary setup action higher in the New Game flow**
+5. **Update documentation and QA expectations for the revised shell and setup-action hierarchy**
+
+---
+
+## Epic 26 — Remaining Set Classification Data Corrections
+
+**Status: Approved**
+
+**Objective**
+Correct the remaining misclassifications in the set catalog so every set carries the right type, giving users accurate groupings when browsing or building a collection.
+
+**In scope**
+- reclassification of Core and Villains as base games
+- audit and correction of small-expansion assignments across the catalog
+- audit and correction of large-expansion assignments across the catalog
+- correction of Revelations as a small expansion with no standalone mode
+
+**Stories**
+1. **Audit all base-game, small-expansion, and large-expansion assignments against the published Legendary ruleset**
+2. **Reclassify Core and Villains as base games throughout the catalog data**
+3. **Correct remaining small- and large-expansion misassignments identified by the audit**
+4. **Fix the Revelations entry to reflect it is a small expansion with no standalone mode**
+5. **Verify corrected classifications display accurately across Browse and Collection surfaces**
+
+**Acceptance Criteria**
+- Story 1: A written record lists every set whose current classification differs from the target before code changes are made; all affected sets are identified.
+- Story 2: Core and Villains appear under the base-game group in all catalog, browse, and collection surfaces; no other type label is applied to them.
+- Story 3: Every misassigned expansion flagged in Story 1 carries the correct small- or large-expansion type; no uncorrected entry remains.
+- Story 4: Revelations appears as a small expansion with no standalone row in all surfaces; any existing standalone entry for Revelations is removed.
+- Story 5: All corrected sets render in the expected category in Browse and Collection; alphabetical ordering and filtering show no regressions.
+
+---
+
+## Epic 27 — Remaining Shell and Debug Polish
+
+**Status: Approved**
+
+**Objective**
+Remove a residual developer debug control that is visible in production and correct the app title presentation so the header feels intentional and complete across all supported themes and locales.
+
+**In scope**
+- removal of the "Show history-ready setup snapshot" debug control from all user-facing surfaces
+- app title size increase and vertical alignment with the language and theme controls in the header
+
+**Stories**
+1. **Remove the "Show history-ready setup snapshot" debug panel from all production-rendered surfaces**
+2. **Increase the app title size and align it vertically with the header's language and theme controls**
+3. **Verify the revised header remains stable across all themes, locales, and viewport sizes**
+
+**Acceptance Criteria**
+- Story 1: No "Show history-ready setup snapshot" control, button, or panel is reachable in any production-rendered surface without a deliberate developer override; the element is absent from the DOM in production builds.
+- Story 2: The app title is visually larger and sits at the same vertical level as the language selector and theme toggle in the header; alignment holds on both desktop and mobile viewports.
+- Story 3: The revised header passes visual checks in all supported themes and locales; no overflow, truncation, or layout regression is introduced.

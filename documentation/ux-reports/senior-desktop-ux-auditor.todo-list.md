@@ -2,7 +2,7 @@
 Senior Desktop UX Auditor
 
 ## Scope
-Review the live desktop application at `http://127.0.0.1:8000/` against the intended experience documented in `README.md`, `documentation/ui-design.md`, `documentation/roadmap.md`, `documentation/post-v1-roadmap.md`, and `documentation/post-v1-epics.md`, with focus on information architecture, navigation, task flow friction, visual hierarchy, clarity of controls, feedback, destructive flows, and perceived polish.
+Review the live desktop application at `http://127.0.0.1:8000/` against the intended experience documented in `README.md`, `documentation/ui-design.md`, `documentation/roadmap.md`, and `documentation/epics.md`, with focus on information architecture, navigation, task flow friction, visual hierarchy, clarity of controls, feedback, destructive flows, and perceived polish.
 
 ## Review checklist
 - [x] Reviewed: Representative desktop viewport selected as `1440x900` because it reflects a common laptop workspace and exposes the full desktop header, tab navigation, and multi-column layouts.

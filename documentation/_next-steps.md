@@ -31,5 +31,6 @@
 - [x] The generate button is too far below, the user needs to scroll down through optional information before reaching this mandatory button, this is not convenient, you should find a better layout
 - [x] The version of the app should be displayed in the header
 - [x] The header is too big in my opinion (mainly because of the language and theme selections), you should revisit this to improve the usability
-- [ ] "Show history-ready setup snapshot" should not be there: dev thing
-- [ ] The title is now too small, it should be bigger and align with the top of the screen (with language and theme basically)
+- [x] "Show history-ready setup snapshot" should not be there: dev thing
+- [x] The title is now too small, it should be bigger and align with the top of the screen (with language and theme basically)
+- [x] Revelations is a small extension, there is no standalone at all, only base games

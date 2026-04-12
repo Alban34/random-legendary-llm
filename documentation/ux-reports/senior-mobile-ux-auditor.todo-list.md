@@ -2,7 +2,7 @@
 Senior Mobile UX Auditor
 
 ## Scope
-Review the live mobile application at `http://127.0.0.1:8000/` against the intended experience documented in `README.md`, `documentation/ui-design.md`, `documentation/roadmap.md`, `documentation/post-v1-roadmap.md`, and `documentation/post-v1-epics.md`, with focus on responsive behavior, content prioritization, tap ergonomics, scrolling friction, readability, task completion, and mobile-specific clarity.
+Review the live mobile application at `http://127.0.0.1:8000/` against the intended experience documented in `README.md`, `documentation/ui-design.md`, `documentation/roadmap.md`, and `documentation/epics.md`, with focus on responsive behavior, content prioritization, tap ergonomics, scrolling friction, readability, task completion, and mobile-specific clarity.
 
 ## Review checklist
 - [x] Reviewed: Representative mobile viewport selected as `390x844` because it matches a modern phone-size review target and exposes the fixed bottom navigation and stacked mobile layouts.
