@@ -1,8 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 const PORT = process.env.PLAYWRIGHT_PORT || '8131';
-const CHROMIUM_EXECUTABLE_PATH = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
-  || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const CHROMIUM_EXECUTABLE_PATH = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined;
 
 export default defineConfig({
   testDir: './test/playwright',
@@ -17,9 +16,7 @@ export default defineConfig({
     baseURL: `http://127.0.0.1:${PORT}`,
     headless: true,
     viewport: { width: 1440, height: 1080 },
-    launchOptions: {
-      executablePath: CHROMIUM_EXECUTABLE_PATH
-    }
+    ...(CHROMIUM_EXECUTABLE_PATH ? { launchOptions: { executablePath: CHROMIUM_EXECUTABLE_PATH } } : {}),
   },
   webServer: {
     command: `npm run dev -- --port ${PORT}`,
