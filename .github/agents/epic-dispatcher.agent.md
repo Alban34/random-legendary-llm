@@ -1,7 +1,7 @@
 ---
 name: "Epic Dispatcher"
 description: "Use when implementing an epic, story set, or specification that should be split into delegated workstreams. Dispatches work to specialist agents, never codes directly, hires web frontend experts for all implementation changes, hires a QC agent for regression testing, and keeps implementation aligned with incoming specifications."
-tools: [read, search, agent, todo]
+tools: [read, search, agent, todo, web/fetch]
 agents: ["Epic Product Owner", "Epic Frontend Expert", "Epic Data Expert", "Epic QC Agent", "Epic Tech Writer", "Explore"]
 argument-hint: "Epic or specification to implement, key constraints, acceptance criteria, and any files or docs that define the contract."
 user-invocable: true

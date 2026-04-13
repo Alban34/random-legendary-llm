@@ -4,7 +4,7 @@ export const BACKUP_SCHEMA_ID = 'legendary-marvel-randomizer-backup';
 export const BACKUP_SCHEMA_VERSION = 1;
 
 function deepClone(value) {
-  return JSON.parse(JSON.stringify(value));
+  return structuredClone(value);
 }
 
 function isPlainObject(value) {

@@ -79,6 +79,37 @@ function normalizeHistoryGroupingMode(mode) {
     : DEFAULT_HISTORY_GROUPING_MODE;
 }
 
+function buildGroupConfig(normalizedMode, summary, duplicateMastermindNameCount) {
+  if (normalizedMode === 'mastermind') {
+    return {
+      id: `mastermind:${summary.mastermindId}`,
+      label: duplicateMastermindNameCount > 1
+        ? `${summary.mastermindName} · ${summary.mastermindSetName}`
+        : summary.mastermindName
+    };
+  }
+  if (normalizedMode === 'player-count') {
+    return {
+      id: `player-count:${summary.playerCount}`,
+      label: summary.playerLabel
+    };
+  }
+  let playModeLabel;
+  if (summary.playMode === 'standard') {
+    playModeLabel = 'Standard';
+  } else if (summary.playMode === 'advanced-solo') {
+    playModeLabel = 'Advanced Solo';
+  } else if (summary.playMode === 'two-handed-solo') {
+    playModeLabel = 'Two-Handed Solo';
+  } else {
+    playModeLabel = summary.modeLabel;
+  }
+  return {
+    id: `play-mode:${summary.playMode}`,
+    label: playModeLabel
+  };
+}
+
 export function buildHistoryGroups(records, indexes, { mode = DEFAULT_HISTORY_GROUPING_MODE } = {}) {
   const normalizedMode = normalizeHistoryGroupingMode(mode);
   const summaries = records
@@ -105,28 +136,7 @@ export function buildHistoryGroups(records, indexes, { mode = DEFAULT_HISTORY_GR
 
   summaries.forEach((summary) => {
     const duplicateMastermindNameCount = mastermindNameCounts.get(summary.mastermindName) || 0;
-    const groupConfig = normalizedMode === 'mastermind'
-      ? {
-          id: `mastermind:${summary.mastermindId}`,
-          label: duplicateMastermindNameCount > 1
-            ? `${summary.mastermindName} · ${summary.mastermindSetName}`
-            : summary.mastermindName
-        }
-      : normalizedMode === 'player-count'
-        ? {
-            id: `player-count:${summary.playerCount}`,
-            label: summary.playerLabel
-          }
-        : {
-            id: `play-mode:${summary.playMode}`,
-            label: summary.playMode === 'standard'
-              ? 'Standard'
-              : summary.playMode === 'advanced-solo'
-                ? 'Advanced Solo'
-                : summary.playMode === 'two-handed-solo'
-                  ? 'Two-Handed Solo'
-                  : summary.modeLabel
-          };
+    const groupConfig = buildGroupConfig(normalizedMode, summary, duplicateMastermindNameCount);
 
     if (!groupsById.has(groupConfig.id)) {
       groupsById.set(groupConfig.id, {

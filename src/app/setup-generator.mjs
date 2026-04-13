@@ -4,7 +4,7 @@ import { resolveSetupTemplate, summarizeSetupTemplate } from './setup-rules.mjs'
 const DEFAULT_BYSTANDERS = 30;
 
 function deepClone(value) {
-  return JSON.parse(JSON.stringify(value));
+  return structuredClone(value);
 }
 
 function shuffle(items, random) {
@@ -547,6 +547,108 @@ function summarizeRequirements(template, effectiveRequirements) {
   };
 }
 
+function selectScheme(eligibleSchemes, normalizedForcedPicks, usageSchemes, random) {
+  if (normalizedForcedPicks.schemeId) {
+    return { selected: eligibleSchemes.filter((scheme) => scheme.id === normalizedForcedPicks.schemeId), fallbackItems: [] };
+  }
+  return selectFreshItems(eligibleSchemes, eligibleSchemes.length, usageSchemes, random);
+}
+
+function selectMastermind(pools, normalizedForcedPicks, usageMasterminds, random) {
+  if (normalizedForcedPicks.mastermindId) {
+    return { selected: pools.masterminds.filter((mastermind) => mastermind.id === normalizedForcedPicks.mastermindId), fallbackItems: [] };
+  }
+  return selectFreshItems(pools.masterminds, pools.masterminds.length, usageMasterminds, random);
+}
+
+function resolveLeadEntity(mastermind, runtime) {
+  if (!mastermind.lead) {
+    return null;
+  }
+  return mastermind.lead.category === 'villains'
+    ? runtime.indexes.villainGroupsById[mastermind.lead.id]
+    : runtime.indexes.henchmanGroupsById[mastermind.lead.id];
+}
+
+function tryMastermindForScheme(mastermind, { mastermindRanking, scheme, schemeSelection, pools, effectiveRequirements, normalizedForcedPicks, state, runtime, random, constraintFailureReasons, eligibleSchemes, template }) {
+  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks);
+  if (!categorySelection.selection) {
+    if (categorySelection.reason) {
+      constraintFailureReasons.add(categorySelection.reason);
+    }
+    return null;
+  }
+
+  const heroSelection = selectHeroes(pools.heroes, effectiveRequirements, state.usage.heroes, random, normalizedForcedPicks.heroIds);
+  if (heroSelection.selected.length !== effectiveRequirements.heroCount) {
+    if (heroSelection.reason) {
+      constraintFailureReasons.add(heroSelection.reason);
+    }
+    return null;
+  }
+
+  const leadEntity = resolveLeadEntity(mastermind, runtime);
+  const notices = createGeneratorNotices({
+    forcedConstraintSummary: buildForcedConstraintSummary(normalizedForcedPicks, {
+      scheme,
+      mastermind,
+      heroes: heroSelection.selected,
+      villainGroups: categorySelection.selection.villainGroups,
+      henchmanGroups: categorySelection.selection.henchmanGroups
+    }),
+    schemeFallback: !normalizedForcedPicks.schemeId && schemeSelection.selected[0]?.id === scheme.id && schemeSelection.fallbackItems.length ? [scheme] : [],
+    mastermindFallback: !normalizedForcedPicks.mastermindId && mastermindRanking.fallbackItems.some((entity) => entity.id === mastermind.id) ? [mastermind] : [],
+    heroFallback: heroSelection.fallbackItems,
+    categoryFallback: categorySelection.selection.fallback
+  });
+
+  return {
+    template: summarizeSetupTemplate(template),
+    requirements: summarizeRequirements(template, effectiveRequirements),
+    scheme: {
+      ...scheme,
+      notes: [...scheme.notes]
+    },
+    mastermind: {
+      ...mastermind,
+      leadEntity
+    },
+    heroes: heroSelection.selected,
+    villainGroups: categorySelection.selection.villainGroups,
+    henchmanGroups: categorySelection.selection.henchmanGroups,
+    setupSnapshot: {
+      mastermindId: mastermind.id,
+      schemeId: scheme.id,
+      heroIds: heroSelection.selected.map((entity) => entity.id),
+      villainGroupIds: categorySelection.selection.villainGroups.map((entity) => entity.id),
+      henchmanGroupIds: categorySelection.selection.henchmanGroups.map((entity) => entity.id)
+    },
+    forcedPicks: normalizedForcedPicks,
+    notices,
+    fallbackUsed: notices.length > 0,
+    legalSchemesCount: eligibleSchemes.length
+  };
+}
+
+function trySchemeForSetup(scheme, { schemeSelection, pools, template, normalizedForcedPicks, state, runtime, random, hasConstraintSelections, constraintFailureReasons, eligibleSchemes }) {
+  const effectiveRequirements = applySchemeModifiersToTemplate(template, scheme);
+  if (!canSatisfyHeroRequirements(pools.heroes, effectiveRequirements)) {
+    if (hasConstraintSelections && normalizedForcedPicks.heroIds.length) {
+      constraintFailureReasons.add('Forced Hero selections cannot satisfy the Hero requirements created by the current scheme and play mode.');
+    }
+    return null;
+  }
+
+  const mastermindRanking = selectMastermind(pools, normalizedForcedPicks, state.usage.masterminds, random);
+  for (const mastermind of mastermindRanking.selected) {
+    const result = tryMastermindForScheme(mastermind, { mastermindRanking, scheme, schemeSelection, pools, effectiveRequirements, normalizedForcedPicks, state, runtime, random, constraintFailureReasons, eligibleSchemes, template });
+    if (result) {
+      return result;
+    }
+  }
+  return null;
+}
+
 export function generateSetup({ runtime, state, playerCount, advancedSolo = false, playMode, forcedPicks, random = Math.random }) {
   const legality = validateSetupLegality({ runtime, state, playerCount, advancedSolo, playMode, forcedPicks });
   if (!legality.ok) {
@@ -556,96 +658,17 @@ export function generateSetup({ runtime, state, playerCount, advancedSolo = fals
   const { template, pools, eligibleSchemes, forcedPicks: normalizedForcedPicks } = legality;
   const hasConstraintSelections = hasForcedPicks(normalizedForcedPicks);
   const constraintFailureReasons = new Set();
-  const schemeSelection = normalizedForcedPicks.schemeId
-    ? {
-        selected: eligibleSchemes.filter((scheme) => scheme.id === normalizedForcedPicks.schemeId),
-        fallbackItems: []
-      }
-    : selectFreshItems(eligibleSchemes, eligibleSchemes.length, state.usage.schemes, random);
+  const schemeSelection = selectScheme(eligibleSchemes, normalizedForcedPicks, state.usage.schemes, random);
 
   for (const scheme of schemeSelection.selected) {
-    const effectiveRequirements = applySchemeModifiersToTemplate(template, scheme);
-    if (!canSatisfyHeroRequirements(pools.heroes, effectiveRequirements)) {
-      if (hasConstraintSelections && normalizedForcedPicks.heroIds.length) {
-        constraintFailureReasons.add('Forced Hero selections cannot satisfy the Hero requirements created by the current scheme and play mode.');
-      }
-      continue;
-    }
-
-    const mastermindRanking = normalizedForcedPicks.mastermindId
-      ? {
-          selected: pools.masterminds.filter((mastermind) => mastermind.id === normalizedForcedPicks.mastermindId),
-          fallbackItems: []
-        }
-      : selectFreshItems(pools.masterminds, pools.masterminds.length, state.usage.masterminds, random);
-    for (const mastermind of mastermindRanking.selected) {
-      const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks);
-      if (!categorySelection.selection) {
-        if (categorySelection.reason) {
-          constraintFailureReasons.add(categorySelection.reason);
-        }
-        continue;
-      }
-
-      const heroSelection = selectHeroes(pools.heroes, effectiveRequirements, state.usage.heroes, random, normalizedForcedPicks.heroIds);
-      if (heroSelection.selected.length !== effectiveRequirements.heroCount) {
-        if (heroSelection.reason) {
-          constraintFailureReasons.add(heroSelection.reason);
-        }
-        continue;
-      }
-
-      const leadEntity = mastermind.lead
-        ? (mastermind.lead.category === 'villains'
-            ? runtime.indexes.villainGroupsById[mastermind.lead.id]
-            : runtime.indexes.henchmanGroupsById[mastermind.lead.id])
-        : null;
-
-      const notices = createGeneratorNotices({
-        forcedConstraintSummary: buildForcedConstraintSummary(normalizedForcedPicks, {
-          scheme,
-          mastermind,
-          heroes: heroSelection.selected,
-          villainGroups: categorySelection.selection.villainGroups,
-          henchmanGroups: categorySelection.selection.henchmanGroups
-        }),
-        schemeFallback: !normalizedForcedPicks.schemeId && schemeSelection.selected[0]?.id === scheme.id && schemeSelection.fallbackItems.length ? [scheme] : [],
-        mastermindFallback: !normalizedForcedPicks.mastermindId && mastermindRanking.fallbackItems.some((entity) => entity.id === mastermind.id) ? [mastermind] : [],
-        heroFallback: heroSelection.fallbackItems,
-        categoryFallback: categorySelection.selection.fallback
-      });
-
-      return {
-        template: summarizeSetupTemplate(template),
-        requirements: summarizeRequirements(template, effectiveRequirements),
-        scheme: {
-          ...scheme,
-          notes: [...scheme.notes]
-        },
-        mastermind: {
-          ...mastermind,
-          leadEntity
-        },
-        heroes: heroSelection.selected,
-        villainGroups: categorySelection.selection.villainGroups,
-        henchmanGroups: categorySelection.selection.henchmanGroups,
-        setupSnapshot: {
-          mastermindId: mastermind.id,
-          schemeId: scheme.id,
-          heroIds: heroSelection.selected.map((entity) => entity.id),
-          villainGroupIds: categorySelection.selection.villainGroups.map((entity) => entity.id),
-          henchmanGroupIds: categorySelection.selection.henchmanGroups.map((entity) => entity.id)
-        },
-        forcedPicks: normalizedForcedPicks,
-        notices,
-        fallbackUsed: notices.length > 0,
-        legalSchemesCount: eligibleSchemes.length
-      };
+    const result = trySchemeForSetup(scheme, { schemeSelection, pools, template, normalizedForcedPicks, state, runtime, random, hasConstraintSelections, constraintFailureReasons, eligibleSchemes });
+    if (result) {
+      return result;
     }
   }
 
   if (hasConstraintSelections && constraintFailureReasons.size) {
-    throw new Error([...constraintFailureReasons].join(' '));
+    throw new Error([...constraintFailureReasons].join(' ') || 'No legal setup could be generated due to constraint conflicts.');
   }
 
   throw new Error('No legal setup could be generated from the current owned collection for the selected play mode.');

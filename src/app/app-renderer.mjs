@@ -256,9 +256,12 @@ function renderForcedPickControls(viewModel) {
   const hasActiveForcedPicks = hasForcedPicks(viewModel.ui.forcedPicks);
 
   const controlMarkup = FORCED_PICK_FIELD_CONFIGS.map((config) => {
-    const activeIds = config.multi
-      ? viewModel.ui.forcedPicks[config.field]
-      : viewModel.ui.forcedPicks[config.field] ? [viewModel.ui.forcedPicks[config.field]] : [];
+    let activeIds;
+    if (config.multi) {
+      activeIds = viewModel.ui.forcedPicks[config.field];
+    } else {
+      activeIds = viewModel.ui.forcedPicks[config.field] ? [viewModel.ui.forcedPicks[config.field]] : [];
+    }
     const availableOptions = config.multi
       ? options[config.field].filter((entity) => !activeIds.includes(entity.id))
       : options[config.field];
@@ -288,9 +291,12 @@ function renderForcedPickControls(viewModel) {
   }).join('');
 
   const activeMarkup = FORCED_PICK_FIELD_CONFIGS.flatMap((config) => {
-    const activeIds = config.multi
-      ? viewModel.ui.forcedPicks[config.field]
-      : viewModel.ui.forcedPicks[config.field] ? [viewModel.ui.forcedPicks[config.field]] : [];
+    let activeIds;
+    if (config.multi) {
+      activeIds = viewModel.ui.forcedPicks[config.field];
+    } else {
+      activeIds = viewModel.ui.forcedPicks[config.field] ? [viewModel.ui.forcedPicks[config.field]] : [];
+    }
 
     return activeIds.map((id) => {
       const entity = entityIndexes[config.field][id];
@@ -326,7 +332,7 @@ function renderHeroResultCards(heroes, locale) {
   return heroes.map((hero) => `
     <article class="result-card hero-result-card" data-hero-id="${hero.id}">
       <h3>${hero.name}</h3>
-      <div class="muted">${hero.teams && hero.teams.length ? hero.teams.join(' · ') : locale.t('common.noTeamListed')}</div>
+      <div class="muted">${hero.teams?.length ? hero.teams.join(' · ') : locale.t('common.noTeamListed')}</div>
     </article>
   `).join('');
 }
@@ -524,6 +530,8 @@ function renderInsightsDashboard(viewModel, options = {}) {
     </div>
   `;
 
+  const toggleButtonLabel = expanded ? locale.t('browse.set.hideDetails') : locale.t('browse.set.showDetails');
+
   return `
     <section class="panel history-insights-shell ${compactViewport ? 'compact' : 'expanded'}" data-history-insights>
       <div class="row space-between wrap gap-md align-center">
@@ -534,7 +542,7 @@ function renderInsightsDashboard(viewModel, options = {}) {
         <div class="muted insight-outcome-summary">${locale.t('history.insights.summary', { wins: locale.formatNumber(outcome.wins), losses: locale.formatNumber(outcome.losses), pending: locale.formatNumber(outcome.pendingResults), scored: locale.formatNumber(outcome.scoredGames) })}</div>
       </div>
       <div class="notice info">${helperCopy}</div>
-      ${compactViewport ? `<button type="button" class="button button-secondary history-insights-toggle" data-action="toggle-history-insights" aria-expanded="${expanded}">${expanded ? locale.t('browse.set.hideDetails') : locale.t('browse.set.showDetails')}</button>` : ''}
+      ${compactViewport ? `<button type="button" class="button button-secondary history-insights-toggle" data-action="toggle-history-insights" aria-expanded="${expanded}">${toggleButtonLabel}</button>` : ''}
       ${expanded ? `<div class="history-insights-content">${detailMarkup}</div>` : ''}
     </section>
   `;
@@ -712,7 +720,7 @@ function renderOnboardingShell(viewModel) {
 
   const locale = getLocale(viewModel);
   const currentStep = ONBOARDING_STEPS[Math.max(0, Math.min(viewModel.ui.onboardingStep, ONBOARDING_STEPS.length - 1))];
-  const isLastStep = currentStep.id === ONBOARDING_STEPS[ONBOARDING_STEPS.length - 1].id;
+  const isLastStep = currentStep.id === ONBOARDING_STEPS.at(-1).id;
   const currentStepNumber = viewModel.ui.onboardingStep + 1;
 
   return `
@@ -724,9 +732,17 @@ function renderOnboardingShell(viewModel) {
           <p class="muted">${locale.t('onboarding.description')}</p>
         </div>
         <div class="onboarding-progress" aria-label="${locale.t('onboarding.progress')}">
-          ${ONBOARDING_STEPS.map((step, index) => `
-            <span class="onboarding-step-pill ${index === viewModel.ui.onboardingStep ? 'active' : index < viewModel.ui.onboardingStep ? 'complete' : ''}">${locale.t(`onboarding.step${index + 1}.eyebrow`)}</span>
-          `).join('')}
+          ${ONBOARDING_STEPS.map((step, index) => {
+            let pillStatus;
+            if (index === viewModel.ui.onboardingStep) {
+              pillStatus = 'active';
+            } else if (index < viewModel.ui.onboardingStep) {
+              pillStatus = 'complete';
+            } else {
+              pillStatus = '';
+            }
+            return `<span class="onboarding-step-pill ${pillStatus}">${locale.t(`onboarding.step${index + 1}.eyebrow`)}</span>`;
+          }).join('')}
         </div>
       </div>
       <div class="result-card onboarding-step-card" data-onboarding-step="${currentStep.id}">
@@ -886,7 +902,9 @@ function renderToastRegion(viewModel) {
   const locale = getLocale(viewModel);
   return `
     <div class="toast-stack" role="region" aria-label="${locale.t('toast.region')}">
-      ${viewModel.ui.toasts.map((toast) => `
+      ${viewModel.ui.toasts.map((toast) => {
+        const toastActionLabel = toast.isPersistent ? locale.t('toast.acknowledge') : locale.t('toast.dismiss');
+        return `
         <article class="toast toast-${toast.variant} toast-${toast.behavior}" role="${toast.live === 'assertive' ? 'alert' : 'status'}" aria-live="${toast.live}" data-toast-id="${toast.id}" data-toast-dismiss-on-click="${toast.dismissOnClick ? 'true' : 'false'}" data-toast-auto-dismiss="${toast.autoDismissMs ? 'true' : 'false'}" data-toast-behavior="${toast.behavior}">
           <div class="toast-copy">
             <div class="toast-title">${toast.icon} ${toast.label}</div>
@@ -894,10 +912,11 @@ function renderToastRegion(viewModel) {
             <div>${toast.message}</div>
           </div>
           ${toast.dismissible
-            ? `<button type="button" class="button button-secondary toast-dismiss" data-action="dismiss-toast" data-toast-id="${toast.id}" aria-label="${toast.isPersistent ? locale.t('toast.acknowledge') : locale.t('toast.dismiss')} ${toast.label} notification">${toast.isPersistent ? locale.t('toast.acknowledge') : locale.t('toast.dismiss')}</button>`
+            ? `<button type="button" class="button button-secondary toast-dismiss" data-action="dismiss-toast" data-toast-id="${toast.id}" aria-label="${toastActionLabel} ${toast.label} notification">${toastActionLabel}</button>`
             : ''}
         </article>
-      `).join('')}
+      `;
+      }).join('')}
     </div>
   `;
 }
@@ -1245,6 +1264,10 @@ function renderSetupControls(viewModel, options = {}) {
     </button>
   `).join('');
 
+  const twoHandedHelp = ui.selectedPlayMode === 'two-handed-solo' && !compactViewport
+    ? `<div class="muted new-game-two-handed-help">${locale.t('newGame.twoHandedHelp')}</div>`
+    : '';
+
   return `
     <div class="stack gap-md ${compactViewport ? 'page-flow-compact-mobile' : ''}">
       <div data-mobile-task-anchor="new-game">
@@ -1262,7 +1285,7 @@ function renderSetupControls(viewModel, options = {}) {
       <div class="summary-grid">
         <div class="summary-card">
           <div class="muted">${locale.t('newGame.selectedMode')}</div>
-          <div class="metric-sm">${availablePlayModes.find((mode) => mode.id === ui.selectedPlayMode) ? locale.getPlayModeLabel(ui.selectedPlayMode, ui.selectedPlayerCount) : locale.getPlayModeLabel('standard', ui.selectedPlayerCount)}</div>
+          <div class="metric-sm">${availablePlayModes.some((mode) => mode.id === ui.selectedPlayMode) ? locale.getPlayModeLabel(ui.selectedPlayMode, ui.selectedPlayerCount) : locale.getPlayModeLabel('standard', ui.selectedPlayerCount)}</div>
         </div>
         <div class="summary-card">
           <div class="muted">${locale.t('newGame.ownedSets')}</div>
@@ -1276,9 +1299,7 @@ function renderSetupControls(viewModel, options = {}) {
       <div class="result-card current-requirements-card" id="setup-requirements-card">
         <h3>${locale.t('newGame.setupRequirements')}</h3>
         <div class="muted">${locale.formatEntityCount(displayedRequirements.heroCount, 'common.heroTitle', 'common.heroes')} · ${locale.formatEntityCount(displayedRequirements.villainGroupCount, 'common.villainGroupTitle', 'common.villainGroups')} · ${locale.formatEntityCount(displayedRequirements.henchmanGroupCount, 'common.henchmanGroupTitle', 'common.henchmanGroups')} · ${locale.formatEntityCount(displayedRequirements.wounds, 'common.wound', 'common.wounds')}</div>
-        ${ui.selectedPlayMode === 'two-handed-solo'
-          ? `${compactViewport ? '' : `<div class="muted new-game-two-handed-help">${locale.t('newGame.twoHandedHelp')}</div>`}`
-          : ''}
+        ${twoHandedHelp}
       </div>
       <div class="button-row">
         <button class="button button-primary" data-action="generate-setup">${ui.currentSetup ? locale.t('newGame.reroll') : locale.t('newGame.generate')}</button>
@@ -1617,7 +1638,7 @@ function bindActionButtons(doc, actions) {
       }
       if (event.key === 'Tab' && focusables.length) {
         const first = focusables[0];
-        const last = focusables[focusables.length - 1];
+        const last = focusables.at(-1);
         if (event.shiftKey && document.activeElement === first) {
           event.preventDefault();
           last.focus();

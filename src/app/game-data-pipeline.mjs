@@ -2,7 +2,7 @@ export function slugify(value) {
   return String(value)
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/&/g, ' and ')
+    .replaceAll('&', ' and ')
     .replace(/[^a-zA-Z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .replace(/-{2,}/g, '-')
@@ -10,7 +10,7 @@ export function slugify(value) {
 }
 
 export function clone(value) {
-  return JSON.parse(JSON.stringify(value));
+  return structuredClone(value);
 }
 
 function normalizeLookupName(value) {
@@ -137,9 +137,7 @@ function getCategoryMatches(reference, sourceSetId, category, villainGroupsBySet
 function resolveGroupReference(reference, sourceSetId, preferredCategory, villainGroupsBySet, henchmanGroupsBySet, globalVillainIndex, globalHenchmanIndex) {
   const searchOrder = preferredCategory === 'henchmen'
     ? ['henchmen', 'villains']
-    : preferredCategory === 'villains'
-      ? ['villains', 'henchmen']
-      : ['villains', 'henchmen'];
+    : ['villains', 'henchmen'];
 
   for (const category of searchOrder) {
     const matches = getCategoryMatches(
@@ -359,8 +357,8 @@ export function runEpic1Tests(seed, source, runtime) {
   run('Mastermind lead references resolve correctly', () => {
     const redSkull = runtime.indexes.allMasterminds.find((entity) => entity.name === 'Red Skull' && entity.setId === 'core-set');
     const drDoom = runtime.indexes.allMasterminds.find((entity) => entity.name === 'Dr. Doom');
-    assert(redSkull && redSkull.lead && redSkull.lead.category === 'villains', 'Red Skull lead not resolved');
-    assert(drDoom && drDoom.lead && drDoom.lead.category === 'henchmen', 'Dr. Doom lead not resolved as henchmen');
+    assert(redSkull?.lead?.category === 'villains', 'Red Skull lead not resolved');
+    assert(drDoom?.lead?.category === 'henchmen', 'Dr. Doom lead not resolved as henchmen');
   });
 
   run('Scheme forced groups and modifiers normalize correctly', () => {

@@ -32,9 +32,8 @@ export function getDisplayedSetupRequirements({ playerCount, advancedSolo, playM
   const template = resolveSetupTemplate(playerCount, { advancedSolo, playMode });
 
   if (
-    currentSetup
-    && currentSetup.template.playerCount === template.playerCount
-    && currentSetup.template.playMode === template.playMode
+    currentSetup?.template.playerCount === template.playerCount
+    && currentSetup?.template.playMode === template.playMode
   ) {
     return currentSetup.requirements;
   }

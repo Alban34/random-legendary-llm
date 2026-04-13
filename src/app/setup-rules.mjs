@@ -76,11 +76,12 @@ export function resolveSetupTemplate(playerCount, modeOptions = false) {
   const normalizedPlayerCount = normalizePlayerCount(playerCount);
   const playMode = resolvePlayMode(normalizedPlayerCount, modeOptions);
 
-  const key = playMode === 'advanced-solo'
-    ? '1-advanced'
-    : playMode === 'two-handed-solo'
-      ? '1-two-handed'
-      : normalizedPlayerCount;
+  let key = normalizedPlayerCount;
+  if (playMode === 'advanced-solo') {
+    key = '1-advanced';
+  } else if (playMode === 'two-handed-solo') {
+    key = '1-two-handed';
+  }
 
   const template = SETUP_RULES[key];
   if (!template) {

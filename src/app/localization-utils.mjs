@@ -1164,7 +1164,7 @@ const LOCALE_OPTIONS = [...SELECTABLE_LOCALES];
 const LOCALE_IDS = new Set(LOCALE_OPTIONS.map((locale) => locale.id));
 
 function interpolate(template, params) {
-  return String(template).replace(/\{([^}]+)\}/g, (_, key) => {
+  return String(template).replaceAll(/\{([^}]+)\}/g, (_, key) => {
     const value = params?.[key];
     return value === undefined || value === null ? '' : String(value);
   });
@@ -1298,7 +1298,7 @@ export function createLocaleTools(localeId) {
       return t(`common.outcome.${outcomeId}`);
     },
     formatResultStatus(result) {
-      if (!result || result.status !== 'completed') {
+      if (result?.status !== 'completed') {
         return t('common.pendingResult');
       }
       const outcomeLabel = this.getOutcomeLabel(result.outcome) || t('common.unknown');

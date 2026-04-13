@@ -51,7 +51,7 @@ export function getAdjacentTabId(currentId, direction) {
     case 'first':
       return TAB_IDS[0];
     case 'last':
-      return TAB_IDS[TAB_IDS.length - 1];
+      return TAB_IDS.at(-1);
     case 'previous':
       return TAB_IDS[(currentIndex - 1 + TAB_IDS.length) % TAB_IDS.length];
     case 'next':

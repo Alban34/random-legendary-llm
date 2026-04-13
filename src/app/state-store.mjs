@@ -17,7 +17,7 @@ const USAGE_INDEX_KEYS = {
 };
 
 function deepClone(value) {
-  return JSON.parse(JSON.stringify(value));
+  return structuredClone(value);
 }
 
 function isPlainObject(value) {
@@ -187,6 +187,14 @@ function sortHistoryNewestFirst(history) {
   return [...history].sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
 }
 
+function sanitizeIntegerRange(candidate, min, max, fallback) {
+  return Number.isInteger(candidate) && candidate >= min && candidate <= max ? candidate : fallback;
+}
+
+function sanitizeBoolean(candidate, fallback) {
+  return typeof candidate === 'boolean' ? candidate : fallback;
+}
+
 function sanitizePreferences(candidatePreferences, notices) {
   if (!isPlainObject(candidatePreferences)) {
     if (candidatePreferences !== undefined) {
@@ -196,14 +204,8 @@ function sanitizePreferences(candidatePreferences, notices) {
   }
 
   const defaultPreferences = createDefaultPreferences();
-  const lastPlayerCount = Number.isInteger(candidatePreferences.lastPlayerCount)
-    && candidatePreferences.lastPlayerCount >= 1
-    && candidatePreferences.lastPlayerCount <= 5
-    ? candidatePreferences.lastPlayerCount
-    : defaultPreferences.lastPlayerCount;
-  const lastAdvancedSolo = typeof candidatePreferences.lastAdvancedSolo === 'boolean'
-    ? candidatePreferences.lastAdvancedSolo
-    : defaultPreferences.lastAdvancedSolo;
+  const lastPlayerCount = sanitizeIntegerRange(candidatePreferences.lastPlayerCount, 1, 5, defaultPreferences.lastPlayerCount);
+  const lastAdvancedSolo = sanitizeBoolean(candidatePreferences.lastAdvancedSolo, defaultPreferences.lastAdvancedSolo);
   let lastPlayMode;
   try {
     lastPlayMode = resolvePlayMode(lastPlayerCount, {
@@ -219,9 +221,7 @@ function sanitizePreferences(candidatePreferences, notices) {
   } else if (typeof candidatePreferences.selectedTab === 'string') {
     selectedTab = normalizeSelectedTab(candidatePreferences.selectedTab);
   }
-  const onboardingCompleted = typeof candidatePreferences.onboardingCompleted === 'boolean'
-    ? candidatePreferences.onboardingCompleted
-    : defaultPreferences.onboardingCompleted;
+  const onboardingCompleted = sanitizeBoolean(candidatePreferences.onboardingCompleted, defaultPreferences.onboardingCompleted);
   const themeId = candidatePreferences.themeId === undefined
     ? defaultPreferences.themeId
     : normalizeThemeId(candidatePreferences.themeId);
@@ -512,14 +512,15 @@ export function acceptGameSetup(state, gameConfig) {
 }
 
 export function updateGameResult(state, { recordId, outcome, score, notes = '', updatedAt = new Date().toISOString() }) {
-  const nextState = deepClone(state);
-  const targetRecord = nextState.history.find((record) => record.id === recordId);
+  const targetRecord = state.history.find((record) => record.id === recordId);
 
   if (!targetRecord) {
-    return nextState;
+    return state;
   }
 
-  targetRecord.result = createCompletedGameResult({ outcome, score, notes, updatedAt });
+  const nextState = structuredClone(state);
+  const mutableRecord = nextState.history.find((record) => record.id === recordId);
+  mutableRecord.result = createCompletedGameResult({ outcome, score, notes, updatedAt });
   return nextState;
 }
 

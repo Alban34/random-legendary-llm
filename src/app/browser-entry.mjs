@@ -43,20 +43,20 @@ async function loadSeed() {
 }
 
 function syncDebugGlobals(viewModel) {
-  window.__EPIC1 = viewModel.bundle;
-  window.__APP_STATE__ = viewModel.state;
-  window.__APP_PERSISTENCE__ = viewModel.persistence;
-  window.__CURRENT_SETUP__ = viewModel.ui.currentSetup;
-  window.__ACTIVE_TAB__ = viewModel.ui.selectedTab;
-  window.__BROWSE_UI__ = {
+  globalThis.__EPIC1 = viewModel.bundle;
+  globalThis.__APP_STATE__ = viewModel.state;
+  globalThis.__APP_PERSISTENCE__ = viewModel.persistence;
+  globalThis.__CURRENT_SETUP__ = viewModel.ui.currentSetup;
+  globalThis.__ACTIVE_TAB__ = viewModel.ui.selectedTab;
+  globalThis.__BROWSE_UI__ = {
     searchTerm: viewModel.ui.browseSearchTerm,
     typeFilter: viewModel.ui.browseTypeFilter,
     expandedSetId: viewModel.ui.expandedBrowseSetId
   };
-  window.__COLLECTION_UI__ = {
+  globalThis.__COLLECTION_UI__ = {
     confirmResetOwnedCollection: viewModel.ui.confirmResetOwnedCollection
   };
-  window.__HISTORY_UI__ = {
+  globalThis.__HISTORY_UI__ = {
     groupingMode: viewModel.ui.historyGroupingMode,
     supportedGroupingModes: HISTORY_GROUPING_MODES,
     confirmResetAllState: viewModel.ui.confirmResetAllState,
@@ -66,36 +66,36 @@ function syncDebugGlobals(viewModel) {
     resultInvalidFields: viewModel.ui.resultInvalidFields,
     historyInsightsExpanded: viewModel.ui.historyInsightsExpanded
   };
-  window.__ONBOARDING_UI__ = {
+  globalThis.__ONBOARDING_UI__ = {
     visible: viewModel.ui.onboardingVisible,
     step: viewModel.ui.onboardingStep,
     aboutOpen: viewModel.ui.aboutPanelOpen,
     completed: viewModel.state.preferences.onboardingCompleted,
     mobilePreferencesOpen: viewModel.ui.mobilePreferencesOpen
   };
-  window.__PLAY_MODE_UI__ = {
+  globalThis.__PLAY_MODE_UI__ = {
     playerCount: viewModel.ui.selectedPlayerCount,
     playMode: viewModel.ui.selectedPlayMode,
     advancedSolo: viewModel.ui.advancedSolo
   };
-  window.__THEME_UI__ = {
+  globalThis.__THEME_UI__ = {
     activeThemeId: viewModel.state.preferences.themeId,
     supportedThemes: THEME_OPTIONS.map((theme) => ({ id: theme.id, label: viewModel.locale.getThemeLabel(theme.id) }))
   };
-  window.__LOCALE_UI__ = {
+  globalThis.__LOCALE_UI__ = {
     activeLocaleId: viewModel.state.preferences.localeId,
     supportedLocales: getSelectableLocales(),
     hasFallbacks: viewModel.locale.hasFallbacks,
     fallbackKeys: viewModel.locale.fallbackKeys
   };
-  window.__BACKUP_UI__ = {
+  globalThis.__BACKUP_UI__ = {
     importError: viewModel.ui.backupImportError,
     stagedBackupSummary: viewModel.ui.stagedBackup?.summary || null,
     confirmRestoreMode: viewModel.ui.confirmBackupRestoreMode,
     lastExportFileName: viewModel.ui.lastBackupExportFileName || null
   };
-  window.__FORCED_PICKS_UI__ = viewModel.ui.forcedPicks;
-  window.__TOASTS__ = viewModel.ui.toasts;
+  globalThis.__FORCED_PICKS_UI__ = viewModel.ui.forcedPicks;
+  globalThis.__TOASTS__ = viewModel.ui.toasts;
 }
 
 async function boot() {
@@ -895,14 +895,14 @@ async function boot() {
       viewModel.ui.selectedTab = DEFAULT_TAB_ID;
       viewModel.ui.lastActionNotice = t('actions.resetAllDefaults');
       rerender();
-      if (!result.save.ok) {
+      if (result.save.ok) {
+        enqueueToast({ variant: 'warning', message: t('actions.resetAllDefaults') });
+      } else {
         enqueueToast({
           variant: result.save.storageAvailable === false ? 'warning' : 'error',
           message: result.save.message,
           behavior: 'persistent'
         });
-      } else {
-        enqueueToast({ variant: 'warning', message: t('actions.resetAllDefaults') });
       }
     },
     corruptSavedState() {
@@ -920,7 +920,7 @@ async function boot() {
       });
     },
     injectInvalidOwnedSet() {
-      const corruptedState = JSON.parse(JSON.stringify(viewModel.state));
+      const corruptedState = structuredClone(viewModel.state);
       corruptedState.collection.ownedSetIds = [...corruptedState.collection.ownedSetIds, 'definitely-missing-set'];
       const save = storageAdapter.setItem(STORAGE_KEY, JSON.stringify(corruptedState, null, 2));
       viewModel.persistence.lastSaveMessage = save.message;
@@ -956,8 +956,10 @@ async function boot() {
   rerender();
 }
 
-boot().catch((error) => {
+try {
+  await boot();
+} catch (error) {
   console.error(error);
-  window.__EPIC1_ERROR__ = error;
+  globalThis.__EPIC1_ERROR__ = error;
   renderInitializationError(document, error);
-});
+}
