@@ -63,11 +63,12 @@
     "build:seed": "python3 ./tools/build_epic1_seed.py",
     "lint": "eslint src/",
     "build": "node tools/build.mjs",
-    "test:coverage": "node --test --experimental-test-coverage --test-coverage-reporter=lcov --test-coverage-dir=coverage ./test/*.test.mjs"
+    "test:coverage": "c8 --reporter=lcov --report-dir=coverage node --test ./test/*.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.59.1",
+    "c8": "^11.0.0",
     "esbuild": "^0.28.0",
     "eslint": "^10.2.0"
   }

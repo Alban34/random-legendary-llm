@@ -35,3 +35,4 @@ node_modules
 test-results
 dist
 personal-data/
+coverage
