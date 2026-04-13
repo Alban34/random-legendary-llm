@@ -459,7 +459,7 @@ Automated coverage:
 ## Epic 20 — History Grouping and Organization
 
 Required tests:
-- grouping helpers keep grouped sections deterministic for mastermind, player-count, play-mode, and ungrouped views
+- grouping helpers keep grouped sections deterministic for mastermind, scheme, heroes, villains, and player-mode views
 - duplicate mastermind names remain distinguishable inside grouped history labels
 - grouping state stays presentation-only and does not mutate persisted history records or backup payloads
 - result editing continues to target the correct record inside grouped sections
@@ -471,8 +471,30 @@ QC checks:
 - verify reloads and backup restore reset History back to the default grouping rather than persisting UI-only grouping state
 
 Automated coverage:
-- `test/epic20-history-grouping.test.mjs` covers grouped-history derivations, duplicate-name labels, and ungrouped fallback behavior
+- `test/epic20-history-grouping.test.mjs` covers grouped-history derivations and duplicate-name labels
 - `test/playwright/epic20-qc.spec.mjs` covers default grouping, grouping-mode switching, grouped result editing, and reset-to-default behavior after reload and backup restore
+
+---
+
+## Epic 34 — History Grouping Expansion
+
+Required tests:
+- grouping derivations for all five modes (mastermind, scheme, heroes, villains, player mode) produce correct group keys from `setupSnapshot` fields
+- a record with multiple heroes appears under each hero group individually
+- a record with multiple villain groups appears under each villain group individually
+- no record is silently omitted from any group it belongs to
+- `player-count` and `none` modes are no longer reachable
+- all five grouping mode labels resolve in English and French without fallback
+
+QC checks:
+- verify the History grouping control exposes exactly five mode buttons and no others
+- verify selecting each mode updates the displayed groups immediately
+- verify multi-group membership renders correctly for heroes and villains
+- verify `mastermind` is the active default mode on load
+
+Automated coverage:
+- `test/epic34-history-grouping.test.mjs` covers all five grouping derivations, multi-value membership for heroes and villains, and removal of deprecated modes
+- `test/playwright/epic34-qc.spec.mjs` covers grouping-control rendering, mode switching, and multi-group record display
 
 ---
 

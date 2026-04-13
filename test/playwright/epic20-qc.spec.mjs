@@ -93,12 +93,11 @@ test.describe('Epic 20 automated QC', () => {
 
     const beforeState = await readAppState(page);
     await selectTab(page, 'history');
-    await page.locator('[data-action="set-history-grouping"][data-history-grouping-mode="player-count"]').click();
-    await expect(page.locator('[data-history-group-id]').first()).toContainText('2 Players');
+    await page.locator('[data-action="set-history-grouping"][data-history-grouping-mode="scheme"]').click();
+    await expect(page.locator('[data-history-group-id]').first()).toBeVisible();
 
-    await page.locator('[data-action="set-history-grouping"][data-history-grouping-mode="none"]').click();
-    await expect(page.locator('[data-history-group-id]')).toHaveCount(0);
-    await expect(page.locator('#panel-history .history-item')).toHaveCount(2);
+    await page.locator('[data-action="set-history-grouping"][data-history-grouping-mode="heroes"]').click();
+    await expect(page.locator('[data-history-group-id]').first()).toBeVisible();
 
     const afterState = await readAppState(page);
     expect(afterState).toEqual(beforeState);
@@ -127,7 +126,7 @@ test.describe('Epic 20 automated QC', () => {
 
     const savedState = await readAppState(page);
     await selectTab(page, 'history');
-    await page.locator('[data-action="set-history-grouping"][data-history-grouping-mode="none"]').click();
+    await page.locator('[data-action="set-history-grouping"][data-history-grouping-mode="scheme"]').click();
     await reloadApp(page);
     await selectTab(page, 'history');
     await expect(page.locator('[data-history-grouping-controls] [data-history-grouping-mode="mastermind"]')).toHaveAttribute('aria-pressed', 'true');

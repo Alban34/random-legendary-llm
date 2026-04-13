@@ -57,15 +57,12 @@ test('Epic 20 defaults to mastermind grouping and preserves newest-first group o
   assert.deepEqual(groups[1].records.map((record) => record.id), ['three', 'one']);
 });
 
-test('Epic 20 supports player-count and play-mode grouping without mutating history summaries', () => {
+test('Epic 20 supports play-mode grouping without mutating history summaries', () => {
   const records = [
     createRecord({ id: 'solo-standard', createdAt: '2026-04-10T09:00:00.000Z', mastermindId: 'core-set-red-skull', playerCount: 1, playMode: 'standard' }),
     createRecord({ id: 'solo-two-handed', createdAt: '2026-04-10T10:00:00.000Z', mastermindId: 'core-set-magneto', playerCount: 1, playMode: 'two-handed-solo' }),
     createRecord({ id: 'multi', createdAt: '2026-04-10T11:00:00.000Z', mastermindId: 'core-set-red-skull', playerCount: 3, playMode: 'standard' })
   ];
-
-  const byPlayers = buildHistoryGroups(records, bundle.runtime.indexes, { mode: 'player-count' });
-  assert.deepEqual(byPlayers.map((group) => group.label), ['3 Players', '1 Player']);
 
   const byMode = buildHistoryGroups(records, bundle.runtime.indexes, { mode: 'play-mode' });
   assert.deepEqual(byMode.map((group) => group.label), ['Standard', 'Two-Handed Solo']);
@@ -74,7 +71,7 @@ test('Epic 20 supports player-count and play-mode grouping without mutating hist
   assert.equal(summary.modeLabel, 'Two-Handed Solo');
 });
 
-test('Epic 20 keeps duplicate mastermind groups distinguishable and supports ungrouped rendering', () => {
+test('Epic 20 keeps duplicate mastermind groups distinguishable', () => {
   const indexes = {
     ...bundle.runtime.indexes,
     mastermindsById: {
@@ -110,9 +107,4 @@ test('Epic 20 keeps duplicate mastermind groups distinguishable and supports ung
   const grouped = buildHistoryGroups(records, indexes, { mode: 'mastermind' });
   assert.match(grouped[0].label, /^Loki · /);
   assert.match(grouped[1].label, /^Loki · /);
-
-  const ungrouped = buildHistoryGroups(records, indexes, { mode: 'none' });
-  assert.equal(ungrouped.length, 1);
-  assert.equal(ungrouped[0].label, 'All games');
-  assert.deepEqual(ungrouped[0].records.map((record) => record.id), ['loki-two', 'loki-one']);
 });

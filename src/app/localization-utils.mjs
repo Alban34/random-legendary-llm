@@ -154,9 +154,10 @@ const EN_MESSAGES = {
   'history.empty': 'No accepted games have been logged yet.',
   'history.groupBy': 'Group by',
   'history.group.mastermind': 'Mastermind',
-  'history.group.player-count': 'Players',
-  'history.group.play-mode': 'Play Mode',
-  'history.group.none': 'Ungrouped',
+  'history.group.scheme': 'Scheme',
+  'history.group.heroes': 'Heroes',
+  'history.group.villains': 'Villains',
+  'history.group.play-mode': 'Player Mode',
   'history.group.allGames': 'All games',
   'history.acceptedAt': 'Accepted {date} · {mode}',
   'history.result': 'Result:',
@@ -556,9 +557,10 @@ const FR_MESSAGES = {
   'history.empty': 'Aucune partie acceptee n a encore ete enregistree.',
   'history.groupBy': 'Regrouper par',
   'history.group.mastermind': 'Mastermind',
-  'history.group.player-count': 'Joueurs',
-  'history.group.play-mode': 'Mode de jeu',
-  'history.group.none': 'Sans regroupement',
+  'history.group.scheme': 'Scénario',
+  'history.group.heroes': 'Héros',
+  'history.group.villains': 'Vilains',
+  'history.group.play-mode': 'Mode joueur',
   'history.group.allGames': 'Toutes les parties',
   'history.acceptedAt': 'Acceptee {date} · {mode}',
   'history.result': 'Resultat :',
@@ -1378,7 +1380,7 @@ export function createLocaleTools(localeId) {
       return message;
     },
     formatGroupingModeLabel(modeId) {
-      return modeId === 'none' ? t('history.group.none') : titleCaseWords(this.getHistoryGroupingLabel(modeId));
+      return titleCaseWords(this.getHistoryGroupingLabel(modeId));
     }
   };
 }

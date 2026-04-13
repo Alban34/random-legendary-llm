@@ -242,7 +242,7 @@ Typography roles are governed by `documentation/design-system.md`.
 ## Tab 4 — History
 
 ```
-  Group by: [Mastermind] [Players] [Play Mode] [Ungrouped]
+  Group by: [Mastermind] [Scheme] [Heroes] [Villains] [Player Mode]
 
   ── Game History ────────────────────────────────────
 

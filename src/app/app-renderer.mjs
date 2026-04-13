@@ -140,17 +140,9 @@ function renderHistoryGroupingControls(activeMode, locale) {
 }
 
 function getLocalizedHistoryGroupLabel(group, locale) {
-  if (group.mode === 'player-count') {
-    return locale.formatPlayerLabel(Number(group.id.split(':')[1] || 0));
-  }
-
   if (group.mode === 'play-mode') {
     const playMode = group.id.split(':')[1] || 'standard';
     return locale.getPlayModeLabel(playMode, playMode === 'standard' ? 2 : 1);
-  }
-
-  if (group.mode === 'none') {
-    return locale.t('history.group.allGames');
   }
 
   return group.label;
@@ -164,13 +156,6 @@ function renderGroupedHistory(viewModel) {
 
   if (!state.history.length) {
     return `<p class="muted empty-state">${locale.t('history.empty')}</p>`;
-  }
-
-  if (groupingMode === 'none') {
-    return groups[0].records.map((summary) => {
-      const record = state.history.find((entry) => entry.id === summary.id);
-      return formatHistoryEntry(record, bundle, { ...ui, locale });
-    }).join('');
   }
 
   return groups.map((group, index) => `
