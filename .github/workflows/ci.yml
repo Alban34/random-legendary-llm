@@ -58,6 +58,16 @@ jobs:
           # Full history required for accurate blame and new-code detection
           fetch-depth: 0
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate unit test coverage (LCOV)
+        run: npm run test:coverage
+
       - name: SonarCloud scan
         uses: SonarSource/sonarqube-scan-action@v7
         env:

@@ -1,11 +1,11 @@
 export function slugify(value) {
   return String(value)
     .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replaceAll(/[\u0300-\u036f]/g, '')
     .replaceAll('&', ' and ')
-    .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .replace(/-{2,}/g, '-')
+    .replaceAll(/[^a-zA-Z0-9]+/g, '-')
+    .replaceAll(/^-+|-+$/g, '')
+    .replaceAll(/-{2,}/g, '-')
     .toLowerCase();
 }
 
@@ -120,7 +120,7 @@ function getCategoryMatches(reference, sourceSetId, category, villainGroupsBySet
   const normalizedName = normalizeLookupName(reference);
   const sameSetIndex = category === 'villains' ? villainGroupsBySet : henchmanGroupsBySet;
   const globalIndex = category === 'villains' ? globalVillainIndex : globalHenchmanIndex;
-  const sameSetMatches = (sameSetIndex.get(sourceSetId) && sameSetIndex.get(sourceSetId).get(normalizedName)) || [];
+  const sameSetMatches = sameSetIndex.get(sourceSetId)?.get(normalizedName) || [];
   if (sameSetMatches.length > 1) {
     throw new Error(`Ambiguous ${category} reference '${reference}' within set ${sourceSetId}`);
   }
@@ -366,7 +366,7 @@ export function runEpic1Tests(seed, source, runtime) {
     const negativeZone = runtime.indexes.allSchemes.find((entity) => entity.name === 'Negative Zone Prison Breakout');
     assert(secretInvasion && secretInvasion.forcedGroups.length > 0, 'Secret Invasion missing forced group');
     assert(secretInvasion.modifiers.some((modifier) => modifier.type === 'set-min-heroes' && modifier.value === 6), 'Secret Invasion modifier missing');
-    assert(negativeZone && negativeZone.modifiers.some((modifier) => modifier.type === 'add-henchman-group'), 'Negative Zone modifier missing');
+    assert(negativeZone?.modifiers.some((modifier) => modifier.type === 'add-henchman-group'), 'Negative Zone modifier missing');
   });
 
   run('Runtime indexes match canonical entity totals', () => {

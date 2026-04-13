@@ -48,7 +48,7 @@ export function getDisplayedSetupRequirements({ playerCount, advancedSolo, playM
 }
 
 export function formatHeroTeamLabel(hero) {
-  return hero.teams && hero.teams.length ? hero.teams.join(' · ') : 'No team listed';
+  return hero.teams?.length ? hero.teams.join(' · ') : 'No team listed';
 }
 
 export function formatMastermindLeadLabel(mastermind) {

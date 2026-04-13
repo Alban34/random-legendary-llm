@@ -62,7 +62,8 @@
     "check:epic14": "node --test ./test/epic14-stats-dashboard.test.mjs",
     "build:seed": "python3 ./tools/build_epic1_seed.py",
     "lint": "eslint src/",
-    "build": "node tools/build.mjs"
+    "build": "node tools/build.mjs",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-reporter=lcov --test-coverage-dir=coverage ./test/*.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
