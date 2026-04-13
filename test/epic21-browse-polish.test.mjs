@@ -16,7 +16,7 @@ let nextSteps;
 
 before(async () => {
   [indexHtml, rendererSource, postV1Epics, postV1TaskList, nextSteps] = await Promise.all([
-    fs.readFile(path.join(rootDir, 'index.html'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'epics.md'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8'),
@@ -25,7 +25,7 @@ before(async () => {
 });
 
 test('Epic 21 moves the onboarding shell above the tab panels and removes the low-value Ready Tabs metric', () => {
-  assert.match(indexHtml, /<section class="stack gap-md" id="diagnostics-shell"><\/section>[\s\S]*<div class="tab-panel-shell">/);
+  assert.match(indexHtml, /id="diagnostics-shell"[\s\S]*<div class="tab-panel-shell">/);  
   assert.doesNotMatch(rendererSource, /Ready Tabs/);
   assert.match(rendererSource, /data-browse-help-disclosure/);
   assert.match(rendererSource, /data-browse-primary-cta/);

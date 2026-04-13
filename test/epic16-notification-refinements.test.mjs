@@ -15,14 +15,17 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const browserEntryPath = path.join(rootDir, 'src', 'app', 'browser-entry.mjs');
 const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.mjs');
+const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 
 let browserEntrySource;
 let rendererSource;
+let appSvelteSource;
 
 before(async () => {
-  [browserEntrySource, rendererSource] = await Promise.all([
+  [browserEntrySource, rendererSource, appSvelteSource] = await Promise.all([
     fs.readFile(browserEntryPath, 'utf8'),
-    fs.readFile(rendererPath, 'utf8')
+    fs.readFile(rendererPath, 'utf8'),
+    fs.readFile(appSveltePath, 'utf8')
   ]);
 });
 
@@ -69,9 +72,9 @@ test('Epic 16 stack trimming preserves persistent alerts ahead of transient noti
 });
 
 test('Epic 16 suppresses redundant generator toasts and keeps critical alerts persistent in source behavior', () => {
-  assert.doesNotMatch(browserEntrySource, /setup\.notices\.forEach\(\(notice\) => enqueueToast/);
-  assert.doesNotMatch(browserEntrySource, /Generated a fully fresh setup\./);
-  assert.match(browserEntrySource, /enqueueToast\(\{ variant: 'error', message: error\.message, behavior: 'persistent' \}\)/);
+  assert.doesNotMatch(appSvelteSource, /setup\.notices\.forEach\(\(notice\) => enqueueToast/);
+  assert.doesNotMatch(appSvelteSource, /Generated a fully fresh setup\./);
+  assert.match(appSvelteSource, /enqueueToast\(\{ variant: 'error', message: error\.message, behavior: 'persistent' \}\)/);
   assert.match(rendererSource, /Persistent alert/);
   assert.match(rendererSource, /data-toast-auto-dismiss="\$\{toast\.autoDismissMs \? 'true' : 'false'\}"/);
 });

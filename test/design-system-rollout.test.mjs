@@ -10,17 +10,17 @@ const rootDir = path.resolve(__dirname, '..');
 
 let shellCss;
 let rendererSource;
-let browserEntrySource;
+let appSvelteSource;
 let uiDesignDoc;
 let stylingArchitectureDoc;
 let testingStrategyDoc;
 let adoptionPlanDoc;
 
 before(async () => {
-  const [css, renderer, browserEntry, uiDesign, stylingArchitecture, testingStrategy, adoptionPlan] = await Promise.all([
+  const [css, renderer, appSvelte, uiDesign, stylingArchitecture, testingStrategy, adoptionPlan] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'browser-entry.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'ui-design.md'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'styling-architecture.md'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'testing-qc-strategy.md'), 'utf8'),
@@ -29,7 +29,7 @@ before(async () => {
 
   shellCss = css;
   rendererSource = renderer;
-  browserEntrySource = browserEntry;
+  appSvelteSource = appSvelte;
   uiDesignDoc = uiDesign;
   stylingArchitectureDoc = stylingArchitecture;
   testingStrategyDoc = testingStrategy;
@@ -55,10 +55,10 @@ test('Design system rollout adds reduced-motion and focus-restoration guardrails
   assert.match(shellCss, /\.collection-row:focus-within,[\s\S]*\.history-item:focus-within,[\s\S]*\.history-group:focus-within/);
   assert.match(rendererSource, /role="alert"[\s\S]*data-result-form-error/);
 
-  assert.match(browserEntrySource, /const focusSelector = \(selector\) =>/);
-  assert.match(browserEntrySource, /focusSelector\(`\[data-action="set-theme"\]\[data-theme-id="\$\{normalizedThemeId\}"\]`\);/);
-  assert.match(browserEntrySource, /focusSelector\('#header-locale-select'\);/);
-  assert.match(browserEntrySource, /focusSelector\(`\[data-action="select-tab"\]\[data-tab-id="\$\{normalizeSelectedTab\(tabId\)\}"\]\[aria-selected="true"\]`\);/);
+  assert.match(appSvelteSource, /function focusSelector\(selector\)/);
+  assert.match(appSvelteSource, /focusSelector\(`\[data-action="set-theme"\]\[data-theme-id="\$\{normalizedThemeId\}"\]`\);/);
+  assert.match(appSvelteSource, /focusSelector\('#header-locale-select'\);/);
+  assert.match(appSvelteSource, /focusSelector[\s\S]*?\[data-action="select-tab"\]\[data-tab-id="\$\{normalizeSelectedTab\(tabId\)\}"\]\[aria-selected="true"\]/);
 });
 
 test('Design system rollout keeps screen-level docs and planning aligned with the canonical contract', () => {

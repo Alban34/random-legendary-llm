@@ -116,4 +116,23 @@ test.describe('Epic 13 automated QC', () => {
     const endingState = await readAppState(page);
     expect(endingState).toEqual(startingState);
   });
+
+  test('import button opens file chooser and preview appears when a valid backup is selected', async ({ page }) => {
+    const backupPayload = createBackupPayload({
+      schemaVersion: 1,
+      collection: { ownedSetIds: [] },
+      usage: { heroes: {}, masterminds: {}, villainGroups: {}, henchmanGroups: {}, schemes: {} },
+      history: [],
+      preferences: { themeId: 'dark', localeId: 'en-US', lastPlayerCount: 1, lastAdvancedSolo: false, lastPlayMode: 'standard', selectedTab: null, onboardingCompleted: false }
+    }, { exportedAt: '2026-04-13T10:00:00.000Z' });
+
+    await selectTab(page, 'backup');
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.locator('[data-action="open-import-backup"]').click();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(toJsonFile(backupPayload, 'via-button.json'));
+
+    await expect(page.locator('[data-backup-preview]')).toContainText('via-button.json');
+  });
 });

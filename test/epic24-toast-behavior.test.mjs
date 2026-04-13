@@ -16,7 +16,7 @@ let postV1TaskList;
 
 before(async () => {
   [browserEntry, appShellCss, feedbackUtils, appRenderer, postV1TaskList] = await Promise.all([
-    fs.readFile(path.join(rootDir, 'src', 'app', 'browser-entry.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'feedback-utils.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
@@ -28,7 +28,7 @@ before(async () => {
 test('Story 24.2: setTheme action does not call enqueueToast', () => {
   // Isolate the setTheme handler block and confirm enqueueToast is absent
   const setThemeMatch = browserEntry.match(/setTheme\(themeId\)[\s\S]*?focusSelector\(`\[data-action="set-theme"\]/);
-  assert.ok(setThemeMatch, 'setTheme handler must be present in browser-entry.mjs');
+  assert.ok(setThemeMatch, 'setTheme handler must be present in App.svelte');
   assert.doesNotMatch(setThemeMatch[0], /enqueueToast/, 'setTheme must not call enqueueToast (Story 24.2)');
 });
 

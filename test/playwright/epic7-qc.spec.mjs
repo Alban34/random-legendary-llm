@@ -119,5 +119,37 @@ test.describe('Epic 7 automated QC', () => {
     await selectTab(page, 'history');
     await expect(page.locator('#panel-history .history-item')).toHaveCount(1);
   });
+
+  test('accept-current-setup persists snapshot and usage to localStorage (regression: Svelte 5 $state.snapshot must wrap ui.currentSetup)', async ({ page }) => {
+    // This test catches the Svelte 5 $state proxy + buildHistoryReadySetupSnapshot/deepClone failure.
+    // If $state.snapshot(ui.currentSetup) is NOT called before buildHistoryReadySetupSnapshot,
+    // deepClone throws "could not be cloned" and acceptCurrentSetup silently fails — no history entry,
+    // no usage update, no tab switch to history.
+    await page.locator('[data-action="generate-setup"]').click();
+    await page.waitForFunction(() => window.__CURRENT_SETUP__ !== null);
+
+    const setupSnapshot = await page.evaluate(() => window.__CURRENT_SETUP__.setupSnapshot);
+    await page.locator('[data-action="accept-current-setup"]').click();
+
+    // Verify the tab switches to history (fails if accept threw internally)
+    await expect(page.locator('#panel-history')).toBeVisible();
+
+    // Verify localStorage was written with the correct snapshot IDs
+    const savedState = await readAppState(page);
+    expect(savedState.history).toHaveLength(1);
+    const savedSnapshot = savedState.history[0].setupSnapshot;
+    expect(savedSnapshot.mastermindId).toBe(setupSnapshot.mastermindId);
+    expect(savedSnapshot.schemeId).toBe(setupSnapshot.schemeId);
+    expect(savedSnapshot.heroIds).toEqual(setupSnapshot.heroIds);
+    expect(savedSnapshot.villainGroupIds).toEqual(setupSnapshot.villainGroupIds);
+    expect(savedSnapshot.henchmanGroupIds).toEqual(setupSnapshot.henchmanGroupIds);
+
+    // Verify usage counters incremented for the exact heroes/mastermind/scheme played
+    for (const heroId of setupSnapshot.heroIds) {
+      expect(savedState.usage.heroes[heroId]?.plays).toBeGreaterThan(0);
+    }
+    expect(savedState.usage.masterminds[setupSnapshot.mastermindId]?.plays).toBeGreaterThan(0);
+    expect(savedState.usage.schemes[setupSnapshot.schemeId]?.plays).toBeGreaterThan(0);
+  });
 });
 

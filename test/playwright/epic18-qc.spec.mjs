@@ -41,7 +41,10 @@ async function captureThemeSurfaceMetrics(page) {
 
     const bodyStyles = getComputedStyle(document.body);
     const panelStyles = getComputedStyle(document.querySelector('.panel'));
-    const buttonStyles = getComputedStyle(document.querySelector('.button'));
+    // Pick a button that always has solid (non-transparent) colors and is always in the DOM.
+    // Avoid theme-button-active whose background is semi-transparent (alpha ignored by parseColor).
+    const buttonEl = document.querySelector('[data-action="export-backup"]') || document.querySelector('.button');
+    const buttonStyles = getComputedStyle(buttonEl);
     const themeStyles = getComputedStyle(document.documentElement);
 
     const bodyText = parseColor(bodyStyles.color);
@@ -87,6 +90,28 @@ test.describe('Epic 18 automated QC', () => {
     const reloadedTheme = await readDocumentTheme(page);
     expect(reloadedTheme.themeId).toBe('light');
     expect(reloadedTheme.colorScheme).toBe('light');
+  });
+
+  test('theme switch applies to document immediately (regression: reactive proxy must not be passed to structuredClone)', async ({ page }) => {
+    // This test catches the Svelte 5 $state proxy + structuredClone incompatibility.
+    // If applyStateUpdate passes a reactive proxy to updateState, structuredClone throws
+    // and the theme never updates – all three assertions below would fail.
+    await selectTheme(page, 'light');
+
+    // 1. UI reflects new theme (aria-pressed)
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toHaveAttribute('aria-pressed', 'true');
+    // 2. document.dataset.theme actually changes
+    const liveTheme = await readDocumentTheme(page);
+    expect(liveTheme.themeId).toBe('light');
+    // 3. State persisted to localStorage
+    const savedState = await readAppState(page);
+    expect(savedState.preferences.themeId).toBe('light');
+
+    // Switching back must also work
+    await selectTheme(page, 'dark');
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="dark"]')).toHaveAttribute('aria-pressed', 'true');
+    const darkTheme = await readDocumentTheme(page);
+    expect(darkTheme.themeId).toBe('dark');
   });
 
   test('uses a lighter mobile preference pattern and confirms theme and locale changes outside Collection', async ({ page }) => {

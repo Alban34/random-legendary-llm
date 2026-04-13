@@ -616,3 +616,44 @@ Targeted Epic 9 browser QC command:
 Targeted Epic 10 browser QC command:
 - `npm run check:qc:epic10`
 
+---
+
+## Svelte 5 Migration Test Strategy
+
+### Overview (Epics 29–33)
+
+The Svelte 5 migration (Epics 29–32) moved app initialization and event-handling logic from `src/app/browser-entry.mjs` into `src/components/App.svelte` while leaving all utility modules unchanged.
+
+### Node unit tests — fully preserved
+
+All utility modules imported directly by the Node test suite are unchanged:
+
+- `src/app/state-store.mjs`, `game-data-pipeline.mjs`, `setup-generator.mjs`, `setup-rules.mjs`
+- `src/app/browse-utils.mjs`, `collection-utils.mjs`, `history-utils.mjs`, `stats-utils.mjs`
+- `src/app/backup-utils.mjs`, `feedback-utils.mjs`, `localization-utils.mjs`, `result-utils.mjs`
+- `src/app/theme-utils.mjs`, `new-game-utils.mjs`, `forced-picks-utils.mjs`
+- `src/app/app-tabs.mjs`, `app-renderer.mjs`
+
+Node tests that previously verified source-code patterns inside `browser-entry.mjs` (focus utilities, `setTheme`/`setLocale` handlers, error-toast calls) were updated during Epic 33 to read `src/components/App.svelte` instead, since those patterns migrated there. Affected test files:
+- `test/epic16-notification-refinements.test.mjs`
+- `test/design-system-rollout.test.mjs`
+- `test/epic24-toast-behavior.test.mjs`
+
+### Playwright browser QC — no selector changes required
+
+Tab panel HTML is produced by the same `renderTabPanels()` and `renderOnboardingShell()` functions from `app-renderer.mjs`, now injected via `{@html}` in `App.svelte`. The rendered DOM structure is identical to the pre-migration output. All Playwright selectors (`#desktop-tabs`, `#mobile-tabs`, `#panel-browse`, `[data-action="set-theme"]`, etc.) continue to match without modification.
+
+The Playwright fixture's readiness signal (`window.__EPIC1`, `window.__APP_STATE__`) is provided by `syncGlobals()` inside `App.svelte`'s `$effect`, replacing the equivalent `syncDebugGlobals()` call from the old `browser-entry.mjs`.
+
+### Svelte 5 reactive state wrapper
+
+`src/app/state-store.svelte.js` wraps the plain-object state store in Svelte 5 `$state` runes for use inside components. It is **not** imported by any Node test. Node tests continue to import `src/app/state-store.mjs` directly, passing a `createMemoryStorage()` adapter for isolation.
+
+### Split testing responsibility
+
+| Layer | Tool | What it covers |
+|---|---|---|
+| Utility logic | `node:test` (via `npm test`) | Pure functions in `src/app/*.mjs` |
+| Component source patterns | `node:test` reading `.svelte` source | Handler presence, focus-restoration guarantees |
+| UI behavior / DOM | Playwright (`npx playwright test`) | Compiled Svelte output in a real browser |
+

@@ -74,55 +74,7 @@
   <link rel="stylesheet" href="./src/app/app-shell.css" />
 </head>
 <body>
-  <header class="app-header">
-    <div class="header-inner">
-      <div class="header-copy">
-        <h1 id="app-title">Legendary: Marvel Randomizer</h1>
-        <span class="app-version" id="app-version">v0.1.0</span>
-        <p id="app-subtitle">Browse sets, manage your collection, generate legal setups, and track history with browser-based persistence.</p>
-      </div>
-      <div class="header-controls">
-        <div id="mobile-preference-controls"></div>
-        <div class="header-preferences-row">
-          <div id="header-locale-controls"></div>
-          <div id="header-theme-controls"></div>
-        </div>
-        <nav class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary" role="tablist"></nav>
-      </div>
-    </div>
-  </header>
-  <script>
-    (() => {
-      const copy = globalThis.__LEGENDARY_BOOTSTRAP_COPY__;
-      if (!copy) {
-        return;
-      }
-
-      const title = document.getElementById('app-title');
-      const subtitle = document.getElementById('app-subtitle');
-      if (title) {
-        title.textContent = copy.title;
-      }
-      if (subtitle) {
-        subtitle.textContent = copy.subtitle;
-      }
-    })();
-  </script>
-  <main class="app-main">
-    <section id="toast-region" aria-live="polite" aria-atomic="false"></section>
-    <section class="stack gap-md" id="diagnostics-shell"></section>
-    <div class="tab-panel-shell">
-      <section class="tab-panel" id="panel-browse" role="tabpanel"></section>
-      <section class="tab-panel" id="panel-collection" role="tabpanel" hidden></section>
-      <section class="tab-panel" id="panel-new-game" role="tabpanel" hidden></section>
-      <section class="tab-panel" id="panel-history" role="tabpanel" hidden></section>
-      <section class="tab-panel" id="panel-backup" role="tabpanel" hidden></section>
-    </div>
-  </main>
-
-  <nav class="mobile-tab-nav" id="mobile-tabs" aria-label="Primary mobile" role="tablist"></nav>
-  <div id="modal-root"></div>
-
+  <div id="app"></div>
   <script type="module" src="./src/app/browser-entry.mjs"></script>
 </body>
 </html>

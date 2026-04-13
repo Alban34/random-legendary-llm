@@ -1389,3 +1389,11 @@ Approved
 - [x] Confirm no record is silently omitted from a group it belongs to under any mode
 - [x] **Test:** verify all five modes produce correct groupings for diverse representative setups; multi-entity records appear under all applicable groups
 - [x] **QC (Automated):** run Playwright History tab QC exercising all five grouping modes with seeded data; assert correct group headings and record distribution
+
+---
+
+## Epics 29–33 — Svelte 5 Migration
+
+The Svelte 5 migration backlog (Epics 29–33) is tracked in a separate file:
+
+See: `documentation/svelte-migration-task-list.md`

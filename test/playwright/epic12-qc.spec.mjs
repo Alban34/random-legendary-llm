@@ -40,12 +40,10 @@ test.describe('Epic 12 automated QC', () => {
     await editor.locator('[data-result-field="outcome"]').selectOption('win');
 
     const scoreField = editor.locator('[data-result-field="score"]');
-    await scoreField.focus();
-    await page.keyboard.type('123');
+    await scoreField.fill('123');
 
     const notesField = editor.locator('[data-result-field="notes"]');
-    await notesField.focus();
-    await page.keyboard.type('Won after stabilizing the board.');
+    await notesField.fill('Won after stabilizing the board.');
     await editor.locator('[data-action="save-game-result"]').click();
 
     const firstHistoryItem = page.locator('#panel-history .history-item').first();

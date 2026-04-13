@@ -1654,6 +1654,8 @@ function bindActionButtons(doc, actions) {
   }
 }
 
+export { renderTabPanels, renderOnboardingShell };
+
 export function renderBundle(doc, viewModel, actions) {
   const compactViewport = doc.defaultView?.matchMedia('(max-width: 767px)').matches ?? false;
   const activeTabId = normalizeSelectedTab(viewModel.ui.selectedTab);

@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node ./tools/dev-server.mjs",
-    "start": "node ./tools/dev-server.mjs",
+    "dev": "vite",
+    "start": "vite preview",
     "test": "node --test ./test/*.test.mjs",
     "test:epic1": "node --test ./test/epic1.test.mjs",
     "test:epic2": "node --test ./test/epic2-state.test.mjs",
@@ -62,14 +62,19 @@
     "check:epic14": "node --test ./test/epic14-stats-dashboard.test.mjs",
     "build:seed": "python3 ./tools/build_epic1_seed.py",
     "lint": "eslint src/",
-    "build": "node tools/build.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
     "test:coverage": "c8 --reporter=lcov --report-dir=coverage node --test ./test/*.test.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.0.0",
     "@playwright/test": "^1.59.1",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "c8": "^11.0.0",
     "esbuild": "^0.28.0",
-    "eslint": "^10.2.0"
+    "eslint": "^9.0.0",
+    "eslint-plugin-svelte": "^2.46.0",
+    "svelte": "^5.0.0",
+    "vite": "^6.0.0"
   }
 }

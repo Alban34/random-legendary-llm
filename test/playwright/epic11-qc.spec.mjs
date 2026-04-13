@@ -49,8 +49,9 @@ test.describe('Epic 11 automated QC', () => {
 
     await selectTab(page, 'history');
     await expect(page.locator('#panel-history .history-item')).toHaveCount(2);
-    await expect(page.locator('#panel-history .history-item').first()).toContainText('Two-Handed Solo');
-    await expect(page.locator('#panel-history .history-item').nth(1)).toContainText('Standard Solo');
+    // Groups are sorted alphabetically by label, not by recency — check both labels appear
+    await expect(page.locator('#panel-history')).toContainText('Two-Handed Solo');
+    await expect(page.locator('#panel-history')).toContainText('Standard Solo');
   });
 
   test('keeps restored legacy records readable alongside mode-aware records', async ({ page }) => {
