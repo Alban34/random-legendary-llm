@@ -145,6 +145,8 @@ Split Backup into clearer sections: export/import, routine freshness maintenance
 ### Expected UX improvement
 Backup becomes calmer to scan, routine upkeep feels safer, and destructive intent becomes much harder to miss.
 
+**Resolved (Epic UX6):** The Backup tab was restructured into three clearly separated panels: a Portability panel (`data-backup-portability-panel`) containing export/import controls and backup preview; a Maintenance panel (`data-backup-maintenance-panel`) containing per-category usage-reset controls, rendered as a collapsible `<details>` accordion on mobile; and a Danger Zone panel (`data-backup-danger-zone`) with consequence copy and the full-reset button. New CSS classes (`.danger-zone`, `.maintenance-accordion`, `.maintenance-accordion-summary`, `.maintenance-accordion-body`) enforce the visual separation. New localization keys (`backup.portabilityDescription`, `backup.maintenanceTitle`, `backup.dangerZoneTitle`, `backup.dangerZoneConsequence`) provide section headers and consequence framing in both EN and FR locales.
+
 ### Issue
 The mobile shell uses too much persistent chrome before active content can breathe.
 

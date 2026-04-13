@@ -26,7 +26,7 @@
 - [x] Toast is not needed when switching dark/light mode
 - [x] Toasts should be displayed on the bottom, raise from "outside" the window and disappear the same way
 - [x] Storage issue information should appear only if there is actually an issue, no need to indicate that everything is green
-- [ ] The classification of expansions should be revisited: Core and Villains should be both "Base games", there are mistakes in small and large expansions, if you need me to fix this, I can help.
+- [x] The classification of expansions should be revisited: Core and Villains should be both "Base games", there are mistakes in small and large expansions, if you need me to fix this, I can help.
 - [x] The generate and re-generate buttons do not make sense as they are doing the same thing in the end: there should be only one
 - [x] The generate button is too far below, the user needs to scroll down through optional information before reaching this mandatory button, this is not convenient, you should find a better layout
 - [x] The version of the app should be displayed in the header
@@ -34,3 +34,5 @@
 - [x] "Show history-ready setup snapshot" should not be there: dev thing
 - [x] The title is now too small, it should be bigger and align with the top of the screen (with language and theme basically)
 - [x] Revelations is a small extension, there is no standalone at all, only base games
+- [x] Refactor the whole project to use the latest Svelte framework
+- [x] In history, I want to group by mastermind, schemes, heroes, villains and player mode, only those.

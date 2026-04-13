@@ -633,3 +633,190 @@ Remove a residual developer debug control that is visible in production and corr
 - Story 28.3 — Structural Refactors and Bug Fixes: Reduce cognitive complexity of three functions (setup-generator.mjs `generateSetup`, history-utils.mjs grouping function, state-store.mjs `sanitizePreferences`) from above 15 to within the allowed limit by extracting helper functions; fix genuine bug in game-data-pipeline.mjs where a conditional ternary always evaluates to the same value; fix Blocker in state-store.mjs where `updateGameResult` always returns a cloned state even when no record was found (should return original state unchanged on the not-found path).
 
 **Out of scope:** No new features, no UI redesign, no test-file modifications beyond fixing lint-equivalent patterns inside existing test assertions.
+
+---
+
+## Epic 29 — Svelte 5 Build Tooling and Project Foundation
+
+**Status: Approved**
+
+**Objective**
+Replace the esbuild-based build pipeline with Vite and `@sveltejs/vite-plugin-svelte` so the project can compile Svelte 5 components while retaining zero runtime dependencies and a working dev server.
+
+**In scope**
+- replace `tools/build.mjs` and `tools/dev-server.mjs` with Vite equivalents
+- install `vite`, `svelte`, and `@sveltejs/vite-plugin-svelte` as dev dependencies only
+- configure Svelte 5 runes mode in `svelte.config.js`
+- establish the `/src` component directory structure for `.svelte` files
+- preserve the static SPA output (`index.html` + bundled JS/CSS)
+- verify the app boots to a working shell after the tooling switch
+
+**Stories**
+1. **Replace esbuild with Vite and configure `@sveltejs/vite-plugin-svelte`**
+2. **Add Svelte 5 as a dev dependency and enable runes mode globally**
+3. **Establish the component directory structure for `.svelte` files under `src/`**
+4. **Migrate the custom dev server to Vite's built-in dev mode**
+5. **Confirm the static build output remains a self-contained SPA with zero runtime dependencies**
+6. **Verify the existing ESLint and Playwright configurations still resolve after the tooling switch**
+
+**Acceptance Criteria**
+- Story 1: `npm run build` succeeds using Vite; the output directory contains an `index.html` and bundled assets equivalent to the previous esbuild output.
+- Story 2: `svelte` and `@sveltejs/vite-plugin-svelte` appear only in `devDependencies`; `svelte.config.js` enables runes mode; no Svelte runtime chunk appears in the production bundle.
+- Story 3: A documented directory convention exists for `.svelte` files under `src/`; at least one placeholder component file confirms the compiler resolves it.
+- Story 4: `npm run dev` launches the Vite dev server; the app is reachable in a browser without the old custom dev server.
+- Story 5: Inspecting the production bundle shows no Svelte runtime library — only compiled vanilla JS; bundle size does not exceed a documented baseline.
+- Story 6: `npm run lint` and `npx playwright test` both exit without configuration errors related to the tooling change.
+
+---
+
+## Epic 30 — Data and State Layer Migration to Svelte 5
+
+**Status: Approved**
+
+**Objective**
+Migrate the app's data pipeline and state management modules to work correctly within the Svelte 5 reactive system without breaking any existing behavioral contract.
+
+**In scope**
+- convert `state-store.mjs` to use Svelte 5 `$state` and `$derived` runes
+- make `game-data-pipeline.mjs` importable from `.svelte` components without side effects
+- verify collection, history, preferences, and usage-stats persistence remain intact after migration
+- ensure the app remains fully functional at this epic boundary
+
+**Stories**
+1. **Audit all stateful modules and define their Svelte 5 reactive equivalents**
+2. **Migrate `state-store.mjs` to export Svelte 5 `$state`-backed reactive stores**
+3. **Verify game-data-pipeline modules are free of side effects that conflict with Svelte's module runtime**
+4. **Confirm all storage persistence paths survive the migration intact**
+5. **Validate that all existing Node unit tests still pass against the migrated state layer**
+
+**Acceptance Criteria**
+- Story 1: A written audit maps each stateful module to its intended Svelte 5 reactive pattern before any code changes are made.
+- Story 2: `state-store.mjs` (or its replacement) exports reactive state objects backed by `$state` runes; consumers no longer call explicit setter functions for simple property updates where a reactive binding suffices.
+- Story 3: `game-data-pipeline.mjs` and its dependents import cleanly inside `.svelte` files without triggering unintended side effects or initialization errors.
+- Story 4: A round-trip integration check (set collection, accept game, persist, reload) passes in the browser after the migration; no localStorage key is lost or renamed.
+- Story 5: All unit tests under `test/epic2-state.test.mjs` and related state test files pass without modification to the test assertions.
+
+---
+
+## Epic 31 — UI Shell and Navigation Migration to Svelte Components
+
+**Status: Approved**
+
+**Objective**
+Convert the application shell, tab navigation, and shared UI primitives from DOM-manipulation modules into Svelte 5 components so the component hierarchy mirrors the rendered page structure.
+
+**In scope**
+- convert `app-renderer.mjs` shell and mount logic to a root Svelte component
+- convert tab navigation to a Svelte component backed by reactive active-tab state
+- convert shared UI primitives (buttons, cards, badges, toasts) to Svelte components
+- preserve all existing visual design tokens and CSS without modification
+- ensure the app is visually and behaviorally identical to the pre-migration shell at this epic boundary
+
+**Stories**
+1. **Create a root `App.svelte` component and mount it via the Vite entry point**
+2. **Convert tab navigation to a `TabNav.svelte` component with reactive active-tab state**
+3. **Convert shared UI primitives (buttons, cards, badges) to individual Svelte component files**
+4. **Convert the toast notification system to a `ToastStack.svelte` component**
+5. **Verify the app shell is visually and behaviorally identical to the pre-migration version**
+
+**Acceptance Criteria**
+- Story 1: The app mounts from a single `App.svelte` root component; `app-renderer.mjs` is removed or reduced to the Vite entry bootstrap only; the page renders correctly in the browser.
+- Story 2: Tab switching is driven by a reactive `$state` variable inside `TabNav.svelte`; active-tab persistence and keyboard navigation continue to work exactly as before.
+- Story 3: Buttons, cards, and badges are individually importable `.svelte` files; each matches the visual output of its DOM-manipulation predecessor without CSS changes.
+- Story 4: Toasts appear and dismiss correctly via `ToastStack.svelte`; auto-dismiss timing and ARIA attributes are preserved.
+- Story 5: A side-by-side visual comparison confirms no layout, color, or typography regression; existing Playwright shell navigation tests pass unchanged.
+
+---
+
+## Epic 32 — Feature Tab Components Migration
+
+**Status: Approved**
+
+**Objective**
+Convert each major feature tab — Browse, Collection, New Game, History, and Stats — from DOM-manipulation rendering functions into Svelte 5 components, completing the full UI layer migration from vanilla JS to Svelte.
+
+**In scope**
+- Browse tab: set grid, set detail expansion, search/filter controls, ownership toggle
+- Collection tab: grouped checklist, category totals, capacity indicators, collection reset
+- New Game tab: player-count controls, setup generation, result display, Accept & Log
+- History tab: history list, record expansion, result editing
+- Stats tab: per-category usage panels, collapsible sections, reset actions
+- all feature behavior must be preserved exactly — no functional changes during migration
+
+**Stories**
+1. **Convert Browse tab rendering to a `BrowseTab.svelte` component with reactive filtering**
+2. **Convert Collection tab rendering to a `CollectionTab.svelte` component with reactive ownership state**
+3. **Convert New Game tab to a `NewGameTab.svelte` component with reactive setup generation flow**
+4. **Convert History tab to a `HistoryTab.svelte` component with reactive record expansion**
+5. **Convert Stats tab to a `StatsTab.svelte` component with reactive usage displays**
+6. **Run the full Playwright end-to-end suite and confirm all feature scenarios pass**
+
+**Acceptance Criteria**
+- Story 1: `BrowseTab.svelte` renders the set grid; search filtering and ownership toggles are driven by reactive state; no standalone DOM manipulation functions remain for Browse rendering.
+- Story 2: `CollectionTab.svelte` mirrors ownership state with Browse; category totals and capacity indicators update reactively; collection reset with confirmation works as before.
+- Story 3: `NewGameTab.svelte` generates, displays, and accepts setups; player-count and Advanced Solo controls update reactively; Regenerate does not consume history state.
+- Story 4: `HistoryTab.svelte` renders history in newest-first order; records expand and collapse; result editing actions remain functional.
+- Story 5: `StatsTab.svelte` displays per-category usage panels that expand and collapse correctly; all reset actions work as before.
+- Story 6: The full Playwright suite exits with zero failures after all feature tab components are in place.
+
+---
+
+## Epic 33 — Test Suite Alignment for Svelte 5
+
+**Status: Approved**
+
+**Objective**
+Update the Node unit test suite and Playwright end-to-end specs to correctly exercise the Svelte 5 component hierarchy so coverage remains meaningful and no test is silently bypassed by the migration.
+
+**In scope**
+- audit which unit tests target DOM-manipulation modules replaced by Svelte components
+- replace or update unit tests that imported removed vanilla JS rendering modules
+- confirm Playwright specs exercise the correct component-rendered DOM
+- ensure `node --test` and `npx playwright test` both exit cleanly with no skipped or failing tests
+- no new features are tested — coverage scope must match the pre-migration baseline
+
+**Stories**
+1. **Audit all existing test files to identify tests that target removed DOM-manipulation modules**
+2. **Update or replace unit tests that imported vanilla JS rendering modules with component-equivalent tests**
+3. **Verify Playwright specs select the correct DOM elements produced by Svelte-rendered components**
+4. **Confirm `node --test` exits with zero failures and no uncovered epic boundary**
+5. **Document the updated test strategy reflecting the Svelte component test model**
+
+**Acceptance Criteria**
+- Story 1: A written audit lists every test file that imports a module removed or renamed during the migration; no test file is silently broken without being identified.
+- Story 2: All listed tests are updated to import or mount the replacement Svelte components; total test count does not decrease across any epic boundary.
+- Story 3: Playwright selectors target rendered DOM from Svelte components; no selector relies on DOM structure that only the old vanilla JS renderer produced.
+- Story 4: `node --test` exits with zero failures and zero skipped tests on the fully migrated codebase.
+- Story 5: `documentation/testing-qc-strategy.md` is updated to describe how unit tests interact with Svelte components and how Playwright exercises the compiled output.
+
+---
+
+## Epic 34 — History Grouping Expansion
+
+**Status: Approved**
+
+**Objective**
+Replace the current limited grouping options with the five user-requested dimensions — mastermind, scheme, heroes, villains, and player mode — so every game record is explorable from the angles that matter most at the table.
+
+**In scope**
+- five supported grouping modes: mastermind, scheme, heroes, villains, and player mode
+- derivation of scheme, hero, and villain group keys from `setupSnapshot` fields (`schemeId`, `heroIds`, `villainGroupIds`)
+- multi-value grouping behavior for heroes and villains: a single record appears under each hero it contains and under each villain group it contains
+- removal of the `player-count` grouping mode
+- removal of the `none` (ungrouped) mode; mastermind becomes the default grouping
+- localization of all five grouping mode labels in English and French
+- grouping is a presentation-only concern — no modification to the persisted history model
+
+**Stories**
+1. **Define the five-mode grouping contract including multi-value semantics for heroes and villains**
+2. **Add scheme, hero, and villain grouping derivations to `history-utils.mjs` and remove `player-count` and `none` modes**
+3. **Update the History grouping UI controls to expose exactly the five new modes**
+4. **Localize all five grouping mode labels in English and French**
+5. **Verify all five grouping modes render correctly for existing records, including multi-group membership for heroes and villains**
+
+**Acceptance Criteria**
+- Story 1: A written contract specifies the group key derivation for each of the five modes, documents that heroes and villains produce one group entry per entity, and declares mastermind as the default mode replacing the removed `none` option.
+- Story 2: `history-utils.mjs` derives correct group keys for all five modes from `setupSnapshot`; `player-count` and `none` are removed; the persisted history model is unchanged.
+- Story 3: The grouping control in the History tab presents exactly five mode options; selecting any mode updates the displayed groups immediately; `player-count` and ungroup options are unreachable.
+- Story 4: All five grouping mode labels render in English and French without falling back to the alternate locale; no untranslated string is visible in either supported locale.
+- Story 5: Each mode groups all existing records correctly; a record with three heroes appears under all three hero groups; a record with two villain groups appears under both; no record is silently omitted from a group it belongs to.

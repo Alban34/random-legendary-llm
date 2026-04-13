@@ -3,7 +3,6 @@ import { BROWSE_TYPE_OPTIONS, filterBrowseSets, summarizeBrowseSet } from './bro
 import { getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
 import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from './forced-picks-utils.mjs';
 import {
-  buildFullResetPreview,
   buildHistoryGroups,
   DEFAULT_HISTORY_GROUPING_MODE,
   formatHistorySummary,
@@ -1395,13 +1394,12 @@ function renderBackupPanel(viewModel, options = {}) {
   const locale = getLocale(viewModel);
   const compactViewport = Boolean(options.compactViewport);
   const indicators = summarizeUsageIndicators(bundle.runtime, state);
-  const resetPreview = buildFullResetPreview();
   return `
     <section class="page-flow stack gap-md ${compactViewport ? 'page-flow-compact-mobile' : ''}">
-      <section class="panel" data-backup-panel>
+      <section class="panel" data-backup-panel data-backup-portability-panel>
         <div class="panel-copy ${compactViewport ? 'compact-mobile' : ''}">
           <h2>${locale.t('backup.title')}</h2>
-          ${compactViewport ? '' : `<div class="muted backup-panel-description">${locale.t('backup.description')}</div>`}
+          ${compactViewport ? '' : `<div class="muted backup-panel-description">${locale.t('backup.portabilityDescription')}</div>`}
         </div>
         <div class="button-row" data-mobile-task-anchor="backup">
           <button class="button button-secondary" data-action="export-backup">${locale.t('backup.export')}</button>
@@ -1410,10 +1408,27 @@ function renderBackupPanel(viewModel, options = {}) {
         <input id="backup-import-input" class="visually-hidden" type="file" accept=".json,application/json" />
         ${renderBackupPreview(ui, locale)}
       </section>
-      <section class="panel">
-        <div class="panel-copy ${compactViewport ? 'compact-mobile' : ''}">
-          <h2>${locale.t('backup.usedCardTracking')}</h2>
-          ${compactViewport ? '' : `<div class="muted backup-usage-description">${locale.t('backup.usedCardDescription')}</div>`}
+      ${compactViewport ? `
+      <details class="maintenance-accordion panel" data-backup-maintenance-panel>
+        <summary class="maintenance-accordion-summary">${locale.t('backup.maintenanceTitle')}</summary>
+        <div class="maintenance-accordion-body">
+          <div class="stack gap-sm history-usage-indicators">
+            ${indicators.map((indicator) => `
+              <article class="summary-card history-usage-row" data-usage-category="${indicator.category}">
+                <div>
+                  <strong>${locale.getUsageLabel(indicator.category)}</strong>
+                  <div class="muted">${locale.t('backup.neverPlayed', { value: `${locale.formatNumber(indicator.neverPlayed)}/${locale.formatNumber(indicator.total)}` })}</div>
+                </div>
+                <button class="button button-secondary" data-action="reset-usage" data-category="${indicator.category}">${locale.t('backup.resetCategory', { label: locale.getUsageLabel(indicator.category) })}</button>
+              </article>
+            `).join('')}
+          </div>
+        </div>
+      </details>` : `
+      <section class="panel" data-backup-maintenance-panel>
+        <div class="panel-copy">
+          <h2>${locale.t('backup.maintenanceTitle')}</h2>
+          <div class="muted backup-usage-description">${locale.t('backup.usedCardDescription')}</div>
         </div>
         <div class="stack gap-sm history-usage-indicators">
           ${indicators.map((indicator) => `
@@ -1426,8 +1441,11 @@ function renderBackupPanel(viewModel, options = {}) {
             </article>
           `).join('')}
         </div>
-        ${compactViewport ? '' : `<p class="muted backup-reuse-notice">${locale.t('backup.lowestPlayReuse')}</p>`}
-        <div class="muted">${locale.t('backup.resetPreview', { historyCount: locale.formatNumber(resetPreview.history.length), ownedSetCount: locale.formatNumber(resetPreview.collection.ownedSetIds.length) })}</div>
+        <p class="muted backup-reuse-notice">${locale.t('backup.lowestPlayReuse')}</p>
+      </section>`}
+      <section class="panel danger-zone" data-backup-danger-zone>
+        <h2>${locale.t('backup.dangerZoneTitle')}</h2>
+        <p>${locale.t('backup.dangerZoneConsequence')}</p>
         <div class="button-row">
           <button class="button button-danger" data-action="request-reset-all-state">${locale.t('backup.fullReset')}</button>
         </div>

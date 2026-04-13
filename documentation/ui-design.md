@@ -279,8 +279,11 @@ Typography roles are governed by `documentation/design-system.md`.
 
 ## Tab 5 — Backup & Data Management
 
+The Backup tab is divided into three clearly separated panels (Epic UX6):
+
 ```
-  ── Backup and Restore ──────────────────────────────
+  ── Portability ─────────────────────────────────────
+  (data-backup-panel data-backup-portability-panel)
 
   Export your collection, usage, history, results,
   and preferences as a versioned JSON backup.
@@ -290,7 +293,9 @@ Typography roles are governed by `documentation/design-system.md`.
   Imported backup preview...
   [Merge Backup] [Replace with Backup]
 
-  ── Used Card Tracking ──────────────────────────────
+  ── Maintenance ─────────────────────────────────────
+  (data-backup-maintenance-panel)
+  (mobile: collapsed behind a <details> accordion)
 
   Heroes         Never played: 10/52        [Reset Hero Counts]
   Masterminds    Never played: 5/14         [Reset Mastermind Counts]
@@ -300,15 +305,24 @@ Typography roles are governed by `documentation/design-system.md`.
 
   Lowest-play reuse activates automatically when a category runs out of never-played options.
 
+  ── Danger Zone ─────────────────────────────────────
+  (data-backup-danger-zone)
+
+  This will permanently delete all game history and
+  reset all card tracking. This cannot be undone.
+
   [🗑 FULL RESET — Clear all data]
 ```
 
 **Interactions:**
 - Progress indicators show never-played/total for each category
 - Individual Reset buttons clear only that category's play counts (no confirmation needed)
-- Full Reset shows a modal confirmation: "This will delete all game history and reset all card tracking. Are you sure?"
+- The Maintenance panel is rendered as a collapsible `<details>` accordion on mobile to reduce scroll density; on desktop it is always visible
+- Full Reset is presented in the dedicated Danger Zone panel with consequence copy; it shows a modal confirmation before any data is cleared
 - Import preview stages the backup before any merge or replace action is applied
 - Storage-health status is only surfaced when storage is unavailable or degraded; no indicator is shown during normal healthy operation
+
+**CSS classes introduced by Epic UX6:** `.danger-zone`, `.maintenance-accordion`, `.maintenance-accordion-summary`, `.maintenance-accordion-body`
 
 ---
 
