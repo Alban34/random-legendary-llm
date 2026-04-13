@@ -157,8 +157,7 @@ function sanitizeGameRecord(record, indexes, notices) {
       advancedSolo: record.advancedSolo,
       playMode: record.playMode
     });
-  } catch (error) {
-    notices.push(`Removed invalid stored game history record '${record.id ?? 'unknown'}'.`);
+  } catch {
     return null;
   }
 
@@ -211,7 +210,7 @@ function sanitizePreferences(candidatePreferences, notices) {
       advancedSolo: lastAdvancedSolo,
       playMode: candidatePreferences.lastPlayMode
     });
-  } catch (error) {
+  } catch {
     lastPlayMode = resolvePlayMode(lastPlayerCount, { advancedSolo: lastAdvancedSolo });
   }
   let selectedTab = defaultPreferences.selectedTab;

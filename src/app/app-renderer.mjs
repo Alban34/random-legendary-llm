@@ -1,7 +1,6 @@
 import { APP_TABS, normalizeSelectedTab } from './app-tabs.mjs';
-import { BROWSE_TYPE_OPTIONS, filterBrowseSets, getBrowseTypeLabel, summarizeBrowseSet } from './browse-utils.mjs';
-import { COLLECTION_TYPE_GROUPS, getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
-import { TOAST_VARIANTS } from './feedback-utils.mjs';
+import { BROWSE_TYPE_OPTIONS, filterBrowseSets, summarizeBrowseSet } from './browse-utils.mjs';
+import { getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from './collection-utils.mjs';
 import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from './forced-picks-utils.mjs';
 import {
   buildFullResetPreview,
@@ -12,7 +11,7 @@ import {
   summarizeUsageIndicators
 } from './history-utils.mjs';
 import { getSelectableLocales } from './localization-utils.mjs';
-import { formatHeroTeamLabel, formatMastermindLeadLabel, formatPersistedPlayMode, getAvailablePlayModes, getDisplayedSetupRequirements, getPlayModeHelpText } from './new-game-utils.mjs';
+import { getAvailablePlayModes, getDisplayedSetupRequirements } from './new-game-utils.mjs';
 import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from './result-utils.mjs';
 import { buildInsightsDashboard } from './stats-utils.mjs';
 import { buildOwnedPools } from './setup-generator.mjs';
@@ -323,10 +322,6 @@ function renderForcedPickControls(viewModel) {
   `;
 }
 
-function formatEntityCards(entities) {
-  return entities.map((entity) => `<span class="entity-chip">${entity.name}</span>`).join('');
-}
-
 function renderHeroResultCards(heroes, locale) {
   return heroes.map((hero) => `
     <article class="result-card hero-result-card" data-hero-id="${hero.id}">
@@ -438,7 +433,7 @@ function renderInsightsDashboard(viewModel, options = {}) {
   const { outcome, usage, freshness, collectionCoverage } = dashboard;
   const scoredWindow = Math.min(outcome.scoredGames, 5);
 
-  let helperCopy = locale.t('history.insights.helper.unlockTrends');
+  let helperCopy;
   if (outcome.totalGames === 0) {
     helperCopy = locale.t('history.insights.helper.noGames');
   } else if (outcome.completedResults === 0) {
@@ -709,10 +704,6 @@ const ONBOARDING_STEPS = [
     tabId: 'backup'
   }
 ];
-
-function formatSetCountLabel(value, singular, plural = `${singular}s`) {
-  return `${value} ${value === 1 ? singular : plural}`;
-}
 
 function renderOnboardingShell(viewModel) {
   if (!viewModel.ui.onboardingVisible) {

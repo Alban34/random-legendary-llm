@@ -1194,7 +1194,7 @@ function getMessagesForLocale(localeId) {
   return EN_MESSAGES;
 }
 
-function collectFallbackKeys(localeId) {
+function collectFallbackKeys(_localeId) {
   return [];
 }
 
@@ -1208,14 +1208,6 @@ export function getSelectableLocales() {
 
 export function getLocaleOption(localeId) {
   return LOCALE_OPTIONS.find((locale) => locale.id === normalizeLocaleId(localeId)) || SELECTABLE_LOCALES[0];
-}
-
-function formatWith(localeId, value, formatter, fallback = '—') {
-  if (value === null || value === undefined || value === '') {
-    return fallback;
-  }
-
-  return formatter.format(value);
 }
 
 function titleCaseWords(value) {
