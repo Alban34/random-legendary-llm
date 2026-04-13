@@ -596,7 +596,7 @@ function tryMastermindForScheme(mastermind, { mastermindRanking, scheme, schemeS
       villainGroups: categorySelection.selection.villainGroups,
       henchmanGroups: categorySelection.selection.henchmanGroups
     }),
-    schemeFallback: !normalizedForcedPicks.schemeId && schemeSelection.selected[0]?.id === scheme.id && schemeSelection.fallbackItems.length ? [scheme] : [],
+    schemeFallback: !normalizedForcedPicks.schemeId && schemeSelection.fallbackItems.some((s) => s.id === scheme.id) ? [scheme] : [],
     mastermindFallback: !normalizedForcedPicks.mastermindId && mastermindRanking.fallbackItems.some((entity) => entity.id === mastermind.id) ? [mastermind] : [],
     heroFallback: heroSelection.fallbackItems,
     categoryFallback: categorySelection.selection.fallback

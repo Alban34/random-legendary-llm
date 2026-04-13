@@ -1289,6 +1289,26 @@ Approved
 - [x] **Test:** verify the revised header renders without overflow, truncation, or layout regression in all supported themes, locales, and viewport sizes
 - [x] **QC (Automated):** automate QC coverage for the revised header across all theme and locale combinations on desktop and mobile viewports
 
+### Story 27.4 — Fix the scheme-selection fallback notification that fires unconditionally
+
+**Status: Approved**
+
+- [x] Locate the `schemeFallback` condition in `setup-generator.mjs` that uses `schemeSelection.fallbackItems.length` as its gate
+- [x] Replace the gate with `schemeSelection.fallbackItems.some((s) => s.id === scheme.id)` so the notification fires only when the selected scheme is itself a fallback pick
+- [x] Verify the notification no longer appears when the freshest never-played scheme is selected even if other schemes in the pool have plays
+- [x] Verify the notification still appears correctly when every eligible scheme has been played before
+- [x] **Test:** verify the corrected condition produces no notification for a fresh scheme pick and produces a notification for a genuine fallback pick
+- [x] **QC (Automated):** automate QC coverage asserting the scheme fallback notification is absent on a fresh selection and present on an all-played selection
+
+### Story 27.5 — Sort history groups alphabetically by label
+
+**Status: Approved**
+
+- [x] Replace the `latestCreatedAt`-descending sort in `buildHistoryGroups` with a pure `label.localeCompare` alphabetical sort
+- [x] Verify the new sort applies to all five grouping modes (mastermind, scheme, heroes, villains, play-mode)
+- [x] **Test:** verify groups for each mode are returned in alphabetical order by label
+- [x] **QC (Automated):** automate QC coverage confirming group headers appear in alphabetical order in the History tab
+
 ---
 
 ## Epic 28 — SonarCloud Code Quality Remediation

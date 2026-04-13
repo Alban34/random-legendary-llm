@@ -36,3 +36,5 @@
 - [x] Revelations is a small extension, there is no standalone at all, only base games
 - [x] Refactor the whole project to use the latest Svelte framework
 - [x] In history, I want to group by mastermind, schemes, heroes, villains and player mode, only those.
+- [x] "Least-played fallback used for Scheme selection" always appears, this is probably a defect
+- [x] History grouping should be in alphabetical order

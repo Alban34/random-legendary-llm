@@ -188,13 +188,7 @@ export function buildHistoryGroups(records, indexes, { mode = DEFAULT_HISTORY_GR
     }
   });
 
-  return [...groupsById.values()].sort((left, right) => {
-    const createdAtOrder = String(right.latestCreatedAt).localeCompare(String(left.latestCreatedAt));
-    if (createdAtOrder !== 0) {
-      return createdAtOrder;
-    }
-    return left.label.localeCompare(right.label);
-  });
+  return [...groupsById.values()].sort((left, right) => left.label.localeCompare(right.label));
 }
 
 export function buildFullResetPreview() {

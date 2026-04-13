@@ -12,13 +12,15 @@ let rendererSource;
 let cssSource;
 let localeSource;
 let postV1TaskList;
+let generatorSource;
 
 before(async () => {
-  [rendererSource, cssSource, localeSource, postV1TaskList] = await Promise.all([
+  [rendererSource, cssSource, localeSource, postV1TaskList, generatorSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'setup-generator.mjs'), 'utf8')
   ]);
 });
 
@@ -84,5 +86,34 @@ test('Epic 27 full regression gate is marked in task-list.md', () => {
   assert.match(
     postV1TaskList,
     /- \[x\] \*\*Full regression gate:\*\* run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 27 work complete/
+  );
+});
+
+// Story 27.4 — schemeFallback condition uses .some() not .length
+test('Story 27.4 — schemeFallback gate uses fallbackItems.some() not fallbackItems.length', () => {
+  // The old bug: fallbackItems.length causes the notification to fire whenever ANY scheme
+  // in the pool has been played, even when the selected scheme is the freshest/never-played.
+  // The fix: gate on whether the selected scheme itself is in fallbackItems.
+  assert.doesNotMatch(
+    generatorSource,
+    /schemeFallback:.*schemeSelection\.fallbackItems\.length/,
+    'schemeFallback must not use fallbackItems.length as its gate (unconditional notification bug)'
+  );
+  assert.match(
+    generatorSource,
+    /schemeFallback:.*schemeSelection\.fallbackItems\.some\(\(s\) => s\.id === scheme\.id\)/,
+    'schemeFallback must use fallbackItems.some((s) => s.id === scheme.id) to fire only for genuine fallback picks'
+  );
+});
+
+test('Story 27.4 — task-list Story 27.4 checkboxes are all marked complete', () => {
+  assert.match(
+    postV1TaskList,
+    /### Story 27\.4 — Fix the scheme-selection fallback notification that fires unconditionally/
+  );
+  assert.doesNotMatch(
+    postV1TaskList,
+    /### Story 27\.4[\s\S]*?- \[ \]/,
+    'Story 27.4 must have no unchecked checkboxes'
   );
 });

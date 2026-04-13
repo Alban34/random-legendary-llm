@@ -173,3 +173,35 @@ test('Epic 34 villains grouping accumulates all records that share a villain gro
   assert.equal(groupV1.count, 2);
   assert.equal(groupV2.count, 1);
 });
+
+test('Epic 34 Story 27.5 buildHistoryGroups returns groups sorted alphabetically by label for mastermind mode', () => {
+  // Use three distinct masterminds whose names are intentionally out of alphabetical order
+  // relative to the createdAt timestamps, to confirm alphabetical wins over newest-first.
+  const allMastermindIds = Object.keys(bundle.runtime.indexes.mastermindsById);
+  // Collect three masterminds with distinct names by iterating the index
+  const picked = [];
+  for (const id of allMastermindIds) {
+    if (picked.length === 3) break;
+    picked.push(id);
+  }
+  assert.ok(picked.length === 3, 'seed data must contain at least 3 masterminds');
+
+  const nameOf = (id) => bundle.runtime.indexes.mastermindsById[id].name;
+
+  // Sort picked by name to know the expected alphabetical order
+  const alphabeticalIds = [...picked].sort((a, b) => nameOf(a).localeCompare(nameOf(b)));
+
+  // Assign createdAt in reverse-alphabetical order so newest-first would yield the wrong order
+  const records = [
+    createRecord({ id: 'r1', createdAt: '2026-04-10T12:00:00.000Z', mastermindId: alphabeticalIds[2] }),
+    createRecord({ id: 'r2', createdAt: '2026-04-10T11:00:00.000Z', mastermindId: alphabeticalIds[1] }),
+    createRecord({ id: 'r3', createdAt: '2026-04-10T10:00:00.000Z', mastermindId: alphabeticalIds[0] })
+  ];
+
+  const groups = buildHistoryGroups(records, bundle.runtime.indexes, { mode: 'mastermind' });
+  assert.equal(groups.length, 3);
+
+  const returnedLabels = groups.map((g) => g.label);
+  const expectedLabels = alphabeticalIds.map(nameOf);
+  assert.deepEqual(returnedLabels, expectedLabels, 'groups must be in alphabetical label order, not newest-first');
+});

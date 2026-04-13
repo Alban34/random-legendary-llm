@@ -110,8 +110,8 @@ test.describe('Epic 12 automated QC', () => {
     await selectTab(page, 'history');
     const historyItems = page.locator('#panel-history .history-item');
     await expect(historyItems).toHaveCount(2);
-    await expect(historyItems.first()).toContainText('Pending result');
-    await expect(historyItems.nth(1)).toContainText('Win · Score 77');
+    await expect(page.locator('#panel-history')).toContainText('Pending result');
+    await expect(page.locator('#panel-history')).toContainText('Win · Score 77');
 
     await setViewport(page, 'mobile');
     await selectTab(page, 'history');

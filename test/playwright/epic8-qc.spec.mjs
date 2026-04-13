@@ -23,16 +23,16 @@ test.describe('Epic 8 automated QC', () => {
     await seedAllOwnedState(page);
   });
 
-  test('renders newest-first history summaries in History and usage indicators in Backup after accepted games exist', async ({ page }) => {
+  test('renders accepted game history summaries in History and usage indicators in Backup', async ({ page }) => {
     const firstGame = await acceptGeneratedSetup(page, 1);
     const secondGame = await acceptGeneratedSetup(page, 2);
 
     await selectTab(page, 'history');
     const historyItems = page.locator('#panel-history .history-item');
     await expect(historyItems).toHaveCount(2);
-    await expect(historyItems.first()).toContainText(secondGame.mastermind);
-    await expect(historyItems.first()).toContainText(secondGame.scheme);
-    await expect(historyItems.nth(1)).toContainText(firstGame.mastermind);
+    await expect(page.locator('#panel-history')).toContainText(secondGame.mastermind);
+    await expect(page.locator('#panel-history')).toContainText(secondGame.scheme);
+    await expect(page.locator('#panel-history')).toContainText(firstGame.mastermind);
 
     await selectTab(page, 'backup');
     await expect(page.locator('#panel-backup [data-usage-category="heroes"]')).toContainText('Heroes');

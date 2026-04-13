@@ -44,7 +44,7 @@ function createRecord({
   };
 }
 
-test('Epic 20 defaults to mastermind grouping and preserves newest-first group ordering', () => {
+test('Epic 20 defaults to mastermind grouping and sorts groups alphabetically by label', () => {
   const records = [
     createRecord({ id: 'one', createdAt: '2026-04-10T10:00:00.000Z', mastermindId: 'core-set-red-skull' }),
     createRecord({ id: 'two', createdAt: '2026-04-10T12:00:00.000Z', mastermindId: 'core-set-magneto' }),

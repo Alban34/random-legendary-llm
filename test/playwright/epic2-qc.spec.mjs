@@ -44,7 +44,7 @@ test.describe('Epic 2 automated QC', () => {
     await expect(page.locator('#panel-collection')).toContainText('3');
   });
 
-  test('accepts multiple setups, persists usage stats, and renders matching history entries newest first', async ({ page }) => {
+  test('accepts multiple setups, persists usage stats, and renders both entries in history', async ({ page }) => {
     await seedAllOwnedState(page);
     await selectTab(page, 'new-game');
 
@@ -80,8 +80,7 @@ test.describe('Epic 2 automated QC', () => {
     await expect(historyPanel).toContainText(firstSetup.mastermind);
     await expect(historyPanel).toContainText(firstSetup.scheme);
 
-    const firstHistorySummary = historyPanel.locator('.history-item').first();
-    await expect(firstHistorySummary).toContainText(secondSetup.mastermind);
+    await expect(historyPanel.locator('.history-item').filter({ hasText: secondSetup.mastermind }).first()).toBeVisible();
   });
 
   test('per-category resets and full reset update visible state without leaving stale data behind', async ({ page }) => {
