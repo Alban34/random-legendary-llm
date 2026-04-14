@@ -34,21 +34,21 @@ export function rankItemsByFreshness(items, usageBucket, random = Math.random) {
   const grouped = new Map();
 
   for (const item of items) {
-    const key = JSON.stringify(getFreshnessKey(usageBucket, item));
-    const list = grouped.get(key) || [];
-    list.push(item);
-    grouped.set(key, list);
+    const key = getFreshnessKey(usageBucket, item);
+    const keyStr = `${key[0]}|${key[1]}|${key[2]}`;
+    if (!grouped.has(keyStr)) {
+      grouped.set(keyStr, { key, list: [] });
+    }
+    grouped.get(keyStr).list.push(item);
   }
 
-  return [...grouped.entries()]
+  return [...grouped.values()]
     .sort((left, right) => {
-      const leftKey = JSON.parse(left[0]);
-      const rightKey = JSON.parse(right[0]);
-      if (leftKey[0] !== rightKey[0]) return leftKey[0] - rightKey[0];
-      if (leftKey[1] !== rightKey[1]) return leftKey[1] - rightKey[1];
-      return leftKey[2] - rightKey[2];
+      if (left.key[0] !== right.key[0]) return left.key[0] - right.key[0];
+      if (left.key[1] !== right.key[1]) return left.key[1] - right.key[1];
+      return left.key[2] - right.key[2];
     })
-    .flatMap(([, list]) => shuffle(list, random));
+    .flatMap(({ list }) => shuffle(list, random));
 }
 
 function summarizeFallback(selected, usageBucket) {

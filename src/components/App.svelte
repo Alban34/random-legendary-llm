@@ -1,5 +1,4 @@
 <script>
-  import { onMount, tick } from 'svelte';
   import TabNav from './TabNav.svelte';
   import ToastStack from './ToastStack.svelte';
   import BrowseTab from './BrowseTab.svelte';
@@ -10,7 +9,7 @@
   import { createEpic1Bundle } from '../app/game-data-pipeline.mjs';
   import { APP_TABS, DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from '../app/app-tabs.mjs';
   import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from '../app/feedback-utils.mjs';
-  import { addForcedPick, createEmptyForcedPicks, hasForcedPicks, removeForcedPick } from '../app/forced-picks-utils.mjs';
+  import { addForcedPick, hasForcedPicks, removeForcedPick } from '../app/forced-picks-utils.mjs';
   import { DEFAULT_HISTORY_GROUPING_MODE, HISTORY_GROUPING_MODES } from '../app/history-utils.mjs';
   import { createLocaleTools, getSelectableLocales, normalizeLocaleId } from '../app/localization-utils.mjs';
   import { normalizeGameResultDraft, validateGameResultDraft } from '../app/result-utils.mjs';
@@ -39,12 +38,38 @@
     parseBackupText,
     summarizeBackupState
   } from '../app/backup-utils.mjs';
+  import {
+    getBrowseSearchTerm, setBrowseSearchTerm,
+    getBrowseTypeFilter, setBrowseTypeFilter,
+    getExpandedBrowseSetId, setExpandedBrowseSetId
+  } from '../app/browse-vm.svelte.js';
+  import {
+    getCurrentSetup, setCurrentSetup,
+    getGeneratorError, setGeneratorError,
+    getGeneratorNotices, setGeneratorNotices,
+    getSelectedPlayerCount, setSelectedPlayerCount,
+    getSelectedPlayMode, setSelectedPlayMode,
+    getAdvancedSolo, setAdvancedSolo,
+    getForcedPicks, setForcedPicks, resetForcedPicks
+  } from '../app/new-game-vm.svelte.js';
+  import {
+    getHistoryExpandedRecordId, setHistoryExpandedRecordId,
+    getHistoryInsightsExpanded, setHistoryInsightsExpanded, toggleHistoryInsights,
+    getHistoryGroupingMode, setHistoryGroupingMode, resetHistoryGroupingMode,
+    getResultEditorRecordId, setResultEditorRecordId,
+    getResultEditorReturnFocusSelector, setResultEditorReturnFocusSelector,
+    getResultDraft, setResultDraft, resetResultDraft,
+    getResultFormError, setResultFormError,
+    getResultInvalidFields, setResultInvalidFields
+  } from '../app/history-vm.svelte.js';
+  import {
+    getBackupImportError, setBackupImportError,
+    getStagedBackup, setStagedBackup,
+    getConfirmBackupRestoreMode, setConfirmBackupRestoreMode,
+    getLastBackupExportFileName, setLastBackupExportFileName
+  } from '../app/backup-vm.svelte.js';
 
   const APP_VERSION = '0.1.0';
-
-  function createEmptyResultDraft() {
-    return { outcome: '', score: '', notes: '' };
-  }
 
   async function loadSeed() {
     const seedUrl = new URL('../data/canonical-game-data.json', import.meta.url);
@@ -72,12 +97,6 @@
   });
   let ui = $state({
     lastActionNotice: null,
-    generatorError: null,
-    generatorNotices: [],
-    currentSetup: null,
-    browseSearchTerm: '',
-    browseTypeFilter: 'all',
-    expandedBrowseSetId: null,
     confirmResetOwnedCollection: false,
     confirmResetAllState: false,
     modalReturnFocusAction: null,
@@ -85,24 +104,8 @@
     onboardingVisible: false,
     onboardingStep: 0,
     aboutPanelOpen: false,
-    backupImportError: null,
-    stagedBackup: null,
-    confirmBackupRestoreMode: null,
-    lastBackupExportFileName: null,
     mobilePreferencesOpen: false,
-    forcedPicks: createEmptyForcedPicks(),
-    resultEditorRecordId: null,
-    resultEditorReturnFocusSelector: null,
-    resultDraft: createEmptyResultDraft(),
-    resultFormError: null,
-    resultInvalidFields: [],
-    historyExpandedRecordId: null,
-    historyInsightsExpanded: false,
-    historyGroupingMode: DEFAULT_HISTORY_GROUPING_MODE,
-    selectedTab: DEFAULT_TAB_ID,
-    selectedPlayerCount: 1,
-    selectedPlayMode: 'standard',
-    advancedSolo: false
+    selectedTab: DEFAULT_TAB_ID
   });
   let compactViewport = $state(false);
   let initError = $state(null);
@@ -144,27 +147,28 @@
   // Debug globals (mirrors syncDebugGlobals from browser-entry.mjs)
   // ---------------------------------------------------------------------------
   function syncGlobals() {
+    if (!import.meta.env.DEV) return;
     if (!bundle || !appState) return;
     globalThis.__EPIC1 = bundle;
     globalThis.__APP_STATE__ = appState;
     globalThis.__APP_PERSISTENCE__ = persistence;
-    globalThis.__CURRENT_SETUP__ = ui.currentSetup;
+    globalThis.__CURRENT_SETUP__ = getCurrentSetup();
     globalThis.__ACTIVE_TAB__ = ui.selectedTab;
     globalThis.__BROWSE_UI__ = {
-      searchTerm: ui.browseSearchTerm,
-      typeFilter: ui.browseTypeFilter,
-      expandedSetId: ui.expandedBrowseSetId
+      searchTerm: getBrowseSearchTerm(),
+      typeFilter: getBrowseTypeFilter(),
+      expandedSetId: getExpandedBrowseSetId()
     };
     globalThis.__COLLECTION_UI__ = { confirmResetOwnedCollection: ui.confirmResetOwnedCollection };
     globalThis.__HISTORY_UI__ = {
-      groupingMode: ui.historyGroupingMode,
+      groupingMode: getHistoryGroupingMode(),
       supportedGroupingModes: HISTORY_GROUPING_MODES,
       confirmResetAllState: ui.confirmResetAllState,
-      resultEditorRecordId: ui.resultEditorRecordId,
-      resultDraft: ui.resultDraft,
-      resultFormError: ui.resultFormError,
-      resultInvalidFields: ui.resultInvalidFields,
-      historyInsightsExpanded: ui.historyInsightsExpanded
+      resultEditorRecordId: getResultEditorRecordId(),
+      resultDraft: getResultDraft(),
+      resultFormError: getResultFormError(),
+      resultInvalidFields: getResultInvalidFields(),
+      historyInsightsExpanded: getHistoryInsightsExpanded()
     };
     globalThis.__ONBOARDING_UI__ = {
       visible: ui.onboardingVisible,
@@ -174,9 +178,9 @@
       mobilePreferencesOpen: ui.mobilePreferencesOpen
     };
     globalThis.__PLAY_MODE_UI__ = {
-      playerCount: ui.selectedPlayerCount,
-      playMode: ui.selectedPlayMode,
-      advancedSolo: ui.advancedSolo
+      playerCount: getSelectedPlayerCount(),
+      playMode: getSelectedPlayMode(),
+      advancedSolo: getAdvancedSolo()
     };
     globalThis.__THEME_UI__ = {
       activeThemeId: appState.preferences.themeId,
@@ -192,12 +196,12 @@
       fallbackKeys: locale.fallbackKeys
     };
     globalThis.__BACKUP_UI__ = {
-      importError: ui.backupImportError,
-      stagedBackupSummary: ui.stagedBackup?.summary || null,
-      confirmRestoreMode: ui.confirmBackupRestoreMode,
-      lastExportFileName: ui.lastBackupExportFileName || null
+      importError: getBackupImportError(),
+      stagedBackupSummary: getStagedBackup()?.summary || null,
+      confirmRestoreMode: getConfirmBackupRestoreMode(),
+      lastExportFileName: getLastBackupExportFileName() || null
     };
-    globalThis.__FORCED_PICKS_UI__ = ui.forcedPicks;
+    globalThis.__FORCED_PICKS_UI__ = getForcedPicks();
     globalThis.__TOASTS__ = ui.toasts;
   }
 
@@ -228,9 +232,9 @@
         onConfirm: () => actions.resetAllState()
       };
     }
-    if (ui.confirmBackupRestoreMode && ui.stagedBackup) {
-      const { summary } = ui.stagedBackup;
-      if (ui.confirmBackupRestoreMode === 'merge') {
+    if (getConfirmBackupRestoreMode() && getStagedBackup()) {
+      const { summary } = getStagedBackup();
+      if (getConfirmBackupRestoreMode() === 'merge') {
         return {
           title: locale.t('modal.merge.title'),
           description: locale.t('modal.merge.description', {
@@ -383,42 +387,43 @@
   }
 
   function clearGeneratedSetup() {
-    ui.currentSetup = null;
-    ui.generatorError = null;
-    ui.generatorNotices = [];
+    setCurrentSetup(null);
+    setGeneratorError(null);
+    setGeneratorNotices([]);
   }
 
   function clearForcedPicksState() {
-    ui.forcedPicks = createEmptyForcedPicks();
+    resetForcedPicks();
   }
 
   function clearBackupDraft() {
-    ui.backupImportError = null;
-    ui.stagedBackup = null;
-    ui.confirmBackupRestoreMode = null;
+    setBackupImportError(null);
+    setStagedBackup(null);
+    setConfirmBackupRestoreMode(null);
   }
 
   function closeResultEditor() {
-    const returnFocusSelector = ui.resultEditorReturnFocusSelector;
-    ui.resultEditorRecordId = null;
-    ui.resultEditorReturnFocusSelector = null;
-    ui.resultDraft = createEmptyResultDraft();
-    ui.resultFormError = null;
-    ui.resultInvalidFields = [];
+    const returnFocusSelector = getResultEditorReturnFocusSelector();
+    setResultEditorRecordId(null);
+    setResultEditorReturnFocusSelector(null);
+    resetResultDraft();
+    setResultFormError(null);
+    setResultInvalidFields([]);
     return returnFocusSelector;
   }
 
   function openResultEditor(recordId, options = {}) {
     const record = appState.history.find((entry) => entry.id === recordId);
     if (!record) return false;
-    ui.resultEditorRecordId = recordId;
-    ui.resultEditorReturnFocusSelector =
+    setResultEditorRecordId(recordId);
+    setResultEditorReturnFocusSelector(
       options.returnFocusSelector ||
-      `[data-action="edit-game-result"][data-record-id="${recordId}"]`;
-    ui.resultDraft = normalizeGameResultDraft(record.result);
-    ui.resultFormError = null;
-    ui.resultInvalidFields = [];
-    ui.historyExpandedRecordId = recordId;
+      `[data-action="edit-game-result"][data-record-id="${recordId}"]`
+    );
+    setResultDraft(normalizeGameResultDraft(record.result));
+    setResultFormError(null);
+    setResultInvalidFields([]);
+    setHistoryExpandedRecordId(recordId);
     return true;
   }
 
@@ -426,12 +431,12 @@
     appState = nextState;
     refreshLocaleState();
     ui.selectedTab = normalizeSelectedTab(nextState.preferences.selectedTab);
-    ui.selectedPlayerCount = nextState.preferences.lastPlayerCount;
-    ui.selectedPlayMode = resolvePlayMode(nextState.preferences.lastPlayerCount, {
+    setSelectedPlayerCount(nextState.preferences.lastPlayerCount);
+    setSelectedPlayMode(resolvePlayMode(nextState.preferences.lastPlayerCount, {
       advancedSolo: nextState.preferences.lastAdvancedSolo,
       playMode: nextState.preferences.lastPlayMode
-    });
-    ui.advancedSolo = nextState.preferences.lastAdvancedSolo;
+    }));
+    setAdvancedSolo(nextState.preferences.lastAdvancedSolo);
     ui.onboardingVisible = !nextState.preferences.onboardingCompleted;
     ui.onboardingStep = 0;
     ui.aboutPanelOpen = false;
@@ -440,9 +445,9 @@
     closeResultEditor();
     clearGeneratedSetup();
     clearBackupDraft();
-    ui.historyExpandedRecordId = null;
-    ui.historyInsightsExpanded = false;
-    ui.historyGroupingMode = DEFAULT_HISTORY_GROUPING_MODE;
+    setHistoryExpandedRecordId(null);
+    setHistoryInsightsExpanded(false);
+    resetHistoryGroupingMode();
   }
 
   function applyStateUpdate(updater, actionNotice) {
@@ -474,9 +479,9 @@
   function persistPreferences(playerCount, playMode, actionNotice) {
     const normalizedPlayMode = resolvePlayMode(playerCount, { playMode });
     const advancedSolo = normalizedPlayMode === 'advanced-solo';
-    ui.selectedPlayerCount = playerCount;
-    ui.selectedPlayMode = normalizedPlayMode;
-    ui.advancedSolo = advancedSolo;
+    setSelectedPlayerCount(playerCount);
+    setSelectedPlayMode(normalizedPlayMode);
+    setAdvancedSolo(advancedSolo);
     clearGeneratedSetup();
     applyStateUpdate((currentState) => {
       currentState.preferences.lastPlayerCount = playerCount;
@@ -551,14 +556,14 @@
     },
 
     setHistoryGrouping(mode) {
-      ui.historyGroupingMode = HISTORY_GROUPING_MODES.some((entry) => entry.id === mode)
+      setHistoryGroupingMode(HISTORY_GROUPING_MODES.some((entry) => entry.id === mode)
         ? mode
-        : DEFAULT_HISTORY_GROUPING_MODE;
+        : DEFAULT_HISTORY_GROUPING_MODE);
       ui.lastActionNotice = locale.t('actions.updatedHistoryGrouping', {
-        mode: locale.getHistoryGroupingLabel(ui.historyGroupingMode)
+        mode: locale.getHistoryGroupingLabel(getHistoryGroupingMode())
       });
       focusSelector(
-        `[data-action="set-history-grouping"][data-history-grouping-mode="${ui.historyGroupingMode}"]`
+        `[data-action="set-history-grouping"][data-history-grouping-mode="${getHistoryGroupingMode()}"]`
       );
     },
 
@@ -572,9 +577,9 @@
       );
     },
 
-    setBrowseSearchTerm(searchTerm) { ui.browseSearchTerm = searchTerm; },
+    setBrowseSearchTerm(searchTerm) { setBrowseSearchTerm(searchTerm); },
 
-    setBrowseTypeFilter(typeFilter) { ui.browseTypeFilter = typeFilter; },
+    setBrowseTypeFilter(typeFilter) { setBrowseTypeFilter(typeFilter); },
 
     toggleAboutPanel() {
       ui.aboutPanelOpen = !ui.aboutPanelOpen;
@@ -621,7 +626,7 @@
     completeOnboarding() { completeOnboardingFlow(locale.t('actions.completedWalkthrough')); },
 
     toggleBrowseSetExpanded(setId) {
-      ui.expandedBrowseSetId = ui.expandedBrowseSetId === setId ? null : setId;
+      setExpandedBrowseSetId(getExpandedBrowseSetId() === setId ? null : setId);
     },
 
     requestResetOwnedCollection() {
@@ -662,7 +667,7 @@
     },
 
     setPlayerCount(playerCount) {
-      const playMode = playerCount === 1 ? ui.selectedPlayMode : 'standard';
+      const playMode = playerCount === 1 ? getSelectedPlayMode() : 'standard';
       persistPreferences(
         playerCount,
         playMode,
@@ -674,16 +679,16 @@
     },
 
     setPlayMode(playMode) {
-      if (ui.selectedPlayerCount !== 1 && playMode !== 'standard') {
+      if (getSelectedPlayerCount() !== 1 && playMode !== 'standard') {
         ui.lastActionNotice = locale.t('actions.invalidSoloMode');
         enqueueToast({ variant: 'warning', message: locale.t('actions.invalidSoloMode') });
         return;
       }
       persistPreferences(
-        ui.selectedPlayerCount,
+        getSelectedPlayerCount(),
         playMode,
         locale.t('actions.selectedPlayMode', {
-          mode: locale.getPlayModeLabel(playMode, ui.selectedPlayerCount)
+          mode: locale.getPlayModeLabel(playMode, getSelectedPlayerCount())
         })
       );
     },
@@ -734,7 +739,7 @@
       link.click();
       link.remove();
       queueMicrotask(() => URL.revokeObjectURL(downloadUrl));
-      ui.lastBackupExportFileName = fileName;
+      setLastBackupExportFileName(fileName);
       ui.lastActionNotice = locale.t('actions.exportedBackup', { fileName });
       enqueueToast({
         variant: 'success',
@@ -751,21 +756,21 @@
       const importedText = await file.text();
       const parsedBackup = parseBackupText(importedText, { indexes: bundle.runtime.indexes });
       if (!parsedBackup.ok) {
-        ui.stagedBackup = null;
-        ui.confirmBackupRestoreMode = null;
-        ui.backupImportError = parsedBackup.error;
+        setStagedBackup(null);
+        setConfirmBackupRestoreMode(null);
+        setBackupImportError(parsedBackup.error);
         ui.lastActionNotice = locale.t('actions.backupImportFailed');
         enqueueToast({ variant: 'error', message: parsedBackup.error, behavior: 'persistent' });
         return;
       }
-      ui.backupImportError = null;
-      ui.confirmBackupRestoreMode = null;
-      ui.stagedBackup = {
+      setBackupImportError(null);
+      setConfirmBackupRestoreMode(null);
+      setStagedBackup({
         fileName: file.name || buildBackupFilename(parsedBackup.payload.exportedAt),
         payload: parsedBackup.payload,
         importedState: parsedBackup.importedState,
         summary: summarizeBackupState(parsedBackup.importedState)
-      };
+      });
       ui.lastActionNotice = locale.t('actions.loadedBackupPreview');
     },
 
@@ -775,41 +780,41 @@
     },
 
     requestMergeBackup() {
-      if (!ui.stagedBackup) return;
-      ui.confirmBackupRestoreMode = 'merge';
+      if (!getStagedBackup()) return;
+      setConfirmBackupRestoreMode('merge');
       ui.modalReturnFocusAction = 'request-merge-backup';
       ui.lastActionNotice = locale.t('actions.reviewMerge');
       focusModalCancelButton();
     },
 
     requestReplaceBackup() {
-      if (!ui.stagedBackup) return;
-      ui.confirmBackupRestoreMode = 'replace';
+      if (!getStagedBackup()) return;
+      setConfirmBackupRestoreMode('replace');
       ui.modalReturnFocusAction = 'request-replace-backup';
       ui.lastActionNotice = locale.t('actions.reviewReplace');
       focusModalCancelButton();
     },
 
     cancelBackupRestore() {
-      ui.confirmBackupRestoreMode = null;
+      setConfirmBackupRestoreMode(null);
       ui.lastActionNotice = locale.t('actions.keptBackupPreview');
       focusActionButton(ui.modalReturnFocusAction);
     },
 
     confirmMergeBackup() {
-      if (!ui.stagedBackup) return;
-      ui.confirmBackupRestoreMode = null;
-      const nextState = mergeImportedState($state.snapshot(appState), $state.snapshot(ui.stagedBackup.importedState));
+      if (!getStagedBackup()) return;
+      setConfirmBackupRestoreMode(null);
+      const nextState = mergeImportedState($state.snapshot(appState), $state.snapshot(getStagedBackup().importedState));
       const result = applyStateUpdate(() => nextState, locale.t('actions.mergedBackup'));
       syncUiFromPersistedState(result.state);
       enqueueToast({ variant: 'success', message: locale.t('actions.mergedBackup') });
     },
 
     confirmReplaceBackup() {
-      if (!ui.stagedBackup) return;
-      ui.confirmBackupRestoreMode = null;
+      if (!getStagedBackup()) return;
+      setConfirmBackupRestoreMode(null);
       const result = applyStateUpdate(
-        () => ui.stagedBackup.importedState,
+        () => getStagedBackup().importedState,
         locale.t('actions.replacedBackup')
       );
       syncUiFromPersistedState(result.state);
@@ -821,9 +826,9 @@
         ui.lastActionNotice = locale.t('actions.chooseForcedPick');
         return;
       }
-      const nextForcedPicks = addForcedPick(ui.forcedPicks, field, value);
-      const changed = JSON.stringify(nextForcedPicks) !== JSON.stringify(ui.forcedPicks);
-      ui.forcedPicks = nextForcedPicks;
+      const nextForcedPicks = addForcedPick(getForcedPicks(), field, value);
+      const changed = JSON.stringify(nextForcedPicks) !== JSON.stringify(getForcedPicks());
+      setForcedPicks(nextForcedPicks);
       clearGeneratedSetup();
       ui.lastActionNotice = changed
         ? locale.t('actions.updatedForcedPicks')
@@ -831,7 +836,7 @@
     },
 
     removeForcedPick(field, value) {
-      ui.forcedPicks = removeForcedPick(ui.forcedPicks, field, value);
+      setForcedPicks(removeForcedPick(getForcedPicks(), field, value));
       clearGeneratedSetup();
       ui.lastActionNotice = locale.t('actions.removedForcedPick');
     },
@@ -847,26 +852,26 @@
         const setup = generateSetup({
           runtime: bundle.runtime,
           state: appState,
-          playerCount: ui.selectedPlayerCount,
-          advancedSolo: ui.advancedSolo,
-          playMode: ui.selectedPlayMode,
-          forcedPicks: ui.forcedPicks
+          playerCount: getSelectedPlayerCount(),
+          advancedSolo: getAdvancedSolo(),
+          playMode: getSelectedPlayMode(),
+          forcedPicks: getForcedPicks()
         });
-        ui.currentSetup = setup;
-        ui.generatorError = null;
-        ui.generatorNotices = setup.notices;
+        setCurrentSetup(setup);
+        setGeneratorError(null);
+        setGeneratorNotices(setup.notices);
         ui.lastActionNotice = locale.t('actions.generatedSetup');
       } catch (error) {
-        ui.currentSetup = null;
-        ui.generatorNotices = [];
-        ui.generatorError = error.message;
+        setCurrentSetup(null);
+        setGeneratorNotices([]);
+        setGeneratorError(error.message);
         ui.lastActionNotice = locale.t('actions.failedSetup');
         enqueueToast({ variant: 'error', message: error.message, behavior: 'persistent' });
       }
     },
 
     acceptCurrentSetup() {
-      if (!ui.currentSetup) {
+      if (!getCurrentSetup()) {
         ui.lastActionNotice = locale.t('actions.acceptBeforeLog');
         enqueueToast({ variant: 'warning', message: locale.t('actions.acceptBeforeLog') });
         return;
@@ -877,14 +882,14 @@
         const nextState = acceptGameSetup(currentState, {
           id: acceptedRecordId,
           createdAt: acceptedAt,
-          playerCount: ui.selectedPlayerCount,
-          advancedSolo: ui.advancedSolo,
-          playMode: ui.selectedPlayMode,
-          setupSnapshot: buildHistoryReadySetupSnapshot($state.snapshot(ui.currentSetup))
+          playerCount: getSelectedPlayerCount(),
+          advancedSolo: getAdvancedSolo(),
+          playMode: getSelectedPlayMode(),
+          setupSnapshot: buildHistoryReadySetupSnapshot($state.snapshot(getCurrentSetup()))
         });
         nextState.preferences.selectedTab = 'history';
         return nextState;
-      }, hasForcedPicks(ui.forcedPicks)
+      }, hasForcedPicks(getForcedPicks())
         ? locale.t('actions.acceptedLoggedForced')
         : locale.t('actions.acceptedLogged'));
       ui.selectedTab = 'history';
@@ -909,26 +914,26 @@
     },
 
     setResultOutcome(outcome) {
-      ui.resultDraft.outcome = outcome;
-      const hadValidationState = ui.resultFormError || ui.resultInvalidFields.length;
-      ui.resultFormError = null;
-      ui.resultInvalidFields = [];
+      setResultDraft({ ...getResultDraft(), outcome });
+      const hadValidationState = getResultFormError() || getResultInvalidFields().length;
+      setResultFormError(null);
+      setResultInvalidFields([]);
       if (hadValidationState) focusSelector('[data-result-field="outcome"]');
     },
 
     setResultScore(score) {
-      ui.resultDraft.score = score;
-      const hadValidationState = ui.resultFormError || ui.resultInvalidFields.length;
-      ui.resultFormError = null;
-      ui.resultInvalidFields = [];
+      setResultDraft({ ...getResultDraft(), score });
+      const hadValidationState = getResultFormError() || getResultInvalidFields().length;
+      setResultFormError(null);
+      setResultInvalidFields([]);
       if (hadValidationState) focusSelector('[data-result-field="score"]');
     },
 
     setResultNotes(notes) {
-      ui.resultDraft.notes = notes;
-      const hadValidationState = ui.resultFormError || ui.resultInvalidFields.length;
-      ui.resultFormError = null;
-      ui.resultInvalidFields = [];
+      setResultDraft({ ...getResultDraft(), notes });
+      const hadValidationState = getResultFormError() || getResultInvalidFields().length;
+      setResultFormError(null);
+      setResultInvalidFields([]);
       if (hadValidationState) focusSelector('[data-result-field="notes"]');
     },
 
@@ -946,23 +951,23 @@
     },
 
     saveGameResult() {
-      if (!ui.resultEditorRecordId) return;
-      const validation = validateGameResultDraft(ui.resultDraft);
+      if (!getResultEditorRecordId()) return;
+      const validation = validateGameResultDraft(getResultDraft());
       if (!validation.ok) {
-        ui.resultFormError = validation.errors
+        setResultFormError(validation.errors
           .map((message) => locale.localizeValidationMessage(message))
-          .join(' ');
-        ui.resultInvalidFields = validation.errors.flatMap((message) => {
+          .join(' '));
+        setResultInvalidFields(validation.errors.flatMap((message) => {
           if (message.includes('Win or Loss')) return ['outcome'];
           if (message.toLowerCase().includes('score')) return ['score'];
           return [];
-        });
+        }));
         ui.lastActionNotice = locale.t('actions.finishResultFields');
         focusSelector('[data-result-form-error]');
         return;
       }
-      const activeRecordId = ui.resultEditorRecordId;
-      const returnFocusSelector = ui.resultEditorReturnFocusSelector;
+      const activeRecordId = getResultEditorRecordId();
+      const returnFocusSelector = getResultEditorReturnFocusSelector();
       const wasPending =
         appState.history.find((r) => r.id === activeRecordId)?.result?.status !== 'completed';
       applyStateUpdate(
@@ -989,7 +994,7 @@
     },
 
     toggleHistoryInsights() {
-      ui.historyInsightsExpanded = !ui.historyInsightsExpanded;
+      toggleHistoryInsights();
       focusSelector('[data-action="toggle-history-insights"]');
     },
 
@@ -1060,9 +1065,9 @@
 
     clearToDefaults() {
       const defaultState = createDefaultState();
-      ui.selectedPlayerCount = defaultState.preferences.lastPlayerCount;
-      ui.selectedPlayMode = defaultState.preferences.lastPlayMode;
-      ui.advancedSolo = defaultState.preferences.lastAdvancedSolo;
+      setSelectedPlayerCount(defaultState.preferences.lastPlayerCount);
+      setSelectedPlayMode(defaultState.preferences.lastPlayMode);
+      setAdvancedSolo(defaultState.preferences.lastAdvancedSolo);
       clearForcedPicksState();
       closeResultEditor();
       clearGeneratedSetup();
@@ -1079,59 +1084,63 @@
   // ---------------------------------------------------------------------------
   // Mount
   // ---------------------------------------------------------------------------
-  onMount(async () => {
+  $effect(() => {
+    let destroyed = false;
     const mq = window.matchMedia('(max-width: 767px)');
     compactViewport = mq.matches;
     const onViewportChange = (e) => { compactViewport = e.matches; };
     mq.addEventListener('change', onViewportChange);
 
-    try {
-      const seed = await loadSeed();
-      const loadedBundle = createEpic1Bundle(seed);
-      storageAdapter = createStorageAdapter(globalThis.localStorage);
-      const hydration = hydrateState({ storageAdapter, indexes: loadedBundle.runtime.indexes });
+    async function init() {
+      if (destroyed) return;
+      try {
+        const seed = await loadSeed();
+        if (destroyed) return;
+        const loadedBundle = createEpic1Bundle(seed);
+        storageAdapter = createStorageAdapter(globalThis.localStorage);
+        const hydration = hydrateState({ storageAdapter, indexes: loadedBundle.runtime.indexes });
 
-      bundle = loadedBundle;
-      appState = hydration.state;
-      locale = createLocaleTools(hydration.state.preferences.localeId);
-      persistence = {
-        storageAvailable: hydration.storageAvailable,
-        hydratedFromStorage: hydration.hydratedFromStorage,
-        recoveredOnLoad: hydration.recovered,
-        hydrateNotices: hydration.notices,
-        updateNotices: [],
-        lastSaveMessage: null,
-        lastSaveOk: null
-      };
-      ui.onboardingVisible = !hydration.state.preferences.onboardingCompleted;
-      ui.selectedTab = normalizeSelectedTab(hydration.state.preferences.selectedTab);
-      ui.selectedPlayerCount = hydration.state.preferences.lastPlayerCount;
-      ui.selectedPlayMode = resolvePlayMode(hydration.state.preferences.lastPlayerCount, {
-        advancedSolo: hydration.state.preferences.lastAdvancedSolo,
-        playMode: hydration.state.preferences.lastPlayMode
-      });
-      ui.advancedSolo = hydration.state.preferences.lastAdvancedSolo;
+        bundle = loadedBundle;
+        appState = hydration.state;
+        locale = createLocaleTools(hydration.state.preferences.localeId);
+        persistence = {
+          storageAvailable: hydration.storageAvailable,
+          hydratedFromStorage: hydration.hydratedFromStorage,
+          recoveredOnLoad: hydration.recovered,
+          hydrateNotices: hydration.notices,
+          updateNotices: [],
+          lastSaveMessage: null,
+          lastSaveOk: null
+        };
+        ui.onboardingVisible = !hydration.state.preferences.onboardingCompleted;
+        ui.selectedTab = normalizeSelectedTab(hydration.state.preferences.selectedTab);
+        setSelectedPlayerCount(hydration.state.preferences.lastPlayerCount);
+        setSelectedPlayMode(resolvePlayMode(hydration.state.preferences.lastPlayerCount, {
+          advancedSolo: hydration.state.preferences.lastAdvancedSolo,
+          playMode: hydration.state.preferences.lastPlayMode
+        }));
+        setAdvancedSolo(hydration.state.preferences.lastAdvancedSolo);
 
-      // Wait for Svelte's DOM update so #app-title is in DOM before globals are set
-      await tick();
-      syncGlobals();
-
-      if (hydration.notices.length) {
-        hydration.notices.forEach((notice) =>
-          enqueueToast({
-            variant: 'warning',
-            message: localizeNotice(notice),
-            behavior: 'persistent'
-          })
-        );
+        if (hydration.notices.length) {
+          hydration.notices.forEach((notice) =>
+            enqueueToast({
+              variant: 'warning',
+              message: localizeNotice(notice),
+              behavior: 'persistent'
+            })
+          );
+        }
+      } catch (error) {
+        console.error(error);
+        globalThis.__EPIC1_ERROR__ = error;
+        initError = error;
       }
-    } catch (error) {
-      console.error(error);
-      globalThis.__EPIC1_ERROR__ = error;
-      initError = error;
     }
 
+    init();
+
     return () => {
+      destroyed = true;
       mq.removeEventListener('change', onViewportChange);
     };
   });
@@ -1362,13 +1371,13 @@
                 {appState}
                 {locale}
                 {persistence}
-                browseSearchTerm={ui.browseSearchTerm}
-                browseTypeFilter={ui.browseTypeFilter}
-                expandedBrowseSetId={ui.expandedBrowseSetId}
+                browseSearchTerm={getBrowseSearchTerm()}
+                browseTypeFilter={getBrowseTypeFilter()}
+                expandedBrowseSetId={getExpandedBrowseSetId()}
                 {compactViewport}
                 aboutPanelOpen={ui.aboutPanelOpen}
                 onboardingVisible={ui.onboardingVisible}
-                currentSetup={ui.currentSetup}
+                currentSetup={getCurrentSetup()}
                 selectedTab={ui.selectedTab}
                 onToggleOwnedSet={actions.toggleOwnedSet}
                 onSetSearchTerm={actions.setBrowseSearchTerm}
@@ -1393,13 +1402,13 @@
                 {bundle}
                 {appState}
                 {locale}
-                selectedPlayerCount={ui.selectedPlayerCount}
-                selectedPlayMode={ui.selectedPlayMode}
-                advancedSolo={ui.advancedSolo}
-                currentSetup={ui.currentSetup}
-                generatorError={ui.generatorError}
-                generatorNotices={ui.generatorNotices}
-                forcedPicks={ui.forcedPicks}
+                selectedPlayerCount={getSelectedPlayerCount()}
+                selectedPlayMode={getSelectedPlayMode()}
+                advancedSolo={getAdvancedSolo()}
+                currentSetup={getCurrentSetup()}
+                generatorError={getGeneratorError()}
+                generatorNotices={getGeneratorNotices()}
+                forcedPicks={getForcedPicks()}
                 {compactViewport}
                 onSetPlayerCount={actions.setPlayerCount}
                 onSetPlayMode={actions.setPlayMode}
@@ -1416,13 +1425,13 @@
                 {appState}
                 {locale}
                 {compactViewport}
-                historyGroupingMode={ui.historyGroupingMode}
-                historyInsightsExpanded={ui.historyInsightsExpanded}
-                historyExpandedRecordId={ui.historyExpandedRecordId}
-                resultEditorRecordId={ui.resultEditorRecordId}
-                resultDraft={ui.resultDraft}
-                resultFormError={ui.resultFormError}
-                resultInvalidFields={ui.resultInvalidFields}
+                historyGroupingMode={getHistoryGroupingMode()}
+                historyInsightsExpanded={getHistoryInsightsExpanded()}
+                historyExpandedRecordId={getHistoryExpandedRecordId()}
+                resultEditorRecordId={getResultEditorRecordId()}
+                resultDraft={getResultDraft()}
+                resultFormError={getResultFormError()}
+                resultInvalidFields={getResultInvalidFields()}
                 onSetHistoryGrouping={actions.setHistoryGrouping}
                 onEditGameResult={actions.editGameResult}
                 onToggleHistoryInsights={actions.toggleHistoryInsights}
@@ -1440,10 +1449,10 @@
                 {locale}
                 {persistence}
                 {compactViewport}
-                backupImportError={ui.backupImportError}
-                stagedBackup={ui.stagedBackup}
-                confirmBackupRestoreMode={ui.confirmBackupRestoreMode}
-                lastBackupExportFileName={ui.lastBackupExportFileName}
+                backupImportError={getBackupImportError()}
+                stagedBackup={getStagedBackup()}
+                confirmBackupRestoreMode={getConfirmBackupRestoreMode()}
+                lastBackupExportFileName={getLastBackupExportFileName()}
                 onExportBackup={actions.exportBackup}
                 onOpenImportBackup={actions.openImportBackup}
                 onImportBackupFile={actions.importBackupFile}

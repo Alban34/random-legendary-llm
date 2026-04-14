@@ -34,7 +34,7 @@
   }));
   let hasActiveForcedPicks = $derived(hasForcedPicks(forcedPicks));
 
-  let ownedForcedPickOptions = $derived(() => {
+  let ownedForcedPickOptions = $derived.by(() => {
     const pools = buildOwnedPools(bundle.runtime, appState.collection.ownedSetIds);
     return {
       schemeId: [...pools.schemes].sort((a, b) => a.name.localeCompare(b.name)),
@@ -68,7 +68,7 @@
   }
 
   function getAvailableOptions(config) {
-    const opts = ownedForcedPickOptions()[config.field];
+    const opts = ownedForcedPickOptions[config.field];
     return config.multi ? opts.filter((e) => !getActiveIds(config).includes(e.id)) : opts;
   }
 

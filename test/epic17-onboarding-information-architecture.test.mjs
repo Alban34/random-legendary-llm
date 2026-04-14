@@ -10,8 +10,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.mjs');
+const localizationPath = path.join(rootDir, 'src', 'app', 'localization-utils.mjs');
 
 let rendererSource;
+let localizationSource;
 
 function createMemoryStorage(initialEntries = {}) {
   const store = new Map(Object.entries(initialEntries));
@@ -38,7 +40,10 @@ const minimalIndexes = {
 };
 
 before(async () => {
-  rendererSource = await fs.readFile(rendererPath, 'utf8');
+  [rendererSource, localizationSource] = await Promise.all([
+    fs.readFile(rendererPath, 'utf8'),
+    fs.readFile(localizationPath, 'utf8')
+  ]);
 });
 
 test('Epic 17 stores onboarding completion in preferences and recovers invalid values safely', () => {
@@ -69,8 +74,8 @@ test('Epic 17 stores onboarding completion in preferences and recovers invalid v
 });
 
 test('Epic 17 renderer source includes replayable onboarding and an About entry point instead of default diagnostics', () => {
-  assert.match(rendererSource, /First-run walkthrough/);
-  assert.match(rendererSource, /Replay Walkthrough/);
-  assert.match(rendererSource, /About this project/);
+  assert.match(localizationSource, /First-run walkthrough/);
+  assert.match(localizationSource, /Replay Walkthrough/);
+  assert.match(localizationSource, /About this project/);
   assert.doesNotMatch(rendererSource, /Developer diagnostics<\/h2>/);
 });

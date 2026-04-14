@@ -27,7 +27,11 @@ The current release keeps the architecture described below and implements it wit
 - `src/app/state-store.svelte.js` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
 - `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs` — resolve templates and produce legal setups
 - `src/app/app-renderer.mjs` — transitional render functions used via `{@html}` blocks in Svelte tab components
-- `src/components/App.svelte` — root Svelte 5 component; owns viewModel `$state`, mounts the app shell and all tabs
+- `src/app/browse-vm.svelte.js` — browse tab view-model; owns browse-specific reactive state
+- `src/app/new-game-vm.svelte.js` — new-game tab view-model; owns new-game-specific reactive state
+- `src/app/history-vm.svelte.js` — history tab view-model; owns history-specific reactive state
+- `src/app/backup-vm.svelte.js` — backup tab view-model; owns backup-specific reactive state
+- `src/components/App.svelte` — root Svelte 5 component; orchestrates routing and persistence; tab-specific state is delegated to per-tab view-model modules
 - `src/components/TabNav.svelte` — Svelte 5 tab navigation component
 - `src/components/ToastStack.svelte` — Svelte 5 toast stack component
 - `src/components/BrowseTab.svelte`, `CollectionTab.svelte`, `NewGameTab.svelte`, `HistoryTab.svelte`, `BackupTab.svelte` — thin `{@html}` wrapper components for each feature tab

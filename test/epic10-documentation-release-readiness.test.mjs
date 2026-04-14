@@ -72,14 +72,14 @@ before(async () => {
 });
 
 test('Epic 10 README release workflow matches the shipped scripts and no longer treats Epic 10 as future work', () => {
-  assert.equal(typeof packageJson.scripts['check:epic10'], 'string');
-  assert.equal(typeof packageJson.scripts['check:qc:epic10'], 'string');
-  assert.equal(typeof packageJson.scripts['check:qc'], 'string');
+  assert.equal(typeof packageJson.scripts['test:epic10'], 'string');
+  assert.equal(typeof packageJson.scripts['test:qc:epic10'], 'string');
+  assert.equal(typeof packageJson.scripts['test:qc'], 'string');
 
   assert.match(docs.readme, /Epic 10 .*release readiness.*complete/i);
-  assert.match(docs.readme, /npm run check:epic10/);
-  assert.match(docs.readme, /npm run check:qc:epic10/);
-  assert.match(docs.readme, /npm run check:qc/);
+  assert.match(docs.readme, /npm run test:epic10/);
+  assert.match(docs.readme, /npm run test:qc:epic10/);
+  assert.match(docs.readme, /npm run test:qc/);
   assert.match(docs.readme, /legendary_state_v1/);
   assert.doesNotMatch(docs.readme, /next major implementation target is \*\*Epic 10/i);
 });

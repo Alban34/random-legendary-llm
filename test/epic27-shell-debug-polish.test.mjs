@@ -13,14 +13,18 @@ let cssSource;
 let localeSource;
 let postV1TaskList;
 let generatorSource;
+let appSvelteSource;
+
+const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 
 before(async () => {
-  [rendererSource, cssSource, localeSource, postV1TaskList, generatorSource] = await Promise.all([
+  [rendererSource, cssSource, localeSource, postV1TaskList, generatorSource, appSvelteSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'setup-generator.mjs'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'app', 'setup-generator.mjs'), 'utf8'),
+    fs.readFile(appSveltePath, 'utf8')
   ]);
 });
 
@@ -70,7 +74,7 @@ test('Story 27.2 — header-inner uses center alignment', () => {
 
 test('Story 27.3 — app-version element is still present (compact version display)', () => {
   // Version display introduced in Epic 25 must remain
-  assert.match(rendererSource, /app-version/, 'app-version reference must remain');
+  assert.match(appSvelteSource, /app-version/, 'app-version reference must remain');
 });
 
 test('Epic 27 stories are marked complete in task-list.md', () => {

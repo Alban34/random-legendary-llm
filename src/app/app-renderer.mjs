@@ -1,19 +1,22 @@
-// Legacy source markers kept for source-inspection tests:
-// First-run walkthrough
-// Replay Walkthrough
-// About this project
-// Persistent alert
-// role="region" aria-label="Notifications"
-// app-version
-// APP_VERSION
-
 export function renderInitializationError(doc, error) {
-  doc.getElementById('diagnostics-shell').hidden = false;
-  doc.getElementById('diagnostics-shell').innerHTML = `
-    <section class="panel">
-      <h2>Initialization status</h2>
-      <p class="error">Initialization failed: ${error.message}</p>
-      <pre>${error.stack || String(error)}</pre>
-    </section>
-  `;
+  const shell = doc.getElementById('diagnostics-shell');
+  shell.hidden = false;
+
+  const section = doc.createElement('section');
+  section.className = 'panel';
+
+  const heading = doc.createElement('h2');
+  heading.textContent = 'Initialization status';
+  section.appendChild(heading);
+
+  const para = doc.createElement('p');
+  para.className = 'error';
+  para.textContent = `Initialization failed: ${error.message}`;
+  section.appendChild(para);
+
+  const pre = doc.createElement('pre');
+  pre.textContent = error.stack || String(error);
+  section.appendChild(pre);
+
+  shell.appendChild(section);
 }

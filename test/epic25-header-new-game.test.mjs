@@ -13,20 +13,24 @@ let newGameTabSource;
 let cssSource;
 let entrySource;
 let postV1TaskList;
+let appSvelteSource;
+
+const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 
 before(async () => {
-  [rendererSource, newGameTabSource, cssSource, entrySource, postV1TaskList] = await Promise.all([
+  [rendererSource, newGameTabSource, cssSource, entrySource, postV1TaskList, appSvelteSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'NewGameTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'browser-entry.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8'),
+    fs.readFile(appSveltePath, 'utf8')
   ]);
 });
 
 test('Story 25.1/25.2: renderer exposes app-version element for version display in header', () => {
-  assert.match(rendererSource, /app-version/, 'renderer must reference app-version (class or id)');
-  assert.match(rendererSource, /APP_VERSION/, 'renderer must define or use APP_VERSION constant');
+  assert.match(appSvelteSource, /app-version/, 'renderer must reference app-version (class or id)');
+  assert.match(appSvelteSource, /APP_VERSION/, 'renderer must define or use APP_VERSION constant');
 });
 
 test('Story 25.2: CSS contains reduced header padding', () => {

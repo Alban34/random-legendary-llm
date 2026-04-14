@@ -38,3 +38,13 @@
 - [x] In history, I want to group by mastermind, schemes, heroes, villains and player mode, only those.
 - [x] "Least-played fallback used for Scheme selection" always appears, this is probably a defect
 - [x] History grouping should be in alphabetical order
+
+## Code quality findings (2026-04-14 audit)
+
+- [x] **[Security]** `app-renderer.mjs`: `error.message` and `error.stack` are interpolated directly into `.innerHTML` — potential XSS sink if the error string carries user-influenced content. Replace with DOM `textContent` assignments or sanitize before insertion.
+- [x] **[Security/Privacy]** `App.svelte` `syncGlobals()` exposes full app state on `globalThis` (`__APP_STATE__`, `__EPIC1__`, etc.) on every reactive render, with no dev-mode guard. Wrap the entire block in `if (import.meta.env.DEV)` so it is stripped from production builds.
+- [x] **[Svelte 5 migration debt]** `App.svelte` still imports `onMount` and `tick` from Svelte, which are legacy lifecycle APIs. These should be replaced with `$effect` callbacks (with cleanup returned where needed), consistent with the Svelte 5 migration done in Epics 29–33.
+- [x] **[Maintainability]** `App.svelte` is a God Component — it owns all state, all derived values, all event handlers, all tab logic, and all persistence coordination. As features grow this will become a bottleneck. Consider extracting per-tab view-model modules (similar to the existing `state-store.svelte.js` pattern) so `App.svelte` only orchestrates routing and persistence.
+- [x] **[Minor]** `setup-generator.mjs` `rankItemsByFreshness`: uses `JSON.stringify`/`JSON.parse` round-trips as composite Map keys. Replace with a lightweight string key built directly (e.g. template literal) to avoid the serialization cost and fragility.
+- [x] **[Minor]** `package.json`: every `test:epicX` script has an identical `check:epicX` duplicate — 30+ redundant lines. Consolidate to a single set of script names.
+- [x] **[Minor]** `app-renderer.mjs`: the file opens with 7 comment lines that exist solely so string-inspection tests can `grep` for them. Tests should assert on actual rendered output strings, not on dead comment markers in source files.

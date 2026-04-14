@@ -143,7 +143,7 @@ http://localhost:8000/
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic1
+npm run test:epic1
 ```
 
 Run the full npm test suite:
@@ -157,84 +157,84 @@ Run the Epic 2 state-management checks only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic2
+npm run test:epic2
 ```
 
 Run the Epic 3 setup-generation checks only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic3
+npm run test:epic3
 ```
 
 Run the Epic 4 shell and navigation checks only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic4
+npm run test:epic4
 ```
 
 Run the Epic 5 Browse checks only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic5
+npm run test:epic5
 ```
 
 Run the Epic 6 Collection checks only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic6
+npm run test:epic6
 ```
 
 Run the Epic 7 New Game checks only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic7
+npm run test:epic7
 ```
 
 Run the Epic 8 History/Reset checks only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic8
+npm run test:epic8
 ```
 
 Run the Epic 9 Notifications/Error Handling/Accessibility checks only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic9
+npm run test:epic9
 ```
 
 Run the Epic 9 browser QC only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:qc:epic9
+npm run test:qc:epic9
 ```
 
 Run the Epic 10 documentation/release-readiness checks only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:epic10
+npm run test:epic10
 ```
 
 Run the Epic 10 browser QC only:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:qc:epic10
+npm run test:qc:epic10
 ```
 
 Run the browser QC suite for Epic 1–10:
 
 ```sh
 cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run check:qc
+npm run test:qc
 ```
 
 Run the same browser QC suite in headed mode:
