@@ -9,7 +9,7 @@
 
 Legendary: Marvel Randomizer is a free, browser-based companion app for players of *Legendary: A Marvel Deck-Building Game*. Open a URL. Get a legal, fresh, collection-aware setup in seconds. No install. No account. No tracking. Ever.
 
-**[Try it now →][APP URL]**
+**[Try it now →](https://alban34.github.io/random-legendary-llm)**
 
 ---
 

@@ -17,7 +17,7 @@ Your job is to craft compelling, accurate marketing content that makes the app i
 
 ## App URL
 
-The app is hosted on GitHub Pages. The URL is **TBD** — use the placeholder `[APP URL]` in all copy until the real URL is confirmed. Do not fabricate a URL.
+The app is hosted on GitHub Pages. The URL is **https://alban34.github.io/random-legendary-llm**. Use this URL in all copy.
 
 ## Tone and Voice
 
