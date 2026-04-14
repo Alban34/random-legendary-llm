@@ -1,295 +1,76 @@
 # Legendary: Marvel Randomizer
 
-STATUS: Approved
-
-## Project state
-
-The repository now contains the **full implementation through Epic 28**, plus the Svelte 5 migration (Epics 29–33), including post-v1 updates for alternate play modes, score logging, backup portability, insights, forced picks, onboarding, theming, interface localization, grouped history, and classification corrections.
-
-Current status:
-- Epic 10 release readiness is complete and remains covered by documentation-alignment automation
-- Epics 1 through 28 are implemented, along with Svelte 5 migration Epics 29–33
-- Node-based automated tests cover the current shipped runtime modules and documentation contracts
-- Playwright browser QC covers the current shipped user flows, including localization switching and fallback behavior
-
-Implemented so far:
-- canonical seed data under `src/data/`
-- shared normalization and validation logic under `src/app/`
-- versioned browser-state persistence under `src/app/state-store.mjs`
-- a persisted theme switcher plus a persisted language selector with built-in support for English (en-US), French (fr-FR), German (de-DE), Japanese (ja-JP), Korean (ko-KR), and Spanish (es-ES)
-- versioned backup export/import utilities under `src/app/backup-utils.mjs`
-- switchable History grouping modes: by mastermind, scheme, heroes, villain groups, or play mode
-- setup templates and generation logic under `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs`
-- shared tab-shell metadata and navigation helpers under `src/app/app-tabs.mjs`
-- Browse filtering/detail helpers under `src/app/browse-utils.mjs`
-- Collection grouping/totals/feasibility helpers under `src/app/collection-utils.mjs`
-- New Game display/control helpers under `src/app/new-game-utils.mjs`
-- History/usage/reset helpers under `src/app/history-utils.mjs`
-- notification/toast helpers under `src/app/feedback-utils.mjs`
-- a tabbed `index.html` shell for the browser app with Browse, Collection, New Game, History, Backup, notifications, reset confirmation, and accessibility support
-- npm-based automated tests under `test/` covering Epics 1–28 and Svelte migration Epics 29–33
-- Playwright browser QC coverage for the current shipped user flows under `test/playwright/`
-- a data-foundation summary reporter under `tools/`
-
-The app remains **fully static**:
-- no server-side code
-- built with Vite and the Svelte 5 plugin; output in `dist/` can be hosted by any static HTTP server
+> **Fan-made tool. Not affiliated with Marvel or Upper Deck Entertainment.**
+> **Built entirely by AI (GitHub Copilot / Claude) as a demonstration of what modern AI-assisted development can produce from scratch.**
 
 ---
 
-## Current architecture direction
+**Stop arguing about setup. Start playing.**
 
-The project is now a **single-page app served as static files**, rather than a single monolithic HTML file.
+Legendary: Marvel Randomizer is a free, browser-based companion app for players of *Legendary: A Marvel Deck-Building Game*. Open a URL. Get a legal, fresh, collection-aware setup in seconds. No install. No account. No tracking. Ever.
 
-Current entry points:
-- `index.html` — browser shell
-- `src/app/app-shell.css` — application shell styles
-- `src/app/browser-entry.mjs` — mounts the root `App.svelte` component via Svelte 5 `mount()`
-- `src/app/game-data-pipeline.mjs` — canonical-data transformation, normalization, validation, and Epic 1 checks
-- `src/app/state-store.mjs` — versioned browser-state creation, hydration, persistence, history, and reset helpers
-- `src/app/state-store.svelte.js` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
-- `src/components/App.svelte` — root Svelte 5 component; owns viewModel `$state`, mounts the app shell and all tabs
-- `src/app/setup-rules.mjs` — player-count templates and active-mode resolution
-- `src/app/setup-generator.mjs` — legality checks, freshness ranking, forced-group handling, and setup generation
-- `src/app/app-tabs.mjs` — tab metadata, default-tab selection, and keyboard navigation order
-- `src/app/app-renderer.mjs` — transitional render helpers used via `{@html}` blocks inside Svelte tab components
-- `src/data/canonical-game-data.json` — project-owned canonical game data asset
-
-This keeps the app easy to host statically while making Epic 2+ work much easier to maintain and test.
+**[Try it now →][APP URL]**
 
 ---
 
-## Use the app
+## Why you'll love it
 
-Typical flow:
+### It knows the rules so you don't have to
+Every generated setup is 100% legal — mandatory mastermind leads, scheme constraints, player-count requirements, all enforced automatically. You'll never accidentally deal an illegal hand again.
 
-1. Open the app through a static HTTP server.
-2. Use the first-run walkthrough if needed, then use the shared header controls to choose your preferred language and theme.
-3. Use the **Browse** tab to inspect included sets, replay onboarding, open About, and add sets to your collection.
-4. Review totals and legality warnings in **Collection**.
-5. Go to **New Game** to choose player count, optionally enable Advanced Solo for 1 player, then **Generate Setup**.
-6. Use **Regenerate** as much as you want without changing persisted history or usage.
-7. Use **Accept & Log** when you want the current setup to count toward usage tracking and game history, then complete or skip the immediate result-entry editor.
-8. Review accepted games in **History**, regroup them by mastermind, scheme, heroes, villain groups, or play mode, edit pending or completed results, and inspect insights after the grouped history list.
-9. Use **Backup** to export a portable JSON backup, reset usage buckets, or import one with Merge or Replace restore modes.
+### It knows your collection
+Mark the sets you own. The randomizer only draws from your shelf. Whether you have just the core box or every expansion ever printed, the generator stays within what you actually have.
 
-Important behavior:
-- **Generate** and **Regenerate** are ephemeral; they do not change persisted state
-- **Accept & Log** updates usage statistics and appends a history record
-- if browser storage is unavailable, the app stays usable in-memory for the current session and shows a warning
+### It fights repetition for you
+The app tracks what you've played and prioritizes entities you haven't seen recently. Popular heroes and overused masterminds stay fresh instead of dominating every session. Freshness-first randomization, every time.
 
----
+### Lock in your favorites
+Forcing a specific hero, villain group, or scheme before rolling. The generator fills the rest legally around your pick. Great for themed nights, challenges, or just when you really need to play as Spider-Man.
 
-## Persistence, reset behavior, and current limitations
+### Your history, your insights
+Every accepted game is logged. Track wins, losses, and scores. Regroup your play history by mastermind, scheme, hero, villain group, or play mode. An at-a-glance insights dashboard shows win rate, average score, most-played, and least-played — so you finally know which villain groups you've been avoiding.
 
-Persisted data:
-- the app stores one versioned root state object in browser storage under `legendary_state_v1`
-- that state contains collection ownership, usage statistics, accepted game history, and preferences
-- preferences now include the active theme and locale so the shared header controls restore on reload without leaving the shell in a mixed state longer than necessary
-- the **Backup** tab can export the persistent data above as a versioned JSON backup and later import it with either **Merge** or **Replace** restore modes
+### All play modes covered
+- **Standard** — 1 to 5 players
+- **Advanced Solo** — 1 player, 4 heroes, 2 villain groups
+- **Two-Handed Solo** — 1 player playing both sides
 
-Reset behavior:
-- **Reset All Selections** in **Collection** clears owned sets only
-- **Reset Heroes / Masterminds / Villain Groups / Henchman Groups / Schemes** in **Backup** clear only the selected usage bucket
-- **Full Reset — Clear all data** clears collection, usage, history, and preferences only after confirmation
+### Your data, your device
+Export a portable backup anytime. Import it on any other device. Merge two devices' histories without losing a single game record. No cloud required.
 
-Current V1 limitations:
-- hero tracking is at the hero-deck level, not per individual card
-- the app must be opened through a static HTTP server rather than `file://`
-- browser QC is automated in Chromium via Playwright; runtime behavior targets modern browsers with graceful degradation when storage is unavailable
+### Six languages
+The full UI — not just labels — in English, French, German, Japanese, Korean, and Spanish.
 
----
+### Dark mode. Light mode. Your call.
+Theme preference is remembered across sessions.
 
-## Run the app locally
-
-Because the app now loads ES modules and JSON assets, open it through a static HTTP server rather than `file://`.
-
-Preferred dev command with Node:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run dev
-```
-
-Then open:
-
-```text
-http://127.0.0.1:8000/
-```
-
-Optional port override:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run dev -- --port 8123
-```
-
-Fallback example with Python:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-python3 -m http.server 8000
-```
-
-Then open:
-
-```text
-http://localhost:8000/
-```
+### Zero friction, zero compromise
+- No install
+- No login or account
+- No subscription
+- No ads
+- No server — the app is 100% static and runs entirely in your browser
+- Full keyboard navigation and screen-reader support
 
 ---
 
-## Run validation checks
+## How to use it
 
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic1
-```
-
-Run the full npm test suite:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm test
-```
-
-Run the Epic 2 state-management checks only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic2
-```
-
-Run the Epic 3 setup-generation checks only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic3
-```
-
-Run the Epic 4 shell and navigation checks only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic4
-```
-
-Run the Epic 5 Browse checks only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic5
-```
-
-Run the Epic 6 Collection checks only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic6
-```
-
-Run the Epic 7 New Game checks only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic7
-```
-
-Run the Epic 8 History/Reset checks only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic8
-```
-
-Run the Epic 9 Notifications/Error Handling/Accessibility checks only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic9
-```
-
-Run the Epic 9 browser QC only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:qc:epic9
-```
-
-Run the Epic 10 documentation/release-readiness checks only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:epic10
-```
-
-Run the Epic 10 browser QC only:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:qc:epic10
-```
-
-Run the browser QC suite for Epic 1–10:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:qc
-```
-
-Run the same browser QC suite in headed mode:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run test:qc:headed
-```
-
-Optional human-readable Epic 1 data summary reporter:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-npm run report:epic1
-```
-
-Optional shell refresh:
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-python3 ./tools/build_epic1_index.py
-```
-
-Optional seed rebuild (expects the upstream source file path or `LEGENDARY_SOURCE_CARD_DB`):
-
-```sh
-cd "/Users/afayard1/Projects/random-legendary-llm"
-python3 ./tools/build_epic1_seed.py
-```
+1. **Browse** your sets and add the ones you own to your collection.
+2. Go to **New Game**, pick your player count and play mode, then hit **Generate Setup**.
+3. **Regenerate** as many times as you like — it's free and doesn't affect your history.
+4. Hit **Accept & Log** when you're happy. Log your result after the game.
+5. Check **History** to review past games and explore your insights.
+6. Use **Backup** to export your data or sync across devices.
 
 ---
 
-## Documentation index
+## For developers and contributors
 
-Project documentation lives in `documentation/`.
-
-- `documentation/create-project.md` — original brief plus implementation-direction addendum
-- `documentation/sources.md` — authoritative external reference sources
-- `documentation/architecture.md` — runtime architecture and module boundaries
-- `documentation/roadmap.md` — implementation roadmap
-- `documentation/data-model.md` — data and local storage specification
-- `documentation/setup-rules.md` — setup rules and randomization rules
-- `documentation/ui-design.md` — visual design and user flows
-- `documentation/game-data.md` — human-readable data scope summary
-- `documentation/game-data-normalized.md` — BGG-derived normalized inventory
-- `documentation/clarifications.md` — clarification record and final decisions
-- `documentation/epics.md` — implementation epics and stories
-- `documentation/task-list.md` — checkable implementation tracker
-- `documentation/testing-qc-strategy.md` — testing and quality-control policy
-- `documentation/_next-steps.md` — post-V1 ideas and future enhancements
+The full architecture, data model, testing strategy, design system, and development workflow are documented in the [`/documentation`](./documentation/) folder. This is a fully static SPA — no server-side code, no database, no secrets.
 
 ---
 
-## Current release status
+*Legendary: Marvel Randomizer is an unofficial, fan-made tool. It is not affiliated with, endorsed by, or connected to Marvel Entertainment or Upper Deck Entertainment in any way. All Marvel character names and likenesses are property of their respective owners.*
 
-Epic 1 through Epic 10 are implemented, documented, and covered by automated logic tests plus browser QC, and Epic 10 release readiness remains complete in the shipped baseline.
-
-For future enhancements beyond the current release, see `documentation/_next-steps.md`.
+*This project was built entirely using AI-assisted development (GitHub Copilot with Claude) as a demonstration of what modern AI tooling can produce end-to-end — from data modeling and business logic through UI, testing, and documentation.*
