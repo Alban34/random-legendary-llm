@@ -1,0 +1,100 @@
+# Testing and Quality Control Strategy
+
+STATUS: Approved
+
+## Purpose
+
+This document defines how implementation quality will be verified.
+
+Its core rule is:
+
+> **No story is considered done until its corresponding tests and QC checks are completed.**
+
+This applies to:
+- data normalization,
+- state management,
+- setup generation,
+- UI behavior,
+- persistence,
+- accessibility,
+- and documentation consistency.
+
+The authoritative reference baseline for inventory and setup-rule verification is defined in `data/sources.md`.
+
+---
+
+## Quality policy
+
+A story can move to **Done** only when all of the following are true:
+
+1. the implementation task(s) for that story are complete,
+2. the story's matching test task(s) are complete,
+3. relevant automated QC coverage has been executed,
+4. no blocking errors remain in edited files,
+5. the behavior matches the approved specifications.
+
+Additional workflow rules for implementation epics:
+
+6. if the implemented story changed files under `/src`, run the story-specific automated checks needed to satisfy that story's documented **Test** and **QC** tasks,
+7. if the completed epic changed files under `/src`, run the full regression suite before marking the epic complete,
+8. documentation-only, planning-only, prompt-only, or agent-only changes that do not modify `/src` do not require the full regression suite.
+
+---
+
+## Test pyramid for this project
+
+Because the project is a static-hosted client app with shared JavaScript modules, testing will rely on a practical mix of:
+
+### 1. Data and logic verification
+Used for:
+- normalization
+- cross-reference validation
+- setup generation
+- legality checks
+- selection priority
+- persistence helpers
+
+Preferred form:
+- `node:test`-based module tests run locally through npm
+- deterministic sample inputs / expected outputs
+
+### 2. UI behavior verification
+Used for:
+- tab switching
+- collection toggling
+- generated result rendering
+- history rendering
+- reset behavior
+- notifications and modals
+
+Preferred form:
+- Playwright browser QC specs for stable user-visible flows
+- targeted follow-up coverage only where automation is not yet practical
+
+### 3. End-to-end scenario verification
+Used for:
+- full user flows from collection selection to accepted setup
+- persistence across reloads
+- reset flows
+- legality errors
+- least-played fallback
+
+Preferred form:
+- scripted Playwright walkthroughs with expected outcomes
+- focused supplemental checks for any flows not yet automated
+
+---
+
+## Story-level Definition of Done
+
+Every story must satisfy this Definition of Done:
+
+- implementation tasks checked
+- matching **Test** task checked
+- matching **QC** task checked
+- any discovered defect fixed or explicitly deferred
+- task list updated accordingly
+
+When a story changes files under `/src`, its **QC** task should be satisfied through targeted automated checks that are appropriate for that story's scope.
+
+When the epic containing that story changes files under `/src`, the epic is not complete until the full regression suite also passes.

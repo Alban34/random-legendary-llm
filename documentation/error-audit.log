@@ -1,9 +1,0 @@
-[2026-04-13] Epic: Epics 29–33 (Svelte 5 Migration)
-File: README.md
-Finding: The root README is stale in four ways after the Svelte 5 migration:
-  1. "Project state" section says "Epic 1 through Epic 20 implementation" — Epics 29–33 have been implemented but are not mentioned.
-  2. The "fully static" paragraph says "no framework build step" — this is now false; the app uses Vite + @sveltejs/vite-plugin-svelte as a build step.
-  3. The entry-point list includes "`src/app/browser-entry.mjs` — browser bootstrap entry" without noting that it now only calls Svelte 5 mount() rather than bootstrapping the full app.
-  4. The entry-point list includes "`src/app/app-renderer.mjs` — browser rendering for the current foundation screen" — app-renderer.mjs is now a transitional module used only via {@html} blocks inside Svelte tab components, not the primary rendering layer.
-Suggested action: Update README.md to mention Epics 29–33 are implemented, replace "no framework build step" with a note about the Vite + Svelte 5 build pipeline, and update the entry-point descriptions for browser-entry.mjs and app-renderer.mjs to reflect their post-migration roles.
----

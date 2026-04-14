@@ -4,11 +4,11 @@ STATUS: Approved
 
 ## Project state
 
-The repository now contains the **Epic 1 through Epic 20 implementation**, including post-v1 updates for alternate play modes, score logging, backup portability, insights, forced picks, onboarding, theming, interface localization, and grouped history.
+The repository now contains the **full implementation through Epic 28**, plus the Svelte 5 migration (Epics 29–33), including post-v1 updates for alternate play modes, score logging, backup portability, insights, forced picks, onboarding, theming, interface localization, grouped history, and classification corrections.
 
 Current status:
 - Epic 10 release readiness is complete and remains covered by documentation-alignment automation
-- Epics 1 through 20 are implemented
+- Epics 1 through 28 are implemented, along with Svelte 5 migration Epics 29–33
 - Node-based automated tests cover the current shipped runtime modules and documentation contracts
 - Playwright browser QC covers the current shipped user flows, including localization switching and fallback behavior
 
@@ -16,9 +16,9 @@ Implemented so far:
 - canonical seed data under `src/data/`
 - shared normalization and validation logic under `src/app/`
 - versioned browser-state persistence under `src/app/state-store.mjs`
-- a persisted theme switcher plus a persisted language selector with built-in English, French, and long-copy QA locale support
+- a persisted theme switcher plus a persisted language selector with built-in support for English (en-US), French (fr-FR), German (de-DE), Japanese (ja-JP), Korean (ko-KR), and Spanish (es-ES)
 - versioned backup export/import utilities under `src/app/backup-utils.mjs`
-- switchable History grouping modes for mastermind, player count, play mode, or an ungrouped view
+- switchable History grouping modes: by mastermind, scheme, heroes, villain groups, or play mode
 - setup templates and generation logic under `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs`
 - shared tab-shell metadata and navigation helpers under `src/app/app-tabs.mjs`
 - Browse filtering/detail helpers under `src/app/browse-utils.mjs`
@@ -27,14 +27,13 @@ Implemented so far:
 - History/usage/reset helpers under `src/app/history-utils.mjs`
 - notification/toast helpers under `src/app/feedback-utils.mjs`
 - a tabbed `index.html` shell for the browser app with Browse, Collection, New Game, History, Backup, notifications, reset confirmation, and accessibility support
-- npm-based Epic 1 through Epic 10 tests under `test/`
-- Playwright browser QC coverage for the Epic 1 through Epic 10 flows under `test/playwright/`
+- npm-based automated tests under `test/` covering Epics 1–28 and Svelte migration Epics 29–33
+- Playwright browser QC coverage for the current shipped user flows under `test/playwright/`
 - a data-foundation summary reporter under `tools/`
 
 The app remains **fully static**:
 - no server-side code
-- no framework build step
-- can be hosted by any static HTTP server
+- built with Vite and the Svelte 5 plugin; output in `dist/` can be hosted by any static HTTP server
 
 ---
 
@@ -45,13 +44,15 @@ The project is now a **single-page app served as static files**, rather than a s
 Current entry points:
 - `index.html` — browser shell
 - `src/app/app-shell.css` — application shell styles
-- `src/app/browser-entry.mjs` — browser bootstrap entry
+- `src/app/browser-entry.mjs` — mounts the root `App.svelte` component via Svelte 5 `mount()`
 - `src/app/game-data-pipeline.mjs` — canonical-data transformation, normalization, validation, and Epic 1 checks
 - `src/app/state-store.mjs` — versioned browser-state creation, hydration, persistence, history, and reset helpers
+- `src/app/state-store.svelte.js` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
+- `src/components/App.svelte` — root Svelte 5 component; owns viewModel `$state`, mounts the app shell and all tabs
 - `src/app/setup-rules.mjs` — player-count templates and active-mode resolution
 - `src/app/setup-generator.mjs` — legality checks, freshness ranking, forced-group handling, and setup generation
 - `src/app/app-tabs.mjs` — tab metadata, default-tab selection, and keyboard navigation order
-- `src/app/app-renderer.mjs` — browser rendering for the current foundation screen
+- `src/app/app-renderer.mjs` — transitional render helpers used via `{@html}` blocks inside Svelte tab components
 - `src/data/canonical-game-data.json` — project-owned canonical game data asset
 
 This keeps the app easy to host statically while making Epic 2+ work much easier to maintain and test.
@@ -69,7 +70,7 @@ Typical flow:
 5. Go to **New Game** to choose player count, optionally enable Advanced Solo for 1 player, then **Generate Setup**.
 6. Use **Regenerate** as much as you want without changing persisted history or usage.
 7. Use **Accept & Log** when you want the current setup to count toward usage tracking and game history, then complete or skip the immediate result-entry editor.
-8. Review accepted games in **History**, regroup them by mastermind, players, play mode, or an ungrouped view, edit pending or completed results, and inspect insights after the grouped history list.
+8. Review accepted games in **History**, regroup them by mastermind, scheme, heroes, villain groups, or play mode, edit pending or completed results, and inspect insights after the grouped history list.
 9. Use **Backup** to export a portable JSON backup, reset usage buckets, or import one with Merge or Replace restore modes.
 
 Important behavior:
