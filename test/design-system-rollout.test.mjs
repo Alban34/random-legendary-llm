@@ -15,16 +15,22 @@ let uiDesignDoc;
 let stylingArchitectureDoc;
 let testingStrategyDoc;
 let adoptionPlanDoc;
+let historyTabSource;
+let collectionTabSource;
+let browseTabSource;
 
 before(async () => {
-  const [css, renderer, appSvelte, uiDesign, stylingArchitecture, testingStrategy, adoptionPlan] = await Promise.all([
+  const [css, renderer, appSvelte, uiDesign, stylingArchitecture, testingStrategy, adoptionPlan, historyTab, collectionTab, browseTab] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'ui-design.md'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'styling-architecture.md'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'testing-qc-strategy.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'design-system-adoption-plan.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'documentation', 'design-system-adoption-plan.md'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryTab.svelte'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'CollectionTab.svelte'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'BrowseTab.svelte'), 'utf8')
   ]);
 
   shellCss = css;
@@ -34,6 +40,9 @@ before(async () => {
   stylingArchitectureDoc = stylingArchitecture;
   testingStrategyDoc = testingStrategy;
   adoptionPlanDoc = adoptionPlan;
+  historyTabSource = historyTab;
+  collectionTabSource = collectionTab;
+  browseTabSource = browseTab;
 });
 
 test('Design system rollout ships governed typography roles and tokenized shell primitives', () => {
@@ -53,7 +62,7 @@ test('Design system rollout adds reduced-motion and focus-restoration guardrails
   assert.match(shellCss, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(shellCss, /\.button:hover,[\s\S]*\.set-card:hover,[\s\S]*\.collection-row:hover\s*\{[\s\S]*transform:\s*none;/);
   assert.match(shellCss, /\.collection-row:focus-within,[\s\S]*\.history-item:focus-within,[\s\S]*\.history-group:focus-within/);
-  assert.match(rendererSource, /role="alert"[\s\S]*data-result-form-error/);
+  assert.match(historyTabSource, /role="alert"[\s\S]*data-result-form-error/);
 
   assert.match(appSvelteSource, /function focusSelector\(selector\)/);
   assert.match(appSvelteSource, /focusSelector\(`\[data-action="set-theme"\]\[data-theme-id="\$\{normalizedThemeId\}"\]`\);/);
@@ -75,6 +84,6 @@ test('Design system rollout keeps screen-level docs and planning aligned with th
 
   assert.match(adoptionPlanDoc, /Shared shell and primitives first/);
   assert.match(adoptionPlanDoc, /Manual review still required/);
-  assert.match(rendererSource, /class="page-flow stack gap-md"/);
-  assert.match(rendererSource, /class="panel-copy"/);
+  assert.match(collectionTabSource, /class="page-flow stack gap-md"/);
+  assert.match(browseTabSource, /class="panel-copy"/);
 });

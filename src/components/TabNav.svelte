@@ -2,7 +2,7 @@
   let { tabs, activeTab, locale, variant, navId, navLabel, onTabSelect, onTabKeydown } = $props();
 </script>
 
-<nav
+<div
   class="{variant}-tab-nav"
   id={navId}
   aria-label={navLabel}
@@ -32,4 +32,4 @@
       <span class="tab-label">{variant === 'mobile' ? locale.getTabShortLabel(tab.id) : locale.getTabLabel(tab.id)}</span>
     </button>
   {/each}
-</nav>
+</div>

@@ -9,13 +9,15 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
 let rendererSource;
+let newGameTabSource;
 let cssSource;
 let entrySource;
 let postV1TaskList;
 
 before(async () => {
-  [rendererSource, cssSource, entrySource, postV1TaskList] = await Promise.all([
+  [rendererSource, newGameTabSource, cssSource, entrySource, postV1TaskList] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'NewGameTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'browser-entry.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
@@ -54,7 +56,7 @@ test('Story 25.2: CSS contains .app-version style rule', () => {
 test('Story 25.3: renderer does NOT render Generate Setup and Regenerate as simultaneous separate buttons', () => {
   // Old pattern: generate-setup button followed immediately by regenerate-setup button in the same button-row
   assert.doesNotMatch(
-    rendererSource,
+    newGameTabSource,
     /data-action="generate-setup"[^<]{0,200}data-action="regenerate-setup"/,
     'generate-setup and regenerate-setup must not appear as two separate sequential buttons'
   );
@@ -62,29 +64,25 @@ test('Story 25.3: renderer does NOT render Generate Setup and Regenerate as simu
 
 test('Story 25.3: renderer uses a single context-sensitive generate button', () => {
   assert.match(
-    rendererSource,
+    newGameTabSource,
     /data-action="generate-setup"/,
     'generate-setup action must still exist'
   );
   assert.match(
-    rendererSource,
+    newGameTabSource,
     /newGame\.reroll/,
     'renderer must reference newGame.reroll for the setup-present label'
   );
 });
 
 test('Story 25.4: generate button row appears before forced picks panel in render source', () => {
-  // Use the renderForcedPickControls(viewModel) call site (not the function definition)
-  // and the data-action="generate-setup" as reference point.
-  // Both appear inside renderSetupControls — verify generate comes first.
-  const generateButtonIdx = rendererSource.indexOf('data-action="generate-setup"');
-  // The call to renderForcedPickControls inside renderSetupControls happens after the button row
-  const forcedPicksCallIdx = rendererSource.indexOf('${renderForcedPickControls(viewModel)}');
-  assert.ok(generateButtonIdx !== -1, 'generate-setup button must exist in renderer');
-  assert.ok(forcedPicksCallIdx !== -1, 'renderForcedPickControls call must exist in renderer');
+  const generateButtonIdx = newGameTabSource.indexOf('data-action="generate-setup"');
+  const forcedPicksPanelIdx = newGameTabSource.indexOf('data-forced-picks-panel');
+  assert.ok(generateButtonIdx !== -1, 'generate-setup button must exist in NewGameTab');
+  assert.ok(forcedPicksPanelIdx !== -1, 'data-forced-picks-panel must exist in NewGameTab');
   assert.ok(
-    generateButtonIdx < forcedPicksCallIdx,
-    `generate button (at ${generateButtonIdx}) must appear before renderForcedPickControls call (at ${forcedPicksCallIdx}) in source`
+    generateButtonIdx < forcedPicksPanelIdx,
+    `generate button (at ${generateButtonIdx}) must appear before forced-picks-panel (at ${forcedPicksPanelIdx}) in source`
   );
 });
 

@@ -14,7 +14,7 @@
   import { DEFAULT_HISTORY_GROUPING_MODE, HISTORY_GROUPING_MODES } from '../app/history-utils.mjs';
   import { createLocaleTools, getSelectableLocales, normalizeLocaleId } from '../app/localization-utils.mjs';
   import { normalizeGameResultDraft, validateGameResultDraft } from '../app/result-utils.mjs';
-  import { renderTabPanels, renderOnboardingShell } from '../app/app-renderer.mjs';
+  import OnboardingShell from './OnboardingShell.svelte';
   import { buildHistoryReadySetupSnapshot, generateSetup } from '../app/setup-generator.mjs';
   import { resolvePlayMode } from '../app/setup-rules.mjs';
   import { getThemeDefinition, normalizeThemeId, THEME_OPTIONS } from '../app/theme-utils.mjs';
@@ -121,16 +121,7 @@
   let activeTheme = $derived(activeThemeId ? getThemeDefinition(activeThemeId) : null);
   let activeLocaleId = $derived(appState?.preferences?.localeId ?? 'en-US');
 
-  let tabPanels = $derived(
-    isLoaded
-      ? renderTabPanels({ bundle, state: appState, locale, persistence, ui }, { compactViewport })
-      : {}
-  );
-  let onboardingMarkup = $derived(
-    isLoaded
-      ? renderOnboardingShell({ bundle, state: appState, locale, persistence, ui })
-      : ''
-  );
+
   let modalConfig = $derived(isLoaded ? computeModalConfig() : null);
 
   // ---------------------------------------------------------------------------
@@ -1084,98 +1075,6 @@
   // Document-level event delegation (for {@html} tab/onboarding content)
   // Actions handled by Svelte directly are in the skip set.
   // ---------------------------------------------------------------------------
-  const SVELTE_HANDLED_ACTIONS = new Set([
-    'select-tab',
-    'dismiss-toast',
-    'set-theme',
-    'toggle-mobile-preferences',
-    'cancel-reset-owned-collection',
-    'confirm-reset-owned-collection',
-    'cancel-reset-all-state',
-    'confirm-reset-all-state',
-    'cancel-backup-restore',
-    'confirm-merge-backup',
-    'confirm-replace-backup'
-  ]);
-
-  function handleDocumentClick(event) {
-    if (!isLoaded) return;
-    const actionEl = event.target.closest('[data-action]');
-    if (!actionEl) return;
-    const action = actionEl.dataset.action;
-    if (SVELTE_HANDLED_ACTIONS.has(action)) return;
-    switch (action) {
-      case 'toggle-owned-set': actions.toggleOwnedSet(actionEl.dataset.setId); break;
-      case 'reset-usage': actions.resetUsageCategory(actionEl.dataset.category); break;
-      case 'set-browse-type-filter': actions.setBrowseTypeFilter(actionEl.dataset.typeFilter); break;
-      case 'toggle-browse-set-expanded': actions.toggleBrowseSetExpanded(actionEl.dataset.setId); break;
-      case 'set-player-count': actions.setPlayerCount(Number(actionEl.dataset.playerCount)); break;
-      case 'set-play-mode': actions.setPlayMode(actionEl.dataset.playMode); break;
-      case 'add-forced-pick': {
-        const sel = document.querySelector(`[data-forced-pick-select="${actionEl.dataset.field}"]`);
-        actions.addForcedPick(actionEl.dataset.field, sel?.value || '');
-        break;
-      }
-      case 'remove-forced-pick': actions.removeForcedPick(actionEl.dataset.field, actionEl.dataset.entityId); break;
-      case 'edit-game-result': actions.editGameResult(actionEl.dataset.recordId); break;
-      case 'set-history-grouping': actions.setHistoryGrouping(actionEl.dataset.historyGroupingMode); break;
-      case 'jump-tab': actions.selectTab(actionEl.dataset.tabId); break;
-      case 'open-onboarding-tab': actions.openOnboardingTab(actionEl.dataset.tabId); break;
-      case 'request-reset-owned-collection': actions.requestResetOwnedCollection(); break;
-      case 'request-reset-all-state': actions.requestResetAllState(); break;
-      case 'open-import-backup': actions.openImportBackup(); break;
-      case 'export-backup': actions.exportBackup(); break;
-      case 'request-merge-backup': actions.requestMergeBackup(); break;
-      case 'request-replace-backup': actions.requestReplaceBackup(); break;
-      case 'cancel-backup-preview': actions.cancelBackupPreview(); break;
-      case 'toggle-about-panel': actions.toggleAboutPanel(); break;
-      case 'start-onboarding': actions.startOnboarding(); break;
-      case 'previous-onboarding-step': actions.previousOnboardingStep(); break;
-      case 'next-onboarding-step': actions.nextOnboardingStep(); break;
-      case 'skip-onboarding': actions.skipOnboarding(); break;
-      case 'complete-onboarding': actions.completeOnboarding(); break;
-      case 'clear-forced-picks': actions.clearForcedPicks(); break;
-      case 'generate-setup': actions.generateSetup(); break;
-      case 'accept-current-setup': actions.acceptCurrentSetup(); break;
-      case 'save-game-result': actions.saveGameResult(); break;
-      case 'skip-game-result': actions.skipGameResultEntry(); break;
-      case 'cancel-result-entry': actions.cancelResultEntry(); break;
-      case 'toggle-history-insights': actions.toggleHistoryInsights(); break;
-      case 'clear-setup-controls': actions.clearToDefaults(); break;
-      case 'corrupt-saved-state': actions.corruptSavedState(); break;
-      case 'inject-invalid-owned-set': actions.injectInvalidOwnedSet(); break;
-    }
-  }
-
-  function handleDocumentChange(event) {
-    if (!isLoaded) return;
-    const target = event.target;
-    if (target.id === 'backup-import-input') {
-      const [file] = [...(target.files || [])];
-      actions.importBackupFile(file);
-      target.value = '';
-      return;
-    }
-    if (target.dataset?.resultField === 'outcome') {
-      actions.setResultOutcome(target.value);
-    }
-  }
-
-  function handleDocumentInput(event) {
-    if (!isLoaded) return;
-    const target = event.target;
-    if (target.id === 'browse-search-input') {
-      actions.setBrowseSearchTerm(target.value);
-      return;
-    }
-    if (target.dataset?.resultField === 'score') {
-      actions.setResultScore(target.value);
-      return;
-    }
-    if (target.dataset?.resultField === 'notes') {
-      actions.setResultNotes(target.value);
-    }
-  }
 
   // ---------------------------------------------------------------------------
   // Mount
@@ -1185,10 +1084,6 @@
     compactViewport = mq.matches;
     const onViewportChange = (e) => { compactViewport = e.matches; };
     mq.addEventListener('change', onViewportChange);
-
-    document.addEventListener('click', handleDocumentClick);
-    document.addEventListener('change', handleDocumentChange);
-    document.addEventListener('input', handleDocumentInput);
 
     try {
       const seed = await loadSeed();
@@ -1237,9 +1132,6 @@
     }
 
     return () => {
-      document.removeEventListener('click', handleDocumentClick);
-      document.removeEventListener('change', handleDocumentChange);
-      document.removeEventListener('input', handleDocumentInput);
       mq.removeEventListener('change', onViewportChange);
     };
   });
@@ -1257,7 +1149,7 @@
           <div id="header-locale-controls"></div>
           <div id="header-theme-controls"></div>
         </div>
-        <nav class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary" role="tablist"></nav>
+        <div class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary" role="tablist"></div>
       </div>
     </div>
   </header>
@@ -1272,11 +1164,11 @@
     </section>
     <div class="tab-panel-shell">
       {#each APP_TABS as tab (tab.id)}
-        <section class="tab-panel" id="panel-{tab.id}" role="tabpanel" hidden={tab.id !== 'browse'}></section>
+        <div class="tab-panel" id="panel-{tab.id}" role="tabpanel" hidden={tab.id !== 'browse'}></div>
       {/each}
     </div>
   </main>
-  <nav class="mobile-tab-nav" id="mobile-tabs" aria-label="Primary mobile" role="tablist"></nav>
+  <div class="mobile-tab-nav" id="mobile-tabs" aria-label="Primary mobile" role="tablist"></div>
   <div id="modal-root"></div>
 
 {:else if isLoaded}
@@ -1436,33 +1328,134 @@
       {/if}
     </section>
 
-    <!-- Diagnostics / Onboarding shell (transitional: {@html} until Epic 32) -->
-    <section class="stack gap-md" id="diagnostics-shell" hidden={!onboardingMarkup}>
-      {@html onboardingMarkup}
+    <!-- Onboarding shell -->
+    <section class="stack gap-md" id="diagnostics-shell" hidden={!ui.onboardingVisible}>
+      {#if isLoaded}
+        <OnboardingShell
+          {locale}
+          visible={ui.onboardingVisible}
+          step={ui.onboardingStep}
+          onboardingCompleted={appState.preferences.onboardingCompleted}
+          onPreviousStep={actions.previousOnboardingStep}
+          onNextStep={actions.nextOnboardingStep}
+          onSkip={actions.skipOnboarding}
+          onComplete={actions.completeOnboarding}
+          onOpenTab={actions.openOnboardingTab}
+        />
+      {/if}
     </section>
 
     <!-- Tab panels -->
     <div class="tab-panel-shell">
       {#each APP_TABS as tab (tab.id)}
-        <section
+        <div
           class="tab-panel"
           id="panel-{tab.id}"
           role="tabpanel"
           hidden={activeTabId !== tab.id}
           aria-labelledby={"tab-desktop-" + tab.id + " tab-mobile-" + tab.id}
         >
-          {#if tab.id === 'browse'}
-            <BrowseTab content={tabPanels.browse ?? ''} />
-          {:else if tab.id === 'collection'}
-            <CollectionTab content={tabPanels.collection ?? ''} />
-          {:else if tab.id === 'new-game'}
-            <NewGameTab content={tabPanels['new-game'] ?? ''} />
-          {:else if tab.id === 'history'}
-            <HistoryTab content={tabPanels.history ?? ''} />
-          {:else if tab.id === 'backup'}
-            <BackupTab content={tabPanels.backup ?? ''} />
+          {#if isLoaded}
+            {#if tab.id === 'browse'}
+              <BrowseTab
+                {bundle}
+                {appState}
+                {locale}
+                {persistence}
+                browseSearchTerm={ui.browseSearchTerm}
+                browseTypeFilter={ui.browseTypeFilter}
+                expandedBrowseSetId={ui.expandedBrowseSetId}
+                {compactViewport}
+                aboutPanelOpen={ui.aboutPanelOpen}
+                onboardingVisible={ui.onboardingVisible}
+                currentSetup={ui.currentSetup}
+                selectedTab={ui.selectedTab}
+                onToggleOwnedSet={actions.toggleOwnedSet}
+                onSetSearchTerm={actions.setBrowseSearchTerm}
+                onSetTypeFilter={actions.setBrowseTypeFilter}
+                onToggleSetExpanded={actions.toggleBrowseSetExpanded}
+                onJumpTab={actions.selectTab}
+                onToggleAboutPanel={actions.toggleAboutPanel}
+                onStartOnboarding={actions.startOnboarding}
+              />
+            {:else if tab.id === 'collection'}
+              <CollectionTab
+                {bundle}
+                {appState}
+                {locale}
+                {persistence}
+                lastActionNotice={ui.lastActionNotice}
+                onToggleOwnedSet={actions.toggleOwnedSet}
+                onRequestResetOwnedCollection={actions.requestResetOwnedCollection}
+              />
+            {:else if tab.id === 'new-game'}
+              <NewGameTab
+                {bundle}
+                {appState}
+                {locale}
+                selectedPlayerCount={ui.selectedPlayerCount}
+                selectedPlayMode={ui.selectedPlayMode}
+                advancedSolo={ui.advancedSolo}
+                currentSetup={ui.currentSetup}
+                generatorError={ui.generatorError}
+                generatorNotices={ui.generatorNotices}
+                forcedPicks={ui.forcedPicks}
+                {compactViewport}
+                onSetPlayerCount={actions.setPlayerCount}
+                onSetPlayMode={actions.setPlayMode}
+                onGenerateSetup={actions.generateSetup}
+                onAcceptCurrentSetup={actions.acceptCurrentSetup}
+                onAddForcedPick={actions.addForcedPick}
+                onRemoveForcedPick={actions.removeForcedPick}
+                onClearForcedPicks={actions.clearForcedPicks}
+                onClearToDefaults={actions.clearToDefaults}
+              />
+            {:else if tab.id === 'history'}
+              <HistoryTab
+                {bundle}
+                {appState}
+                {locale}
+                {compactViewport}
+                historyGroupingMode={ui.historyGroupingMode}
+                historyInsightsExpanded={ui.historyInsightsExpanded}
+                historyExpandedRecordId={ui.historyExpandedRecordId}
+                resultEditorRecordId={ui.resultEditorRecordId}
+                resultDraft={ui.resultDraft}
+                resultFormError={ui.resultFormError}
+                resultInvalidFields={ui.resultInvalidFields}
+                onSetHistoryGrouping={actions.setHistoryGrouping}
+                onEditGameResult={actions.editGameResult}
+                onToggleHistoryInsights={actions.toggleHistoryInsights}
+                onSaveGameResult={actions.saveGameResult}
+                onSkipGameResult={actions.skipGameResultEntry}
+                onCancelResultEntry={actions.cancelResultEntry}
+                onSetResultOutcome={actions.setResultOutcome}
+                onSetResultScore={actions.setResultScore}
+                onSetResultNotes={actions.setResultNotes}
+              />
+            {:else if tab.id === 'backup'}
+              <BackupTab
+                {bundle}
+                {appState}
+                {locale}
+                {persistence}
+                {compactViewport}
+                backupImportError={ui.backupImportError}
+                stagedBackup={ui.stagedBackup}
+                confirmBackupRestoreMode={ui.confirmBackupRestoreMode}
+                lastBackupExportFileName={ui.lastBackupExportFileName}
+                onExportBackup={actions.exportBackup}
+                onOpenImportBackup={actions.openImportBackup}
+                onImportBackupFile={actions.importBackupFile}
+                onCancelBackupPreview={actions.cancelBackupPreview}
+                onRequestMergeBackup={actions.requestMergeBackup}
+                onRequestReplaceBackup={actions.requestReplaceBackup}
+                onResetUsageCategory={actions.resetUsageCategory}
+                onRequestResetAllState={actions.requestResetAllState}
+              />
+            {/if}
           {/if}
-        </section>
+        </div>
       {/each}
     </div>
   </main>
@@ -1483,7 +1476,7 @@
   <div id="modal-root">
     {#if modalConfig}
       <div class="modal-backdrop">
-        <section
+        <div
           class="modal-dialog"
           role="dialog"
           aria-modal="true"
@@ -1510,7 +1503,7 @@
               onclick={modalConfig.onConfirm}
             >{modalConfig.confirmLabel}</button>
           </div>
-        </section>
+        </div>
       </div>
     {/if}
   </div>
@@ -1530,7 +1523,7 @@
           <div id="header-locale-controls"></div>
           <div id="header-theme-controls"></div>
         </div>
-        <nav class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary" role="tablist"></nav>
+        <div class="desktop-tab-nav" id="desktop-tabs" aria-label="Primary" role="tablist"></div>
       </div>
     </div>
   </header>
@@ -1539,10 +1532,10 @@
     <section class="stack gap-md" id="diagnostics-shell" hidden></section>
     <div class="tab-panel-shell">
       {#each APP_TABS as tab (tab.id)}
-        <section class="tab-panel" id="panel-{tab.id}" role="tabpanel" hidden={tab.id !== 'browse'}></section>
+        <div class="tab-panel" id="panel-{tab.id}" role="tabpanel" hidden={tab.id !== 'browse'}></div>
       {/each}
     </div>
   </main>
-  <nav class="mobile-tab-nav" id="mobile-tabs" aria-label="Primary mobile" role="tablist"></nav>
+  <div class="mobile-tab-nav" id="mobile-tabs" aria-label="Primary mobile" role="tablist"></div>
   <div id="modal-root"></div>
 {/if}

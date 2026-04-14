@@ -12,14 +12,16 @@ let browserEntry;
 let appShellCss;
 let feedbackUtils;
 let appRenderer;
+let toastStackSource;
 let postV1TaskList;
 
 before(async () => {
-  [browserEntry, appShellCss, feedbackUtils, appRenderer, postV1TaskList] = await Promise.all([
+  [browserEntry, appShellCss, feedbackUtils, appRenderer, toastStackSource, postV1TaskList] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'feedback-utils.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'ToastStack.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
   ]);
 });
@@ -81,8 +83,8 @@ test('Story 24.4: feedback-utils persistent toast behavior is unchanged', () => 
 
 // Story 24.4 — toast HTML preserves role and aria-live
 test('Story 24.4: toast HTML preserves role="status" or role="alert" and aria-live', () => {
-  assert.match(appRenderer, /role="\${toast\.live === 'assertive' \? 'alert' : 'status'}"/, 'toast must have conditional role attribute');
-  assert.match(appRenderer, /aria-live="\${toast\.live}"/, 'toast must have aria-live attribute');
+  assert.match(toastStackSource, /role=\{toast\.live === 'assertive' \? 'alert' : 'status'\}/, 'toast must have conditional role attribute');
+  assert.match(toastStackSource, /aria-live=\{toast\.live\}/, 'toast must have aria-live attribute');
 });
 
 // Documentation — post-v1 task list covers Epic 24 stories 24.1–24.4

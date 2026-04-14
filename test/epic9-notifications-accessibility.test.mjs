@@ -16,11 +16,15 @@ const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.mjs');
 const shellCssPath = path.join(rootDir, 'src', 'app', 'app-shell.css');
 const htmlPath = path.join(rootDir, 'src', 'components', 'App.svelte');
+const tabNavPath = path.join(rootDir, 'src', 'components', 'TabNav.svelte');
+const toastStackPath = path.join(rootDir, 'src', 'components', 'ToastStack.svelte');
 
 let bundle;
 let rendererSource;
 let shellCssSource;
 let htmlSource;
+let tabNavSource;
+let toastStackSource;
 
 function createAllOwnedState() {
   const state = createDefaultState();
@@ -41,17 +45,21 @@ function markAllUsedExcept(bucket, entities, keepIds) {
 }
 
 before(async () => {
-  const [seedRaw, rendererRaw, shellCssRaw, htmlRaw] = await Promise.all([
+  const [seedRaw, rendererRaw, shellCssRaw, htmlRaw, tabNavRaw, toastStackRaw] = await Promise.all([
     fs.readFile(seedPath, 'utf8'),
     fs.readFile(rendererPath, 'utf8'),
     fs.readFile(shellCssPath, 'utf8'),
-    fs.readFile(htmlPath, 'utf8')
+    fs.readFile(htmlPath, 'utf8'),
+    fs.readFile(tabNavPath, 'utf8'),
+    fs.readFile(toastStackPath, 'utf8')
   ]);
 
   bundle = createEpic1Bundle(JSON.parse(seedRaw));
   rendererSource = rendererRaw;
   shellCssSource = shellCssRaw;
   htmlSource = htmlRaw;
+  tabNavSource = tabNavRaw;
+  toastStackSource = toastStackRaw;
 });
 
 test('Epic 9 toast helpers preserve variant metadata, dismiss records, and cap stacked notifications', () => {
@@ -156,12 +164,12 @@ test('Epic 9 ships semantic tab, toast, and modal markup plus visible focus styl
   assert.match(htmlSource, /id="toast-region"[^>]*aria-live="polite"[^>]*aria-atomic="false"/);
   assert.match(htmlSource, /role="tablist"/);
 
-  assert.match(rendererSource, /role="tab"/);
-  assert.match(rendererSource, /role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description"/);
-  assert.ok(rendererSource.includes("panel.setAttribute('aria-labelledby', `tab-desktop-${tab.id} tab-mobile-${tab.id}`);"));
-  assert.match(rendererSource, /role="region" aria-label="Notifications"/);
-  assert.match(rendererSource, /data-toast-dismiss-on-click="\$\{toast\.dismissOnClick \? 'true' : 'false'\}"/);
-  assert.match(rendererSource, /toast-\$\{toast\.behavior\}/);
+  assert.match(tabNavSource, /role="tab"/);
+  assert.match(htmlSource, /role="dialog"[\s\S]*?aria-modal="true"[\s\S]*?aria-labelledby="modal-title"[\s\S]*?aria-describedby="modal-description"/);
+  assert.match(htmlSource, /aria-labelledby=\{"tab-desktop-" \+ tab\.id \+ " tab-mobile-" \+ tab\.id\}/);
+  assert.match(toastStackSource, /role="region" aria-label=\{locale\.t\('toast\.region'\)\}/);
+  assert.match(toastStackSource, /data-toast-dismiss-on-click=\{toast\.dismissOnClick \? 'true' : 'false'\}/);
+  assert.match(toastStackSource, /" toast-" \+ toast\.behavior/);
 
   assert.match(shellCssSource, /button:focus-visible/);
   assert.match(shellCssSource, /\.tab-button:focus-visible/);

@@ -16,16 +16,19 @@ const rootDir = path.resolve(__dirname, '..');
 const browserEntryPath = path.join(rootDir, 'src', 'app', 'browser-entry.mjs');
 const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.mjs');
 const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
+const toastStackPath = path.join(rootDir, 'src', 'components', 'ToastStack.svelte');
 
 let browserEntrySource;
 let rendererSource;
 let appSvelteSource;
+let toastStackSource;
 
 before(async () => {
-  [browserEntrySource, rendererSource, appSvelteSource] = await Promise.all([
+  [browserEntrySource, rendererSource, appSvelteSource, toastStackSource] = await Promise.all([
     fs.readFile(browserEntryPath, 'utf8'),
     fs.readFile(rendererPath, 'utf8'),
-    fs.readFile(appSveltePath, 'utf8')
+    fs.readFile(appSveltePath, 'utf8'),
+    fs.readFile(toastStackPath, 'utf8')
   ]);
 });
 
@@ -76,5 +79,5 @@ test('Epic 16 suppresses redundant generator toasts and keeps critical alerts pe
   assert.doesNotMatch(appSvelteSource, /Generated a fully fresh setup\./);
   assert.match(appSvelteSource, /enqueueToast\(\{ variant: 'error', message: error\.message, behavior: 'persistent' \}\)/);
   assert.match(rendererSource, /Persistent alert/);
-  assert.match(rendererSource, /data-toast-auto-dismiss="\$\{toast\.autoDismissMs \? 'true' : 'false'\}"/);
+  assert.match(toastStackSource, /data-toast-auto-dismiss=\{toast\.autoDismissMs \? 'true' : 'false'\}/);
 });

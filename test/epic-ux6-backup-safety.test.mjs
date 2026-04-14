@@ -9,13 +9,15 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
 let rendererSource;
+let backupTabSource;
 let cssSource;
 let localeSource;
 let uxTaskList;
 
 before(async () => {
-  [rendererSource, cssSource, localeSource, uxTaskList] = await Promise.all([
+  [rendererSource, backupTabSource, cssSource, localeSource, uxTaskList] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'BackupTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'documentation', 'ux-alignment', 'task-list.md'), 'utf8')
@@ -26,7 +28,7 @@ before(async () => {
 
 test('UX6.1 — renderer contains data-backup-portability-panel section', () => {
   assert.match(
-    rendererSource,
+    backupTabSource,
     /data-backup-portability-panel/,
     'renderer must declare data-backup-portability-panel'
   );
@@ -34,21 +36,21 @@ test('UX6.1 — renderer contains data-backup-portability-panel section', () => 
 
 test('UX6.1 — portability panel contains export-backup and open-import-backup actions', () => {
   // Portability panel appears before maintenance panel — find its slice
-  const portabilityIdx = rendererSource.indexOf('data-backup-portability-panel');
-  const maintenanceIdx = rendererSource.indexOf('data-backup-maintenance-panel');
+  const portabilityIdx = backupTabSource.indexOf('data-backup-portability-panel');
+  const maintenanceIdx = backupTabSource.indexOf('data-backup-maintenance-panel');
   assert.ok(portabilityIdx !== -1, 'data-backup-portability-panel must exist');
   assert.ok(maintenanceIdx !== -1, 'data-backup-maintenance-panel must exist');
   assert.ok(portabilityIdx < maintenanceIdx, 'portability panel must appear before maintenance panel');
 
-  const portabilitySlice = rendererSource.slice(portabilityIdx, maintenanceIdx);
+  const portabilitySlice = backupTabSource.slice(portabilityIdx, maintenanceIdx);
   assert.match(portabilitySlice, /data-action="export-backup"/, 'export-backup must be in portability panel');
   assert.match(portabilitySlice, /data-action="open-import-backup"/, 'open-import-backup must be in portability panel');
 });
 
 test('UX6.1 — portability panel does NOT contain request-reset-all-state', () => {
-  const portabilityIdx = rendererSource.indexOf('data-backup-portability-panel');
-  const maintenanceIdx = rendererSource.indexOf('data-backup-maintenance-panel');
-  const portabilitySlice = rendererSource.slice(portabilityIdx, maintenanceIdx);
+  const portabilityIdx = backupTabSource.indexOf('data-backup-portability-panel');
+  const maintenanceIdx = backupTabSource.indexOf('data-backup-maintenance-panel');
+  const portabilitySlice = backupTabSource.slice(portabilityIdx, maintenanceIdx);
   assert.doesNotMatch(
     portabilitySlice,
     /data-action="request-reset-all-state"/,
@@ -60,7 +62,7 @@ test('UX6.1 — portability panel does NOT contain request-reset-all-state', () 
 
 test('UX6.1 — renderer contains data-backup-maintenance-panel section or accordion', () => {
   assert.match(
-    rendererSource,
+    backupTabSource,
     /data-backup-maintenance-panel/,
     'renderer must declare data-backup-maintenance-panel'
   );
@@ -68,26 +70,26 @@ test('UX6.1 — renderer contains data-backup-maintenance-panel section or accor
 
 test('UX6.3 — renderer uses maintenance-accordion for the compact (mobile) layout', () => {
   assert.match(
-    rendererSource,
+    backupTabSource,
     /maintenance-accordion/,
     'renderer must reference the maintenance-accordion class for mobile collapsing'
   );
 });
 
 test('UX6.1 — maintenance panel contains reset-usage actions', () => {
-  const maintenanceIdx = rendererSource.indexOf('data-backup-maintenance-panel');
-  const dangerIdx = rendererSource.indexOf('data-backup-danger-zone');
+  const maintenanceIdx = backupTabSource.indexOf('data-backup-maintenance-panel');
+  const dangerIdx = backupTabSource.indexOf('data-backup-danger-zone');
   assert.ok(maintenanceIdx !== -1, 'data-backup-maintenance-panel must exist');
   assert.ok(dangerIdx !== -1, 'data-backup-danger-zone must exist');
 
-  const maintenanceSlice = rendererSource.slice(maintenanceIdx, dangerIdx);
+  const maintenanceSlice = backupTabSource.slice(maintenanceIdx, dangerIdx);
   assert.match(maintenanceSlice, /data-action="reset-usage"/, 'reset-usage must be in maintenance panel');
 });
 
 test('UX6.2 — maintenance panel does NOT contain request-reset-all-state', () => {
-  const maintenanceIdx = rendererSource.indexOf('data-backup-maintenance-panel');
-  const dangerIdx = rendererSource.indexOf('data-backup-danger-zone');
-  const maintenanceSlice = rendererSource.slice(maintenanceIdx, dangerIdx);
+  const maintenanceIdx = backupTabSource.indexOf('data-backup-maintenance-panel');
+  const dangerIdx = backupTabSource.indexOf('data-backup-danger-zone');
+  const maintenanceSlice = backupTabSource.slice(maintenanceIdx, dangerIdx);
   assert.doesNotMatch(
     maintenanceSlice,
     /data-action="request-reset-all-state"/,
@@ -99,16 +101,16 @@ test('UX6.2 — maintenance panel does NOT contain request-reset-all-state', () 
 
 test('UX6.2 — renderer contains data-backup-danger-zone section', () => {
   assert.match(
-    rendererSource,
+    backupTabSource,
     /data-backup-danger-zone/,
     'renderer must declare data-backup-danger-zone'
   );
 });
 
 test('UX6.2 — danger zone contains request-reset-all-state and NOT reset-usage', () => {
-  const dangerIdx = rendererSource.indexOf('data-backup-danger-zone');
+  const dangerIdx = backupTabSource.indexOf('data-backup-danger-zone');
   assert.ok(dangerIdx !== -1, 'data-backup-danger-zone must exist');
-  const dangerSlice = rendererSource.slice(dangerIdx);
+  const dangerSlice = backupTabSource.slice(dangerIdx);
   assert.match(dangerSlice, /data-action="request-reset-all-state"/, 'full reset must be in the danger zone');
   // danger zone slice starts at the opening — check reset-usage does not appear there
   // The danger zone is the last panel so slicing from its position is sufficient
@@ -122,7 +124,7 @@ test('UX6.2 — danger zone contains request-reset-all-state and NOT reset-usage
 
 test('UX6.2 — danger zone uses panel danger-zone CSS class', () => {
   assert.match(
-    rendererSource,
+    backupTabSource,
     /class="panel danger-zone"/,
     'danger zone section must use the danger-zone CSS class'
   );
@@ -130,7 +132,7 @@ test('UX6.2 — danger zone uses panel danger-zone CSS class', () => {
 
 test('UX6.2 — danger zone consequence copy key is used in renderer', () => {
   assert.match(
-    rendererSource,
+    backupTabSource,
     /backup\.dangerZoneConsequence/,
     'renderer must reference backup.dangerZoneConsequence locale key'
   );
