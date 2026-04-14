@@ -52,7 +52,7 @@ test.describe('Epic 1 automated QC', () => {
 
   test('surfaces initialization errors with understandable browser messaging', async ({ page }) => {
     await page.evaluate(async () => {
-      const { renderInitializationError } = await import('/src/app/app-renderer.mjs');
+      const { renderInitializationError } = await import('./src/app/app-renderer.mjs');
       renderInitializationError(document, new Error('Demo initialization error for QC review.'));
     });
 
