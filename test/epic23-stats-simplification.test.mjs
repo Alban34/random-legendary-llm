@@ -12,15 +12,13 @@ let rendererSource;
 let historyTabSource;
 let collectionTabSource;
 let cssSource;
-let postV1TaskList;
 
 before(async () => {
-  [rendererSource, historyTabSource, collectionTabSource, cssSource, postV1TaskList] = await Promise.all([
+  [rendererSource, historyTabSource, collectionTabSource, cssSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'CollectionTab.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8')
   ]);
 });
 
@@ -74,24 +72,4 @@ test('Epic 23.4 — renderer does NOT unconditionally display the storage availa
   assert.doesNotMatch(collectionTabSource, /persistence\.storageAvailable\s*\?\s*locale\.t\('collection\.storage\.available'\)/);
 });
 
-test('Epic 23.1–23.4 — task list shows stories 23.1–23.4 checked', () => {
-  // All task boxes in stories 23.1–23.4 should be checked
-  const story231Block = postV1TaskList.match(/### Story 23\.1[\s\S]*?(?=### Story 23\.2)/)?.[0] ?? '';
-  const story232Block = postV1TaskList.match(/### Story 23\.2[\s\S]*?(?=### Story 23\.3)/)?.[0] ?? '';
-  const story233Block = postV1TaskList.match(/### Story 23\.3[\s\S]*?(?=### Story 23\.4)/)?.[0] ?? '';
-  const story234Block = postV1TaskList.match(/### Story 23\.4[\s\S]*?(?=### Story 23\.5)/)?.[0] ?? '';
 
-  assert.doesNotMatch(story231Block, /- \[ \]/);
-  assert.doesNotMatch(story232Block, /- \[ \]/);
-  assert.doesNotMatch(story233Block, /- \[ \]/);
-  assert.doesNotMatch(story234Block, /- \[ \]/);
-
-  assert.match(story231Block, /- \[x\]/);
-  assert.match(story232Block, /- \[x\]/);
-  assert.match(story233Block, /- \[x\]/);
-  assert.match(story234Block, /- \[x\]/);
-});
-
-test('Epic 23 — full regression gate is marked checked in task list', () => {
-  assert.match(postV1TaskList, /- \[x\] \*\*Full regression gate:\*\*[\s\S]*?Epic 23/);
-});

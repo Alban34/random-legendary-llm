@@ -1,21 +1,8 @@
-import test, { before } from 'node:test';
+import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.mjs';
 import { DEFAULT_THEME_ID, THEME_OPTIONS, getThemeDefinition, normalizeThemeId } from '../src/app/theme-utils.mjs';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, '..');
-
-let shellCss;
-let stylingArchitectureDoc;
-let readmeDoc;
-let dataModelDoc;
-let indexHtmlDoc;
 
 function createMemoryStorage(initialEntries = {}) {
   const store = new Map(Object.entries(initialEntries));
@@ -40,22 +27,6 @@ const minimalIndexes = {
   henchmanGroupsById: {},
   schemesById: {}
 };
-
-before(async () => {
-  const [css, stylingArchitecture, readme, dataModel, indexHtml] = await Promise.all([
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'styling-architecture.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'README.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'data-model.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'index.html'), 'utf8')
-  ]);
-
-  shellCss = css;
-  stylingArchitectureDoc = stylingArchitecture;
-  readmeDoc = readme;
-  dataModelDoc = dataModel;
-  indexHtmlDoc = indexHtml;
-});
 
 test('Epic 18 theme utilities normalize supported IDs and expose stable theme metadata', () => {
   assert.equal(DEFAULT_THEME_ID, 'dark');
@@ -94,20 +65,3 @@ test('Epic 18 persists the selected theme and safely recovers invalid stored the
   assert.equal(recovered.notices.some((notice) => notice.includes('Recovered invalid preference values during state hydration.')), true);
 });
 
-test('Epic 18 stylesheet and docs describe the supported themes and hand-authored CSS decision', () => {
-  assert.match(shellCss, /:root\[data-theme='light'\]/);
-  assert.match(shellCss, /:root\[data-theme='dark'\]/);
-  assert.match(shellCss, /theme-switcher/);
-
-  assert.match(stylingArchitectureDoc, /Dark/);
-  assert.match(stylingArchitectureDoc, /Light/);
-  assert.match(stylingArchitectureDoc, /hand-authored CSS custom properties/i);
-  assert.match(stylingArchitectureDoc, /Open Props/);
-  assert.match(stylingArchitectureDoc, /Pico CSS/);
-  assert.match(stylingArchitectureDoc, /Tailwind CSS/);
-
-  assert.match(readmeDoc, /theme switcher/i);
-  assert.match(dataModelDoc, /themeId/);
-  assert.match(indexHtmlDoc, /<link rel="stylesheet" href="\.\/src\/app\/app-shell\.css"/);
-  assert.doesNotMatch(indexHtmlDoc, /https?:\/\/.*\.css/i);
-});

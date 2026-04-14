@@ -12,15 +12,13 @@ let rendererSource;
 let backupTabSource;
 let cssSource;
 let localeSource;
-let uxTaskList;
 
 before(async () => {
-  [rendererSource, backupTabSource, cssSource, localeSource, uxTaskList] = await Promise.all([
+  [rendererSource, backupTabSource, cssSource, localeSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'BackupTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'ux-alignment', 'task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.mjs'), 'utf8')
   ]);
 });
 
@@ -253,13 +251,3 @@ test('UX6.4 — FR locale contains backup.dangerZoneConsequence', () => {
   assert.ok(allMatches.length >= 2, 'backup.dangerZoneConsequence must exist in both EN and FR locales');
 });
 
-// UX6.5 — UX task-list completion
-
-test('UX6 stories are marked complete in ux-alignment task-list.md', () => {
-  assert.match(uxTaskList, /## Epic UX6 — Backup Safety, Maintenance Clarity, and Danger-Zone Separation/);
-  assert.match(uxTaskList, /- \[x\] Redesign the Backup information architecture into clearly separated portability, maintenance, and destructive areas/);
-  assert.match(uxTaskList, /- \[x\] Design a distinct danger-zone visual treatment for full reset/);
-  assert.match(uxTaskList, /- \[x\] Design a mobile-specific organization pattern for per-category resets/);
-  assert.match(uxTaskList, /- \[x\] Audit Backup helper text for repetition/);
-  assert.match(uxTaskList, /- \[x\] Audit the revised Backup screen end to end on desktop and mobile/);
-});

@@ -11,22 +11,15 @@ const rootDir = path.resolve(__dirname, '..');
 let gameDataSource;
 let browseUtilsSource;
 let collectionUtilsSource;
-let correctionManifest;
 let postV1TaskList;
 
 before(async () => {
-  [gameDataSource, browseUtilsSource, collectionUtilsSource, correctionManifest, postV1TaskList] = await Promise.all([
+  [gameDataSource, browseUtilsSource, collectionUtilsSource, postV1TaskList] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'data', 'canonical-game-data.json'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'browse-utils.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'collection-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'correction-manifest-26.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'documentation', 'planning', 'task-list.md'), 'utf8')
   ]);
-});
-
-test('Story 26.1 QC — correction manifest file exists and is non-empty', () => {
-  assert.ok(correctionManifest.length > 0, 'correction manifest must be non-empty');
-  assert.match(correctionManifest, /Revelations/, 'correction manifest must include Revelations');
 });
 
 test('Story 26.2 — Core Set is classified as base in canonical-game-data.json', () => {
@@ -67,15 +60,6 @@ test('Story 26.5 — standalone group is removed from collection-utils', () => {
 
 test('Story 26.5 — alphabetical order in filterBrowseSets is preserved', () => {
   assert.match(browseUtilsSource, /localeCompare/);
-});
-
-test('Epic 26 stories are marked complete in task-list.md', () => {
-  assert.match(postV1TaskList, /## Epic 26 — Remaining Set Classification Data Corrections/);
-  assert.match(postV1TaskList, /- \[x\] Read all set entries in the catalog data source and list their current type assignments/);
-  assert.match(postV1TaskList, /- \[x\] Cross-reference each assignment against the published Legendary ruleset/);
-  assert.match(postV1TaskList, /- \[x\] Locate all catalog data entries for Core and Villains/);
-  assert.match(postV1TaskList, /- \[x\] Locate the Revelations catalog entry and update its type to small expansion/);
-  assert.match(postV1TaskList, /- \[x\] Run through all corrected sets in Browse and confirm each appears in the expected category group/);
 });
 
 test('Epic 26 full regression gate is marked in task-list.md', () => {

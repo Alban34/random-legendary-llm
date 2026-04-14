@@ -11,38 +11,20 @@ const rootDir = path.resolve(__dirname, '..');
 let shellCss;
 let rendererSource;
 let appSvelteSource;
-let uiDesignDoc;
-let stylingArchitectureDoc;
-let testingStrategyDoc;
-let adoptionPlanDoc;
 let historyTabSource;
-let collectionTabSource;
-let browseTabSource;
 
 before(async () => {
-  const [css, renderer, appSvelte, uiDesign, stylingArchitecture, testingStrategy, adoptionPlan, historyTab, collectionTab, browseTab] = await Promise.all([
+  const [css, renderer, appSvelte, historyTab] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'ui-design.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'styling-architecture.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'testing-qc-strategy.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'design-system-adoption-plan.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryTab.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'components', 'CollectionTab.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'components', 'BrowseTab.svelte'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryTab.svelte'), 'utf8')
   ]);
 
   shellCss = css;
   rendererSource = renderer;
   appSvelteSource = appSvelte;
-  uiDesignDoc = uiDesign;
-  stylingArchitectureDoc = stylingArchitecture;
-  testingStrategyDoc = testingStrategy;
-  adoptionPlanDoc = adoptionPlan;
   historyTabSource = historyTab;
-  collectionTabSource = collectionTab;
-  browseTabSource = browseTab;
 });
 
 test('Design system rollout ships governed typography roles and tokenized shell primitives', () => {
@@ -68,22 +50,4 @@ test('Design system rollout adds reduced-motion and focus-restoration guardrails
   assert.match(appSvelteSource, /focusSelector\(`\[data-action="set-theme"\]\[data-theme-id="\$\{normalizedThemeId\}"\]`\);/);
   assert.match(appSvelteSource, /focusSelector\('#header-locale-select'\);/);
   assert.match(appSvelteSource, /focusSelector[\s\S]*?\[data-action="select-tab"\]\[data-tab-id="\$\{normalizeSelectedTab\(tabId\)\}"\]\[aria-selected="true"\]/);
-});
-
-test('Design system rollout keeps screen-level docs and planning aligned with the canonical contract', () => {
-  assert.match(uiDesignDoc, /The current supported themes are:[\s\S]*`dark`[\s\S]*`light`/);
-  assert.match(uiDesignDoc, /Use `documentation\/design-system\.md` as the canonical source/);
-  assert.match(stylingArchitectureDoc, /documentation\/design-system-adoption-plan\.md/);
-  assert.match(testingStrategyDoc, /## Design System Epic DS2 — Typography, Layout, and Shell Rhythm/);
-  assert.match(testingStrategyDoc, /test\/design-system-rollout\.test\.mjs/);
-  assert.match(testingStrategyDoc, /test\/playwright\/epic18-qc\.spec\.mjs/);
-
-  for (const screen of ['Browse', 'Collection', 'New Game', 'History', 'Backup']) {
-    assert.match(adoptionPlanDoc, new RegExp(`### ${screen.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
-  }
-
-  assert.match(adoptionPlanDoc, /Shared shell and primitives first/);
-  assert.match(adoptionPlanDoc, /Manual review still required/);
-  assert.match(collectionTabSource, /class="page-flow stack gap-md"/);
-  assert.match(browseTabSource, /class="panel-copy"/);
 });

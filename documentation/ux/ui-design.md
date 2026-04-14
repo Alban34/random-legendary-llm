@@ -5,7 +5,7 @@ STATUS: Approved
 ## Design Philosophy
 Themeable Marvel-inspired UI. Functional first, visually bold second. No external fonts, no framework — pure CSS with semantic custom properties.
 
-Canonical token definitions now live in `design-system/overview.md`. This document remains the screen-level UI specification and examples reference.
+Canonical token definitions now live in `documentation/design-system/overview.md`. This document remains the screen-level UI specification and examples reference.
 
 The current supported themes are:
 - `dark` — the default high-contrast dark theme
@@ -17,7 +17,7 @@ The current supported themes are:
 
 The styling layer separates semantic tokens from concrete palette values. Each built-in theme implements the same governed token families, and component selectors consume semantic variables instead of shipping duplicated per-theme rule blocks.
 
-Use `design-system/overview.md` as the canonical source for the current color tables, semantic token names, and component-state rules.
+Use `documentation/design-system/overview.md` as the canonical source for the current color tables, semantic token names, and component-state rules.
 
 Screen-level examples in this document may still show compatibility aliases such as `--bg`, `--panel`, `--text`, and `--accent`, but those aliases resolve from the governed semantic layer in `src/app/app-shell.css`.
 

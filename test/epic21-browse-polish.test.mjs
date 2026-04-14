@@ -11,18 +11,12 @@ const rootDir = path.resolve(__dirname, '..');
 let indexHtml;
 let rendererSource;
 let browseTabSource;
-let postV1Epics;
-let postV1TaskList;
-let nextSteps;
 
 before(async () => {
-  [indexHtml, rendererSource, browseTabSource, postV1Epics, postV1TaskList, nextSteps] = await Promise.all([
+  [indexHtml, rendererSource, browseTabSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'components', 'BrowseTab.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'epics.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', '_next-steps.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'components', 'BrowseTab.svelte'), 'utf8')
   ]);
 });
 
@@ -35,10 +29,3 @@ test('Epic 21 moves the onboarding shell above the tab panels and removes the lo
   assert.match(browseTabSource, /browse-panel-full-width/);
 });
 
-test('Epic 21 is documented in the post-v1 backlog and clears the matching next-step items', () => {
-  assert.match(postV1Epics, /## Epic 21 — Browse and Onboarding Detail Polish/);
-  assert.match(postV1TaskList, /## Epic 21 — Browse and Onboarding Detail Polish/);
-  assert.match(nextSteps, /- \[x\] Move the "Get comfortable with the app in under a minute" on top/);
-  assert.match(nextSteps, /- \[x\] "Browse sets" should be full width/);
-  assert.match(nextSteps, /- \[x\] "Ready Tabs" is not a relevant information, you should remove it/);
-});

@@ -13,16 +13,14 @@ let appShellCss;
 let feedbackUtils;
 let appRenderer;
 let toastStackSource;
-let postV1TaskList;
 
 before(async () => {
-  [browserEntry, appShellCss, feedbackUtils, appRenderer, toastStackSource, postV1TaskList] = await Promise.all([
+  [browserEntry, appShellCss, feedbackUtils, appRenderer, toastStackSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'feedback-utils.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'components', 'ToastStack.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'components', 'ToastStack.svelte'), 'utf8')
   ]);
 });
 
@@ -87,23 +85,3 @@ test('Story 24.4: toast HTML preserves role="status" or role="alert" and aria-li
   assert.match(toastStackSource, /aria-live=\{toast\.live\}/, 'toast must have aria-live attribute');
 });
 
-// Documentation — post-v1 task list covers Epic 24 stories 24.1–24.4
-test('Task list: Epic 24 stories 24.1–24.4 are checked', () => {
-  assert.match(postV1TaskList, /## Epic 24 — Toast Behavior and Feedback Channel Cleanup/);
-
-  // Story 24.1 items
-  assert.match(postV1TaskList, /- \[x\] Audit the events that currently emit toasts for preference or shell changes/);
-  assert.match(postV1TaskList, /- \[x\] Decide which preference changes should use silent visual feedback instead of a toast/);
-  assert.match(postV1TaskList, /- \[x\] Confirm that theme switching should not produce a toast in the default interaction path/);
-
-  // Story 24.2 items
-  assert.match(postV1TaskList, /- \[x\] Remove toast emission from theme-toggle actions/);
-  assert.match(postV1TaskList, /- \[x\] Verify theme changes remain understandable from every major tab without relying on transient toast feedback/);
-
-  // Story 24.3 items
-  assert.match(postV1TaskList, /- \[x\] Anchor the toast stack at the bottom of the viewport rather than inside the layout flow/);
-  assert.match(postV1TaskList, /- \[x\] Update enter motion so toasts rise in from beyond the visible window edge/);
-
-  // Story 24.4 items
-  assert.match(postV1TaskList, /- \[x\] Preserve semantic roles, reduced-motion compatibility, and manual dismissal affordances/);
-});

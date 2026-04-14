@@ -39,7 +39,7 @@ The default selection rule is `dark` so the current shipped visual identity stay
 
 The user-visible locale selector exposes six locales: `en-US` (English), `fr-FR` (French), `de-DE` (German), `ja-JP` (Japanese), `ko-KR` (Korean), and `es-ES` (Spanish). The default is `en-US`.
 
-Ephemeral UI-only state such as the current generated setup, active toast notifications, open confirmation modal, and transient recovery notices is intentionally kept out of persisted browser state.
+Ephemeral UI-only state such as the current generated setup, active toast notifications, open confirmation modal, and transient recovery notices is intentionally kept out of persisted browser state. Generate/Regenerate remain ephemeral — each new setup is discarded unless the user explicitly accepts it via Accept & Log.
 
 Two-Handed Solo is now modeled as a first-class play mode. It is still recorded as a solo game in history, but the setup template uses the standard 2-player counts.
 

@@ -98,3 +98,33 @@ Every story must satisfy this Definition of Done:
 When a story changes files under `/src`, its **QC** task should be satisfied through targeted automated checks that are appropriate for that story's scope.
 
 When the epic containing that story changes files under `/src`, the epic is not complete until the full regression suite also passes.
+
+---
+
+## Design System Epic DS1 — Design Token Foundation and Theme Contract
+
+Automated verification: `test/design-system-epic1-foundation.test.mjs`
+
+Browser QC: `test/playwright/epic18-qc.spec.mjs`
+
+---
+
+## Design System Epic DS2 — Typography, Layout, and Shell Rhythm
+
+Automated verification: `test/design-system-rollout.test.mjs`
+
+Browser QC: `test/playwright/epic18-qc.spec.mjs`
+
+---
+
+## Epic 10 — Final Documentation and Release Readiness
+
+Automated verification: `test/epic10-documentation-release-readiness.test.mjs`
+
+Browser QC: `test/playwright/epic10-qc.spec.mjs`
+
+Current automated browser QC command for Epic 1–10:
+
+```
+npm run check:qc:epic10
+```

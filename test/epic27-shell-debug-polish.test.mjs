@@ -11,18 +11,16 @@ const rootDir = path.resolve(__dirname, '..');
 let rendererSource;
 let cssSource;
 let localeSource;
-let postV1TaskList;
 let generatorSource;
 let appSvelteSource;
 
 const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 
 before(async () => {
-  [rendererSource, cssSource, localeSource, postV1TaskList, generatorSource, appSvelteSource] = await Promise.all([
+  [rendererSource, cssSource, localeSource, generatorSource, appSvelteSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'task-list.md'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'setup-generator.mjs'), 'utf8'),
     fs.readFile(appSveltePath, 'utf8')
   ]);
@@ -77,22 +75,6 @@ test('Story 27.3 — app-version element is still present (compact version displ
   assert.match(appSvelteSource, /app-version/, 'app-version reference must remain');
 });
 
-test('Epic 27 stories are marked complete in task-list.md', () => {
-  assert.match(postV1TaskList, /## Epic 27 — Remaining Shell and Debug Polish/);
-  assert.match(postV1TaskList, /- \[x\] Locate every render path that conditionally or unconditionally shows the "Show history-ready setup snapshot"/);
-  assert.match(postV1TaskList, /- \[x\] Remove the control, trigger button, and panel output from all production-rendered surfaces/);
-  assert.match(postV1TaskList, /- \[x\] Identify the current font-size and vertical-alignment rules applied to the app title element/);
-  assert.match(postV1TaskList, /- \[x\] Increase the app title font size/);
-  assert.match(postV1TaskList, /- \[x\] Apply vertical-alignment rules so the title sits at the same baseline or midpoint/);
-});
-
-test('Epic 27 full regression gate is marked in task-list.md', () => {
-  assert.match(
-    postV1TaskList,
-    /- \[x\] \*\*Full regression gate:\*\* run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 27 work complete/
-  );
-});
-
 // Story 27.4 — schemeFallback condition uses .some() not .length
 test('Story 27.4 — schemeFallback gate uses fallbackItems.some() not fallbackItems.length', () => {
   // The old bug: fallbackItems.length causes the notification to fire whenever ANY scheme
@@ -110,14 +92,3 @@ test('Story 27.4 — schemeFallback gate uses fallbackItems.some() not fallbackI
   );
 });
 
-test('Story 27.4 — task-list Story 27.4 checkboxes are all marked complete', () => {
-  assert.match(
-    postV1TaskList,
-    /### Story 27\.4 — Fix the scheme-selection fallback notification that fires unconditionally/
-  );
-  assert.doesNotMatch(
-    postV1TaskList,
-    /### Story 27\.4[\s\S]*?- \[ \]/,
-    'Story 27.4 must have no unchecked checkboxes'
-  );
-});

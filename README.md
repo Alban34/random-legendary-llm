@@ -42,7 +42,7 @@ Export a portable backup anytime. Import it on any other device. Merge two devic
 The full UI — not just labels — in English, French, German, Japanese, Korean, and Spanish.
 
 ### Dark mode. Light mode. Your call.
-Theme preference is remembered across sessions.
+The built-in theme switcher lets you switch between dark and light themes. Theme preference is remembered across sessions.
 
 ### Zero friction, zero compromise
 - No install
@@ -68,6 +68,10 @@ Theme preference is remembered across sessions.
 ## For developers and contributors
 
 The full architecture, data model, testing strategy, design system, and development workflow are documented in the [`/documentation`](./documentation/) folder. This is a fully static SPA — no server-side code, no database, no secrets.
+
+State is persisted under the `legendary_state_v1` key in browser localStorage. Epic 10 (documentation and release readiness) is complete.
+
+Run story-level tests with `npm run test:epic10`. Run browser QC with `npm run test:qc:epic10`, or run the full browser QC suite with `npm run test:qc`.
 
 ---
 
