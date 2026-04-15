@@ -61,12 +61,12 @@ test('Story 27.2 — app-header h1 font size is larger than 1.1rem', () => {
   );
 });
 
-test('Story 27.2 — header-inner uses center alignment', () => {
-  // align-items: end was replaced with align-items: center for title/controls alignment
+test('Story 27.2 — header-top-row uses center alignment', () => {
+  // align-items: center moved from .header-inner to .header-top-row in the column layout refactor
   assert.match(
     cssSource,
-    /\.header-inner\s*\{[^}]*align-items:\s*center/,
-    'header-inner must use align-items: center'
+    /\.header-top-row\s*\{[^}]*align-items:\s*center/,
+    'header-top-row must use align-items: center'
   );
 });
 

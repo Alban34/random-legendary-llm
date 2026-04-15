@@ -245,20 +245,20 @@ test('Story 36.3: GitHub anchor opens in a new tab', () => {
   );
 });
 
-test('Story 36.3: GitHub link appears inside header-controls in the loaded header', () => {
-  // The loaded header (isLoaded branch) must have the github-link anchor inside header-controls
+test('Story 36.3: GitHub link appears inside header-icon-strip in the loaded header', () => {
+  // The loaded header (isLoaded branch) must have the github-link anchor inside header-icon-strip
   const loadedHeaderRegion = appSvelteSource.slice(
     appSvelteSource.indexOf('isLoaded}'),
     appSvelteSource.indexOf('{:else}', appSvelteSource.indexOf('isLoaded}'))
   );
   assert.match(
     loadedHeaderRegion,
-    /class="header-controls"[\s\S]*?github-link/,
-    'Loaded header must have the GitHub link inside header-controls'
+    /class="header-icon-strip"[\s\S]*?github-link/,
+    'Loaded header must have the GitHub link inside header-icon-strip'
   );
 });
 
-test('Story 36.3: GitHub link is inside header-controls, not in the loading-shell header', () => {
+test('Story 36.3: GitHub link is inside header-icon-strip, not in the loading-shell header', () => {
   // The loading shell is the {:else} branch at the end of the template — it should NOT have a github-link
   const loadingShellStart = appSvelteSource.lastIndexOf('Loading shell');
   assert.ok(loadingShellStart > -1, 'Loading shell comment must be present');
@@ -268,15 +268,15 @@ test('Story 36.3: GitHub link is inside header-controls, not in the loading-shel
     /github-link/,
     'Loading-shell header must not contain the GitHub link'
   );
-  // The github-link must be inside header-controls in the loaded-state header
+  // The github-link must be inside header-icon-strip in the loaded-state header
   const loadedHeaderRegion = appSvelteSource.slice(
     appSvelteSource.indexOf('isLoaded}'),
     appSvelteSource.indexOf('{:else}', appSvelteSource.indexOf('isLoaded}'))
   );
   assert.match(
     loadedHeaderRegion,
-    /class="header-controls"[\s\S]*?github-link/,
-    'Loaded header must have the GitHub link inside header-controls'
+    /class="header-icon-strip"[\s\S]*?github-link/,
+    'Loaded header must have the GitHub link inside header-icon-strip'
   );
 });
 
@@ -293,8 +293,8 @@ test('Story 36.4: vite.config.js uses the callback form of defineConfig', () => 
 test('Story 36.4: vite.config.js sets base conditionally based on command', () => {
   assert.match(
     viteConfigSource,
-    /command\s*===\s*['"]serve['"]/,
-    "vite.config.js must branch on command === 'serve' to differentiate dev from build"
+    /command\s*===\s*['"]build['"]/,
+    "vite.config.js must branch on command === 'build' to apply the production base path"
   );
   assert.match(
     viteConfigSource,

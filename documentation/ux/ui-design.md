@@ -67,7 +67,7 @@ Typography roles are governed by `design-system/overview.md`.
 
 ### Shared Header Controls
 - Theme and locale are part of the baseline shell, not optional polish
-- The app title (`h1`) is rendered at 1.4rem to give the title appropriate visual weight relative to the header controls; the app version is displayed inline beside the title as a muted `.app-version` element; a GitHub repository icon link (`.github-link`) is positioned absolutely to the right of the header copy area, opening `https://github.com/Alban34/random-legendary-llm` in a new tab with `aria-label="View source on GitHub"` and `rel="noopener noreferrer"`; the icon is hidden on mobile (max-width: 900px)
+- The app title (`h1`) is rendered at 1.4rem to give the title appropriate visual weight relative to the header controls; the app version is displayed as a muted `.app-version` element inside `header-right`, below the icon strip; a GitHub repository icon link (`.github-link`) is rendered inside `header-icon-strip` within `header-right`, alongside the locale and theme controls, opening `https://github.com/Alban34/random-legendary-llm` in a new tab with `aria-label="View source on GitHub"` and `rel="noopener noreferrer"`; the icon is visible on all viewports
 - Desktop: theme buttons and locale select remain visible in the shared header
 - Mobile: a compact preferences toggle reveals theme and locale controls on demand
 - Preference changes persist immediately and restore focus to the triggering control after rerender

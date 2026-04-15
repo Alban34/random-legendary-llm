@@ -1497,11 +1497,11 @@ See: `documentation/planning/migration-task-list.md`
 ### Story 36.6 — GitHub icon in far-right header controls
 - [x] Remove the `<a class="github-link">` element from `.header-copy` in both the loaded header variant and the loading-shell header variant of `App.svelte`
 - [x] Remove the `<a class="github-link">` from the loading-shell header (`{:else}` branch) in `App.svelte`
-- [x] Add `<a class="github-link">` as the last child inside the `<div class="header-controls">` element in the loaded-state header — after the TabNav component
+- [x] Add `<a class="github-link">` inside `<div class="header-icon-strip">` within `<div class="header-right">` in the loaded-state header — alongside the locale and theme controls
 - [x] Remove `tabindex="-1"` from the new anchor so it is keyboard-focusable
 - [x] Remove the `.github-link { display: none; }` rule from the `@media (max-width: 900px)` block in `src/app/app-shell.css` so the icon is visible on mobile too
-- [x] Update the `.github-link` CSS positioning: remove `position: absolute`, `right`, `top`, `transform` — instead use `margin-left: auto` on `.github-link` inside a flex row, or adjust to use the existing flex layout of `header-controls`; size the icon to 20×20 or 24×24 for better visibility
-- [x] Update the unit test in `test/epic36-version-storage-disclosure.test.mjs` that checks github-link appears immediately after `.app-version` span — change it to assert the github-link appears inside `.header-controls` instead
+- [x] Update the `.github-link` CSS positioning: remove `position: absolute`, `right`, `top`, `transform` — instead use the flex layout of `header-icon-strip`; size the icon to 20×20 or 24×24 for better visibility
+- [x] Update the unit test in `test/epic36-version-storage-disclosure.test.mjs` that checks github-link appears immediately after `.app-version` span — change it to assert the github-link appears inside `.header-icon-strip` inside `.header-right` instead
 - [x] Update `.header-copy` CSS to remove `position: relative` if that was added solely for the github-link anchor (check `src/app/app-shell.css`)
-- [x] **Test:** verify the github-link anchor appears inside `header-controls` markup, not inside `header-copy`
-- [x] **QC (Automated):** automate QC coverage asserting the github-link is the last interactive element in header-controls
+- [x] **Test:** verify the github-link anchor appears inside `header-icon-strip` inside `header-right`, not inside `header-copy` or `header-controls`
+- [x] **QC (Automated):** automate QC coverage asserting the github-link is inside `header-icon-strip` within `header-right`
