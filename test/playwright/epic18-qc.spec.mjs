@@ -68,7 +68,7 @@ test.describe('Epic 18 automated QC', () => {
   });
 
   test('persists the selected theme across reloads from the shared header control', async ({ page }) => {
-    await expect(page.locator('#header-theme-controls')).toContainText('Theme');
+    await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toBeVisible();
 
     const defaultTheme = await readDocumentTheme(page);
     expect(defaultTheme.themeId).toBe('dark');
@@ -119,12 +119,10 @@ test.describe('Epic 18 automated QC', () => {
     await reloadApp(page);
     await selectTab(page, 'history');
 
-    const preferenceToggle = page.locator('[data-action="toggle-mobile-preferences"]');
-    await expect(preferenceToggle).toBeVisible();
-    await preferenceToggle.click();
+    // Icon strip is always visible; no toggle needed
+    await expect(page.locator('.header-icon-strip')).toBeVisible();
 
     await selectTheme(page, 'light');
-    // Epic 24 (Story 24.2): theme changes no longer emit a toast; verify via aria-pressed instead
     await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toHaveAttribute('aria-pressed', 'true');
 
     await selectLocale(page, 'fr-FR');

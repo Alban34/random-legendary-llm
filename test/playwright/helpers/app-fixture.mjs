@@ -50,15 +50,8 @@ export async function selectTab(page, tabId) {
 }
 
 async function ensurePreferenceControlsVisible(page) {
-  const localeSelect = page.locator('#header-locale-select');
-  if (await localeSelect.isVisible()) {
-    return;
-  }
-
-  const toggle = page.locator('[data-action="toggle-mobile-preferences"]');
-  if (await toggle.isVisible()) {
-    await toggle.click();
-  }
+  // With the new icon strip, preference controls are always visible.
+  // No toggle action needed.
 }
 
 export async function selectTheme(page, themeId) {

@@ -42,7 +42,7 @@ Typography roles are governed by `design-system/overview.md`.
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  ⚡ LEGENDARY RANDOMIZER v0.1.0  [theme][locale][5 tabs]  │  ← sticky, compact header
+│  ⚡ LEGENDARY RANDOMIZER v1.0.1  [theme][locale][5 tabs]  │  ← sticky, compact header
 ├─────────────────────────────────────────────────────┤
 │                                                     │
 │   [Active Tab Panel]                                │  ← scrollable, --bg-app
@@ -67,7 +67,7 @@ Typography roles are governed by `design-system/overview.md`.
 
 ### Shared Header Controls
 - Theme and locale are part of the baseline shell, not optional polish
-- The app title (`h1`) is rendered at 1.4rem to give the title appropriate visual weight relative to the header controls; the app version is displayed inline beside the title as a muted `.app-version` element
+- The app title (`h1`) is rendered at 1.4rem to give the title appropriate visual weight relative to the header controls; the app version is displayed inline beside the title as a muted `.app-version` element; a GitHub repository icon link (`.github-link`) is positioned absolutely to the right of the header copy area, opening `https://github.com/Alban34/random-legendary-llm` in a new tab with `aria-label="View source on GitHub"` and `rel="noopener noreferrer"`; the icon is hidden on mobile (max-width: 900px)
 - Desktop: theme buttons and locale select remain visible in the shared header
 - Mobile: a compact preferences toggle reveals theme and locale controls on demand
 - Preference changes persist immediately and restore focus to the triggering control after rerender

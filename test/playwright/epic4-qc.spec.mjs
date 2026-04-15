@@ -39,7 +39,7 @@ test.describe('Epic 4 automated QC', () => {
     await expect(page.locator('#desktop-tabs')).toBeHidden();
     await expect(page.locator('#mobile-tabs')).toBeVisible();
     await expect(page.locator('#panel-browse')).toBeVisible();
-    await expect(page.locator('[data-action="toggle-mobile-preferences"]')).toBeVisible();
+    await expect(page.locator('.header-icon-strip')).toBeVisible();
 
     const mobileShellMetrics = await page.evaluate(() => {
       const nav = document.querySelector('#mobile-tabs');
@@ -54,7 +54,7 @@ test.describe('Epic 4 automated QC', () => {
 
     expect(mobileShellMetrics.wrappedRows).toBe(1);
     expect(mobileShellMetrics.navHeight).toBeLessThan(96);
-    expect(mobileShellMetrics.headerHeight).toBeLessThan(260);
+    expect(mobileShellMetrics.headerHeight).toBeLessThan(160);
   });
 
   test('trims repeated mobile copy after onboarding while keeping first-use cues and earlier task visibility across major tabs', async ({ page }) => {
@@ -197,6 +197,10 @@ test.describe('Epic 4 automated QC', () => {
 
     await page.keyboard.press('Tab');
     await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toBeFocused();
+
+    // step over the GitHub link in the header icon strip
+    await page.keyboard.press('Tab');
+    await expect(page.locator('.github-link')).toBeFocused();
 
     await page.keyboard.press('Tab');
     await expect(page.locator('#tab-desktop-browse')).toBeFocused();

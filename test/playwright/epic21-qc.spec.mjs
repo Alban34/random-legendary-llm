@@ -81,17 +81,17 @@ test.describe('Epic 21 automated QC', () => {
     const expectations = [
       {
         id: 'fr-FR',
-        eyebrow: 'Visite de premiere ouverture',
-        stepPrefix: 'Etape 1 sur 5',
-        stepTitle: 'Parcourez d abord tout le catalogue',
+        eyebrow: 'Visite de première ouverture',
+        stepPrefix: 'Étape 1 sur 5',
+        stepTitle: "Parcourez d'abord tout le catalogue",
         stepAction: 'Rester dans Parcourir'
       },
       {
         id: 'de-DE',
-        eyebrow: 'Erststart-Einfuhrung',
+        eyebrow: 'Erststart-Einführung',
         stepPrefix: 'Schritt 1 von 5',
         stepTitle: 'Durchsuche zuerst den gesamten Katalog',
-        stepAction: 'Im Stoebern bleiben'
+        stepAction: 'Im Stöbern bleiben'
       },
       {
         id: 'ja-JP',
@@ -109,7 +109,7 @@ test.describe('Epic 21 automated QC', () => {
       },
       {
         id: 'es-ES',
-        eyebrow: 'Guia de primer uso',
+        eyebrow: 'Guía de primer uso',
         stepPrefix: 'Paso 1 de 5',
         stepTitle: 'Explora primero el catálogo completo',
         stepAction: 'Seguir en Explorar'

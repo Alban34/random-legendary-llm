@@ -370,7 +370,7 @@ html {
 .header-inner {
   display: flex;
   gap: var(--space-5);
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   max-width: var(--layout-max-width);
   margin-inline: auto;
@@ -386,17 +386,111 @@ html {
   justify-items: end;
 }
 
-#mobile-preference-controls {
-  width: 100%;
+/* Compact preference icon strip */
+.header-icon-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: flex-end;
 }
 
-.header-preferences-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+/* Locale compact select */
+.locale-wrap {
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+.locale-flag {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  z-index: 1;
+}
+
+.locale-select-compact {
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  opacity: 0.01;
+  cursor: pointer;
+  border: none;
+  background: none;
+  appearance: none;
+  -webkit-appearance: none;
+  z-index: 2;
+}
+
+.locale-select-compact:focus-visible {
+  outline: 2px solid var(--accent-border-strong);
+  outline-offset: 2px;
+}
+
+/* Theme icon buttons */
+.theme-icon-row {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  border-color: var(--accent-border-strong);
+  background: var(--accent-soft);
+  outline-offset: 2px;
+}
+
+.icon-btn-active {
+  border-color: var(--accent-border-strong);
+  background: var(--accent-soft-strong);
+}
+
+/* GitHub link in strip */
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  color: inherit;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+  text-decoration: none;
+}
+
+.github-link:hover,
+.github-link:focus-visible {
+  opacity: 1;
+  outline-offset: 2px;
+}
+
+.github-link svg {
+  fill: currentColor;
 }
 
 .app-header h1 {
@@ -406,6 +500,9 @@ html {
   line-height: var(--type-heading-md-line);
   letter-spacing: 0.03em;
   color: var(--accent);
+  display: flex;
+  align-items: center;
+  min-height: 2.2rem;
 }
 
 .app-version {
@@ -422,53 +519,6 @@ html {
   max-width: 70rem;
   font-size: var(--type-body-md-size);
   line-height: var(--type-body-lg-line);
-}
-
-.theme-switcher {
-  display: grid;
-  gap: var(--space-2);
-  justify-items: end;
-  min-width: min(16rem, 100%);
-}
-
-.theme-switcher-copy {
-  display: grid;
-  justify-items: end;
-}
-
-.theme-switcher-label {
-  font-size: var(--type-label-size);
-  line-height: var(--type-label-line);
-  font-weight: 700;
-  letter-spacing: var(--type-label-tracking);
-  text-transform: uppercase;
-  color: var(--accent-gold);
-}
-
-.theme-switcher-caption {
-  font-size: var(--type-body-sm-size);
-  line-height: var(--type-body-sm-line);
-}
-
-.theme-switcher-buttons {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.theme-button {
-  min-width: min(7rem, 100%);
-  justify-content: center;
-}
-
-.theme-button-active {
-  border-color: var(--accent-border-strong);
-  background: var(--accent-soft-strong);
-}
-
-#header-locale-controls,
-#header-theme-controls {
-  display: contents;
 }
 
 .app-main {
@@ -544,7 +594,7 @@ html {
   z-index: 20;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-width: 768px) {
   .header-inner {
     align-items: start;
   }
@@ -552,19 +602,21 @@ html {
   .header-controls {
     width: 100%;
   }
+}
 
-  .header-preferences-row {
-    justify-content: stretch;
+@media (max-width: 767px) {
+  .header-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-3);
   }
 
-  .theme-switcher {
-    justify-items: start;
-    min-width: 0;
-    flex: 1 1 16rem;
+  .header-controls {
+    flex-shrink: 0;
   }
 
-  .theme-switcher-copy {
-    justify-items: start;
+  #app-subtitle {
+    display: none;
   }
 }
 
@@ -1604,30 +1656,6 @@ details[open] .stats-category-summary::after {
   display: grid;
   gap: var(--space-3);
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-}
-
-.mobile-preferences-shell {
-  width: 100%;
-  display: grid;
-  gap: var(--space-3);
-}
-
-.mobile-preferences-toggle {
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.mobile-preferences-summary {
-  text-align: right;
-}
-
-.mobile-preferences-panel {
-  padding: var(--space-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--panel);
-  box-shadow: var(--shadow-panel);
 }
 
 .browse-details {

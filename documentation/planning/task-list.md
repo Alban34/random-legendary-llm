@@ -1392,8 +1392,116 @@ Approved
 
 ---
 
+## Epic 35 — v1.0.1 Release Polish
+
+### Epic-wide validation gate
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 35 work complete
+
+### Story 35.1 — Audit and correct French locale strings
+- [x] Identify the French locale file path in `src/`
+- [x] Find all strings with missing apostrophes or incorrect/missing accented characters
+- [x] Correct each such string inline (apostrophes, accented characters)
+- [x] Replace "Non posee actuellement." with "Non possédée actuellement." in the French locale file
+- [x] **Test:** verify the French locale file contains correct apostrophes and accented characters throughout; verify "Non possédée actuellement." appears wherever collection-ownership absence is communicated in French
+- [x] **QC (Automated):** automate QC coverage that renders key French strings in the UI and confirms apostrophes and accented characters are present and not replaced by ASCII substitutes
+
+### Story 35.2 — Audit other supported locales for encoding and quality issues
+- [x] Identify all locale files in the project other than the French locale file
+- [x] Check each locale file for missing apostrophes, encoding errors, or obvious translation quality mistakes
+- [x] Correct any issues found; add a brief comment inside the locale file if no issues are found, recording the audit result
+- [x] **Test:** verify all non-French locale files have been reviewed; any issues found have been corrected; files with no issues carry an audit comment
+- [x] **QC (Automated):** automate QC coverage that switches the UI to at least one non-French locale and confirms rendered strings display correct encoding (no garbled or ASCII-fallback characters)
+
+### Story 35.3 — Supply translations for every missing user-facing string
+- [x] Audit all supported locale files for missing or untranslated keys (keys absent from a locale file, causing fallback to another locale or display of a raw key)
+- [x] Add a translated string for every missing key in each supported locale
+- [x] Verify no tab or panel falls back to English or shows a raw translation key in any supported locale
+- [x] **Test:** verify every locale file defines every required translation key; switching to each supported locale in the running app shows no untranslated or raw-key string in any tab or panel
+- [x] **QC (Automated):** automate QC coverage that switches to each supported locale and confirms no untranslated key or raw key is visible in any tab
+
+### Story 35.4 — Fix score input keyboard focus retention
+- [x] Locate the score input field component and its `change`/`input` event handler in `src/`
+- [x] Identify why keyboard focus leaves the input field after a single digit is entered
+- [x] Fix the handler so focus remains in the input field after each keystroke
+- [x] Verify successive digits can be typed without the user needing to re-click the field between digits
+- [x] **Test:** verify entering multiple successive digits in the score input never moves focus away from the field; no re-click is required between digits
+- [x] **QC (Automated):** automate QC coverage for keyboard-only score entry, confirming that after each digit keystroke the score input field retains focus and the cursor does not leave the field
+
+### Story 35.5 — Bump application version to 1.0.1
+- [x] Update the `version` field in `package.json` from `"1.0.0"` to `"1.0.1"`
+- [x] Locate every UI surface in `src/` that displays the application version string
+- [x] Update each UI surface to display `"1.0.1"` instead of `"1.0.0"`
+- [x] Confirm no reference to `"1.0.0"` remains visible on any production UI surface
+- [x] **Test:** verify `package.json` contains `"version": "1.0.1"`; verify all UI version surfaces render `"1.0.1"`; verify no `"1.0.0"` string is visible in the UI
+- [x] **QC (Automated):** automate QC coverage asserting the version string `"1.0.1"` is visible in the UI and no `"1.0.0"` reference appears on any rendered surface
+
+---
+
 ## Epics 29–33 — Svelte 5 Migration
 
 The Svelte 5 migration backlog (Epics 29–33) is tracked in a separate file:
 
 See: `documentation/planning/migration-task-list.md`
+
+---
+
+## Epic 36 — Version Source and Storage Disclosure
+
+### Epic-wide validation gate
+- [x] **Full regression gate:** run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 36 work complete
+
+### Story 36.1 — Version from package.json
+- [x] Import `package.json` in `vite.config.js` using `createRequire` or a JSON import and add `define: { __APP_VERSION__: JSON.stringify(pkg.version) }` to the Vite config
+- [x] Remove the hardcoded `const APP_VERSION = '1.0.1'` from `src/components/App.svelte`
+- [x] Replace all usages of `APP_VERSION` in `App.svelte` with the injected global `__APP_VERSION__`
+- [x] Add a `/* global __APP_VERSION__ */` comment in `App.svelte` so linters understand the injected global
+- [x] Verify the version string displayed in the UI matches the value in `package.json` without any other code changes
+- [x] **Test:** verify the version rendered in the UI equals `npm pkg get version` (the value from package.json) and that no hardcoded version string remains in the source
+- [x] **QC (Automated):** automate QC coverage asserting the UI version string matches the package.json version after a build
+
+### Story 36.2 — localStorage disclosure
+- [x] Decide on the appropriate placement for the disclosure (Backup tab "Danger zone" area, Collection tab storage section, or a dedicated footer note)
+- [x] Add a localizable disclosure string to EN_MESSAGES in `src/app/localization-utils.mjs` (keys `storage.disclosureTitle` and `storage.disclosureBody`)
+- [x] Add the French translation for the same keys to FR_MESSAGES
+- [x] Render the disclosure text in the chosen UI surface
+- [x] Ensure the disclosure accurately states: localStorage is used (not cookies); what is stored (collection ownership, game history, user preferences); data stays on the device and is never transmitted
+- [x] Ensure the word "cookie" or "cookies" does not appear in the disclosure copy
+- [x] **Test:** verify the disclosure text is visible in the UI, contains accurate descriptions of localStorage usage, and does not mention cookies
+- [x] **QC (Automated):** automate QC coverage asserting the localStorage disclosure is visible in English and French without mentioning cookies
+
+### Story 36.3 — GitHub repository link in the header
+- [x] Choose the exact slot in the header template (next to the `<span class="app-version">` element) for the icon link
+- [x] Add an inline GitHub SVG icon (the standard GitHub mark — a simple 24×24 or 16×16 Octicon-style silhouette) as a Svelte component or inline SVG in `App.svelte`
+- [x] Render an `<a>` element wrapping the icon with `href="https://github.com/Alban34/random-legendary-llm"`, `target="_blank"`, `rel="noopener noreferrer"`, and `aria-label="View source on GitHub"`
+- [x] Style the icon link so it blends with the header (same muted color as the version badge, hover state consistent with other header interactive elements)
+- [x] Verify the link appears in both the loaded and loading-shell header variants where an app-version badge is rendered
+- [x] **Test:** verify the anchor element exists in the header, has the correct href, and carries the required accessibility label
+- [x] **QC (Automated):** automate QC coverage asserting the GitHub link is present and has the correct href and rel attributes
+
+### Story 36.4 — Fix Vite base path for local dev vs. GitHub Pages
+- [x] Change the `defineConfig(...)` call in `vite.config.js` to use the callback form `defineConfig(({ command }) => ({ ... }))` so the `command` argument is available
+- [x] Set `base` conditionally: `command === 'build' ? '/random-legendary-llm/' : '/'`
+- [x] Verify `npm run dev` serves the app at the root path with no console 404 errors
+- [x] Verify `npm run build` still prefixes asset paths with `/random-legendary-llm/` in the output
+- [x] **Test:** confirm no import or asset path regression exists in the built output (check `dist/index.html` references)
+- [x] **QC (Automated):** add a QC assertion confirming the built `dist/index.html` contains `/random-legendary-llm/` prefixed asset references
+
+### Story 36.5 — Compact desktop preference controls
+- [x] Remove the `.theme-switcher-copy` wrapper div (containing `.theme-switcher-label` and `.theme-switcher-caption` spans) from the desktop locale section in `App.svelte` (`#header-locale-controls`)
+- [x] Remove the `.theme-switcher-copy` wrapper div from the desktop theme section in `App.svelte` (`#header-theme-controls`)
+- [x] Verify the `<section>` for each control already has an `aria-label` and that the `<select>` has `aria-label` — add any missing ones
+- [x] Do not touch the mobile preferences panel (toggle button + expandable panel) — it is already compact
+- [x] **Test:** verify `.theme-switcher-copy` no longer appears in the desktop preference control HTML
+- [x] **QC (Automated):** automate QC coverage asserting no `.theme-switcher-label` text is rendered in the preference controls on desktop
+
+### Story 36.6 — GitHub icon in far-right header controls
+- [x] Remove the `<a class="github-link">` element from `.header-copy` in both the loaded header variant and the loading-shell header variant of `App.svelte`
+- [x] Remove the `<a class="github-link">` from the loading-shell header (`{:else}` branch) in `App.svelte`
+- [x] Add `<a class="github-link">` as the last child inside the `<div class="header-controls">` element in the loaded-state header — after the TabNav component
+- [x] Remove `tabindex="-1"` from the new anchor so it is keyboard-focusable
+- [x] Remove the `.github-link { display: none; }` rule from the `@media (max-width: 900px)` block in `src/app/app-shell.css` so the icon is visible on mobile too
+- [x] Update the `.github-link` CSS positioning: remove `position: absolute`, `right`, `top`, `transform` — instead use `margin-left: auto` on `.github-link` inside a flex row, or adjust to use the existing flex layout of `header-controls`; size the icon to 20×20 or 24×24 for better visibility
+- [x] Update the unit test in `test/epic36-version-storage-disclosure.test.mjs` that checks github-link appears immediately after `.app-version` span — change it to assert the github-link appears inside `.header-controls` instead
+- [x] Update `.header-copy` CSS to remove `position: relative` if that was added solely for the github-link anchor (check `src/app/app-shell.css`)
+- [x] **Test:** verify the github-link anchor appears inside `header-controls` markup, not inside `header-copy`
+- [x] **QC (Automated):** automate QC coverage asserting the github-link is the last interactive element in header-controls

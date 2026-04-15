@@ -49,6 +49,10 @@
         onclick={onOpenImportBackup}
       >{locale.t('backup.import')}</button>
     </div>
+    <p class="muted storage-disclosure" data-storage-disclosure>
+      <strong>{locale.t('storage.disclosureTitle')} —</strong>
+      {locale.t('storage.disclosureBody')}
+    </p>
     <input
       id="backup-import-input"
       class="visually-hidden"

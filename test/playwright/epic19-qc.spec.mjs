@@ -17,7 +17,7 @@ test.describe('Epic 19 automated QC', () => {
   });
 
   test('switches to French from the shared header selector and persists across reloads', async ({ page }) => {
-    await expect(page.locator('#header-locale-controls')).toContainText('Language');
+    await expect(page.locator('#header-locale-controls')).toBeVisible();
 
     await selectLocale(page, 'fr-FR');
     await expect(page.locator('#app-title')).toHaveText('Randomiseur Legendary: Marvel');

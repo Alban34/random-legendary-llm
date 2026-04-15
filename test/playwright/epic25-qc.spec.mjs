@@ -49,17 +49,14 @@ test.describe('Epic 25 — Header and New Game Action Density Refinement', () =>
   test('theme and locale controls are still present and accessible in the header', async ({ page }) => {
     await gotoApp(page);
 
-    // Desktop controls are rendered into these containers
+    // The icon strip is always visible — verify theme and locale controls are present in the header
     const headerThemeControls = page.locator('#header-theme-controls');
     const headerLocaleControls = page.locator('#header-locale-controls');
 
-    // At least one of them should contain something — or mobile preference toggle is visible
-    const mobilePrefs = page.locator('#mobile-preference-controls');
-    const hasMobilePrefs = await mobilePrefs.evaluate((el) => el.children.length > 0);
     const hasDesktopTheme = await headerThemeControls.evaluate((el) => el.children.length > 0);
     const hasDesktopLocale = await headerLocaleControls.evaluate((el) => el.children.length > 0);
 
-    expect(hasMobilePrefs || (hasDesktopTheme && hasDesktopLocale)).toBe(true);
+    expect(hasDesktopTheme && hasDesktopLocale).toBe(true);
   });
 
   test('New Game tab shows only ONE generate-type primary button — not both Generate Setup and Regenerate simultaneously', async ({ page }) => {

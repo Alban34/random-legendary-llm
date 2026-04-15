@@ -62,17 +62,17 @@ test('Epic 19 locale helpers expose the six production locales and translated UI
   const frenchLocale = createLocaleTools('fr-FR');
   assert.equal(frenchLocale.t('app.title'), 'Randomiseur Legendary: Marvel');
   assert.equal(frenchLocale.formatPlayerLabel(2), '2 joueurs');
-  assert.equal(frenchLocale.t('onboarding.stepPrefix', { current: 1, total: 5 }), 'Etape 1 sur 5');
-  assert.equal(frenchLocale.t('onboarding.step1.title'), 'Parcourez d abord tout le catalogue');
-  assert.equal(frenchLocale.t('onboarding.step5.title'), 'Protegez votre collection avec Sauvegarde');
+  assert.equal(frenchLocale.t('onboarding.stepPrefix', { current: 1, total: 5 }), 'Étape 1 sur 5');
+  assert.equal(frenchLocale.t('onboarding.step1.title'), "Parcourez d'abord tout le catalogue");
+  assert.equal(frenchLocale.t('onboarding.step5.title'), 'Protégez votre collection avec Sauvegarde');
   assert.equal(frenchLocale.hasFallbacks, false);
 
   const germanLocale = createLocaleTools('de-DE');
   assert.equal(germanLocale.t('browse.hero.manageCollection'), 'Sammlung verwalten');
-  assert.equal(germanLocale.t('onboarding.titleEyebrow'), 'Erststart-Einfuhrung');
+  assert.equal(germanLocale.t('onboarding.titleEyebrow'), 'Erststart-Einführung');
   assert.equal(germanLocale.t('onboarding.stepPrefix', { current: 1, total: 5 }), 'Schritt 1 von 5');
   assert.equal(germanLocale.t('onboarding.step1.title'), 'Durchsuche zuerst den gesamten Katalog');
-  assert.equal(germanLocale.t('onboarding.step5.title'), 'Schuetze deine Sammlung mit Backup');
+  assert.equal(germanLocale.t('onboarding.step5.title'), 'Schütze deine Sammlung mit Backup');
   assert.equal(germanLocale.hasFallbacks, false);
 
   const japaneseLocale = createLocaleTools('ja-JP');
@@ -91,7 +91,7 @@ test('Epic 19 locale helpers expose the six production locales and translated UI
 
   const spanishLocale = createLocaleTools('es-ES');
   assert.equal(spanishLocale.t('newGame.acceptLog'), 'Aceptar y registrar');
-  assert.equal(spanishLocale.t('onboarding.titleEyebrow'), 'Guia de primer uso');
+  assert.equal(spanishLocale.t('onboarding.titleEyebrow'), 'Guía de primer uso');
   assert.equal(spanishLocale.t('onboarding.stepPrefix', { current: 1, total: 5 }), 'Paso 1 de 5');
   assert.equal(spanishLocale.t('onboarding.step1.title'), 'Explora primero el catálogo completo');
   assert.equal(spanishLocale.t('onboarding.step5.title'), 'Protege tu colección con Copia');

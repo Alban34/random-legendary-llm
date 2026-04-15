@@ -1,11 +1,11 @@
 {
   "name": "legendary-marvel-randomizer",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "start": "vite preview",
+    "start": "vite build --base / && vite preview",
     "test": "node --test ./test/*.test.mjs",
     "test:epic1": "node --test ./test/epic1.test.mjs",
     "test:epic2": "node --test ./test/epic2-state.test.mjs",
