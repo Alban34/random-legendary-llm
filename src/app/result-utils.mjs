@@ -1,3 +1,5 @@
+import { createLocaleTools } from './localization-utils.mjs';
+
 export const GAME_RESULT_STATUS_PENDING = 'pending';
 export const GAME_RESULT_STATUS_COMPLETED = 'completed';
 
@@ -44,14 +46,19 @@ export function formatGameOutcomeLabel(outcome) {
   return GAME_OUTCOME_LABELS[outcome] || 'Unknown';
 }
 
-export function formatGameResultStatus(result) {
+export function formatGameResultStatus(result, locale = 'en-US') {
   if (!isCompletedGameResult(result)) {
     return 'Pending result';
   }
 
-  return result.score === null
-    ? formatGameOutcomeLabel(result.outcome)
-    : `${formatGameOutcomeLabel(result.outcome)} · Score ${result.score}`;
+  if (result.score === null) {
+    return formatGameOutcomeLabel(result.outcome);
+  }
+
+  const { t } = createLocaleTools(locale);
+  const scoreLabel = t('result.scoreLabel');
+  const formattedScore = new Intl.NumberFormat(locale).format(result.score);
+  return `${formatGameOutcomeLabel(result.outcome)} · ${scoreLabel} ${formattedScore}`;
 }
 
 export function createCompletedGameResult({ outcome, score, notes = '', updatedAt = new Date().toISOString() }) {

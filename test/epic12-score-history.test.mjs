@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
 import { formatHistorySummary } from '../src/app/history-utils.mjs';
+import { formatGameResultStatus } from '../src/app/result-utils.mjs';
 import {
   STORAGE_KEY,
   acceptGameSetup,
@@ -187,4 +188,38 @@ test('Epic 12 saves, edits, and roundtrips completed results without duplicating
 
   const loaded = loadState({ storageAdapter, indexes: bundle.runtime.indexes });
   assert.deepEqual(loaded.state.history[0].result, correctedState.history[0].result);
+});
+
+test('Epic 37.2 formatGameResultStatus formats score label and number locale-aware', () => {
+  const winResult = {
+    status: 'completed',
+    outcome: 'win',
+    score: 1000,
+    notes: '',
+    updatedAt: '2026-04-16T12:00:00.000Z'
+  };
+
+  // en-US: 'Score' label with comma thousands separator
+  assert.equal(formatGameResultStatus(winResult, 'en-US'), 'Win · Score 1,000');
+
+  // de-DE: 'Punktzahl' label with period thousands separator
+  assert.equal(formatGameResultStatus(winResult, 'de-DE'), 'Win · Punktzahl 1.000');
+
+  // default (no locale arg) uses en-US
+  assert.equal(formatGameResultStatus(winResult), 'Win · Score 1,000');
+
+  // null score returns outcome only — no score label
+  const lossResult = {
+    status: 'completed',
+    outcome: 'loss',
+    score: null,
+    notes: '',
+    updatedAt: '2026-04-16T12:00:00.000Z'
+  };
+  assert.equal(formatGameResultStatus(lossResult, 'en-US'), 'Loss');
+  assert.equal(formatGameResultStatus(lossResult, 'de-DE'), 'Loss');
+
+  // pending result is unaffected by locale
+  const pendingResult = { status: 'pending', outcome: null, score: null, notes: '', updatedAt: null };
+  assert.equal(formatGameResultStatus(pendingResult, 'de-DE'), 'Pending result');
 });

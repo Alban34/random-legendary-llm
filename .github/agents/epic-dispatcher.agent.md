@@ -165,26 +165,30 @@ If the QC run reports failures:
 Whenever an implemented story introduces or modifies **user-facing strings** — labels, descriptions, button text, toast messages, aria labels, validation messages, or any copy rendered into the UI — the following localization workflow is mandatory.
 
 ### Step 1 — English keys first (serial)
-Hire `Epic Frontend Expert` and instruct it to add the new or changed message key(s) to the `EN_MESSAGES` object in `src/app/localization-utils.mjs`. The English entry is the canonical source of truth. All keys must exist in `EN_MESSAGES` before any translator is hired. Wait for the Frontend Expert to confirm completion before proceeding.
+Hire `Epic Frontend Expert` and instruct it to add the new or changed message key(s) to `src/app/locales/en.mjs`. The English file is the canonical source of truth. All keys must exist in `en.mjs` before any translator is hired. Wait for the Frontend Expert to confirm completion before proceeding.
 
 ### Step 2 — all translators in parallel
-After the English keys are confirmed, hire all five translator agents **simultaneously**, each scoped exclusively to its own messages object:
+After the English keys are confirmed, hire all five translator agents **simultaneously**, each scoped exclusively to its own locale file:
 
-| Agent | Locale | Target object |
+| Agent | Locale | Target file |
 |---|---|---|
-| `French Translator` | fr-FR | `FR_MESSAGES` |
-| `German Translator` | de-DE | `DE_MESSAGES` |
-| `Japanese Translator` | ja-JP | `JA_MESSAGES` |
-| `Korean Translator` | ko-KR | `KO_MESSAGES` |
-| `Spanish Translator` | es-ES | `ES_MESSAGES` |
+| `French Translator` | fr-FR | `src/app/locales/fr.mjs` |
+| `German Translator` | de-DE | `src/app/locales/de.mjs` |
+| `Japanese Translator` | ja-JP | `src/app/locales/ja.mjs` |
+| `Korean Translator` | ko-KR | `src/app/locales/ko.mjs` |
+| `Spanish Translator` | es-ES | `src/app/locales/es.mjs` |
 
 Pass to each translator:
 - the exact list of new or changed key names and their English values,
-- the file path: `src/app/localization-utils.mjs`,
-- the name of the messages object they own (e.g. `FR_MESSAGES`),
 - a reminder to preserve ICU-style placeholders verbatim and to leave game-specific brand names untranslated.
 
-Each translator edits only its own block. Because the five target objects are distinct sections of the same file, parallel edits are safe when each agent respects its block boundary.
+Each translator reads only `src/app/locales/en.mjs` and edits only its own locale file. The five target files are independent, so all five agents can run in parallel safely.
+
+### Step 3 — handle translator completion signals
+Each translator ends its report with `TASK COMPLETE — Epic Dispatcher: please mark my task done in the task list.` When you receive this signal from a translator:
+1. Locate the corresponding task in `documentation/task-list.md`.
+2. Mark it `- [x]` (done).
+3. Once all five translator completion signals are received, proceed with the remaining workflow (QC, Tech Writer, etc.).
 
 ### When this standard applies
 - Any story task marked "add string", "copy", "label", "message", "toast", "aria-label", "notification", or any task that changes visible UI text.
