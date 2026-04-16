@@ -70,7 +70,7 @@ test('Epic 2 default root state matches the expected schema', () => {
   const state = createDefaultState();
 
   assert.equal(state.schemaVersion, 1);
-  assert.deepEqual(state.collection, { ownedSetIds: [] });
+  assert.deepEqual(state.collection, { ownedSetIds: [], activeSetIds: null });
   assert.deepEqual(state.usage, {
     heroes: {},
     masterminds: {},

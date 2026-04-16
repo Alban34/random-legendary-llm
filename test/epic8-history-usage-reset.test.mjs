@@ -114,7 +114,7 @@ test('Epic 8 category resets and full reset preview/behavior stay scoped correct
 
   const preview = buildFullResetPreview();
   assert.deepEqual(preview, {
-    collection: { ownedSetIds: [] },
+    collection: { ownedSetIds: [], activeSetIds: null },
     usage: {
       heroes: {},
       masterminds: {},

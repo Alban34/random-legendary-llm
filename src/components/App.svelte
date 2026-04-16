@@ -28,6 +28,8 @@
     resetOwnedCollection,
     resetUsageCategory as resetUsageCategoryStore,
     toggleOwnedSet as toggleOwnedSetStore,
+    setActiveSetIds as setActiveSetIdsStore,
+    clearActiveSetIds as clearActiveSetIdsStore,
     updateGameResult,
     updateState
   } from '../app/state-store.mjs';
@@ -596,6 +598,20 @@
       applyStateUpdate(
         (currentState) => toggleOwnedSetStore(currentState, setId),
         locale.t('actions.updatedOwnedCollection')
+      );
+    },
+
+    setActiveSetIds(ids) {
+      applyStateUpdate(
+        (currentState) => setActiveSetIdsStore(currentState, ids),
+        locale.t('actions.updatedActiveFilter')
+      );
+    },
+
+    clearActiveSetIds() {
+      applyStateUpdate(
+        (currentState) => clearActiveSetIdsStore(currentState),
+        locale.t('actions.clearedActiveFilter')
       );
     },
 
@@ -1385,6 +1401,8 @@
                 onRemoveForcedPick={actions.removeForcedPick}
                 onClearForcedPicks={actions.clearForcedPicks}
                 onClearToDefaults={actions.clearToDefaults}
+                onSetActiveSetIds={actions.setActiveSetIds}
+                onClearActiveSetIds={actions.clearActiveSetIds}
               />
             {:else if tab.id === 'history'}
               <HistoryTab

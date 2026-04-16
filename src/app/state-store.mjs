@@ -50,7 +50,8 @@ export function createDefaultState() {
   return {
     schemaVersion: SCHEMA_VERSION,
     collection: {
-      ownedSetIds: []
+      ownedSetIds: [],
+      activeSetIds: null
     },
     usage: createDefaultUsageState(),
     history: [],
@@ -253,8 +254,25 @@ function sanitizeStateCandidate(candidate, indexes) {
     return { state: defaultState, notices };
   }
 
+  const ownedSetIds = sanitizeOwnedSetIds(candidate.collection?.ownedSetIds, indexes, notices);
+
+  const rawActiveSetIds = candidate.collection?.activeSetIds;
+  let activeSetIds = null;
+  if (Array.isArray(rawActiveSetIds)) {
+    if (rawActiveSetIds.length === 0) {
+      activeSetIds = []; // explicitly empty — all boxes unchecked
+    } else {
+      const validActiveSetIds = rawActiveSetIds.filter((id) => typeof id === 'string' && id && ownedSetIds.includes(id));
+      if (validActiveSetIds.length !== rawActiveSetIds.filter((id) => typeof id === 'string' && id).length) {
+        notices.push('Removed invalid active set IDs during state hydration.');
+      }
+      activeSetIds = validActiveSetIds;
+    }
+  }
+
   const collection = {
-    ownedSetIds: sanitizeOwnedSetIds(candidate.collection?.ownedSetIds, indexes, notices)
+    ownedSetIds,
+    activeSetIds
   };
 
   const usage = {};
@@ -449,10 +467,23 @@ export function toggleOwnedSet(state, setId) {
   const ownedSetIds = new Set(nextState.collection.ownedSetIds);
   if (ownedSetIds.has(setId)) {
     ownedSetIds.delete(setId);
+    if (Array.isArray(nextState.collection.activeSetIds)) { nextState.collection.activeSetIds = nextState.collection.activeSetIds.filter((id) => id !== setId); }
   } else {
     ownedSetIds.add(setId);
   }
   nextState.collection.ownedSetIds = [...ownedSetIds].sort((left, right) => left.localeCompare(right));
+  return nextState;
+}
+
+export function setActiveSetIds(state, ids) {
+  const nextState = deepClone(state);
+  nextState.collection.activeSetIds = ids === null ? null : [...ids];
+  return nextState;
+}
+
+export function clearActiveSetIds(state) {
+  const nextState = deepClone(state);
+  nextState.collection.activeSetIds = null;
   return nextState;
 }
 

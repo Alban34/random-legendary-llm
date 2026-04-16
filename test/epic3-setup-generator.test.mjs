@@ -125,7 +125,7 @@ test('Epic 3 mastermind leads consume the correct villain or henchman slot', () 
   assert.ok(drDoomSetup.henchmanGroups.some((group) => group.name === 'Doombot Legion' && group.forced));
 });
 
-test('Epic 3 hero freshness ranking prefers never-played first, then least-played, then oldest timestamps', () => {
+test('Epic 3 hero freshness ranking prefers never-played first, then least-played, items with equal plays are shuffled together', () => {
   const heroes = bundle.runtime.indexes.allHeroes.slice(0, 6);
   const usage = {
     [heroes[2].id]: { plays: 1, lastPlayedAt: '2026-04-03T12:00:00.000Z' },
@@ -135,14 +135,21 @@ test('Epic 3 hero freshness ranking prefers never-played first, then least-playe
   };
 
   const ranked = rankItemsByFreshness(heroes, usage, () => 0);
+  // Never-played (heroes[0], heroes[1]) always come first
   assert.deepEqual(new Set(ranked.slice(0, 2).map((entity) => entity.id)), new Set([
     heroes[0].id,
     heroes[1].id
   ]));
-  assert.deepEqual(ranked.slice(2, 4).map((entity) => entity.id), [
+  // 1-play items (heroes[2], heroes[3]) come next — order within the tier is random, not by lastPlayedAt
+  assert.deepEqual(new Set(ranked.slice(2, 4).map((entity) => entity.id)), new Set([
     heroes[2].id,
     heroes[3].id
-  ]);
+  ]));
+  // 2-play items (heroes[4], heroes[5]) come last
+  assert.deepEqual(new Set(ranked.slice(4, 6).map((entity) => entity.id)), new Set([
+    heroes[4].id,
+    heroes[5].id
+  ]));
 });
 
 test('Epic 3 least-played fallback is used when fresh heroes are insufficient', () => {

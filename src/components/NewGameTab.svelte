@@ -1,7 +1,7 @@
 <script>
   import { getAvailablePlayModes, getDisplayedSetupRequirements } from '../app/new-game-utils.mjs';
   import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from '../app/forced-picks-utils.mjs';
-  import { buildOwnedPools } from '../app/setup-generator.mjs';
+  import { buildOwnedPools, validateSetupLegality } from '../app/setup-generator.mjs';
 
   let {
     bundle,
@@ -22,7 +22,9 @@
     onAddForcedPick,
     onRemoveForcedPick,
     onClearForcedPicks,
-    onClearToDefaults
+    onClearToDefaults,
+    onSetActiveSetIds,
+    onClearActiveSetIds
   } = $props();
 
   let availablePlayModes = $derived(getAvailablePlayModes(selectedPlayerCount));
@@ -33,6 +35,17 @@
     currentSetup
   }));
   let hasActiveForcedPicks = $derived(hasForcedPicks(forcedPicks));
+
+  let filterFeasibility = $derived.by(() => {
+    return validateSetupLegality({
+      runtime: bundle.runtime,
+      state: appState,
+      playerCount: selectedPlayerCount,
+      advancedSolo,
+      playMode: selectedPlayMode,
+      forcedPicks: null
+    });
+  });
 
   let ownedForcedPickOptions = $derived.by(() => {
     const pools = buildOwnedPools(bundle.runtime, appState.collection.ownedSetIds);
@@ -84,6 +97,77 @@
   <section class="panel">
     <h2>{locale.t('newGame.panel.setupTitle')}</h2>
     <div class={"stack gap-md" + (compactViewport ? ' page-flow-compact-mobile' : '')}>
+
+      {#if appState.collection.ownedSetIds.length > 0}
+        <!-- Active expansion filter panel -->
+        <details data-active-filter-panel>
+          <summary>
+            {locale.t('newGame.activeFilter.title')}
+            <span class="muted">
+              — {#if appState.collection.activeSetIds === null}
+                {locale.t('newGame.activeFilter.summaryAll', { count: appState.collection.ownedSetIds.length })}
+              {:else}
+                {locale.t('newGame.activeFilter.summaryFiltered', { active: appState.collection.activeSetIds.length, total: appState.collection.ownedSetIds.length })}
+              {/if}
+            </span>
+          </summary>
+          <section class="result-card" style="margin-top: var(--space-sm)">
+            <div class="stack gap-sm">
+              {#each appState.collection.ownedSetIds as setId (setId)}
+                {@const setEntry = bundle.runtime.indexes.setsById[setId]}
+                {@const isChecked = appState.collection.activeSetIds === null || appState.collection.activeSetIds.includes(setId)}
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    data-active-filter-checkbox={setId}
+                    onchange={(e) => {
+                      const nowChecked = e.target.checked;
+                      const activeIds = appState.collection.activeSetIds;
+                      const ownedIds = appState.collection.ownedSetIds;
+                      if (nowChecked) {
+                        if (activeIds === null) return;
+                        const newIds = [...new Set([...activeIds, setId])];
+                        if (newIds.length === ownedIds.length) {
+                          onClearActiveSetIds();
+                        } else {
+                          onSetActiveSetIds(newIds);
+                        }
+                      } else {
+                        const currentIds = activeIds === null ? [...ownedIds] : activeIds;
+                        onSetActiveSetIds(currentIds.filter((id) => id !== setId));
+                      }
+                    }}
+                  /> {setEntry ? setEntry.name : setId}
+                </label>
+              {/each}
+            </div>
+            <div class="row wrap gap-sm align-center" style="margin-top: var(--space-sm)">
+              <button
+                type="button"
+                class="button button-secondary"
+                data-action="active-filter-select-all"
+                onclick={onClearActiveSetIds}
+              >{locale.t('newGame.activeFilter.selectAll')}</button>
+              <button
+                type="button"
+                class="button button-secondary"
+                data-action="active-filter-clear-all"
+                onclick={() => onSetActiveSetIds([])}
+              >{locale.t('newGame.activeFilter.clearAll')}</button>
+            </div>
+            {#if !filterFeasibility.ok}
+              <div class="notice warning" style="margin-top: var(--space-sm)" data-active-filter-warning>
+                <ul>
+                  {#each filterFeasibility.reasons as reason}
+                    <li>{reason}</li>
+                  {/each}
+                </ul>
+              </div>
+            {/if}
+          </section>
+        </details>
+      {/if}
 
       <div data-mobile-task-anchor="new-game">
         <h3>{locale.t('newGame.playerCount')}</h3>
@@ -152,6 +236,7 @@
         <button
           class="button button-primary"
           data-action="generate-setup"
+          disabled={!filterFeasibility.ok}
           onclick={onGenerateSetup}
         >{currentSetup ? locale.t('newGame.reroll') : locale.t('newGame.generate')}</button>
         <button

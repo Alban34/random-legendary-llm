@@ -35,7 +35,7 @@ export function rankItemsByFreshness(items, usageBucket, random = Math.random) {
 
   for (const item of items) {
     const key = getFreshnessKey(usageBucket, item);
-    const keyStr = `${key[0]}|${key[1]}|${key[2]}`;
+    const keyStr = `${key[0]}|${key[1]}`;
     if (!grouped.has(keyStr)) {
       grouped.set(keyStr, { key, list: [] });
     }
@@ -45,8 +45,7 @@ export function rankItemsByFreshness(items, usageBucket, random = Math.random) {
   return [...grouped.values()]
     .sort((left, right) => {
       if (left.key[0] !== right.key[0]) return left.key[0] - right.key[0];
-      if (left.key[1] !== right.key[1]) return left.key[1] - right.key[1];
-      return left.key[2] - right.key[2];
+      return left.key[1] - right.key[1];
     })
     .flatMap(({ list }) => shuffle(list, random));
 }
@@ -272,6 +271,9 @@ function validateBaseCounts(pools, template) {
 }
 
 export function validateSetupLegality({ runtime, state, playerCount, advancedSolo = false, playMode, forcedPicks }) {
+  const activeSetIds = state.collection.activeSetIds ?? null;
+  const effectiveSetIds = Array.isArray(activeSetIds) ? activeSetIds : state.collection.ownedSetIds;
+
   let template;
   try {
     template = resolveSetupTemplate(playerCount, { advancedSolo, playMode });
@@ -280,12 +282,12 @@ export function validateSetupLegality({ runtime, state, playerCount, advancedSol
       ok: false,
       reasons: [error.message],
       template: null,
-      pools: buildOwnedPools(runtime, state.collection.ownedSetIds),
+      pools: buildOwnedPools(runtime, effectiveSetIds),
       eligibleSchemes: []
     };
   }
 
-  const pools = buildOwnedPools(runtime, state.collection.ownedSetIds);
+  const pools = buildOwnedPools(runtime, effectiveSetIds);
   const reasons = [];
   const normalizedForcedPicks = normalizeForcedPicks(forcedPicks);
 
