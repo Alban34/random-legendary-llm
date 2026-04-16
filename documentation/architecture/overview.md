@@ -27,7 +27,7 @@ The current release keeps the architecture described below and implements it wit
 - `src/app/game-data-pipeline.mjs` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
 - `src/app/state-store.mjs` — owns the versioned root state persisted under `legendary_state_v1`
 - `src/app/state-store.svelte.js` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
-- `src/app/history-utils.mjs` — history record formatting utilities; `formatHistorySummary` resolves entity display names, expansion set names, and grouping keys from runtime indexes for each history record
+- `src/app/history-utils.mjs` — history record formatting and filtering utilities; `formatHistorySummary` resolves entity display names, expansion set names, and grouping keys from runtime indexes for each history record; `filterHistoryByOutcome(records, filter)` filters a history array to the requested outcome (`'all'`, `'win'`, `'loss'`, `'pending'`) without mutating the input
 - `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs` — resolve templates and produce legal setups
 - `src/app/app-renderer.mjs` — transitional render functions used via `{@html}` blocks in Svelte tab components
 - `src/app/browse-vm.svelte.js` — browse tab view-model; owns browse-specific reactive state

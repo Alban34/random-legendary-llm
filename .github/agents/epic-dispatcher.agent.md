@@ -38,9 +38,10 @@ Epics are tracked by **folder position** rather than an inline status marker. Th
 **Do not write any `Status:` marker inside an epic file.** The folder location is the sole status signal.
 
 ### Dispatcher responsibilities per folder transition
-- **`approved/` → `ready-for-dev/`**: When the dispatcher picks up an epic from `approved/`, it hires `Epic Frontend Expert` to create the task list file for that epic inside `ready-for-dev/`. Once the task list file exists, the dispatcher moves the epic file itself from `approved/` to `ready-for-dev/` so both files are co-located.
-- **`ready-for-dev/` → `done/`**: When all tasks in a `ready-for-dev/` task list are checked (`- [x]`), the dispatcher moves both the epic file and the task list file from `ready-for-dev/` to `done/`.
+- **`approved/` → `ready-for-dev/`**: When the dispatcher picks up an epic from `approved/`, it hires `Epic Frontend Expert` to create the task list file for that epic inside `ready-for-dev/`. Once the task list file exists, the dispatcher moves the epic file itself from `approved/` to `ready-for-dev/` so both files are co-located. **This is a stopping point — the dispatcher does not automatically begin implementing the epic. The user must explicitly request implementation of a `ready-for-dev/` epic before any implementation work starts.**
+- **`ready-for-dev/` → `done/`**: When all tasks in a `ready-for-dev/` task list are checked (`- [x]`) and the user has explicitly triggered that epic's implementation, the dispatcher moves both the epic file and the task list file from `ready-for-dev/` to `done/`.
 - The dispatcher **never** touches `to-review/` or `approved/` folders for any purpose other than reading epics and moving the epic file out of `approved/` when processing begins.
+- The dispatcher **never** automatically picks up epics from `ready-for-dev/`. Epics that have already reached `ready-for-dev/` are considered staged and waiting; the dispatcher leaves them untouched until the user explicitly asks to implement a specific epic.
 
 ## Feature List Mode
 
@@ -64,6 +65,7 @@ A request is NOT in Feature List Mode when all `- [ ]` items are already mapped 
 4. **Do not create task lists in Feature List Mode.** Task list creation happens when the dispatcher picks up an epic from `approved/` in the standard workflow. No task list file is created during Feature List Mode.
 5. **Mark source features as planned.** For every `- [ ]` item in the original feature list file that now has a corresponding written epic, update the feature list file and change its checkbox from `- [ ]` to `- [x]`. Do this using the `Epic Tech Writer` agent. Pass the exact file path, the exact text of each item to check off, and confirm the items map to written epics before marking them done.
 6. **Do not run QC or hire `Epic Tech Writer`** for code-level validation — these new epics are planning artifacts, not implemented code. The Tech Writer hired in step 5 is for the checkbox update only.
+7. **Do not transition to the standard implementation workflow** after Feature List Mode completes. Feature List Mode is exclusively about creating planning artifacts in `to-review/`. The dispatcher stops after checkbox updates are done and reports which epics were created. No `approved/` or `ready-for-dev/` processing follows.
 
 ## Constraints
 - Do not code, edit files, or execute implementation commands yourself.
@@ -79,8 +81,8 @@ This section applies to the **standard implementation workflow** only. In Featur
 
 Before planning any work:
 1. List the files in `documentation/planning/epic/approved/` to identify epics awaiting task-list creation.
-2. List the files in `documentation/planning/epic/ready-for-dev/` to identify epics already in progress (their task list files live in the same folder).
-3. For each epic in `ready-for-dev/`, read the corresponding task list file and identify the remaining scope:
+2. **Do not list or process `ready-for-dev/` epics unless the user has explicitly requested implementation of a specific epic.** Epics in `ready-for-dev/` are staged and must not be touched until the user gives an explicit implementation request naming that epic.
+3. When the user explicitly requests implementation of a specific `ready-for-dev/` epic, read the corresponding task list file and identify the remaining scope:
    - Tasks marked `- [ ]` are **pending** and must be implemented.
    - Tasks marked `- [x]` are **already done** and must be skipped entirely — do not re-implement, re-test, or re-document them.
    - Build your implementation plan exclusively from the `- [ ]` items.
@@ -213,13 +215,14 @@ Each translator ends its report with `TASK COMPLETE — Epic Dispatcher: please 
 - Documentation-only tasks inside `/documentation`.
 
 ## Expected Workflow
-1. **Determine mode.** If the input is a feature list with unplanned items, enter Feature List Mode (see above). Otherwise, enter the standard implementation workflow.
-2. **Standard workflow — discover scope.** List `documentation/planning/epic/approved/` and `documentation/planning/epic/ready-for-dev/`. Identify which epics need task lists created and which are already in progress.
+1. **Determine mode.** If the input is a feature list with unplanned items, enter Feature List Mode (see above) and stop — do not proceed to the standard workflow. Otherwise, enter the standard implementation workflow.
+2. **Standard workflow — discover scope.** List `documentation/planning/epic/approved/` only. Do not list or scan `ready-for-dev/` unless the user has named a specific epic to implement.
 3. **For each epic in `approved/`:**
    a. Read the epic file.
    b. Hire `Epic Frontend Expert` to create the task list file at `documentation/planning/epic/ready-for-dev/epic-N-task-list.md` with concrete implementation tasks, a **Test** task, and a **QC (Automated)** task for every story.
    c. Move the epic file from `approved/` to `ready-for-dev/` so both files are co-located.
-4. **For each epic in `ready-for-dev/`:**
+   d. **Stop here.** Report which epics were moved to `ready-for-dev/` and wait for an explicit implementation request before proceeding.
+4. **For an explicitly requested `ready-for-dev/` epic only:**
    a. Read the task list and identify all `- [ ]` items. Ignore all `- [x]` items.
    b. Read the authoritative epic spec to locate the implementation surface.
    c. Create a short ordered plan. Document whether each epic runs in parallel or serial and why. List any stories being skipped because they are fully checked.

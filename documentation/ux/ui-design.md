@@ -244,6 +244,9 @@ Typography roles are governed by `design-system/overview.md`.
 ```
   Group by: [Mastermind] [Scheme] [Heroes] [Villains] [Player Mode]
 
+  Filter: [All] [Won] [Lost] [Pending]
+  3 games                                ← count line (hidden when All is active)
+
   ── Game History ────────────────────────────────────
 
   ▼  Dr. Doom                           [2 games]
@@ -274,6 +277,7 @@ Typography roles are governed by `design-system/overview.md`.
 - Accepted records stay primary; insights are secondary and appear after grouped records
 - Pending and completed results are both supported, and completed results can be corrected later
 - Opening result entry from History moves focus into the active editor, invalid saves announce errors with field-level invalid state, and save/skip/cancel return focus to the originating record action
+- A row of outcome filter buttons — All, Won, Lost, Pending — appears above the game list whenever at least one history record exists; the active option is visually distinguished; selecting a filter immediately re-renders the list to show only matching records; a count line (e.g. "3 games") appears below the filter row when a non-All filter is active; when the filtered list is empty a contextual message is shown (e.g. "No won games yet") in place of the list; the filter is not persisted across page reloads
 
 ---
 

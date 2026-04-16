@@ -2,10 +2,12 @@
   import {
     buildHistoryGroups,
     DEFAULT_HISTORY_GROUPING_MODE,
+    filterHistoryByOutcome,
     HISTORY_GROUPING_MODES
   } from '../app/history-utils.mjs';
   import { buildInsightsDashboard } from '../app/stats-utils.mjs';
   import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from '../app/result-utils.mjs';
+  import { getHistoryOutcomeFilter, setHistoryOutcomeFilter } from '../app/history-vm.svelte.js';
 
   let {
     bundle,
@@ -31,9 +33,11 @@
   } = $props();
 
   let activeGroupingMode = $derived(historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE);
+  let filteredHistory = $derived(filterHistoryByOutcome(appState.history, getHistoryOutcomeFilter()));
   let groups = $derived(
-    buildHistoryGroups(appState.history, bundle.runtime.indexes, { mode: activeGroupingMode })
+    buildHistoryGroups(filteredHistory, bundle.runtime.indexes, { mode: activeGroupingMode })
   );
+  let filteredCount = $derived(filteredHistory.length);
   let dashboard = $derived(buildInsightsDashboard(bundle.runtime, appState, { limit: 3 }));
   let insightsExpanded = $derived(compactViewport ? Boolean(historyInsightsExpanded) : true);
 
@@ -76,10 +80,7 @@
     </div>
 
     <!-- Grouping controls -->
-    <div class="stack gap-sm" data-history-grouping-controls>
-      <div class="row space-between wrap gap-sm align-center">
-        <strong>{locale.t('history.groupBy')}</strong>
-      </div>
+    <div class="row space-between wrap gap-sm align-center" data-history-grouping-controls>
       <div class="button-row wrap">
         {#each HISTORY_GROUPING_MODES as mode (mode.id)}
           <button
@@ -93,11 +94,38 @@
           >{locale.getHistoryGroupingLabel(mode.id)}</button>
         {/each}
       </div>
+      {#if appState.history.length > 0}
+      <div class="button-row wrap" data-outcome-filter-row>
+        {#each [
+          { value: 'all', label: 'All' },
+          { value: 'win', label: 'Won' },
+          { value: 'loss', label: 'Lost' },
+          { value: 'pending', label: 'Pending' }
+        ] as opt (opt.value)}
+          <button
+            type="button"
+            class={"button " + (getHistoryOutcomeFilter() === opt.value ? 'button-primary' : 'button-secondary')}
+            aria-pressed={getHistoryOutcomeFilter() === opt.value}
+            data-outcome-filter={opt.value}
+            onclick={() => setHistoryOutcomeFilter(opt.value)}
+          >{opt.label}</button>
+        {/each}
+      </div>
+      {/if}
     </div>
+    {#if getHistoryOutcomeFilter() !== 'all' && appState.history.length > 0}
+      <p class="muted" data-outcome-filter-count>{filteredCount} {filteredCount === 1 ? 'game' : 'games'}</p>
+    {/if}
 
     <!-- History records -->
     {#if !appState.history.length}
       <p class="muted empty-state">{locale.t('history.empty')}</p>
+    {:else if filteredHistory.length === 0 && getHistoryOutcomeFilter() !== 'all'}
+      <p class="muted empty-state" data-outcome-filter-empty>
+        {#if getHistoryOutcomeFilter() === 'win'}No won games yet
+        {:else if getHistoryOutcomeFilter() === 'loss'}No lost games yet
+        {:else}No pending games yet{/if}
+      </p>
     {:else}
       {#each groups as group, groupIndex (group.id)}
         <details

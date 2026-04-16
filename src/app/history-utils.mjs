@@ -195,6 +195,15 @@ export function buildHistoryGroups(records, indexes, { mode = DEFAULT_HISTORY_GR
   return [...groupsById.values()].sort((left, right) => left.label.localeCompare(right.label));
 }
 
+export function filterHistoryByOutcome(records, filter) {
+  if (!records || records.length === 0) return [];
+  if (filter === 'all') return records;
+  if (filter === 'win') return records.filter((r) => r.result?.outcome === 'win');
+  if (filter === 'loss') return records.filter((r) => r.result?.outcome === 'loss');
+  if (filter === 'pending') return records.filter((r) => r.result?.status === 'pending' || r.result == null);
+  return records;
+}
+
 export function buildFullResetPreview() {
   const defaultState = createDefaultState();
   return {

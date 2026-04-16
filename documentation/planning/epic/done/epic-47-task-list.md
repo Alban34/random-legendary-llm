@@ -1,0 +1,37 @@
+# Epic 47 — History Outcome Filter: Task List
+
+## Story 1: Model the outcome filter state and derive the filtered history list
+
+- [x] In `src/app/history-vm.svelte.js`, add a private `let _historyOutcomeFilter = $state('all')` following the same pattern as `_historyGroupingMode`
+- [x] Export `getHistoryOutcomeFilter()`, `setHistoryOutcomeFilter(v)`, and `resetHistoryOutcomeFilter()` from `src/app/history-vm.svelte.js`; valid values for `v` are `'all'`, `'win'`, `'loss'`, and `'pending'`; `resetHistoryOutcomeFilter` sets the value back to `'all'`
+- [x] In `src/app/history-utils.mjs`, add and export a pure function `filterHistoryByOutcome(records, filter)`: when `filter === 'all'` return `records` unchanged; when `filter === 'win'` or `filter === 'loss'` return only records where `record.result.outcome === filter`; when `filter === 'pending'` return only records where `record.result.status === 'pending'`; the input `records` array must never be mutated
+- [x] Confirm that `filterHistoryByOutcome` handles edge cases: empty `records` array returns `[]`; a `null` or `undefined` `result` field on a record is treated as pending (i.e. included when `filter === 'pending'`, excluded for `'win'` and `'loss'`)
+- [x] **Test:** create `test/epic47-history-outcome-filter.test.mjs`; import `filterHistoryByOutcome` from `src/app/history-utils.mjs`; assert that `'all'` returns all records unchanged; assert `'win'` returns only records with `result.outcome === 'win'`; assert `'loss'` returns only records with `result.outcome === 'loss'`; assert `'pending'` returns only records where `result.status === 'pending'`; assert that none of the above mutate the input array; assert that an empty records array always returns `[]`; import `getHistoryOutcomeFilter`, `setHistoryOutcomeFilter`, and `resetHistoryOutcomeFilter` from `src/app/history-vm.svelte.js` and assert the getter returns `'all'` by default, the setter changes the value, and the reset restores `'all'`
+- [x] **QC (Automated):** `npm run lint` must pass with no errors in `src/app/history-vm.svelte.js` and `src/app/history-utils.mjs`; run `npm test -- --testPathPattern epic47` (or equivalent for this repo's test runner) and confirm all new assertions pass; also run the existing history test suites `npm test -- --testPathPattern "epic12|epic20|epic34"` to confirm no regressions
+
+---
+
+## Story 2: Build the outcome filter control UI on the History tab
+
+- [x] In `src/components/HistoryTab.svelte`, import `getHistoryOutcomeFilter` and `setHistoryOutcomeFilter` from `../app/history-vm.svelte.js`
+- [x] Import `filterHistoryByOutcome` from `../app/history-utils.mjs`
+- [x] Add a `$derived` value `filteredHistory` computed as `filterHistoryByOutcome(appState.history, getHistoryOutcomeFilter())` (or equivalent reactive expression matching the component's existing reactivity pattern); use `filteredHistory` everywhere the history list is currently rendered instead of `appState.history` directly
+- [x] Add a filter control row (`<div class="outcome-filter-row">` or equivalent) above the game list containing four options — All, Won, Lost, Pending — rendered as `<button>` elements (or `<input type="radio">` within a `<fieldset>`); each option calls `setHistoryOutcomeFilter` with the corresponding value (`'all'`, `'win'`, `'loss'`, `'pending'`) when activated
+- [x] Apply a visually-distinct class (e.g. `class:active` or `aria-pressed="true"`) to the currently active filter option so the selected state is unambiguous at a glance
+- [x] Mark each button with an accessible label: at minimum, each button must have visible text ("All", "Won", "Lost", "Pending"); no additional `aria-label` is required if the visible text already conveys the option clearly
+- [x] Ensure the filter row is only rendered when `appState.history.length > 0`; when history is empty the filter row must not appear (it is superfluous with no records)
+- [x] Ensure each button is reachable and activatable via keyboard Tab and Enter/Space — no custom focus management is needed if the elements are native `<button>` elements
+- [x] **Test:** extend `test/epic47-history-outcome-filter.test.mjs` with unit assertions for `filterHistoryByOutcome` covering realistic mixed-outcome history arrays (e.g. 3 wins, 2 losses, 1 pending); confirm derived counts are correct for each filter value; add a Playwright spec at `test/playwright/epic47-history-outcome-filter.spec.mjs` asserting: the filter row appears on the History tab when at least one record exists; clicking "Won" shows only won records; clicking "Lost" shows only lost records; clicking "Pending" shows only pending records; clicking "All" restores all records; the active option is visually distinguished (check for `aria-pressed` or an active CSS class)
+- [x] **QC (Automated):** `npm run lint` must pass with no errors in `src/components/HistoryTab.svelte`; run `npm test -- --testPathPattern epic47` and confirm all assertions pass; run the existing epic4 and epic12 test suites (`npm test -- --testPathPattern "epic4|epic12"`) to confirm no regressions in History tab navigation or score recording
+
+---
+
+## Story 3: Show the filtered result count and empty-state message when no games match
+
+- [x] In `src/components/HistoryTab.svelte`, add a `$derived` value `filteredCount` equal to `filteredHistory.length` and `totalCount` equal to `appState.history.length`
+- [x] Immediately below the filter control row, render a count line conditionally: show it only when `getHistoryOutcomeFilter() !== 'all'`; the text must read `"{filteredCount} games"` (e.g. "3 games") — do not include the total in the count line per the spec; hide the count line entirely when the filter is `'all'`
+- [x] When `filteredHistory.length === 0` and `getHistoryOutcomeFilter() !== 'all'`, replace the game list with a contextual empty-state message in place of the list (do not show both); the message text must reflect the active filter: "No won games yet" for `'win'`, "No lost games yet" for `'loss'`, "No pending games yet" for `'pending'`; use the same empty-state markup/class as the existing zero-history empty state if one exists
+- [x] When `filteredHistory.length > 0`, render the filtered list normally and suppress the empty-state message
+- [x] Switching the filter from an empty-result state to `'all'` (or any filter that yields results) must immediately restore the game list and hide the empty-state message without a page reload
+- [x] **Test:** extend `test/epic47-history-outcome-filter.test.mjs` with unit assertions: `filterHistoryByOutcome` called with a filter that matches zero records returns `[]`; add Playwright assertions in `test/playwright/epic47-history-outcome-filter.spec.mjs`: when a filter is active and `filteredCount !== totalCount`, the count line is visible with the correct number; when the filter is `'all'` the count line is absent; when the filtered list is empty the appropriate empty-state message is visible and the game list is not; switching back to `'all'` hides the empty state and shows the full list
+- [x] **QC (Automated):** `npm run lint` must pass with no errors across all files modified in this epic; run `npm test -- --testPathPattern epic47` and confirm all new assertions pass; run `npx playwright test test/playwright/epic47-history-outcome-filter.spec.mjs` and confirm all Playwright assertions pass; run the full history-related test suites (`npm test -- --testPathPattern "epic12|epic20|epic34"`) to confirm no regressions before handing off to Epic QC

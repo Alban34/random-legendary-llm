@@ -20,6 +20,12 @@ export function getHistoryGroupingMode() { return _historyGroupingMode; }
 export function setHistoryGroupingMode(v) { _historyGroupingMode = v; }
 export function resetHistoryGroupingMode() { _historyGroupingMode = DEFAULT_HISTORY_GROUPING_MODE; }
 
+let _historyOutcomeFilter = $state('all');
+
+export function getHistoryOutcomeFilter() { return _historyOutcomeFilter; }
+export function setHistoryOutcomeFilter(v) { _historyOutcomeFilter = v; }
+export function resetHistoryOutcomeFilter() { _historyOutcomeFilter = 'all'; }
+
 export function getResultEditorRecordId() { return _resultEditorRecordId; }
 export function setResultEditorRecordId(v) { _resultEditorRecordId = v; }
 
