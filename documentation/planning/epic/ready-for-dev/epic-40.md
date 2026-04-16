@@ -1,6 +1,5 @@
 ## Epic 40 — PWA Installability
 
-**Status: In Review**
 
 **Objective**
 Make the app installable directly from the browser on Chrome, Edge, and Safari on iOS by adding a Web App Manifest and a Service Worker, so users can add it to their home screen or app drawer and use it offline after the first load — without any server-side changes or new runtime dependencies.

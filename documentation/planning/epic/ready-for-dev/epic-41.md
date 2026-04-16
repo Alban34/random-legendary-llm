@@ -1,6 +1,5 @@
 ## Epic 41 — Translation Data Model Migration
 
-**Status: In Review**
 
 **Objective**
 Restructure the localization layer so each supported language lives in its own dedicated file under `src/app/locales/`, giving every translator agent a single, clearly bounded file to own; the runtime API exposed by `localization-utils.mjs` remains fully backward-compatible and no consumer code outside that module requires changes.
