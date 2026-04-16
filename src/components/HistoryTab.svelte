@@ -129,7 +129,7 @@
                 open={isEditing || historyExpandedRecordId === summary.id}
               >
                 <summary>
-                  <strong>{summary.mastermindName}</strong>
+                  <strong>{summary.mastermindName}</strong><span class="expansion-label">{summary.mastermindSetName}</span>
                   <span class="pill">{playerLabel}</span>
                   <span class="pill">{modeLabel}</span>
                   <span
@@ -145,10 +145,10 @@
                 {#if summary.resultUpdatedAt}
                   <div class="history-meta muted">{locale.t('history.lastUpdated', { date: locale.formatDateTime(summary.resultUpdatedAt) })}</div>
                 {/if}
-                <div class="history-meta"><strong>{locale.t('history.scheme')}</strong> {summary.schemeName}</div>
-                <div class="history-meta"><strong>{locale.t('history.heroes')}</strong> {locale.formatList(summary.heroNames)}</div>
-                <div class="history-meta"><strong>{locale.t('history.villainGroups')}</strong> {locale.formatList(summary.villainGroupNames)}</div>
-                <div class="history-meta"><strong>{locale.t('history.henchmanGroups')}</strong> {locale.formatList(summary.henchmanGroupNames)}</div>
+                <div class="history-meta"><strong>{locale.t('history.scheme')}</strong> {summary.schemeName}<span class="expansion-label">{summary.schemeSetName}</span></div>
+                <div class="history-meta"><strong>{locale.t('history.heroes')}</strong> {#each summary.heroNames as name, i}{name}<span class="expansion-label">{summary.heroSetNames[i]}</span>{#if i < summary.heroNames.length - 1}, {/if}{/each}</div>
+                <div class="history-meta"><strong>{locale.t('history.villainGroups')}</strong> {#each summary.villainGroupNames as name, i}{name}<span class="expansion-label">{summary.villainGroupSetNames[i]}</span>{#if i < summary.villainGroupNames.length - 1}, {/if}{/each}</div>
+                <div class="history-meta"><strong>{locale.t('history.henchmanGroups')}</strong> {#each summary.henchmanGroupNames as name, i}{name}<span class="expansion-label">{summary.henchmanGroupSetNames[i]}</span>{#if i < summary.henchmanGroupNames.length - 1}, {/if}{/each}</div>
                 <div class="button-row history-result-actions">
                   <button
                     type="button"

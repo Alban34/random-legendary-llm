@@ -128,3 +128,17 @@ Current automated browser QC command for Epic 1–10:
 ```
 npm run check:qc:epic10
 ```
+
+---
+
+## Epic 43 — Expansion Attribution in History
+
+Automated verification: `test/epic43-expansion-attribution.test.mjs`
+
+---
+
+## Epic 45 — MyLudo Collection Import
+
+Automated verification: `test/epic45-myludo-import.test.mjs`
+
+Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, `mergeOwnedSets` (via `collection-utils.mjs`), CollectionTab import panel rendering, post-import summary, and dismiss flow. All 23 tests pass.

@@ -9,7 +9,12 @@
     persistence,
     lastActionNotice,
     onToggleOwnedSet,
-    onRequestResetOwnedCollection
+    onRequestResetOwnedCollection,
+    onImportMyludoFile,
+    onDismissMyludoSummary,
+    myludoImportStatus = 'idle',
+    myludoImportError = '',
+    myludoImportSummary = null
   } = $props();
 
   let totals = $derived(summarizeOwnedCollection(bundle.runtime, appState.collection.ownedSetIds));
@@ -101,6 +106,79 @@
     </section>
   </section>
 
+  {#if false}
+  <section class="panel" data-myludo-import-panel>
+    <div class="panel-copy">
+      <h2>Import from MyLudo</h2>
+      <p class="muted">Upload your MyLudo collection export to pre-populate your owned expansions.</p>
+    </div>
+    <div class="button-row">
+      <label
+        class={"button button-secondary" + (myludoImportStatus === 'parsing' ? ' is-loading' : '')}
+        aria-disabled={myludoImportStatus === 'parsing' ? 'true' : undefined}
+        for="myludo-file-input"
+      >
+        Import from MyLudo
+        <input
+          type="file"
+          id="myludo-file-input"
+          class="visually-hidden"
+          accept=".csv,.json,.txt,text/csv,application/json,text/plain"
+          disabled={myludoImportStatus === 'parsing'}
+          onchange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) {
+              onImportMyludoFile(file);
+              event.target.value = '';
+            }
+          }}
+        />
+      </label>
+      {#if myludoImportStatus === 'parsing'}
+        <span aria-live="polite" class="muted">Parsing file…</span>
+      {/if}
+    </div>
+    {#if myludoImportStatus === 'error' && myludoImportError}
+      <div class="notice warning" data-myludo-import-error>{myludoImportError}</div>
+    {/if}
+  </section>
+
+  {#if myludoImportSummary !== null}
+    <section class="panel" data-myludo-summary-panel>
+      <div class="panel-copy">
+        <h2>MyLudo Import Summary</h2>
+        <p>{myludoImportSummary.matched.length} expansion(s) added to your collection</p>
+      </div>
+      {#if myludoImportSummary.matched.length === 0}
+        <p class="muted">No matching expansions were found in the Legendary: Marvel catalog</p>
+      {:else}
+        <ul class="stack gap-sm">
+          {#each myludoImportSummary.matched as item (item.setId)}
+            <li>{item.setName}</li>
+          {/each}
+        </ul>
+      {/if}
+      {#if myludoImportSummary.unmatched.length > 0}
+        <details>
+          <summary class="muted">Unrecognised titles ({myludoImportSummary.unmatched.length})</summary>
+          <ul class="stack gap-sm">
+            {#each myludoImportSummary.unmatched as name}
+              <li class="muted">{name}</li>
+            {/each}
+          </ul>
+        </details>
+      {/if}
+      <div class="button-row">
+        <button
+          class="button button-secondary"
+          data-action="dismiss-myludo-summary"
+          onclick={onDismissMyludoSummary}
+        >Dismiss</button>
+      </div>
+    </section>
+  {/if}
+
+  {/if}
   {#each groupedSets as group (group.id)}
     <section class="panel collection-group" data-collection-group={group.id}>
       <h3>{locale.getCollectionGroupLabel(group.id)}</h3>

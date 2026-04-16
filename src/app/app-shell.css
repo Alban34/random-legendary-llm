@@ -1437,6 +1437,12 @@ details summary {
   margin-top: var(--space-2);
 }
 
+.expansion-label {
+  color: var(--muted);
+  font-size: var(--type-label-size);
+  margin-left: 0.25rem;
+}
+
 .history-result-actions {
   margin-top: var(--space-3);
 }

@@ -38,6 +38,8 @@
     parseBackupText,
     summarizeBackupState
   } from '../app/backup-utils.mjs';
+  import { mergeOwnedSets } from '../app/collection-utils.mjs';
+  import { parseMyludoFile, matchMyludoNamesToSets } from '../app/myludo-import-utils.mjs';
   import {
     getBrowseSearchTerm, setBrowseSearchTerm,
     getBrowseTypeFilter, setBrowseTypeFilter,
@@ -109,6 +111,9 @@
   });
   let compactViewport = $state(false);
   let initError = $state(null);
+  let myludoImportStatus = $state('idle');
+  let myludoImportError = $state('');
+  let myludoImportSummary = $state(null);
 
   // Non-reactive helpers
   let storageAdapter = null;
@@ -1080,6 +1085,34 @@
       clearGeneratedSetup();
       ui.lastActionNotice = locale.t('actions.clearDefaults');
       enqueueToast({ variant: 'info', message: locale.t('actions.clearDefaults') });
+    },
+
+    async importMyludoFile(file) {
+      if (!file) return;
+      myludoImportStatus = 'parsing';
+      myludoImportError = '';
+      myludoImportSummary = null;
+      const result = await parseMyludoFile(file);
+      if (!result.ok) {
+        myludoImportStatus = 'error';
+        myludoImportError = result.error;
+        enqueueToast({ variant: 'error', message: result.error, behavior: 'persistent' });
+        return;
+      }
+      const { matched, unmatched } = matchMyludoNamesToSets(result.gameNames, bundle.runtime.sets);
+      const matchedSetIds = matched.map((m) => m.setId);
+      applyStateUpdate(
+        (currentState) => mergeOwnedSets(currentState, matchedSetIds),
+        'Updated collection from MyLudo import'
+      );
+      myludoImportSummary = { matched, unmatched };
+      myludoImportStatus = 'idle';
+    },
+
+    dismissMyludoSummary() {
+      myludoImportSummary = null;
+      myludoImportError = '';
+      myludoImportStatus = 'idle';
     }
   };
 
@@ -1325,6 +1358,11 @@
                 lastActionNotice={ui.lastActionNotice}
                 onToggleOwnedSet={actions.toggleOwnedSet}
                 onRequestResetOwnedCollection={actions.requestResetOwnedCollection}
+                onImportMyludoFile={actions.importMyludoFile}
+                onDismissMyludoSummary={actions.dismissMyludoSummary}
+                {myludoImportStatus}
+                {myludoImportError}
+                {myludoImportSummary}
               />
             {:else if tab.id === 'new-game'}
               <NewGameTab

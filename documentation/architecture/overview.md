@@ -19,12 +19,15 @@ The current release keeps the architecture described below and implements it wit
 
 - `index.html` — app mount point containing `<div id="app"></div>` and the Vite entry script
 - `src/app/backup-utils.mjs` — versioned backup serialization, parsing, validation, and merge helpers
+- `src/app/collection-utils.mjs` — shared collection helpers including `mergeOwnedSets(state, newSetIds)` (sorted, deduplicated union of owned set IDs); shared by MyLudo import (Epic 45) and reserved for BGG import (Epic 42)
 - `src/app/localization-utils.mjs` — locale metadata, translation lookup, fallback handling, and locale-aware formatting helpers
+- `src/app/myludo-import-utils.mjs` — MyLudo collection import utilities: `parseMyludoFile(file)` (client-side CSV parsing) and `matchMyludoNamesToSets(names, sets)` (case-insensitive alias-aware catalog matching)
 - `src/app/theme-utils.mjs` — supported theme metadata and theme-ID normalization helpers
 - `src/app/browser-entry.mjs` — mounts the root `App.svelte` component via Svelte 5 `mount()`
 - `src/app/game-data-pipeline.mjs` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
 - `src/app/state-store.mjs` — owns the versioned root state persisted under `legendary_state_v1`
 - `src/app/state-store.svelte.js` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
+- `src/app/history-utils.mjs` — history record formatting utilities; `formatHistorySummary` resolves entity display names, expansion set names, and grouping keys from runtime indexes for each history record
 - `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs` — resolve templates and produce legal setups
 - `src/app/app-renderer.mjs` — transitional render functions used via `{@html}` blocks in Svelte tab components
 - `src/app/browse-vm.svelte.js` — browse tab view-model; owns browse-specific reactive state
@@ -34,7 +37,7 @@ The current release keeps the architecture described below and implements it wit
 - `src/components/App.svelte` — root Svelte 5 component; orchestrates routing and persistence; tab-specific state is delegated to per-tab view-model modules
 - `src/components/TabNav.svelte` — Svelte 5 tab navigation component
 - `src/components/ToastStack.svelte` — Svelte 5 toast stack component
-- `src/components/BrowseTab.svelte`, `CollectionTab.svelte`, `NewGameTab.svelte`, `HistoryTab.svelte`, `BackupTab.svelte` — thin `{@html}` wrapper components for each feature tab
+- `src/components/BrowseTab.svelte`, `CollectionTab.svelte`, `NewGameTab.svelte`, `HistoryTab.svelte`, `BackupTab.svelte` — Svelte 5 feature-tab components; each owns its tab's reactive template logic, derived state, and full UI markup
 
 The shipped runtime bundle created by `createEpic1Bundle(seed)` exposes project-owned canonical source data, normalized runtime data, summary counts, and validation test results for the browser shell.
 

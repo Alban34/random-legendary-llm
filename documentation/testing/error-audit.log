@@ -14,3 +14,8 @@ Suggested action: Update README.md to mention Epics 29–33 are implemented, rep
   4. app-renderer.mjs description updated to reflect transitional {@html} helper role.
   Additional corrections applied in the same pass: locale list expanded to all 6 shipped locales, history grouping modes updated to current shipped modes, state-store.svelte.js and App.svelte added to entry-point list.
 ---
+[2026-04-16] Epic: Epic 43 — Expansion Attribution in History
+File: src/components/HistoryTab.svelte
+Finding: The architecture/overview.md description of BrowseTab.svelte, CollectionTab.svelte, NewGameTab.svelte, HistoryTab.svelte, and BackupTab.svelte as "thin {@html} wrapper components" was stale before Epic 43 and was fixed in-scope during this audit. HistoryTab.svelte contains no {@html} blocks; it is a full Svelte 5 component with $props(), $derived(), {#each} loops, and direct template markup. The "thin {@html} wrapper" characterisation was almost certainly left over from the pre-Svelte-5-migration state and should have been corrected during the Epics 29–33 alignment pass. No action required on the source file itself.
+Suggested action: No code change required. The documentation/architecture/overview.md description has been corrected in this audit pass. Future migration alignment audits should verify tab-component descriptions whenever a tab component is substantially changed.
+---

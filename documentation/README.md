@@ -9,6 +9,7 @@
 - [Game Data](data/game-data.md) — Scope decisions and included product lines
 - [Game Data Normalized](data/game-data-normalized.md) — Normalized format spec and ID rules
 - [Sources](data/sources.md) — External reference policy (BGG)
+- [MyLudo Export Format](data/myludo-export-format.md) — Spike report: MyLudo CSV format, parsing strategy, and fallback assumptions (Epic 45)
 
 ## Design System
 - [Overview](design-system/overview.md) — Brand direction, principles, semantic tokens, component guidelines

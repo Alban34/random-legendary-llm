@@ -38,6 +38,13 @@ export function summarizeOwnedCollection(runtime, ownedSetIds) {
   };
 }
 
+export function mergeOwnedSets(state, newSetIds) {
+  const merged = structuredClone(state);
+  const combined = new Set([...merged.collection.ownedSetIds, ...newSetIds]);
+  merged.collection.ownedSetIds = [...combined].sort();
+  return merged;
+}
+
 export function getCollectionFeasibility(runtime, state) {
   return COLLECTION_FEASIBILITY_MODES.map((mode) => {
     const result = validateSetupLegality({
