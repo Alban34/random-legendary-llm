@@ -79,7 +79,7 @@ test('Epic 3 resolves setup templates for all supported player modes including A
     wounds: 25
   });
   assert.equal(resolveSetupTemplate(1, true).heroCount, 4);
-  assert.equal(resolveSetupTemplate(5, false).villainGroupCount, 4);
+  assert.equal(resolveSetupTemplate(5, false).villainGroupCount, 5);
   assert.throws(() => resolveSetupTemplate(2, true), /Advanced Solo is only available/);
 });
 

@@ -1,7 +1,7 @@
 {
   "name": "legendary-marvel-randomizer",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,6 @@
     "test:epic7": "node --test ./test/epic7-new-game-experience.test.mjs",
     "test:epic8": "node --test ./test/epic8-history-usage-reset.test.mjs",
     "test:epic9": "node --test ./test/epic9-notifications-accessibility.test.mjs",
-    "test:epic10": "node --test ./test/epic10-documentation-release-readiness.test.mjs",
     "test:qc": "playwright test",
     "test:qc:epic9": "playwright test ./test/playwright/epic9-qc.spec.mjs",
     "test:qc:epic10": "playwright test ./test/playwright/epic10-qc.spec.mjs",

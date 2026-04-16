@@ -99,7 +99,7 @@ test.describe('Epic 3 automated QC', () => {
       [2, false, { heroCount: 5, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 30 }],
       [3, false, { heroCount: 5, villainGroupCount: 3, henchmanGroupCount: 1, wounds: 30 }],
       [4, false, { heroCount: 6, villainGroupCount: 3, henchmanGroupCount: 2, wounds: 35 }],
-      [5, false, { heroCount: 6, villainGroupCount: 4, henchmanGroupCount: 2, wounds: 35 }]
+      [5, false, { heroCount: 6, villainGroupCount: 5, henchmanGroupCount: 2, wounds: 35 }]
     ]) {
       await setPlayerMode(page, playerCount, advancedSolo);
       const { setup } = await generateSetup(page);

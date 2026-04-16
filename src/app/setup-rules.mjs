@@ -5,7 +5,7 @@ export const SETUP_RULES = {
   2: { heroCount: 5, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 30 },
   3: { heroCount: 5, villainGroupCount: 3, henchmanGroupCount: 1, wounds: 30 },
   4: { heroCount: 6, villainGroupCount: 3, henchmanGroupCount: 2, wounds: 35 },
-  5: { heroCount: 6, villainGroupCount: 4, henchmanGroupCount: 2, wounds: 35 }
+  5: { heroCount: 6, villainGroupCount: 5, henchmanGroupCount: 2, wounds: 35 }
 };
 
 export const PLAY_MODE_OPTIONS = {

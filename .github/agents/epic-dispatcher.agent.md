@@ -2,7 +2,7 @@
 name: "Epic Dispatcher"
 description: "Use when implementing an epic, story set, or specification that should be split into delegated workstreams. Dispatches work to specialist agents, never codes directly, hires web frontend experts for all implementation changes, hires a QC agent for regression testing, and keeps implementation aligned with incoming specifications."
 tools: [read, search, agent, todo, web/fetch]
-agents: ["Epic Product Owner", "Epic Frontend Expert", "Epic Data Expert", "Epic QC Agent", "Epic Tech Writer", "Explore"]
+agents: ["Epic Product Owner", "Epic Frontend Expert", "Epic Data Expert", "Epic QC Agent", "Epic Tech Writer", "Explore", "French Translator", "German Translator", "Japanese Translator", "Korean Translator", "Spanish Translator"]
 argument-hint: "Epic or specification to implement, key constraints, acceptance criteria, and any files or docs that define the contract."
 user-invocable: true
 ---
@@ -160,6 +160,41 @@ If the QC run reports failures:
 - route implementation fixes back to `Epic Frontend Expert`,
 - preserve the original specification constraints,
 - and rerun the appropriate QC stage before closing the work.
+
+## Localization-Hiring Standard
+Whenever an implemented story introduces or modifies **user-facing strings** — labels, descriptions, button text, toast messages, aria labels, validation messages, or any copy rendered into the UI — the following localization workflow is mandatory.
+
+### Step 1 — English keys first (serial)
+Hire `Epic Frontend Expert` and instruct it to add the new or changed message key(s) to the `EN_MESSAGES` object in `src/app/localization-utils.mjs`. The English entry is the canonical source of truth. All keys must exist in `EN_MESSAGES` before any translator is hired. Wait for the Frontend Expert to confirm completion before proceeding.
+
+### Step 2 — all translators in parallel
+After the English keys are confirmed, hire all five translator agents **simultaneously**, each scoped exclusively to its own messages object:
+
+| Agent | Locale | Target object |
+|---|---|---|
+| `French Translator` | fr-FR | `FR_MESSAGES` |
+| `German Translator` | de-DE | `DE_MESSAGES` |
+| `Japanese Translator` | ja-JP | `JA_MESSAGES` |
+| `Korean Translator` | ko-KR | `KO_MESSAGES` |
+| `Spanish Translator` | es-ES | `ES_MESSAGES` |
+
+Pass to each translator:
+- the exact list of new or changed key names and their English values,
+- the file path: `src/app/localization-utils.mjs`,
+- the name of the messages object they own (e.g. `FR_MESSAGES`),
+- a reminder to preserve ICU-style placeholders verbatim and to leave game-specific brand names untranslated.
+
+Each translator edits only its own block. Because the five target objects are distinct sections of the same file, parallel edits are safe when each agent respects its block boundary.
+
+### When this standard applies
+- Any story task marked "add string", "copy", "label", "message", "toast", "aria-label", "notification", or any task that changes visible UI text.
+- Any story that introduces a new component with rendered copy.
+- Any story that renames or rewrites existing UI strings.
+
+### When this standard does NOT apply
+- Data-model changes with no UI rendering consequence.
+- Internal code comments or variable names.
+- Documentation-only tasks inside `/documentation`.
 
 ## Expected Workflow
 1. Read the task list and identify all `- [ ]` items. Ignore all `- [x]` items — they are done.
