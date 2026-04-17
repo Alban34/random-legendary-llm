@@ -480,6 +480,12 @@ export function clearActiveSetIds(state) {
   return nextState;
 }
 
+export function deactivateAllSets(state) {
+  const nextState = deepClone(state);
+  nextState.collection.activeSetIds = [];
+  return nextState;
+}
+
 export function incrementUsageStat(usageBucket, id, playedAt) {
   const current = usageBucket[id] || { plays: 0, lastPlayedAt: null };
   usageBucket[id] = {

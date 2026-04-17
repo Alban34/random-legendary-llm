@@ -13,7 +13,7 @@ test.describe('Epic 5 automated QC', () => {
   });
 
   test('renders the browse grid from normalized data with representative metadata and low-count edge cases', async ({ page }) => {
-    await expect(page.locator('#panel-browse .set-card')).toHaveCount(33);
+    await expect(page.locator('#panel-browse .set-card')).toHaveCount(39);
 
     const coreSetCard = getSetCard(page, 'Core Set');
     await expect(coreSetCard).toContainText('2012');

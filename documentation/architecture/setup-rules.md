@@ -34,7 +34,7 @@ The shipped implementation resolves these templates through `resolveSetupTemplat
 ## Core setup sequence
 
 1. determine the requested setup template from `SETUP_RULES`
-2. resolve the active pool: if `activeSetIds` is non-empty, build pools from `activeSetIds` (an active expansion filter is in effect); otherwise build pools from `ownedSetIds` (the full owned collection)
+2. resolve the active pool: if `activeSetIds` is non-empty, build pools from `activeSetIds` (an active expansion filter is in effect); otherwise build pools from `ownedSetIds` (the full owned collection); `null` and an empty `[]` both fall through to "use all owned" — the difference is UI-only (`null` = "Use all expansions" state, all checkboxes checked; `[]` = "Clear selection" state, all checkboxes unchecked, introduced in Epic 49)
 3. validate that the resolved active pool can legally support the requested setup
 4. choose a Scheme
 5. choose a Mastermind

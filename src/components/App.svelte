@@ -30,6 +30,7 @@
     toggleOwnedSet as toggleOwnedSetStore,
     setActiveSetIds as setActiveSetIdsStore,
     clearActiveSetIds as clearActiveSetIdsStore,
+    deactivateAllSets as deactivateAllSetsStore,
     updateGameResult,
     updateState
   } from '../app/state-store.mjs';
@@ -563,6 +564,13 @@
     clearActiveSetIds() {
       applyStateUpdate(
         (currentState) => clearActiveSetIdsStore(currentState),
+        locale.t('actions.clearedActiveFilter')
+      );
+    },
+
+    deactivateAllSets() {
+      applyStateUpdate(
+        (currentState) => deactivateAllSetsStore(currentState),
         locale.t('actions.clearedActiveFilter')
       );
     },
@@ -1141,7 +1149,8 @@
     clearForcedPicks: actions.clearForcedPicks,
     clearToDefaults: actions.clearToDefaults,
     setActiveSetIds: actions.setActiveSetIds,
-    clearActiveSetIds: actions.clearActiveSetIds
+    clearActiveSetIds: actions.clearActiveSetIds,
+    deactivateAllSets: actions.deactivateAllSets
   };
 
   const historyActions = {

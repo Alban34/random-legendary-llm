@@ -152,3 +152,11 @@ Automated verification: `test/epic44-card-browser.test.mjs`
 Browser QC: `test/playwright/epic44-card-browser.spec.mjs`
 
 Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion` (via `collection-utils.mjs`), `CardBrowserByCategory.svelte`, `CardBrowserByExpansion.svelte`, the "Sets" / "Browse Cards" view toggle in `CollectionTab.svelte`, the "By Category" / "By Expansion" grouping selector, session-scoped grouping persistence, and `aria-pressed` state on all toggle controls.
+
+---
+
+## Epic 49 — Clear Selection Regression Fix & E2E Guard
+
+Browser QC: `test/playwright/epic49-clear-selection.spec.mjs`
+
+Covers: 4 Playwright tests guarding the "Clear selection" button behaviour in the Active Expansions panel on the New Game tab. Verifies that clicking "Clear selection" sets `activeSetIds` to `[]` in persisted state (not `null`) and that all expansion checkboxes render as unchecked; also verifies that "Use all expansions" restores the `null` state with all checkboxes checked. The existing `test/playwright/epic46-active-filter.spec.mjs` was also updated to align with the corrected `deactivateAllSets` action.

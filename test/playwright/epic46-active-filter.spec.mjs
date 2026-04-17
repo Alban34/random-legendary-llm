@@ -50,15 +50,18 @@ test.describe('Epic 46 Story 46.3: expansion subset selector panel', () => {
     await expect(page.locator('[data-active-filter-panel] .muted')).toContainText(`All ${totalSets} expansions`);
   });
 
-  test('"Clear selection" also restores the all-owned state', async ({ page }) => {
+  test('"Clear selection" unchecks all expansion checkboxes', async ({ page }) => {
     const snapshot = await getRuntimeSnapshot(page);
-    const totalSets = snapshot.runtime.sets.length;
     const firstSetId = snapshot.runtime.sets[0].id;
 
     await page.locator(`[data-active-filter-checkbox="${firstSetId}"]`).uncheck();
     await page.locator('[data-action="active-filter-clear-all"]').click();
 
-    await expect(page.locator('[data-active-filter-panel] .muted')).toContainText(`All ${totalSets} expansions`);
+    const checkboxes = page.locator('[data-active-filter-checkbox]');
+    const count = await checkboxes.count();
+    for (let i = 0; i < count; i++) {
+      await expect(checkboxes.nth(i)).not.toBeChecked();
+    }
   });
 
   test('state is persisted after toggling a checkbox', async ({ page }) => {

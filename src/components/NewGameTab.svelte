@@ -156,7 +156,7 @@
                 type="button"
                 class="button button-secondary"
                 data-action="active-filter-clear-all"
-                onclick={gameActions.clearActiveSetIds}
+                onclick={gameActions.deactivateAllSets}
               >{locale.t('newGame.activeFilter.clearAll')}</button>
             </div>
           </section>
