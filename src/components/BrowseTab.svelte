@@ -41,8 +41,10 @@
     return `${mastermind.name} → ${leadEntity?.name || mastermind.lead.id}`;
   }
 
+  const KNOWN_DUPLICATE_ENTITY_NAMES = ['Black Widow', 'Loki', 'Thor', 'Nova', 'Venom'];
+
   function formatDuplicateEntries() {
-    return ['Black Widow', 'Loki', 'Thor', 'Nova', 'Venom']
+    return KNOWN_DUPLICATE_ENTITY_NAMES
       .map((name) => {
         const heroes = bundle.runtime.indexes.allHeroes.filter((entity) => entity.name === name);
         const masterminds = bundle.runtime.indexes.allMasterminds.filter((entity) => entity.name === name);

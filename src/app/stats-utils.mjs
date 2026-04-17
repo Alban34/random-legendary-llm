@@ -19,12 +19,14 @@ const BY_ID_KEYS = {
 };
 
 export const INSIGHT_CATEGORY_LABELS = {
-  heroes: 'Heroes',
-  masterminds: 'Masterminds',
-  villainGroups: 'Villain Groups',
-  henchmanGroups: 'Henchman Groups',
-  schemes: 'Schemes'
+  heroes: 'common.heroes',
+  masterminds: 'common.masterminds',
+  villainGroups: 'common.villainGroups',
+  henchmanGroups: 'common.henchmanGroups',
+  schemes: 'common.schemes'
 };
+
+export const RECENT_SCORE_WINDOW = 5;
 
 function average(values) {
   if (!values.length) {
@@ -133,7 +135,7 @@ export function buildOutcomeInsights(history) {
   const losses = completed.filter((entry) => entry.result.outcome === 'loss');
   const scored = completed.filter((entry) => entry.result.score !== null);
   const scoredValues = scored.map((entry) => entry.result.score);
-  const recentScoredValues = scoredValues.slice(0, 5);
+  const recentScoredValues = scoredValues.slice(0, RECENT_SCORE_WINDOW);
 
   return {
     totalGames: history.length,

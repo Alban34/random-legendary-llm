@@ -18,6 +18,7 @@ const shellCssPath = path.join(rootDir, 'src', 'app', 'app-shell.css');
 const htmlPath = path.join(rootDir, 'src', 'components', 'App.svelte');
 const tabNavPath = path.join(rootDir, 'src', 'components', 'TabNav.svelte');
 const toastStackPath = path.join(rootDir, 'src', 'components', 'ToastStack.svelte');
+const modalRootPath = path.join(rootDir, 'src', 'components', 'ModalRoot.svelte');
 
 let bundle;
 let rendererSource;
@@ -25,6 +26,7 @@ let shellCssSource;
 let htmlSource;
 let tabNavSource;
 let toastStackSource;
+let modalRootSource;
 
 function createAllOwnedState() {
   const state = createDefaultState();
@@ -45,13 +47,14 @@ function markAllUsedExcept(bucket, entities, keepIds) {
 }
 
 before(async () => {
-  const [seedRaw, rendererRaw, shellCssRaw, htmlRaw, tabNavRaw, toastStackRaw] = await Promise.all([
+  const [seedRaw, rendererRaw, shellCssRaw, htmlRaw, tabNavRaw, toastStackRaw, modalRootRaw] = await Promise.all([
     fs.readFile(seedPath, 'utf8'),
     fs.readFile(rendererPath, 'utf8'),
     fs.readFile(shellCssPath, 'utf8'),
     fs.readFile(htmlPath, 'utf8'),
     fs.readFile(tabNavPath, 'utf8'),
-    fs.readFile(toastStackPath, 'utf8')
+    fs.readFile(toastStackPath, 'utf8'),
+    fs.readFile(modalRootPath, 'utf8')
   ]);
 
   bundle = createEpic1Bundle(JSON.parse(seedRaw));
@@ -60,6 +63,7 @@ before(async () => {
   htmlSource = htmlRaw;
   tabNavSource = tabNavRaw;
   toastStackSource = toastStackRaw;
+  modalRootSource = modalRootRaw;
 });
 
 test('Epic 9 toast helpers preserve variant metadata, dismiss records, and cap stacked notifications', () => {
@@ -165,7 +169,7 @@ test('Epic 9 ships semantic tab, toast, and modal markup plus visible focus styl
   assert.match(htmlSource, /role="tablist"/);
 
   assert.match(tabNavSource, /role="tab"/);
-  assert.match(htmlSource, /role="dialog"[\s\S]*?aria-modal="true"[\s\S]*?aria-labelledby="modal-title"[\s\S]*?aria-describedby="modal-description"/);
+  assert.match(modalRootSource, /role="dialog"[\s\S]*?aria-modal="true"[\s\S]*?aria-labelledby="modal-title"[\s\S]*?aria-describedby="modal-description"/);
   assert.match(htmlSource, /aria-labelledby=\{"tab-desktop-" \+ tab\.id \+ " tab-mobile-" \+ tab\.id\}/);
   assert.match(toastStackSource, /role="region" aria-label=\{locale\.t\('toast\.region'\)\}/);
   assert.match(toastStackSource, /data-toast-dismiss-on-click=\{toast\.dismissOnClick \? 'true' : 'false'\}/);

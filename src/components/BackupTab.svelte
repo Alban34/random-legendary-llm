@@ -8,21 +8,14 @@
     compactViewport,
     backupImportError,
     stagedBackup,
-    onExportBackup,
-    onOpenImportBackup,
-    onImportBackupFile,
-    onCancelBackupPreview,
-    onRequestMergeBackup,
-    onRequestReplaceBackup,
-    onResetUsageCategory,
-    onRequestResetAllState
+    backupActions
   } = $props();
 
   let indicators = $derived(summarizeUsageIndicators(bundle.runtime, appState));
 
   function handleFileChange(e) {
     const [file] = [...(e.target.files || [])];
-    if (file) onImportBackupFile(file);
+    if (file) backupActions.importBackupFile(file);
     e.target.value = '';
   }
 </script>
@@ -41,12 +34,12 @@
       <button
         class="button button-secondary"
         data-action="export-backup"
-        onclick={onExportBackup}
+        onclick={backupActions.exportBackup}
       >{locale.t('backup.export')}</button>
       <button
         class="button button-primary"
         data-action="open-import-backup"
-        onclick={onOpenImportBackup}
+        onclick={backupActions.openImportBackup}
       >{locale.t('backup.import')}</button>
     </div>
     <p class="muted storage-disclosure" data-storage-disclosure>
@@ -94,19 +87,19 @@
             type="button"
             class="button button-primary"
             data-action="request-merge-backup"
-            onclick={onRequestMergeBackup}
+            onclick={backupActions.requestMergeBackup}
           >{locale.t('backup.merge')}</button>
           <button
             type="button"
             class="button button-danger"
             data-action="request-replace-backup"
-            onclick={onRequestReplaceBackup}
+            onclick={backupActions.requestReplaceBackup}
           >{locale.t('backup.replace')}</button>
           <button
             type="button"
             class="button button-secondary"
             data-action="cancel-backup-preview"
-            onclick={onCancelBackupPreview}
+            onclick={backupActions.cancelBackupPreview}
           >{locale.t('backup.discardPreview')}</button>
         </div>
       </article>
@@ -129,7 +122,7 @@
                 class="button button-secondary"
                 data-action="reset-usage"
                 data-category={indicator.category}
-                onclick={() => onResetUsageCategory(indicator.category)}
+                onclick={() => backupActions.resetUsageCategory(indicator.category)}
               >{locale.t('backup.resetCategory', { label: locale.getUsageLabel(indicator.category) })}</button>
             </article>
           {/each}
@@ -153,7 +146,7 @@
               class="button button-secondary"
               data-action="reset-usage"
               data-category={indicator.category}
-              onclick={() => onResetUsageCategory(indicator.category)}
+              onclick={() => backupActions.resetUsageCategory(indicator.category)}
             >{locale.t('backup.resetCategory', { label: locale.getUsageLabel(indicator.category) })}</button>
           </article>
         {/each}
@@ -170,7 +163,7 @@
       <button
         class="button button-danger"
         data-action="request-reset-all-state"
-        onclick={onRequestResetAllState}
+        onclick={backupActions.requestResetAllState}
       >{locale.t('backup.fullReset')}</button>
     </div>
   </section>

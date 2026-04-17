@@ -9,7 +9,7 @@ export function slugify(value) {
     .toLowerCase();
 }
 
-export function clone(value) {
+function clone(value) {
   return structuredClone(value);
 }
 

@@ -32,6 +32,10 @@ function swInjectPlugin(command) {
       const paths = collectFiles(distDir, distDir)
         .map((p) => base + p.replace(/\\/g, '/'))
         .sort();
+      // Also cache the app base URL so offline navigation requests are served from cache
+      if (!paths.includes(base)) {
+        paths.unshift(base);
+      }
       const hash = createHash('sha256')
         .update(paths.join('\n'))
         .digest('hex')

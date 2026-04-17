@@ -1,13 +1,13 @@
 import { formatGameResultStatus, isCompletedGameResult, sanitizeStoredGameResult } from './result-utils.mjs';
 import { USAGE_CATEGORIES, createDefaultState } from './state-store.mjs';
-import { getPlayModeLabel, resolvePlayMode } from './setup-rules.mjs';
+import { PLAY_MODE_OPTIONS, getPlayModeLabel, resolvePlayMode } from './setup-rules.mjs';
 
 export const HISTORY_USAGE_LABELS = {
-  heroes: 'Heroes',
-  masterminds: 'Masterminds',
-  villainGroups: 'Villain Groups',
-  henchmanGroups: 'Henchman Groups',
-  schemes: 'Schemes'
+  heroes: 'common.heroes',
+  masterminds: 'common.masterminds',
+  villainGroups: 'common.villainGroups',
+  henchmanGroups: 'common.henchmanGroups',
+  schemes: 'common.schemes'
 };
 
 /**
@@ -91,11 +91,9 @@ export function formatHistorySummary(record, indexes) {
     schemeSetName: indexes.setsById[scheme.setId]?.name || scheme.setId,
     heroIds: record.setupSnapshot.heroIds,
     heroNames: record.setupSnapshot.heroIds.map((id) => indexes.heroesById[id].name),
-    heroLabels: record.setupSnapshot.heroIds.map((id) => indexes.heroesById[id].name),
     heroSetNames: record.setupSnapshot.heroIds.map((id) => indexes.setsById[indexes.heroesById[id].setId]?.name || indexes.heroesById[id].setId),
     villainGroupIds: record.setupSnapshot.villainGroupIds,
     villainGroupNames: record.setupSnapshot.villainGroupIds.map((id) => indexes.villainGroupsById[id].name),
-    villainGroupLabels: record.setupSnapshot.villainGroupIds.map((id) => indexes.villainGroupsById[id].name),
     villainGroupSetNames: record.setupSnapshot.villainGroupIds.map((id) => indexes.setsById[indexes.villainGroupsById[id].setId]?.name || indexes.villainGroupsById[id].setId),
     henchmanGroupNames: record.setupSnapshot.henchmanGroupIds.map((id) => indexes.henchmanGroupsById[id].name),
     henchmanGroupSetNames: record.setupSnapshot.henchmanGroupIds.map((id) => indexes.setsById[indexes.henchmanGroupsById[id].setId]?.name || indexes.henchmanGroupsById[id].setId),
@@ -130,16 +128,7 @@ function buildGroupConfig(normalizedMode, summary, duplicateMastermindNameCount)
       label: summary.schemeName
     };
   }
-  let playModeLabel;
-  if (summary.playMode === 'standard') {
-    playModeLabel = 'Standard';
-  } else if (summary.playMode === 'advanced-solo') {
-    playModeLabel = 'Advanced Solo';
-  } else if (summary.playMode === 'two-handed-solo') {
-    playModeLabel = 'Two-Handed Solo';
-  } else {
-    playModeLabel = summary.modeLabel;
-  }
+  const playModeLabel = PLAY_MODE_OPTIONS[summary.playMode]?.label ?? summary.modeLabel;
   return {
     id: `play-mode:${summary.playMode}`,
     label: playModeLabel
@@ -180,11 +169,11 @@ export function buildHistoryGroups(records, indexes, { mode = DEFAULT_HISTORY_GR
   summaries.forEach((summary) => {
     if (normalizedMode === 'heroes') {
       summary.heroIds.forEach((heroId, i) => {
-        pushToGroup({ id: `hero:${heroId}`, label: summary.heroLabels[i] }, summary);
+        pushToGroup({ id: `hero:${heroId}`, label: summary.heroNames[i] }, summary);
       });
     } else if (normalizedMode === 'villains') {
       summary.villainGroupIds.forEach((villainGroupId, i) => {
-        pushToGroup({ id: `villain:${villainGroupId}`, label: summary.villainGroupLabels[i] }, summary);
+        pushToGroup({ id: `villain:${villainGroupId}`, label: summary.villainGroupNames[i] }, summary);
       });
     } else {
       const duplicateMastermindNameCount = mastermindNameCounts.get(summary.mastermindName) || 0;

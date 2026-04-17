@@ -20,7 +20,7 @@ The current release keeps the architecture described below and implements it wit
 - `index.html` — app mount point containing `<div id="app"></div>`, the Vite entry script, and PWA head tags (manifest link, `theme-color` meta, iOS Safari `apple-mobile-web-app` meta/link tags) added in Epic 40
 - `src/app/backup-utils.mjs` — versioned backup serialization, parsing, validation, and merge helpers
 - `src/app/collection-utils.mjs` — shared collection helpers including `mergeOwnedSets(state, newSetIds)` (sorted, deduplicated union of owned set IDs); shared by MyLudo import (Epic 45) and BGG import (Epic 42); also exports `CARD_CATEGORIES` (ordered constant listing the five card-category identifiers and their locale label keys in canonical order: Heroes, Masterminds, Villain Groups, Henchman Groups, Schemes), `getCardsByCategory(ownedPools)` (returns all cards from the owned-expansion pool grouped into five category buckets, each sorted A–Z by card name, with empty categories included for render-time filtering), and `getCardsByExpansion(ownedPools)` (returns one bucket per owned expansion sorted A–Z by expansion name, aggregating all five categories per expansion with cards sorted A–Z by name); these three exports drive the Collection tab card-browser feature (Epic 44)
-- `src/app/localization-utils.mjs` — locale metadata, translation lookup, fallback handling, and locale-aware formatting helpers; message catalogs are imported from per-locale files under `src/app/locales/` (Epic 41)
+- `src/app/localization-utils.mjs` — locale metadata, translation lookup, and locale-aware formatting helpers; message catalogs are imported from per-locale files under `src/app/locales/` (Epic 41)
 - `src/app/myludo-import-utils.mjs` — MyLudo collection import utilities: `parseMyludoFile(file)` (client-side CSV parsing) and `matchMyludoNamesToSets(names, sets)` (case-insensitive alias-aware catalog matching)
 - `src/app/bgg-import-utils.mjs` — BGG collection import utilities: `fetchBggCollection(username, options)` (fetches and parses the BGG XML API v2 collection endpoint with `own=1`, handling 202 queued responses with configurable retries and network errors) and `matchBggNamesToSets(bggGameNames, sets)` (case-insensitive alias-aware catalog matching, returns matched set IDs with display names and a list of unresolved BGG titles); added in Epic 42
 - `src/app/theme-utils.mjs` — supported theme metadata and theme-ID normalization helpers
@@ -28,6 +28,7 @@ The current release keeps the architecture described below and implements it wit
 - `src/app/game-data-pipeline.mjs` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
 - `src/app/state-store.mjs` — owns the versioned root state persisted under `legendary_state_v1`
 - `src/app/state-store.svelte.js` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
+- `src/app/object-utils.mjs` — shared object utilities; exports `deepClone` (thin wrapper over `structuredClone`) and `isPlainObject`; extracted from `state-store.mjs`, `backup-utils.mjs`, and `setup-generator.mjs` to eliminate duplication
 - `src/app/history-utils.mjs` — history record formatting and filtering utilities; `formatHistorySummary` resolves entity display names, expansion set names, and grouping keys from runtime indexes for each history record; `filterHistoryByOutcome(records, filter)` filters a history array to the requested outcome (`'all'`, `'win'`, `'loss'`, `'pending'`) without mutating the input
 - `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs` — resolve templates and produce legal setups
 - `src/app/app-renderer.mjs` — transitional render functions used via `{@html}` blocks in Svelte tab components
@@ -35,6 +36,8 @@ The current release keeps the architecture described below and implements it wit
 - `src/app/new-game-vm.svelte.js` — new-game tab view-model; owns new-game-specific reactive state
 - `src/app/history-vm.svelte.js` — history tab view-model; owns history-specific reactive state
 - `src/app/backup-vm.svelte.js` — backup tab view-model; owns backup-specific reactive state
+- `src/app/import-vm.svelte.js` — import view-model; owns BGG and MyLudo import reactive state (`$state`); extracted from `App.svelte`
+- `src/app/focus-utils.mjs` — focus-management helpers; exports `focusActionButton`, `focusSelector`, and `focusModalCancelButton`; extracted from `App.svelte`
 - `src/components/App.svelte` — root Svelte 5 component; orchestrates routing and persistence; tab-specific state is delegated to per-tab view-model modules
 - `src/components/TabNav.svelte` — Svelte 5 tab navigation component
 - `src/components/ToastStack.svelte` — Svelte 5 toast stack component

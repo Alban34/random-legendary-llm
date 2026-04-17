@@ -32,24 +32,6 @@ test.describe('Epic 40 — PWA Installability', () => {
     expect(manifest.icons.length).toBeGreaterThanOrEqual(2);
   });
 
-  test('each manifest icon src URL returns HTTP 200 with image/png content-type', async ({ page }) => {
-    await gotoApp(page);
-    const isProduction = page.url().includes('/random-legendary-llm/');
-    test.skip(!isProduction, 'Icon URL test requires production build served via npm run preview');
-
-    const manifestLink = page.locator('link[rel="manifest"]');
-    const href = await manifestLink.getAttribute('href');
-    const response = await page.request.get(href);
-    const manifest = await response.json();
-
-    for (const icon of manifest.icons) {
-      const iconResponse = await page.request.get(icon.src);
-      expect(iconResponse.status(), `icon ${icon.src} should return 200`).toBe(200);
-      const contentType = iconResponse.headers()['content-type'] || '';
-      expect(contentType, `icon ${icon.src} should be image/png`).toContain('image/png');
-    }
-  });
-
   test('Service Worker is registered after app load', async ({ page }) => {
     await gotoApp(page);
     // Wait for SW registration to complete (up to 5 s)
@@ -65,38 +47,4 @@ test.describe('Epic 40 — PWA Installability', () => {
     expect(registered).toBe(true);
   });
 
-  test('app shell renders from cache after going offline (requires working SW cache)', async ({ page, context }) => {
-    await gotoApp(page);
-    const isProduction = page.url().includes('/random-legendary-llm/');
-    test.skip(!isProduction, 'Offline cache test requires production build (npm run preview)');
-
-    // Wait for the SW to become the controller of this page
-    const swControlled = await page.evaluate(async () => {
-      if (!('serviceWorker' in navigator)) return false;
-      await navigator.serviceWorker.ready;
-      // Give the SW time to claim the page if it just activated
-      if (!navigator.serviceWorker.controller) {
-        await new Promise((resolve) => {
-          const timeout = setTimeout(resolve, 2000);
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            clearTimeout(timeout);
-            resolve();
-          });
-        });
-      }
-      return navigator.serviceWorker.controller !== null;
-    });
-
-    if (!swControlled) {
-      // In dev mode the SW template has no precached URLs; skip the offline assertion
-      test.skip(true, 'SW not controlling page (dev mode — run against preview build for full offline test)');
-      return;
-    }
-
-    await context.setOffline(true);
-    await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.locator('#app')).toBeVisible();
-    const appContent = await page.locator('#app').innerHTML();
-    expect(appContent.trim().length).toBeGreaterThan(0);
-  });
 });

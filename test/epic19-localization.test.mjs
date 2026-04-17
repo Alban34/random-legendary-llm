@@ -65,7 +65,6 @@ test('Epic 19 locale helpers expose the six production locales and translated UI
   assert.equal(frenchLocale.t('onboarding.stepPrefix', { current: 1, total: 5 }), 'Étape 1 sur 5');
   assert.equal(frenchLocale.t('onboarding.step1.title'), "Parcourez d'abord tout le catalogue");
   assert.equal(frenchLocale.t('onboarding.step5.title'), 'Protégez votre collection avec Sauvegarde');
-  assert.equal(frenchLocale.hasFallbacks, false);
 
   const germanLocale = createLocaleTools('de-DE');
   assert.equal(germanLocale.t('browse.hero.manageCollection'), 'Sammlung verwalten');
@@ -73,7 +72,6 @@ test('Epic 19 locale helpers expose the six production locales and translated UI
   assert.equal(germanLocale.t('onboarding.stepPrefix', { current: 1, total: 5 }), 'Schritt 1 von 5');
   assert.equal(germanLocale.t('onboarding.step1.title'), 'Durchsuche zuerst den gesamten Katalog');
   assert.equal(germanLocale.t('onboarding.step5.title'), 'Schütze deine Sammlung mit Backup');
-  assert.equal(germanLocale.hasFallbacks, false);
 
   const japaneseLocale = createLocaleTools('ja-JP');
   assert.equal(japaneseLocale.t('backup.title'), 'バックアップと復元');

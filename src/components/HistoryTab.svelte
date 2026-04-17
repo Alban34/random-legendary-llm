@@ -5,7 +5,7 @@
     filterHistoryByOutcome,
     HISTORY_GROUPING_MODES
   } from '../app/history-utils.mjs';
-  import { buildInsightsDashboard } from '../app/stats-utils.mjs';
+  import { buildInsightsDashboard, RECENT_SCORE_WINDOW } from '../app/stats-utils.mjs';
   import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from '../app/result-utils.mjs';
   import { getHistoryOutcomeFilter, setHistoryOutcomeFilter } from '../app/history-vm.svelte.js';
 
@@ -21,15 +21,7 @@
     resultDraft,
     resultFormError,
     resultInvalidFields,
-    onSetHistoryGrouping,
-    onEditGameResult,
-    onToggleHistoryInsights,
-    onSaveGameResult,
-    onSkipGameResult,
-    onCancelResultEntry,
-    onSetResultOutcome,
-    onSetResultScore,
-    onSetResultNotes
+    historyActions
   } = $props();
 
   let activeGroupingMode = $derived(historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE);
@@ -55,7 +47,7 @@
   }
 
   function getHelperCopy(outcome) {
-    const scoredWindow = Math.min(outcome.scoredGames, 5);
+    const scoredWindow = Math.min(outcome.scoredGames, RECENT_SCORE_WINDOW);
     if (outcome.totalGames === 0) return locale.t('history.insights.helper.noGames');
     if (outcome.completedResults === 0) return locale.t('history.insights.helper.pendingOnly');
     if (outcome.scoredGames === 0) return locale.t('history.insights.helper.noScores');
@@ -90,17 +82,17 @@
             data-history-grouping-mode={mode.id}
             aria-pressed={activeGroupingMode === mode.id}
             aria-label={`${locale.t('history.groupBy')} ${locale.getHistoryGroupingLabel(mode.id)}`}
-            onclick={() => onSetHistoryGrouping(mode.id)}
+            onclick={() => historyActions.setHistoryGrouping(mode.id)}
           >{locale.getHistoryGroupingLabel(mode.id)}</button>
         {/each}
       </div>
       {#if appState.history.length > 0}
       <div class="button-row wrap" data-outcome-filter-row>
         {#each [
-          { value: 'all', label: 'All' },
-          { value: 'win', label: 'Won' },
-          { value: 'loss', label: 'Lost' },
-          { value: 'pending', label: 'Pending' }
+          { value: 'all', label: locale.t('history.filter.all') },
+          { value: 'win', label: locale.t('history.filter.win') },
+          { value: 'loss', label: locale.t('history.filter.loss') },
+          { value: 'pending', label: locale.t('history.filter.pending') }
         ] as opt (opt.value)}
           <button
             type="button"
@@ -114,7 +106,7 @@
       {/if}
     </div>
     {#if getHistoryOutcomeFilter() !== 'all' && appState.history.length > 0}
-      <p class="muted" data-outcome-filter-count>{filteredCount} {filteredCount === 1 ? 'game' : 'games'}</p>
+      <p class="muted" data-outcome-filter-count>{locale.formatGameCount(filteredCount)}</p>
     {/if}
 
     <!-- History records -->
@@ -183,7 +175,7 @@
                     class="button button-secondary"
                     data-action="edit-game-result"
                     data-record-id={summary.id}
-                    onclick={() => onEditGameResult(summary.id)}
+                    onclick={() => historyActions.editGameResult(summary.id)}
                   >{isCompletedGameResult(summary.result) ? locale.t('history.editResult') : locale.t('history.addResult')}</button>
                 </div>
 
@@ -212,7 +204,7 @@
                         data-result-field="outcome"
                         aria-invalid={outcomeInvalid || undefined}
                         aria-describedby={outcomeInvalid ? errorId : undefined}
-                        onchange={(e) => onSetResultOutcome(e.target.value)}
+                        onchange={(e) => historyActions.setResultOutcome(e.target.value)}
                       >
                         <option value="">{locale.t('history.resultEditor.chooseOutcome')}</option>
                         {#each GAME_OUTCOME_OPTIONS as option (option.id)}
@@ -235,7 +227,7 @@
                         placeholder="0"
                         aria-invalid={scoreInvalid || undefined}
                         aria-describedby={scoreInvalid ? errorId : undefined}
-                        oninput={(e) => onSetResultScore(e.target.value)}
+                        oninput={(e) => historyActions.setResultScore(e.target.value)}
                       />
                     </div>
 
@@ -248,7 +240,7 @@
                         rows="3"
                         maxlength="500"
                         placeholder={locale.t('history.resultEditor.notesPlaceholder')}
-                        oninput={(e) => onSetResultNotes(e.target.value)}
+                        oninput={(e) => historyActions.setResultNotes(e.target.value)}
                       >{resultDraft.notes}</textarea>
                     </div>
 
@@ -257,21 +249,21 @@
                         type="button"
                         class="button button-success"
                         data-action="save-game-result"
-                        onclick={onSaveGameResult}
+                        onclick={historyActions.saveGameResult}
                       >{locale.t('history.resultEditor.save')}</button>
                       {#if isPending}
                         <button
                           type="button"
                           class="button button-secondary"
                           data-action="skip-game-result"
-                          onclick={onSkipGameResult}
+                          onclick={historyActions.skipGameResultEntry}
                         >{locale.t('history.resultEditor.skip')}</button>
                       {/if}
                       <button
                         type="button"
                         class="button button-secondary"
                         data-action="cancel-result-entry"
-                        onclick={onCancelResultEntry}
+                        onclick={historyActions.cancelResultEntry}
                       >{locale.t('history.resultEditor.cancel')}</button>
                     </div>
                   </section>
@@ -308,7 +300,7 @@
           class="button button-secondary history-insights-toggle"
           data-action="toggle-history-insights"
           aria-expanded={insightsExpanded}
-          onclick={onToggleHistoryInsights}
+          onclick={historyActions.toggleHistoryInsights}
         >{toggleButtonLabel}</button>
       {/if}
       {#if insightsExpanded}
@@ -363,7 +355,7 @@
                 {#each collectionCoverage.userCollection.byType as entry (entry.category)}
                   <li class="result-list-item insight-coverage-item" data-insight-coverage-category={entry.category}>
                     <span>
-                      <strong>{entry.label}</strong>
+                      <strong>{locale.t(entry.label)}</strong>
                       <span class="muted insight-ranking-meta">{locale.t('history.coverage.playedSummary', { played: locale.formatNumber(entry.played), total: locale.formatNumber(entry.total) })}</span>
                     </span>
                     <span class="pill">{formatInsightMetric(entry.playedPercent, { suffix: '%' })}</span>
@@ -378,7 +370,7 @@
                 {#each collectionCoverage.overallCollection.byType as entry (entry.category)}
                   <li class="result-list-item insight-coverage-item" data-insight-coverage-category={entry.category}>
                     <span>
-                      <strong>{entry.label}</strong>
+                      <strong>{locale.t(entry.label)}</strong>
                       <span class="muted insight-ranking-meta">{locale.t('history.coverage.playedSummary', { played: locale.formatNumber(entry.played), total: locale.formatNumber(entry.total) })}</span>
                     </span>
                     <span class="pill">{formatInsightMetric(entry.playedPercent, { suffix: '%' })}</span>
@@ -391,7 +383,7 @@
           <div class="stats-category-panels">
             {#each usage as category (category.category)}
               <details class="stats-category-panel" data-stats-category={category.category}>
-                <summary class="stats-category-summary">{category.label}</summary>
+                <summary class="stats-category-summary">{locale.t(category.label)}</summary>
                 <div class="stats-category-body">
                   <div class="muted">{locale.t('history.insights.playedSummary', { used: locale.formatNumber(category.used), total: locale.formatNumber(category.total), neverPlayed: locale.formatNumber(category.neverPlayed) })}</div>
                   <div class="stack gap-sm insight-ranking-section">
@@ -409,7 +401,7 @@
                         {/each}
                       </ul>
                     {:else}
-                      <p class="muted empty-state">{locale.t('history.insights.noneMostPlayed', { label: category.label.toLowerCase() })}</p>
+                      <p class="muted empty-state">{locale.t('history.insights.noneMostPlayed', { label: locale.t(category.label).toLowerCase() })}</p>
                     {/if}
                   </div>
                   <div class="stack gap-sm insight-ranking-section">
@@ -427,7 +419,7 @@
                         {/each}
                       </ul>
                     {:else}
-                      <p class="muted empty-state">{locale.t('history.insights.noneLeastPlayed', { label: category.label.toLowerCase() })}</p>
+                      <p class="muted empty-state">{locale.t('history.insights.noneLeastPlayed', { label: locale.t(category.label).toLowerCase() })}</p>
                     {/if}
                   </div>
                 </div>

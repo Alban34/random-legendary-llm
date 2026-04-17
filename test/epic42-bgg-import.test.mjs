@@ -68,7 +68,7 @@ before(async () => {
 // ---------------------------------------------------------------------------
 
 test('Epic 42.1 CollectionTab declares onImportBggCollection prop', () => {
-  assert.match(collectionTabSource, /onImportBggCollection/);
+  assert.match(collectionTabSource, /collectionActions\.importBggCollection/);
 });
 
 test('Epic 42.1 CollectionTab renders a bgg-username input', () => {
@@ -288,7 +288,7 @@ test('Epic 42.5 CollectionTab summary includes "Not found in catalog" section fo
 
 test('Epic 42.5 CollectionTab summary has a Dismiss button calling onDismissBggSummary', () => {
   assert.match(collectionTabSource, /dismiss-bgg-summary/);
-  assert.match(collectionTabSource, /onDismissBggSummary/);
+  assert.match(collectionTabSource, /collectionActions\.dismissBggSummary/);
 });
 
 test('Epic 42.5 CollectionTab shows "No matching expansions found" when matched is empty', () => {

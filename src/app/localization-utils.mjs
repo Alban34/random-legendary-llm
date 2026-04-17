@@ -16,8 +16,7 @@ const SELECTABLE_LOCALES = [
   { id: 'es-ES', label: 'Spanish', nativeLabel: 'Español' }
 ];
 
-const LOCALE_OPTIONS = [...SELECTABLE_LOCALES];
-const LOCALE_IDS = new Set(LOCALE_OPTIONS.map((locale) => locale.id));
+const LOCALE_IDS = new Set(SELECTABLE_LOCALES.map((locale) => locale.id));
 
 function interpolate(template, params) {
   return String(template).replaceAll(/\{([^}]+)\}/g, (_, key) => {
@@ -50,10 +49,6 @@ function getMessagesForLocale(localeId) {
   return EN_MESSAGES;
 }
 
-function collectFallbackKeys(_localeId) {
-  return [];
-}
-
 export function normalizeLocaleId(localeId) {
   return LOCALE_IDS.has(localeId) ? localeId : DEFAULT_LOCALE_ID;
 }
@@ -63,7 +58,7 @@ export function getSelectableLocales() {
 }
 
 export function getLocaleOption(localeId) {
-  return LOCALE_OPTIONS.find((locale) => locale.id === normalizeLocaleId(localeId)) || SELECTABLE_LOCALES[0];
+  return SELECTABLE_LOCALES.find((locale) => locale.id === normalizeLocaleId(localeId)) || SELECTABLE_LOCALES[0];
 }
 
 function titleCaseWords(value) {
@@ -76,7 +71,6 @@ function titleCaseWords(value) {
 export function createLocaleTools(localeId) {
   const normalizedLocaleId = normalizeLocaleId(localeId);
   const messages = getMessagesForLocale(normalizedLocaleId);
-  const fallbackKeys = collectFallbackKeys(normalizedLocaleId);
   const option = getLocaleOption(normalizedLocaleId);
   const numberFormatter = new Intl.NumberFormat(normalizedLocaleId);
   const dateFormatter = new Intl.DateTimeFormat(normalizedLocaleId, { dateStyle: 'medium' });
@@ -89,8 +83,6 @@ export function createLocaleTools(localeId) {
     localeId: normalizedLocaleId,
     documentLang: normalizedLocaleId,
     localeLabel: option.nativeLabel,
-    fallbackKeys,
-    hasFallbacks: fallbackKeys.length > 0,
     t,
     formatNumber(value, fallback = '—') {
       if (value === null || value === undefined || value === '') {

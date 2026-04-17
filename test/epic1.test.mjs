@@ -6,11 +6,11 @@ import { fileURLToPath } from 'node:url';
 
 import {
   buildCanonicalSourceData,
-  clone,
   createEpic1Bundle,
   normalizeGameData,
   validateNormalizedData
 } from '../src/app/game-data-pipeline.mjs';
+import { deepClone } from '../src/app/object-utils.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -95,7 +95,7 @@ test('Epic 1 runtime indexes match canonical entity totals', () => {
 });
 
 test('Epic 1 validation rejects representative invalid lead references', () => {
-  const brokenSource = clone(source);
+  const brokenSource = deepClone(source);
   const drDoom = brokenSource.sets
     .find((set) => set.id === 'core-set')
     .masterminds.find((entity) => entity.name === 'Dr. Doom');

@@ -39,3 +39,8 @@ File: documentation/planning/epic/ready-for-dev/epic-44.md, documentation/planni
 Finding: Epic 44 is fully implemented and QC-approved but its spec file and task list remain in the `ready-for-dev/` folder instead of `done/`. All other completed epics keep their spec and task-list files in `done/`.
 Suggested action: Move `documentation/planning/epic/ready-for-dev/epic-44.md` and `documentation/planning/epic/ready-for-dev/epic-44-task-list.md` to `documentation/planning/epic/done/`. This is a filesystem operation (`mv`) that falls outside the tech-writer's file-edit scope.
 ---
+[2026-04-17] Epic: Clean Code Fix Pass — 17 April 2026
+File: test/playwright/epic40-qc.spec.mjs (lines 38, 71, 92)
+Finding: The clean-code audit (documentation/planning/clean-code-reports/clean-code-audit-2026-04-17.md, 🟡 issue 14) flagged three `test.skip` calls: two production-only environment guards and one unconditional `test.skip(true, …)`. The fix pass did not address this issue — it is not listed among the shipped changes. The unconditional skip permanently prevents the SW-control assertion from running in any environment.
+Suggested action: Replace the unconditional `test.skip(true, …)` with `test.fixme` and add a tracking comment. For the two `!isProduction` guards, consider extracting them into a separate production-only spec file to make the skip intent explicit at the file level. This requires changes to test files outside `/documentation`.
+---

@@ -12,19 +12,22 @@ let shellCss;
 let rendererSource;
 let appSvelteSource;
 let historyTabSource;
+let focusUtilsSource;
 
 before(async () => {
-  const [css, renderer, appSvelte, historyTab] = await Promise.all([
+  const [css, renderer, appSvelte, historyTab, focusUtils] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryTab.svelte'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryTab.svelte'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'focus-utils.mjs'), 'utf8')
   ]);
 
   shellCss = css;
   rendererSource = renderer;
   appSvelteSource = appSvelte;
   historyTabSource = historyTab;
+  focusUtilsSource = focusUtils;
 });
 
 test('Design system rollout ships governed typography roles and tokenized shell primitives', () => {
@@ -46,7 +49,7 @@ test('Design system rollout adds reduced-motion and focus-restoration guardrails
   assert.match(shellCss, /\.collection-row:focus-within,[\s\S]*\.history-item:focus-within,[\s\S]*\.history-group:focus-within/);
   assert.match(historyTabSource, /role="alert"[\s\S]*data-result-form-error/);
 
-  assert.match(appSvelteSource, /function focusSelector\(selector\)/);
+  assert.match(focusUtilsSource, /function focusSelector\(selector\)/);
   assert.match(appSvelteSource, /focusSelector\(`\[data-action="set-theme"\]\[data-theme-id="\$\{normalizedThemeId\}"\]`\);/);
   assert.match(appSvelteSource, /focusSelector\('#header-locale-select'\);/);
   assert.match(appSvelteSource, /focusSelector[\s\S]*?\[data-action="select-tab"\]\[data-tab-id="\$\{normalizeSelectedTab\(tabId\)\}"\]\[aria-selected="true"\]/);

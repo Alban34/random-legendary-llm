@@ -1,15 +1,8 @@
+import { deepClone, isPlainObject } from './object-utils.mjs';
 import { SCHEMA_VERSION, STORAGE_KEY, sanitizePersistedState } from './state-store.mjs';
 
 export const BACKUP_SCHEMA_ID = 'legendary-marvel-randomizer-backup';
 export const BACKUP_SCHEMA_VERSION = 1;
-
-function deepClone(value) {
-  return structuredClone(value);
-}
-
-function isPlainObject(value) {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
 
 function normalizeIsoString(value) {
   return typeof value === 'string' && value ? value : new Date().toISOString();

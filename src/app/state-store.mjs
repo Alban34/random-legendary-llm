@@ -1,5 +1,6 @@
 import { normalizeSelectedTab } from './app-tabs.mjs';
 import { DEFAULT_LOCALE_ID, normalizeLocaleId } from './localization-utils.mjs';
+import { deepClone, isPlainObject } from './object-utils.mjs';
 import { createCompletedGameResult, createPendingGameResult, sanitizeStoredGameResult } from './result-utils.mjs';
 import { resolvePlayMode } from './setup-rules.mjs';
 import { DEFAULT_THEME_ID, normalizeThemeId } from './theme-utils.mjs';
@@ -15,14 +16,6 @@ const USAGE_INDEX_KEYS = {
   henchmanGroups: 'henchmanGroupsById',
   schemes: 'schemesById'
 };
-
-function deepClone(value) {
-  return structuredClone(value);
-}
-
-function isPlainObject(value) {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
 
 function createDefaultUsageState() {
   return {

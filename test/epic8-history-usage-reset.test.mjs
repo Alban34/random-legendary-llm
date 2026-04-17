@@ -69,7 +69,7 @@ test('Epic 8 usage indicators reflect persisted usage statistics and never-playe
   assert.equal(heroIndicator.used, 3);
   assert.equal(heroIndicator.neverPlayed, heroIndicator.total - 3);
   assert.equal(mastermindIndicator.used, 1);
-  assert.equal(mastermindIndicator.label, 'Masterminds');
+  assert.equal(mastermindIndicator.label, 'common.masterminds');
 });
 
 test('Epic 8 history summaries resolve IDs back to readable newest-first metadata', () => {

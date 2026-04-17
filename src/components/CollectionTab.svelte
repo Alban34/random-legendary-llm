@@ -10,15 +10,10 @@
     locale,
     persistence,
     lastActionNotice,
-    onToggleOwnedSet,
-    onRequestResetOwnedCollection,
-    onImportMyludoFile,
-    onDismissMyludoSummary,
+    collectionActions,
     myludoImportStatus = 'idle',
     myludoImportError = '',
     myludoImportSummary = null,
-    onImportBggCollection,
-    onDismissBggSummary,
     bggImportStatus = 'idle',
     bggImportError = '',
     bggImportSummary = null
@@ -27,6 +22,10 @@
   let bggUsername = $state('');
   let collectionView = $state('sets');
   let cardBrowserGrouping = $state('category');
+
+  // Feature flags — set to true when each import panel is ready for release
+  const FEATURE_BGG_IMPORT = false;
+  const FEATURE_MYLUDO_IMPORT = false;
 
   let totals = $derived(summarizeOwnedCollection(bundle.runtime, appState.collection.ownedSetIds));
   let feasibility = $derived(getCollectionFeasibility(bundle.runtime, appState));
@@ -46,7 +45,7 @@
         <button
           class="button button-secondary"
           data-action="request-reset-owned-collection"
-          onclick={onRequestResetOwnedCollection}
+          onclick={collectionActions.requestResetOwnedCollection}
         >{locale.t('collection.resetSelections')}</button>
       </div>
     </div>
@@ -95,13 +94,13 @@
     </div>
   </section>
 
-  {#if false}
+  {#if FEATURE_BGG_IMPORT}
   <details class="panel" data-bgg-import-panel>
     <summary>Import from BGG</summary>
     <div class="panel-copy">
       <p class="muted">Enter your BoardGameGeek username to import your owned expansions.</p>
     </div>
-    <form onsubmit={(e) => { e.preventDefault(); if (bggUsername.trim()) onImportBggCollection(bggUsername.trim()); }}>
+    <form onsubmit={(e) => { e.preventDefault(); if (bggUsername.trim()) collectionActions.importBggCollection(bggUsername.trim()); }}>
       <div class="stack gap-sm">
         <div class="row gap-sm align-center wrap">
           <label for="bgg-username">BGG Username</label>
@@ -164,7 +163,7 @@
         <button
           class="button button-secondary"
           data-action="dismiss-bgg-summary"
-          onclick={onDismissBggSummary}
+          onclick={collectionActions.dismissBggSummary}
         >Dismiss</button>
       </div>
     </section>
@@ -212,7 +211,7 @@
     </section>
   </section>
 
-  {#if false}
+  {#if FEATURE_MYLUDO_IMPORT}
   <section class="panel" data-myludo-import-panel>
     <div class="panel-copy">
       <h2>Import from MyLudo</h2>
@@ -234,7 +233,7 @@
           onchange={(event) => {
             const file = event.target.files?.[0];
             if (file) {
-              onImportMyludoFile(file);
+              collectionActions.importMyludoFile(file);
               event.target.value = '';
             }
           }}
@@ -278,7 +277,7 @@
         <button
           class="button button-secondary"
           data-action="dismiss-myludo-summary"
-          onclick={onDismissMyludoSummary}
+          onclick={collectionActions.dismissMyludoSummary}
         >Dismiss</button>
       </div>
     </section>
@@ -305,7 +304,7 @@
                 data-action="toggle-owned-set"
                 data-set-id={set.id}
                 checked={isOwned}
-                onchange={() => onToggleOwnedSet(set.id)}
+                onchange={() => collectionActions.toggleOwnedSet(set.id)}
               />
               <span>
                 <strong>{set.name}</strong>

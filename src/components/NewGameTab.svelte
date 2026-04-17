@@ -15,16 +15,7 @@
     generatorNotices,
     forcedPicks,
     compactViewport,
-    onSetPlayerCount,
-    onSetPlayMode,
-    onGenerateSetup,
-    onAcceptCurrentSetup,
-    onAddForcedPick,
-    onRemoveForcedPick,
-    onClearForcedPicks,
-    onClearToDefaults,
-    onSetActiveSetIds,
-    onClearActiveSetIds
+    gameActions
   } = $props();
 
   let availablePlayModes = $derived(getAvailablePlayModes(selectedPlayerCount));
@@ -87,7 +78,7 @@
 
   function handleAddForcedPick(field) {
     const sel = document.querySelector(`[data-forced-pick-select="${field}"]`);
-    onAddForcedPick(field, sel?.value || '');
+    gameActions.addForcedPick(field, sel?.value || '');
   }
 </script>
 
@@ -129,13 +120,13 @@
                         if (activeIds === null) return;
                         const newIds = [...new Set([...activeIds, setId])];
                         if (newIds.length === ownedIds.length) {
-                          onClearActiveSetIds();
+                          gameActions.clearActiveSetIds();
                         } else {
-                          onSetActiveSetIds(newIds);
+                          gameActions.setActiveSetIds(newIds);
                         }
                       } else {
                         const currentIds = activeIds === null ? [...ownedIds] : activeIds;
-                        onSetActiveSetIds(currentIds.filter((id) => id !== setId));
+                        gameActions.setActiveSetIds(currentIds.filter((id) => id !== setId));
                       }
                     }}
                   /> {setEntry ? setEntry.name : setId}
@@ -147,13 +138,13 @@
                 type="button"
                 class="button button-secondary"
                 data-action="active-filter-select-all"
-                onclick={onClearActiveSetIds}
+                onclick={gameActions.clearActiveSetIds}
               >{locale.t('newGame.activeFilter.selectAll')}</button>
               <button
                 type="button"
                 class="button button-secondary"
                 data-action="active-filter-clear-all"
-                onclick={onClearActiveSetIds}
+                onclick={() => gameActions.setActiveSetIds([])}
               >{locale.t('newGame.activeFilter.clearAll')}</button>
             </div>
           </section>
@@ -177,7 +168,7 @@
               class={"button " + (selectedPlayerCount === pc ? 'button-primary' : 'button-secondary')}
               data-action="set-player-count"
               data-player-count={pc}
-              onclick={() => onSetPlayerCount(pc)}
+              onclick={() => gameActions.setPlayerCount(pc)}
             >{pc}P</button>
           {/each}
         </div>
@@ -193,7 +184,7 @@
               data-play-mode={mode.id}
               aria-pressed={selectedPlayMode === mode.id}
               title={locale.getPlayModeDescription(mode.id, selectedPlayerCount)}
-              onclick={() => onSetPlayMode(mode.id)}
+              onclick={() => gameActions.setPlayMode(mode.id)}
             >{selectedPlayMode === mode.id ? `${locale.getPlayModeLabel(mode.id, selectedPlayerCount)} ✓` : locale.getPlayModeLabel(mode.id, selectedPlayerCount)}</button>
           {/each}
         </div>
@@ -203,7 +194,7 @@
         <button
           class="button button-secondary"
           data-action="clear-setup-controls"
-          onclick={onClearToDefaults}
+          onclick={gameActions.clearToDefaults}
         >{locale.t('newGame.resetControls')}</button>
       </div>
 
@@ -237,13 +228,13 @@
           class="button button-primary"
           data-action="generate-setup"
           disabled={appState.collection.activeSetIds !== null && !filterFeasibility.ok}
-          onclick={onGenerateSetup}
+          onclick={gameActions.generateSetup}
         >{currentSetup ? locale.t('newGame.reroll') : locale.t('newGame.generate')}</button>
         <button
           class="button button-success"
           data-action="accept-current-setup"
           disabled={!currentSetup}
-          onclick={onAcceptCurrentSetup}
+          onclick={gameActions.acceptCurrentSetup}
         >{locale.t('newGame.acceptLog')}</button>
       </div>
 
@@ -295,7 +286,7 @@
                 class="button button-secondary"
                 data-action="clear-forced-picks"
                 disabled={!hasActiveForcedPicks}
-                onclick={onClearForcedPicks}
+                onclick={gameActions.clearForcedPicks}
               >{locale.t('newGame.forcedPicks.clearAll')}</button>
             </div>
             {#if hasActiveForcedPicks}
@@ -312,7 +303,7 @@
                         data-action="remove-forced-pick"
                         data-field={config.field}
                         data-entity-id={id}
-                        onclick={() => onRemoveForcedPick(config.field, id)}
+                        onclick={() => gameActions.removeForcedPick(config.field, id)}
                       >{locale.t('newGame.forcedPicks.remove')}</button>
                     </li>
                   {/each}

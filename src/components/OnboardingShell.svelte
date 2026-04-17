@@ -11,11 +11,7 @@
     locale,
     visible,
     step,
-    onPreviousStep,
-    onNextStep,
-    onSkip,
-    onComplete,
-    onOpenTab
+    onboardingActions
   } = $props();
 
   let clampedStep = $derived(Math.max(0, Math.min(step, ONBOARDING_STEPS.length - 1)));
@@ -50,7 +46,7 @@
           class="button button-secondary"
           data-action="open-onboarding-tab"
           data-tab-id={currentStep.tabId}
-          onclick={() => onOpenTab(currentStep.tabId)}
+          onclick={() => onboardingActions.openOnboardingTab(currentStep.tabId)}
         >{locale.t(`onboarding.step${currentStepNumber}.action`)}</button>
       </div>
     </div>
@@ -61,28 +57,28 @@
         class="button button-secondary"
         data-action="previous-onboarding-step"
         disabled={clampedStep === 0}
-        onclick={onPreviousStep}
+        onclick={onboardingActions.previousOnboardingStep}
       >{locale.t('onboarding.previous')}</button>
       {#if isLastStep}
         <button
           type="button"
           class="button button-success"
           data-action="complete-onboarding"
-          onclick={onComplete}
+          onclick={onboardingActions.completeOnboarding}
         >{locale.t('onboarding.finish')}</button>
       {:else}
         <button
           type="button"
           class="button button-primary"
           data-action="next-onboarding-step"
-          onclick={onNextStep}
+          onclick={onboardingActions.nextOnboardingStep}
         >{locale.t('onboarding.next')}</button>
       {/if}
       <button
         type="button"
         class="button button-secondary"
         data-action="skip-onboarding"
-        onclick={onSkip}
+        onclick={onboardingActions.skipOnboarding}
       >{locale.t('onboarding.skip')}</button>
     </div>
   </section>

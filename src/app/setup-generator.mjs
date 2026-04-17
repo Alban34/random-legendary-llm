@@ -1,11 +1,8 @@
 import { hasForcedPicks, normalizeForcedPicks } from './forced-picks-utils.mjs';
+import { deepClone } from './object-utils.mjs';
 import { resolveSetupTemplate, summarizeSetupTemplate } from './setup-rules.mjs';
 
 const DEFAULT_BYSTANDERS = 30;
-
-function deepClone(value) {
-  return structuredClone(value);
-}
 
 function shuffle(items, random) {
   const result = [...items];

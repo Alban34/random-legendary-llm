@@ -21,9 +21,7 @@ export async function fetchBggCollection(
 ) {
   const url = `https://boardgamegeek.com/xmlapi2/collection?username=${encodeURIComponent(username)}&own=1`;
 
-  let retriesLeft = maxRetries;
-
-  while (true) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
     let response;
     try {
       response = await fetchFn(url);
@@ -32,13 +30,12 @@ export async function fetchBggCollection(
     }
 
     if (response.status === 202) {
-      if (retriesLeft <= 0) {
+      if (attempt === maxRetries) {
         return {
           ok: false,
           error: 'BGG collection request timed out after queuing — please try again.'
         };
       }
-      retriesLeft--;
       await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
       continue;
     }
@@ -47,9 +44,7 @@ export async function fetchBggCollection(
       return {
         ok: false,
         error:
-          'BGG denied access (HTTP ' +
-          response.status +
-          '). Make sure your BGG collection is set to public: log in at boardgamegeek.com → your profile → Collection → Privacy → set to "Public".'
+          `BGG denied access (HTTP ${response.status}). Make sure your BGG collection is set to public: log in at boardgamegeek.com → your profile → Collection → Privacy → set to "Public".`
       };
     }
 
@@ -68,13 +63,12 @@ export async function fetchBggCollection(
     // BGG sometimes returns 200 with a <message> body instead of 202 when
     // the collection is still being queued for processing. Treat it as a retry.
     if (doc.querySelector('message')) {
-      if (retriesLeft <= 0) {
+      if (attempt === maxRetries) {
         return {
           ok: false,
           error: 'BGG collection request timed out after queuing — please try again.'
         };
       }
-      retriesLeft--;
       await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
       continue;
     }
@@ -91,6 +85,7 @@ export async function fetchBggCollection(
 
     return { ok: true, gameNames };
   }
+  return { ok: false, error: 'BGG collection request timed out after queuing — please try again.' };
 }
 
 /**

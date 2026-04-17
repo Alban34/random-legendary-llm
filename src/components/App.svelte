@@ -73,6 +73,16 @@
     getConfirmBackupRestoreMode, setConfirmBackupRestoreMode,
     getLastBackupExportFileName, setLastBackupExportFileName
   } from '../app/backup-vm.svelte.js';
+  import {
+    getMyludoImportStatus, setMyludoImportStatus,
+    getMyludoImportError, setMyludoImportError,
+    getMyludoImportSummary, setMyludoImportSummary,
+    getBggImportStatus, setBggImportStatus,
+    getBggImportError, setBggImportError,
+    getBggImportSummary, setBggImportSummary
+  } from '../app/import-vm.svelte.js';
+  import { focusActionButton, focusSelector, focusModalCancelButton } from '../app/focus-utils.mjs';
+  import ModalRoot from './ModalRoot.svelte';
 
   /* global __APP_VERSION__ */
 
@@ -114,12 +124,6 @@
   });
   let compactViewport = $state(false);
   let initError = $state(null);
-  let myludoImportStatus = $state('idle');
-  let myludoImportError = $state('');
-  let myludoImportSummary = $state(null);
-  let bggImportStatus = $state('idle');
-  let bggImportError = $state('');
-  let bggImportSummary = $state(null);
 
   // Non-reactive helpers
   let storageAdapter = null;
@@ -202,9 +206,7 @@
     };
     globalThis.__LOCALE_UI__ = {
       activeLocaleId: appState.preferences.localeId,
-      supportedLocales: getSelectableLocales(),
-      hasFallbacks: locale.hasFallbacks,
-      fallbackKeys: locale.fallbackKeys
+      supportedLocales: getSelectableLocales()
     };
     globalThis.__BACKUP_UI__ = {
       importError: getBackupImportError(),
@@ -274,33 +276,6 @@
     return null;
   }
 
-  function handleModalKeydown(event) {
-    const modalDialog = document.querySelector('#modal-root [role="dialog"]');
-    if (!modalDialog) return;
-    const focusables = [...modalDialog.querySelectorAll('button:not([disabled])')];
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      modalDialog.querySelector('[data-modal-focus="cancel"]')?.click();
-      return;
-    }
-    if (event.key === 'Enter' && modalDialog.contains(event.target)) {
-      event.preventDefault();
-      modalDialog.querySelector('[data-modal-focus="confirm"]')?.click();
-      return;
-    }
-    if (event.key === 'Tab' && focusables.length) {
-      const first = focusables[0];
-      const last = focusables.at(-1);
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-  }
-
   // ---------------------------------------------------------------------------
   // Toast management
   // ---------------------------------------------------------------------------
@@ -357,33 +332,6 @@
     });
     ui.toasts = nextToasts;
     if (nextToastIds.has(toast.id)) scheduleToastDismissal(toast);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Focus utilities
-  // ---------------------------------------------------------------------------
-  function focusActionButton(actionName) {
-    if (!actionName) return;
-    queueMicrotask(() => {
-      [...document.querySelectorAll(`[data-action="${actionName}"]`)]
-        .find((el) => !el.hidden && el.offsetParent !== null)
-        ?.focus();
-    });
-  }
-
-  function focusSelector(selector) {
-    if (!selector) return;
-    queueMicrotask(() => {
-      [...document.querySelectorAll(selector)]
-        .find((el) => !el.hidden && el.offsetParent !== null)
-        ?.focus();
-    });
-  }
-
-  function focusModalCancelButton() {
-    queueMicrotask(() => {
-      document.querySelector('#modal-root [data-modal-focus="cancel"]')?.focus();
-    });
   }
 
   // ---------------------------------------------------------------------------
@@ -860,7 +808,13 @@
         return;
       }
       const nextForcedPicks = addForcedPick(getForcedPicks(), field, value);
-      const changed = JSON.stringify(nextForcedPicks) !== JSON.stringify(getForcedPicks());
+      const prev = getForcedPicks();
+      const changed =
+        nextForcedPicks.schemeId !== prev.schemeId ||
+        nextForcedPicks.mastermindId !== prev.mastermindId ||
+        nextForcedPicks.heroIds.join() !== prev.heroIds.join() ||
+        nextForcedPicks.villainGroupIds.join() !== prev.villainGroupIds.join() ||
+        nextForcedPicks.henchmanGroupIds.join() !== prev.henchmanGroupIds.join();
       setForcedPicks(nextForcedPicks);
       clearGeneratedSetup();
       ui.lastActionNotice = changed
@@ -1062,38 +1016,39 @@
       }
     },
 
-    corruptSavedState() {
-      const save = storageAdapter.setItem(STORAGE_KEY, '{ this-is-not-valid-json');
-      persistence.lastSaveMessage = save.message;
-      persistence.lastSaveOk = save.ok;
-      ui.lastActionNotice = save.ok
-        ? 'Wrote corrupted JSON to browser storage. Reload the page to verify recovery.'
-        : 'Could not write corrupted JSON to browser storage.';
-      enqueueToast({
-        variant: save.ok ? 'warning' : 'error',
-        message: ui.lastActionNotice,
-        behavior: 'persistent'
-      });
-    },
-
-    injectInvalidOwnedSet() {
-      const corruptedState = $state.snapshot(appState);
-      corruptedState.collection.ownedSetIds = [
-        ...corruptedState.collection.ownedSetIds,
-        'definitely-missing-set'
-      ];
-      const save = storageAdapter.setItem(STORAGE_KEY, JSON.stringify(corruptedState, null, 2));
-      persistence.lastSaveMessage = save.message;
-      persistence.lastSaveOk = save.ok;
-      ui.lastActionNotice = save.ok
-        ? 'Wrote an invalid owned set ID to storage. Reload the page to verify safe cleanup.'
-        : 'Could not write an invalid owned set ID to browser storage.';
-      enqueueToast({
-        variant: save.ok ? 'warning' : 'error',
-        message: ui.lastActionNotice,
-        behavior: 'persistent'
-      });
-    },
+    ...(import.meta.env.DEV ? {
+      corruptSavedState() {
+        const save = storageAdapter.setItem(STORAGE_KEY, '{ this-is-not-valid-json');
+        persistence.lastSaveMessage = save.message;
+        persistence.lastSaveOk = save.ok;
+        ui.lastActionNotice = save.ok
+          ? 'Wrote corrupted JSON to browser storage. Reload the page to verify recovery.'
+          : 'Could not write corrupted JSON to browser storage.';
+        enqueueToast({
+          variant: save.ok ? 'warning' : 'error',
+          message: ui.lastActionNotice,
+          behavior: 'persistent'
+        });
+      },
+      injectInvalidOwnedSet() {
+        const corruptedState = $state.snapshot(appState);
+        corruptedState.collection.ownedSetIds = [
+          ...corruptedState.collection.ownedSetIds,
+          'definitely-missing-set'
+        ];
+        const save = storageAdapter.setItem(STORAGE_KEY, JSON.stringify(corruptedState, null, 2));
+        persistence.lastSaveMessage = save.message;
+        persistence.lastSaveOk = save.ok;
+        ui.lastActionNotice = save.ok
+          ? 'Wrote an invalid owned set ID to storage. Reload the page to verify safe cleanup.'
+          : 'Could not write an invalid owned set ID to browser storage.';
+        enqueueToast({
+          variant: save.ok ? 'warning' : 'error',
+          message: ui.lastActionNotice,
+          behavior: 'persistent'
+        });
+      },
+    } : {}),
 
     clearToDefaults() {
       const defaultState = createDefaultState();
@@ -1109,13 +1064,13 @@
 
     async importMyludoFile(file) {
       if (!file) return;
-      myludoImportStatus = 'parsing';
-      myludoImportError = '';
-      myludoImportSummary = null;
+      setMyludoImportStatus('parsing');
+      setMyludoImportError('');
+      setMyludoImportSummary(null);
       const result = await parseMyludoFile(file);
       if (!result.ok) {
-        myludoImportStatus = 'error';
-        myludoImportError = result.error;
+        setMyludoImportStatus('error');
+        setMyludoImportError(result.error);
         enqueueToast({ variant: 'error', message: result.error, behavior: 'persistent' });
         return;
       }
@@ -1123,27 +1078,27 @@
       const matchedSetIds = matched.map((m) => m.setId);
       applyStateUpdate(
         (currentState) => mergeOwnedSets(currentState, matchedSetIds),
-        'Updated collection from MyLudo import'
+        locale.t('actions.importedMyludoCollection')
       );
-      myludoImportSummary = { matched, unmatched };
-      myludoImportStatus = 'idle';
+      setMyludoImportSummary({ matched, unmatched });
+      setMyludoImportStatus('idle');
     },
 
     dismissMyludoSummary() {
-      myludoImportSummary = null;
-      myludoImportError = '';
-      myludoImportStatus = 'idle';
+      setMyludoImportSummary(null);
+      setMyludoImportError('');
+      setMyludoImportStatus('idle');
     },
 
     async importBggCollection(username) {
       if (!username) return;
-      bggImportStatus = 'loading';
-      bggImportError = '';
-      bggImportSummary = null;
+      setBggImportStatus('loading');
+      setBggImportError('');
+      setBggImportSummary(null);
       const result = await fetchBggCollection(username);
       if (!result.ok) {
-        bggImportStatus = 'error';
-        bggImportError = result.error;
+        setBggImportStatus('error');
+        setBggImportError(result.error);
         enqueueToast({ variant: 'error', message: result.error, behavior: 'persistent' });
         return;
       }
@@ -1151,23 +1106,74 @@
       const matchedSetIds = matched.map((m) => m.setId);
       applyStateUpdate(
         (currentState) => mergeOwnedSets(currentState, matchedSetIds),
-        'Updated collection from BGG import'
+        locale.t('actions.importedBggCollection')
       );
-      bggImportSummary = { matched, unmatched };
-      bggImportStatus = 'idle';
+      setBggImportSummary({ matched, unmatched });
+      setBggImportStatus('idle');
     },
 
     dismissBggSummary() {
-      bggImportSummary = null;
-      bggImportError = '';
-      bggImportStatus = 'idle';
+      setBggImportSummary(null);
+      setBggImportError('');
+      setBggImportStatus('idle');
     }
   };
 
   // ---------------------------------------------------------------------------
-  // Document-level event delegation (for {@html} tab/onboarding content)
-  // Actions handled by Svelte directly are in the skip set.
+  // Domain action slices
   // ---------------------------------------------------------------------------
+  const collectionActions = {
+    toggleOwnedSet: actions.toggleOwnedSet,
+    requestResetOwnedCollection: actions.requestResetOwnedCollection,
+    importMyludoFile: actions.importMyludoFile,
+    dismissMyludoSummary: actions.dismissMyludoSummary,
+    importBggCollection: actions.importBggCollection,
+    dismissBggSummary: actions.dismissBggSummary
+  };
+
+  const gameActions = {
+    setPlayerCount: actions.setPlayerCount,
+    setPlayMode: actions.setPlayMode,
+    generateSetup: actions.generateSetup,
+    acceptCurrentSetup: actions.acceptCurrentSetup,
+    addForcedPick: actions.addForcedPick,
+    removeForcedPick: actions.removeForcedPick,
+    clearForcedPicks: actions.clearForcedPicks,
+    clearToDefaults: actions.clearToDefaults,
+    setActiveSetIds: actions.setActiveSetIds,
+    clearActiveSetIds: actions.clearActiveSetIds
+  };
+
+  const historyActions = {
+    setHistoryGrouping: actions.setHistoryGrouping,
+    editGameResult: actions.editGameResult,
+    toggleHistoryInsights: actions.toggleHistoryInsights,
+    saveGameResult: actions.saveGameResult,
+    skipGameResultEntry: actions.skipGameResultEntry,
+    cancelResultEntry: actions.cancelResultEntry,
+    setResultOutcome: actions.setResultOutcome,
+    setResultScore: actions.setResultScore,
+    setResultNotes: actions.setResultNotes
+  };
+
+  const backupActions = {
+    exportBackup: actions.exportBackup,
+    openImportBackup: actions.openImportBackup,
+    importBackupFile: actions.importBackupFile,
+    cancelBackupPreview: actions.cancelBackupPreview,
+    requestMergeBackup: actions.requestMergeBackup,
+    requestReplaceBackup: actions.requestReplaceBackup,
+    resetUsageCategory: actions.resetUsageCategory,
+    requestResetAllState: actions.requestResetAllState
+  };
+
+  const onboardingActions = {
+    previousOnboardingStep: actions.previousOnboardingStep,
+    nextOnboardingStep: actions.nextOnboardingStep,
+    skipOnboarding: actions.skipOnboarding,
+    completeOnboarding: actions.completeOnboarding,
+    openOnboardingTab: actions.openOnboardingTab
+  };
 
   // ---------------------------------------------------------------------------
   // Mount
@@ -1299,6 +1305,7 @@
               data-action="set-theme"
               data-theme-id={theme.id}
               aria-pressed={activeThemeId === theme.id}
+              aria-label={locale.getThemeLabel(theme.id)}
               title={locale.getThemeDescription(theme.id)}
               onclick={() => actions.setTheme(theme.id)}
             >{getThemeIcon(theme.id)}</button>
@@ -1355,11 +1362,7 @@
           visible={ui.onboardingVisible}
           step={ui.onboardingStep}
           onboardingCompleted={appState.preferences.onboardingCompleted}
-          onPreviousStep={actions.previousOnboardingStep}
-          onNextStep={actions.nextOnboardingStep}
-          onSkip={actions.skipOnboarding}
-          onComplete={actions.completeOnboarding}
-          onOpenTab={actions.openOnboardingTab}
+          {onboardingActions}
         />
       {/if}
     </section>
@@ -1404,18 +1407,13 @@
                 {locale}
                 {persistence}
                 lastActionNotice={ui.lastActionNotice}
-                onToggleOwnedSet={actions.toggleOwnedSet}
-                onRequestResetOwnedCollection={actions.requestResetOwnedCollection}
-                onImportMyludoFile={actions.importMyludoFile}
-                onDismissMyludoSummary={actions.dismissMyludoSummary}
-                {myludoImportStatus}
-                {myludoImportError}
-                {myludoImportSummary}
-                onImportBggCollection={actions.importBggCollection}
-                onDismissBggSummary={actions.dismissBggSummary}
-                {bggImportStatus}
-                {bggImportError}
-                {bggImportSummary}
+                {collectionActions}
+                myludoImportStatus={getMyludoImportStatus()}
+                myludoImportError={getMyludoImportError()}
+                myludoImportSummary={getMyludoImportSummary()}
+                bggImportStatus={getBggImportStatus()}
+                bggImportError={getBggImportError()}
+                bggImportSummary={getBggImportSummary()}
               />
             {:else if tab.id === 'new-game'}
               <NewGameTab
@@ -1430,16 +1428,7 @@
                 generatorNotices={getGeneratorNotices()}
                 forcedPicks={getForcedPicks()}
                 {compactViewport}
-                onSetPlayerCount={actions.setPlayerCount}
-                onSetPlayMode={actions.setPlayMode}
-                onGenerateSetup={actions.generateSetup}
-                onAcceptCurrentSetup={actions.acceptCurrentSetup}
-                onAddForcedPick={actions.addForcedPick}
-                onRemoveForcedPick={actions.removeForcedPick}
-                onClearForcedPicks={actions.clearForcedPicks}
-                onClearToDefaults={actions.clearToDefaults}
-                onSetActiveSetIds={actions.setActiveSetIds}
-                onClearActiveSetIds={actions.clearActiveSetIds}
+                {gameActions}
               />
             {:else if tab.id === 'history'}
               <HistoryTab
@@ -1454,15 +1443,7 @@
                 resultDraft={getResultDraft()}
                 resultFormError={getResultFormError()}
                 resultInvalidFields={getResultInvalidFields()}
-                onSetHistoryGrouping={actions.setHistoryGrouping}
-                onEditGameResult={actions.editGameResult}
-                onToggleHistoryInsights={actions.toggleHistoryInsights}
-                onSaveGameResult={actions.saveGameResult}
-                onSkipGameResult={actions.skipGameResultEntry}
-                onCancelResultEntry={actions.cancelResultEntry}
-                onSetResultOutcome={actions.setResultOutcome}
-                onSetResultScore={actions.setResultScore}
-                onSetResultNotes={actions.setResultNotes}
+                {historyActions}
               />
             {:else if tab.id === 'backup'}
               <BackupTab
@@ -1475,14 +1456,7 @@
                 stagedBackup={getStagedBackup()}
                 confirmBackupRestoreMode={getConfirmBackupRestoreMode()}
                 lastBackupExportFileName={getLastBackupExportFileName()}
-                onExportBackup={actions.exportBackup}
-                onOpenImportBackup={actions.openImportBackup}
-                onImportBackupFile={actions.importBackupFile}
-                onCancelBackupPreview={actions.cancelBackupPreview}
-                onRequestMergeBackup={actions.requestMergeBackup}
-                onRequestReplaceBackup={actions.requestReplaceBackup}
-                onResetUsageCategory={actions.resetUsageCategory}
-                onRequestResetAllState={actions.requestResetAllState}
+                {backupActions}
               />
             {/if}
           {/if}
@@ -1503,41 +1477,7 @@
     onTabKeydown={actions.handleTabKeydown}
   />
 
-  <!-- Modal root -->
-  <div id="modal-root">
-    {#if modalConfig}
-      <div class="modal-backdrop">
-        <div
-          class="modal-dialog"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-title"
-          aria-describedby="modal-description"
-          tabindex="-1"
-          onkeydown={handleModalKeydown}
-        >
-          <h2 id="modal-title">{modalConfig.title}</h2>
-          <p id="modal-description">{modalConfig.description}</p>
-          <div class="button-row confirmation-actions">
-            <button
-              type="button"
-              class="button button-secondary"
-              data-action={modalConfig.cancelAction}
-              data-modal-focus="cancel"
-              onclick={modalConfig.onCancel}
-            >{locale.t('modal.cancel')}</button>
-            <button
-              type="button"
-              class="button button-danger"
-              data-action={modalConfig.confirmAction}
-              data-modal-focus="confirm"
-              onclick={modalConfig.onConfirm}
-            >{modalConfig.confirmLabel}</button>
-          </div>
-        </div>
-      </div>
-    {/if}
-  </div>
+  <ModalRoot {modalConfig} {locale} />
 
 {:else}
   <!-- Loading shell — briefly visible while data loads; preserves all DOM IDs for Playwright -->
