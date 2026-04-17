@@ -77,7 +77,7 @@ export function summarizeOwnedCollection(runtime, ownedSetIds) {
 export function mergeOwnedSets(state, newSetIds) {
   const merged = structuredClone(state);
   const combined = new Set([...merged.collection.ownedSetIds, ...newSetIds]);
-  merged.collection.ownedSetIds = [...combined].sort();
+  merged.collection.ownedSetIds = [...combined].sort((a, b) => a.localeCompare(b));
   return merged;
 }
 

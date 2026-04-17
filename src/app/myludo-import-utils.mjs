@@ -5,7 +5,7 @@
  */
 
 // Known header field names that contain the board game title.
-const KNOWN_NAME_FIELDS = ['nom', 'name', 'titre', 'jeu'];
+const KNOWN_NAME_FIELDS = new Set(['nom', 'name', 'titre', 'jeu']);
 
 /**
  * Split a single CSV/DSV line into fields, respecting RFC 4180 double-quote
@@ -68,8 +68,8 @@ export async function parseMyludoFile(file) {
 
   // Normalize line endings and split into non-blank lines
   const lines = content
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
+    .replaceAll('\r\n', '\n')
+    .replaceAll('\r', '\n')
     .split('\n')
     .filter((line) => line.trim().length > 0);
 
@@ -88,7 +88,7 @@ export async function parseMyludoFile(file) {
 
   // Parse header row and locate the game-name column
   const headerFields = splitLine(firstLine, delimiter).map((f) => f.trim().toLowerCase());
-  const nameFieldIndex = headerFields.findIndex((f) => KNOWN_NAME_FIELDS.includes(f));
+  const nameFieldIndex = headerFields.findIndex((f) => KNOWN_NAME_FIELDS.has(f));
 
   if (nameFieldIndex === -1) {
     return {

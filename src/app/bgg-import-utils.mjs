@@ -4,6 +4,71 @@
  * API reference: https://boardgamegeek.com/wiki/page/BGG_XML_API2
  */
 
+const QUEUED_ERROR = {
+  ok: false,
+  error: 'BGG collection request timed out after queuing — please try again.'
+};
+
+/**
+ * Perform a single BGG collection fetch attempt.
+ * Returns `{ retry: true }` when the server indicates the collection is still
+ * being queued (HTTP 202 or a 200 with a <message> body), a terminal error
+ * object, or `{ ok: true, gameNames }` on success.
+ *
+ * @param {string} url
+ * @param {Function} fetchFn
+ * @returns {Promise<{ retry?: boolean, ok?: boolean, gameNames?: string[], error?: string }>}
+ */
+async function attemptBggFetch(url, fetchFn) {
+  let response;
+  try {
+    response = await fetchFn(url);
+  } catch {
+    return { ok: false, error: 'Network error — check your connection and try again.' };
+  }
+
+  if (response.status === 202) {
+    return { retry: true };
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    return {
+      ok: false,
+      error:
+        `BGG denied access (HTTP ${response.status}). Make sure your BGG collection is set to public: log in at boardgamegeek.com → your profile → Collection → Privacy → set to "Public".`
+    };
+  }
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      error: `BGG returned an error (HTTP ${response.status}). Check the username and try again.`
+    };
+  }
+
+  // 200 OK — parse XML and extract game names
+  const text = await response.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/xml');
+
+  // BGG sometimes returns 200 with a <message> body instead of 202 when
+  // the collection is still being queued for processing. Treat it as a retry.
+  if (doc.querySelector('message')) {
+    return { retry: true };
+  }
+
+  const items = [...doc.querySelectorAll('item')];
+  const gameNames = items
+    .map((item) => {
+      const nameEls = [...item.querySelectorAll('name')];
+      const el = nameEls.find((n) => n.getAttribute('sortindex') === '1');
+      return el ? el.textContent.trim() : null;
+    })
+    .filter(Boolean);
+
+  return { ok: true, gameNames };
+}
+
 /**
  * Fetch a BGG user's public owned collection via the BGG XML API v2.
  *
@@ -22,70 +87,12 @@ export async function fetchBggCollection(
   const url = `https://boardgamegeek.com/xmlapi2/collection?username=${encodeURIComponent(username)}&own=1`;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    let response;
-    try {
-      response = await fetchFn(url);
-    } catch {
-      return { ok: false, error: 'Network error — check your connection and try again.' };
-    }
-
-    if (response.status === 202) {
-      if (attempt === maxRetries) {
-        return {
-          ok: false,
-          error: 'BGG collection request timed out after queuing — please try again.'
-        };
-      }
-      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
-      continue;
-    }
-
-    if (response.status === 401 || response.status === 403) {
-      return {
-        ok: false,
-        error:
-          `BGG denied access (HTTP ${response.status}). Make sure your BGG collection is set to public: log in at boardgamegeek.com → your profile → Collection → Privacy → set to "Public".`
-      };
-    }
-
-    if (!response.ok) {
-      return {
-        ok: false,
-        error: `BGG returned an error (HTTP ${response.status}). Check the username and try again.`
-      };
-    }
-
-    // 200 OK — parse XML and extract game names
-    const text = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, 'text/xml');
-
-    // BGG sometimes returns 200 with a <message> body instead of 202 when
-    // the collection is still being queued for processing. Treat it as a retry.
-    if (doc.querySelector('message')) {
-      if (attempt === maxRetries) {
-        return {
-          ok: false,
-          error: 'BGG collection request timed out after queuing — please try again.'
-        };
-      }
-      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
-      continue;
-    }
-
-    const items = [...doc.querySelectorAll('item')];
-
-    const gameNames = items
-      .map((item) => {
-        const nameEls = [...item.querySelectorAll('name')];
-        const el = nameEls.find((n) => n.getAttribute('sortindex') === '1');
-        return el ? el.textContent.trim() : null;
-      })
-      .filter(Boolean);
-
-    return { ok: true, gameNames };
+    const result = await attemptBggFetch(url, fetchFn);
+    if (!result.retry) return result;
+    if (attempt === maxRetries) return QUEUED_ERROR;
+    await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
   }
-  return { ok: false, error: 'BGG collection request timed out after queuing — please try again.' };
+  return QUEUED_ERROR;
 }
 
 /**
