@@ -34,7 +34,7 @@ The shipped implementation resolves these templates through `resolveSetupTemplat
 ## Core setup sequence
 
 1. determine the requested setup template from `SETUP_RULES`
-2. resolve the active pool: if `activeSetIds` is non-empty, build pools from `activeSetIds` (an active expansion filter is in effect); otherwise build pools from `ownedSetIds` (the full owned collection); `null` and an empty `[]` both fall through to "use all owned" — the difference is UI-only (`null` = "Use all expansions" state, all checkboxes checked; `[]` = "Clear selection" state, all checkboxes unchecked, introduced in Epic 49)
+2. resolve the active pool: `state.collection.activeSetIds ?? null` is computed first; if the result is `null`, call `buildOwnedPools(runtime, ownedSetIds)` — this is the "Use all expansions" state (`activeSetIds === null`), where all owned-expansion checkboxes appear checked; if the result is an array (empty or non-empty), call `buildOwnedPools(runtime, activeSetIds)` directly — a non-empty array is an active expansion subset, while `[]` is the "Clear selection" state (all checkboxes unchecked, `deactivateAllSets` action) which produces an empty pool that always fails legality and disables the Generate button; only `null` falls through to the full owned collection
 3. validate that the resolved active pool can legally support the requested setup
 4. choose a Scheme
 5. choose a Mastermind

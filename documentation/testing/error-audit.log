@@ -49,3 +49,18 @@ File: documentation/ux/reports/should-desktop-browse-entry-overload.md
 Finding: The UX audit report cites a `Visible sets 33 of 33` counter as evidence of Browse-screen clutter. After Epic 51 added 5 expansions (Midnight Sons, The Infinity Saga, Weapon X, 2099, Ant-Man and the Wasp), the live counter will display `38 of 38` (or filtered equivalent). The report is a historical audit record documenting what was observed at review time; the `33 of 33` figure was accurate then and should not be retroactively changed. However, future UX reviewers reading the report may be confused by the stale count.
 Suggested action: A UX team member should append a note to the report (e.g., "Note: Catalog has grown to 38 sets as of Epic 51; the `Visible sets` count will reflect the current total.") to prevent confusion without altering the historical evidence.
 ---
+[2026-04-17] Epic: Epic 46 — Active Expansion Filter ("Play Set")
+File: documentation/planning/epic/ready-for-dev/epic-46-task-list.md
+Finding: A copy of `epic-46-task-list.md` exists in both `documentation/planning/epic/done/` and `documentation/planning/epic/ready-for-dev/`. The canonical completed copy should live only in `done/`. The `ready-for-dev/` copy is a stale duplicate.
+Suggested action: Delete `documentation/planning/epic/ready-for-dev/epic-46-task-list.md`. File deletion falls outside the tech-writer's edit scope.
+---
+[2026-04-17] Epic: Epic 46 — Active Expansion Filter ("Play Set")
+File: documentation/planning/epic/done/epic-46-task-list.md (Story 46.3 task 5)
+Finding: The task list states "Add a 'Clear all' affordance that calls `clearActiveSetIds()` (implementation sentinel is `null`=all-owned, so both Select all and Clear all restore the all-owned state)." The shipped implementation introduces a distinct `deactivateAllSets()` action (exported from `src/app/state-store.mjs`) that sets `activeSetIds` to `[]` (empty array, not null). "Clear all" calls `deactivateAllSets()` while "Use all expansions" calls `clearActiveSetIds()`. The two buttons have different runtime effects: `null` is the all-owned fallback (checkboxes all checked), while `[]` is the explicitly-deselected state (all unchecked, pool empty, Generate disabled). The task list note is therefore incorrect about the shipped behavior of "Clear all".
+Suggested action: The task list is a historical planning artifact in the `done/` folder and should not be retroactively edited. However, future readers should be aware the shipped behavior diverges from the task description. The corrected behavior is reflected in `documentation/architecture/setup-rules.md` and `documentation/architecture/overview.md` as of this audit pass.
+---
+[2026-04-17] Epic: Epic 50 — PWA Installability Repair
+File: documentation/planning/epic/ready-for-dev/epic-50-task-list.md (Story 50.1 task 12, Story 50.3)
+Finding: Several tasks in the Epic 50 task list reference `documentation/planning/epic/approved/epic-50.md` as the target for the diagnosis note, but the file lives at `documentation/planning/epic/ready-for-dev/epic-50.md`. The `approved/` folder exists but is empty. The diagnosis and automated validation notes were correctly appended to the `ready-for-dev/` copy, so the content is accurate; only the path cited in the task list is stale.
+Suggested action: No content change required — the notes are in the correct file. The path discrepancy in the task list is a historical planning artefact. Epic 50's spec and task list should be moved to `done/` once the manual Lighthouse validation tasks (Story 50.3) are completed.
+---
