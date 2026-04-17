@@ -140,7 +140,7 @@ Scheme runtime entities must carry structured setup rules:
 - `setId`: owning set ID
 - `name`: display name from the reference sources
 - `aliases`: optional naming variants retained for matching/search
-- `constraints`: structured legality constraints such as `minimumPlayerCount`
+- `constraints`: structured legality constraints such as `minimumPlayerCount` and `incompatiblePlayModes`
 - `forcedGroups`: resolved required groups as runtime IDs
 - `modifiers`: normalized setup-affecting rule modifiers
 - `notes`: human-readable rule notes for display
@@ -168,9 +168,9 @@ Examples:
 
 ### Some schemes carry structured setup restrictions
 Examples from the source data:
-- `Super Hero Civil War` has `minimumPlayerCount: 2` in `Core Set`
+- `Super Hero Civil War` has `minimumPlayerCount: 2` and `incompatiblePlayModes: ["standard-solo"]` in `Core Set` and `Marvel Studios, Phase 1`
+- `Negative Zone Prison Breakout` adds a henchman group and carries `incompatiblePlayModes: ["standard-solo"]`
 - `Secret Invasion of the Skrull Shapeshifters` forces `Skrulls`
-- `Negative Zone Prison Breakout` adds a henchman group
 - `Midtown Bank Robbery` changes the bystander count
 
 ---

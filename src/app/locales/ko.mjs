@@ -206,6 +206,7 @@ export const KO_MESSAGES = {
   'newGame.forcedPicks.reason.mastermind': 'Mastermind 리드',
   'newGame.forcedPicks.reason.scheme': '계획',
   'newGame.forcedPicks.reason.default': '강제 선택',
+  'newGame.forcedPicks.schemesModeIneligible': '{count}개의 계획이 {mode} 모드에서 사용 불가하여 선택 목록에서 제거되었습니다.',
   'newGame.activeFilter.title': '활성 확장판',
   'newGame.activeFilter.summaryAll': '전체 {count}개 확장판',
   'newGame.activeFilter.summaryFiltered': '{total}개 확장판 중 {active}개 사용 중',

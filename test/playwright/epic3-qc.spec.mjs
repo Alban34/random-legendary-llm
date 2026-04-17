@@ -140,7 +140,7 @@ test.describe('Epic 3 automated QC', () => {
     expect(result.setup.villainGroups.some((group) => group.forced)).toBeTruthy();
 
     await prepareTargetedState(page, { schemeNames: ['Negative Zone Prison Breakout'] });
-    await setPlayerMode(page, 1, false);
+    await setPlayerMode(page, 2, false);
     result = await generateSetup(page);
     expect(result.setup.scheme.name).toBe('Negative Zone Prison Breakout');
     expect(result.setup.requirements.henchmanGroupCount).toBe(2);

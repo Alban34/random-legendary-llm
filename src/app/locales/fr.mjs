@@ -144,6 +144,7 @@ export const FR_MESSAGES = {
   'newGame.forcedPicks.reason.mastermind': 'Meneur du mastermind',
   'newGame.forcedPicks.reason.scheme': 'Plan',
   'newGame.forcedPicks.reason.default': 'Sélection forcée',
+  'newGame.forcedPicks.schemesModeIneligible': '{count} plan(s) sont indisponibles en mode {mode} et ont été retirés de la liste de sélection.',
   'newGame.activeFilter.title': 'Extensions actives',
   'newGame.activeFilter.summaryAll': 'Les {count} extensions',
   'newGame.activeFilter.summaryFiltered': 'Utilisation de {active} extensions sur {total}',

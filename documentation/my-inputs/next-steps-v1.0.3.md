@@ -1,0 +1,7 @@
+- [ ] Let's start 1.0.3
+- [x] The "clear selection" is broken again: it MUST uncheck all checkboxes and you MUST set a e2e test on it so that it no longer regress.
+- [x] I do not see the PWA capability, could you explain why or is it broken?
+- [x] There are still some expansion missing and the release dates of many of the ones in the system are wrong
+- [x] Many translations are still missing, you should revisit all user facing text
+- [x] When playing "standard solo", the following scheme MUST NOT be selectable: Super Hero Civil War and Negative Zone Prison Breakout (nor at random nor by forcing selection)
+- [x] Fix this error (add it to epic 53): the "always lead" of mastermind never applies to standard solo mode

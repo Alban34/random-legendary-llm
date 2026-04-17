@@ -49,6 +49,15 @@
     };
   });
 
+  let modeIneligibleSchemeIds = $derived.by(() => {
+    if (selectedPlayMode !== 'standard' || selectedPlayerCount !== 1) return new Set();
+    return new Set(
+      ownedForcedPickOptions.schemeId
+        .filter((s) => s.constraints?.incompatiblePlayModes?.includes('standard-solo'))
+        .map((s) => s.id)
+    );
+  });
+
   let entityIndexes = $derived({
     schemeId: bundle.runtime.indexes.schemesById,
     mastermindId: bundle.runtime.indexes.mastermindsById,
@@ -72,7 +81,10 @@
   }
 
   function getAvailableOptions(config) {
-    const opts = ownedForcedPickOptions[config.field];
+    let opts = ownedForcedPickOptions[config.field];
+    if (config.field === 'schemeId') {
+      opts = opts.filter((e) => !modeIneligibleSchemeIds.has(e.id));
+    }
     return config.multi ? opts.filter((e) => !getActiveIds(config).includes(e.id)) : opts;
   }
 
@@ -278,6 +290,14 @@
               </div>
             {/each}
           </div>
+          {#if modeIneligibleSchemeIds.size > 0}
+            <p class="muted" data-scheme-mode-ineligibility-notice>
+              {locale.t('newGame.forcedPicks.schemesModeIneligible', {
+                count: modeIneligibleSchemeIds.size,
+                mode: locale.getPlayModeLabel(selectedPlayMode, selectedPlayerCount)
+              })}
+            </p>
+          {/if}
           <div class="stack gap-sm">
             <div class="row space-between wrap gap-sm align-center">
               <strong>{locale.t('newGame.forcedPicks.activeConstraints')}</strong>

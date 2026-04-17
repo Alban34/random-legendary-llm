@@ -5181,7 +5181,8 @@
         "setName": "Core Set",
         "aliases": [],
         "constraints": {
-          "minimumPlayerCount": null
+          "minimumPlayerCount": null,
+          "incompatiblePlayModes": ["standard-solo"]
         },
         "forcedGroups": [],
         "modifiers": [
@@ -5680,7 +5681,8 @@
         "setName": "Marvel Studios, Phase 1",
         "aliases": [],
         "constraints": {
-          "minimumPlayerCount": 2
+          "minimumPlayerCount": 2,
+          "incompatiblePlayModes": ["standard-solo"]
         },
         "forcedGroups": [],
         "modifiers": [],
@@ -5693,7 +5695,8 @@
         "setName": "Core Set",
         "aliases": [],
         "constraints": {
-          "minimumPlayerCount": 2
+          "minimumPlayerCount": 2,
+          "incompatiblePlayModes": ["standard-solo"]
         },
         "forcedGroups": [],
         "modifiers": [],

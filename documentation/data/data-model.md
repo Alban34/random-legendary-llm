@@ -148,7 +148,8 @@ That canonical source remains nested by set.
   name: string,
   aliases: string[],
   constraints: {
-    minimumPlayerCount: number | null
+    minimumPlayerCount: number | null,
+    incompatiblePlayModes: string[]
   },
   forcedGroups: Array<{
     category: "villains" | "henchmen",
@@ -228,7 +229,8 @@ The shipped runtime bundle shape is:
   name: string,
   aliases: string[],
   constraints: {
-    minimumPlayerCount: number | null
+    minimumPlayerCount: number | null,
+    incompatiblePlayModes: string[]
   },
   forcedGroups: Array<{
     category: "villains" | "henchmen",

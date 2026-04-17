@@ -144,6 +144,7 @@ export const EN_MESSAGES = {
   'newGame.forcedPicks.reason.mastermind': 'Mastermind lead',
   'newGame.forcedPicks.reason.scheme': 'Scheme',
   'newGame.forcedPicks.reason.default': 'Forced pick',
+  'newGame.forcedPicks.schemesModeIneligible': '{count} scheme(s) are unavailable in {mode} mode and have been removed from the selection list.',
   'newGame.activeFilter.title': 'Active expansions',
   'newGame.activeFilter.summaryAll': 'All {count} expansions',
   'newGame.activeFilter.summaryFiltered': 'Using {active} of {total} expansions',

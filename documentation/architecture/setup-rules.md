@@ -57,6 +57,7 @@ Examples of legality checks:
 - enough total Villain Groups exist after accounting for forced groups
 - enough total Henchman Groups exist after accounting for forced groups
 - the selected Scheme is legal for the selected player count
+- the selected Scheme is not marked incompatible with the active play mode (e.g. `incompatiblePlayModes` does not contain the resolved mode key)
 - Advanced Solo is only available in 1-player mode
 - Two-Handed Solo is only available in 1-player mode
 
@@ -101,7 +102,8 @@ Recommended runtime shape:
 ```text
 {
   constraints: {
-    minimumPlayerCount: number | null
+    minimumPlayerCount: number | null,
+    incompatiblePlayModes: string[]
   },
   forcedGroups: Array<{
     category: "villains" | "henchmen",

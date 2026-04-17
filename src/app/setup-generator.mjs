@@ -194,19 +194,27 @@ function validateForcedPickAvailability(forcedPicks, pools, template, eligibleSc
   }
 
   if (forcedPicks.schemeId && !eligibleSchemes.some((scheme) => scheme.id === forcedPicks.schemeId)) {
-    reasons.push(`Forced Scheme is not legal for the selected player count: ${schemesById[forcedPicks.schemeId]?.name || forcedPicks.schemeId}.`);
+    reasons.push(`Forced Scheme is not legal for the selected play mode: ${schemesById[forcedPicks.schemeId]?.name || forcedPicks.schemeId}.`);
   }
 
   if (forcedPicks.heroIds.length > template.heroCount) {
     reasons.push(`Forced Heroes exceed the base Hero slots for this setup mode (${forcedPicks.heroIds.length}/${template.heroCount}).`);
   }
 
-  if (forcedPicks.villainGroupIds.length > template.villainGroupCount) {
-    reasons.push(`Forced Villain Groups exceed the base Villain Group slots for this setup mode (${forcedPicks.villainGroupIds.length}/${template.villainGroupCount}).`);
+  // Count mastermind villain lead toward the villain group slot limit
+  const forcedMastermind = forcedPicks.mastermindId ? mastermindsById[forcedPicks.mastermindId] : null;
+  const mastermindLeadVillainGroupCount = forcedMastermind?.lead?.category === 'villains' ? 1 : 0;
+  const effectiveForcedVillainCount = forcedPicks.villainGroupIds.length + mastermindLeadVillainGroupCount;
+
+  if (effectiveForcedVillainCount > template.villainGroupCount) {
+    reasons.push(`Forced Villain Groups (including mastermind lead) exceed the base Villain Group slots for this setup mode (${effectiveForcedVillainCount}/${template.villainGroupCount}).`);
   }
 
-  if (forcedPicks.henchmanGroupIds.length > template.henchmanGroupCount) {
-    reasons.push(`Forced Henchman Groups exceed the base Henchman Group slots for this setup mode (${forcedPicks.henchmanGroupIds.length}/${template.henchmanGroupCount}).`);
+  const mastermindLeadHenchmanGroupCount = forcedMastermind?.lead?.category === 'henchmen' ? 1 : 0;
+  const effectiveForcedHenchmanCount = forcedPicks.henchmanGroupIds.length + mastermindLeadHenchmanGroupCount;
+
+  if (effectiveForcedHenchmanCount > template.henchmanGroupCount) {
+    reasons.push(`Forced Henchman Groups (including mastermind lead) exceed the base Henchman Group slots for this setup mode (${effectiveForcedHenchmanCount}/${template.henchmanGroupCount}).`);
   }
 
   return reasons;
@@ -249,8 +257,17 @@ function resolveForcedCollections(scheme, mastermind, pools, forcedPicks) {
   };
 }
 
-function isSchemeEligibleForPlayerCount(scheme, playerCount) {
-  return !scheme.constraints?.minimumPlayerCount || scheme.constraints.minimumPlayerCount <= playerCount;
+function isSchemeEligibleForTemplate(scheme, template) {
+  if (scheme.constraints?.minimumPlayerCount && scheme.constraints.minimumPlayerCount > template.playerCount) {
+    return false;
+  }
+  const effectiveModeKey = template.playMode === 'standard' && template.playerCount === 1
+    ? 'standard-solo'
+    : template.playMode;
+  if (scheme.constraints?.incompatiblePlayModes?.includes(effectiveModeKey)) {
+    return false;
+  }
+  return true;
 }
 
 function validateBaseCounts(pools, template) {
@@ -294,7 +311,7 @@ export function validateSetupLegality({ runtime, state, playerCount, advancedSol
 
   reasons.push(...validateBaseCounts(pools, template));
 
-  const eligibleSchemes = pools.schemes.filter((scheme) => isSchemeEligibleForPlayerCount(scheme, template.playerCount));
+  const eligibleSchemes = pools.schemes.filter((scheme) => isSchemeEligibleForTemplate(scheme, template));
   if (eligibleSchemes.length === 0) {
     reasons.push('No owned schemes are legal for the selected player count.');
   }

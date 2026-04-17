@@ -206,6 +206,7 @@ export const DE_MESSAGES = {
   'newGame.forcedPicks.reason.mastermind': 'Mastermind-Lead',
   'newGame.forcedPicks.reason.scheme': 'Plan',
   'newGame.forcedPicks.reason.default': 'Erzwungene Auswahl',
+  'newGame.forcedPicks.schemesModeIneligible': '{count} Pläne sind im {mode}-Modus nicht verfügbar und wurden aus der Auswahlliste entfernt.',
   'newGame.activeFilter.title': 'Aktive Erweiterungen',
   'newGame.activeFilter.summaryAll': 'Alle {count} Erweiterungen',
   'newGame.activeFilter.summaryFiltered': '{active} von {total} Erweiterungen aktiv',

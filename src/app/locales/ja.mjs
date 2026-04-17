@@ -206,6 +206,7 @@ export const JA_MESSAGES = {
   'newGame.forcedPicks.reason.mastermind': 'マスターマインドリード',
   'newGame.forcedPicks.reason.scheme': '策略',
   'newGame.forcedPicks.reason.default': '強制ピック',
+  'newGame.forcedPicks.schemesModeIneligible': '{count}件の策略が{mode}モードでは使用できないため、選択リストから削除されました。',
   'newGame.activeFilter.title': '有効な拡張',
   'newGame.activeFilter.summaryAll': '{count}件の拡張をすべて使用',
   'newGame.activeFilter.summaryFiltered': '{total}件中{active}件の拡張を使用中',
