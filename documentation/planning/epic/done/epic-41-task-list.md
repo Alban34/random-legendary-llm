@@ -52,5 +52,5 @@
 
 ## Epic-wide validation gate
 
-- [x] After all three stories are complete, confirm `git diff --name-only` lists only `src/app/localization-utils.mjs` and the six files under `src/app/locales/` — no consumer components, no test files, no other `src/app/` modules
+- [x] After all three stories are complete, confirm `git diff --name-only` lists `src/app/localization-utils.mjs` and the six files under `src/app/locales/` with no consumer component or application module changes — **Note (post-implementation):** four test files (`test/epic-ux6-backup-safety.test.mjs`, `test/epic16-notification-refinements.test.mjs`, `test/epic17-onboarding-information-architecture.test.mjs`, `test/epic36-version-storage-disclosure.test.mjs`) were also updated to import locale data directly from the per-locale files after the inline `*_MESSAGES` constants were removed; the public runtime API remains fully backward-compatible.
 - [x] QC (Automated): hand off to the QC agent with instruction to run `npm run lint` (blocking) then `node --test test/epic19-localization.test.mjs` (Story 41.3 gate) and `npm test` (full regression gate); confirm all pass before marking Epic 41 complete

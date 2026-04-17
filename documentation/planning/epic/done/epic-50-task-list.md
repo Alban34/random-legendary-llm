@@ -11,8 +11,8 @@
 - [ ] Fetch `https://<owner>.github.io/random-legendary-llm/` in a browser, open DevTools → Network, and check whether a request for `/manifest.webmanifest` returns 404 (root-relative) vs. `/random-legendary-llm/manifest.webmanifest` returning 200
 - [ ] Open DevTools → Application → Service Workers on the deployed site and record whether a service worker is registered and what scope it is registered under
 - [ ] Open DevTools → Application → Manifest on the deployed site and record whether the manifest is parsed successfully or shows a fetch/parse error
-- [ ] Run a Lighthouse PWA audit against the deployed site (DevTools → Lighthouse → Progressive Web App) and record each failing "Installable" check with its exact error message
-- [x] Append a diagnosis note to `documentation/planning/epic/approved/epic-50.md` listing each root cause found with supporting evidence (network 404 URL, Lighthouse error text, or build diff)
+- [ ] In Chrome DevTools → Application → Manifest on the deployed site, check whether the "App is installable" section appears without blocking reasons and the install icon is visible in the Chrome omnibar; record the outcome (**note:** the Lighthouse PWA category was removed in Lighthouse 11+ and is no longer available as an audit tool)
+- [x] Append a diagnosis note to `documentation/planning/epic/done/epic-50.md` listing each root cause found with supporting evidence (network 404 URL, build diff)
 - [x] Test: Manually open `dist/index.html` source after a local build and confirm whether `<link rel="manifest" href="...">` resolves to a URL reachable under `/random-legendary-llm/`
 - [x] QC (Automated): Run `grep -n 'rel="manifest"' dist/index.html` after `npm run build` and assert the `href` attribute includes `/random-legendary-llm/` prefix; run `ls dist/manifest.webmanifest dist/sw.js` and assert both files exist with non-zero size
 
@@ -26,19 +26,19 @@
 - [x] Confirm no changes are needed to `src/app/browser-entry.mjs` — `import.meta.env.BASE_URL + 'sw.js'` already resolves to `/random-legendary-llm/sw.js` at build time
 - [x] Confirm no changes are needed to `vite.config.js` — `base: '/random-legendary-llm/'` and the `swInjectPlugin` `closeBundle` logic are already correct
 - [x] Run `npm run lint` and confirm it exits with code 0 and reports no new errors
-- [ ] Test: Serve `dist/` locally with `npx serve -s dist -l 5000` (or equivalent), open `http://localhost:5000/random-legendary-llm/` in a browser, open DevTools → Application → Manifest and confirm the manifest is fetched successfully with no errors; open Application → Service Workers and confirm the worker is registered with scope `/random-legendary-llm/`
+- [ ] Test: Serve `dist/` locally via `npx vite preview` and open `http://localhost:4173/random-legendary-llm/` in Chrome; open DevTools → Application → Manifest and confirm the manifest is fetched successfully with no errors; open Application → Service Workers and confirm the worker is registered with scope `/random-legendary-llm/`
 - [x] QC (Automated): After `npm run build`, run `grep 'rel="manifest"' dist/index.html` and assert the output contains `href="/random-legendary-llm/manifest.webmanifest"`; run `node -e "const s=require('fs').readFileSync('dist/sw.js','utf8'); if(!s.includes('/random-legendary-llm/manifest.webmanifest')) process.exit(1);"` to assert the manifest URL is in the precache list
 
 ---
 
-## Story 50.3 — Validate the repair with a Lighthouse PWA audit confirming installability criteria pass
+## Story 50.3 — Validate the repair with Chrome DevTools Application panel confirming installability criteria pass
 
 - [x] Run `npm run build` to produce a fresh `dist/` with the repaired manifest link
-- [ ] Serve the `dist/` directory locally at a path that mirrors the GitHub Pages base: `npx serve dist -l 5000` then navigate to `http://localhost:5000/` (or use `npx http-server dist -p 5000`) — note that Lighthouse can audit `localhost`
-- [ ] Open Chrome DevTools on the served app, go to Lighthouse → Progressive Web App, run the audit, and confirm the "Installable" section shows all criteria passing with no blocking errors
-- [ ] Record the Lighthouse PWA score and the specific "Installable" checklist result (pass/fail per item) and append the findings to `documentation/planning/epic/approved/epic-50.md` under a "Validation" heading
+- [ ] Serve `dist/` locally via `npx vite preview` and navigate to `http://localhost:4173/random-legendary-llm/` (or `npx serve dist -l 5000` → `http://localhost:5000/random-legendary-llm/`)
+- [ ] In Chrome DevTools → Application → Manifest on the locally served app, confirm all required fields (`name`, `short_name`, `start_url`, `display`, `theme_color`, `background_color`, both icons) are listed without errors and the "App is installable" section shows no blocking reasons (**note:** the Lighthouse PWA category was removed in Lighthouse 11+ and cannot produce a PWA installability score)
+- [ ] Record the DevTools Application → Manifest panel findings (all fields shown, no blocking reasons, SW scope confirmed) and append them to `documentation/planning/epic/done/epic-50.md` under a "Validation" heading
 - [ ] Confirm in DevTools → Application → Manifest that `name`, `short_name`, `start_url`, `display: standalone`, `theme_color`, `background_color`, and both icon entries (192×192 and 512×512) are all parsed and shown without errors
-- [ ] Confirm in DevTools → Application → Service Workers that the worker is active and the scope matches `/random-legendary-llm/` (or `http://localhost:5000/` for the local serve test)
+- [ ] Confirm in DevTools → Application → Service Workers that the worker is active and the scope matches `/random-legendary-llm/` (or `http://localhost:4173/random-legendary-llm/` for the local preview test)
 - [ ] Disable network throttling and reload with the network panel open; confirm a `beforeinstallprompt` event fires (visible in the Console with `window.addEventListener('beforeinstallprompt', e => console.log('installable', e))`) or that the browser address bar shows an install icon
 - [ ] Test: On Chrome with network connectivity, navigate to the deployed GitHub Pages URL, open DevTools Console, add `window.addEventListener('beforeinstallprompt', e => console.log('PWA install prompt fired'))`, reload, and confirm the message appears; alternatively confirm the install button appears in the Chrome omnibar
 - [x] QC (Automated): Run `npm run lint` and confirm exit code 0; run `npm run build` and assert `dist/index.html` contains `href="/random-legendary-llm/manifest.webmanifest"` and `dist/sw.js` is non-empty and contains `legendary-v` in its cache name string

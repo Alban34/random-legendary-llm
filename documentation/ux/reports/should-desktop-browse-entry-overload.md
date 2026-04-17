@@ -24,3 +24,7 @@ Turn the desktop Browse landing state into a more staged experience. When onboar
 
 ## Expected UX improvement
 The first-run experience becomes easier to understand, the main Browse action becomes more obvious, and desktop users spend less time scanning decorative or redundant content before they can act.
+
+---
+
+> **Catalog count note (added after Epic 51):** The `Visible sets 33 of 33` figure above was accurate at the time of this audit. As of Epic 51 (Game Catalog Data Audit & Correction), five additional expansions were added (Midnight Sons, The Infinity Saga, Weapon X, 2099, Ant-Man and the Wasp), so the live counter now reads `38 of 38` under the default unfiltered state. The UX observation about clutter remains valid regardless of the exact count.
