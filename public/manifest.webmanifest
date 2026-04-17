@@ -1,0 +1,13 @@
+{
+  "name": "Legendary: Marvel Randomizer",
+  "short_name": "Legendary",
+  "start_url": "/random-legendary-llm/",
+  "display": "standalone",
+  "theme_color": "#f05a28",
+  "background_color": "#1b1f29",
+  "icons": [
+    { "src": "/random-legendary-llm/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/random-legendary-llm/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/random-legendary-llm/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

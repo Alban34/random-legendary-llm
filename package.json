@@ -38,6 +38,7 @@
     "lint": "eslint src/",
     "build": "vite build",
     "preview": "vite preview",
+    "test:qc:epic40": "playwright test ./test/playwright/epic40-qc.spec.mjs",
     "test:coverage": "c8 --reporter=lcov --report-dir=coverage node --test ./test/*.test.mjs"
   },
   "devDependencies": {

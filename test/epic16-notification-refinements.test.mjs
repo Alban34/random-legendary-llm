@@ -17,7 +17,7 @@ const browserEntryPath = path.join(rootDir, 'src', 'app', 'browser-entry.mjs');
 const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.mjs');
 const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 const toastStackPath = path.join(rootDir, 'src', 'components', 'ToastStack.svelte');
-const localizationPath = path.join(rootDir, 'src', 'app', 'localization-utils.mjs');
+const localizationPath = path.join(rootDir, 'src', 'app', 'locales', 'en.mjs');
 
 let browserEntrySource;
 let rendererSource;

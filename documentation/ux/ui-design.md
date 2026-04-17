@@ -143,7 +143,27 @@ Typography roles are governed by `design-system/overview.md`.
 
 ## Tab 2 — My Collection
 
+The Collection tab exposes two mutually exclusive views selected by a segmented view toggle immediately below the tab heading:
+
+- **Sets view** (default) — the existing set-ownership checklist, totals, feasibility indicators, BGG import panel, and Reset button
+- **Browse Cards view** — a card-browser panel listing every individual card from the user's owned expansions, with a grouping selector
+
 ```
+  [Sets]  [Browse Cards]   ← view toggle, below h2
+
+  ── Sets view (active when "Sets" is selected) ────
+
+  ─── Import from BoardGameGeek ───────────────────
+  BGG Username  [___________________] [Import from BGG]
+                                      (aria-busy spinner while loading)
+  ✕ Error: <inline error message if import fails>
+
+  ── Import Summary (shown after successful import) ──
+  Matched 2 expansions: Dark City, Fantastic Four
+  Unmatched BGG titles: "Legendary Villains (2014)"
+  [Dismiss]
+  ─────────────────────────────────────────────────
+
   Total available: 42 Heroes · 12 Masterminds · 18 Villain Groups · 8 Henchman Groups · 24 Schemes
 
   Capacity:
@@ -163,12 +183,52 @@ Typography roles are governed by `design-system/overview.md`.
   ...
 
   [Reset All Selections]
+
+  ── Browse Cards view (active when "Browse Cards" is selected) ──
+
+  Group by: [By Category]  [By Expansion]   ← grouping selector
+
+  ─── Heroes ────────────────────────── (By Category grouping)
+  • Bishop
+  • Black Widow
+  • Captain America
+  ...
+
+  ─── Masterminds ─────────────────────
+  • Dr. Doom
+  • Magneto
+  ...
+
+  ─── Villain Groups ──────────────────
+  ...
+
+  ─── Henchman Groups ─────────────────
+  ...
+
+  ─── Schemes ─────────────────────────
+  ...
+
+  ─── Dark City (2013) ──────────────── (By Expansion grouping)
+  • Bishop  • Blade  • Bullseye  ...
+
+  ─── Fantastic Four (2014) ───────────
+  • Human Torch  • Invisible Woman  ...
 ```
 
 **Interactions:**
+- A segmented view toggle ("Sets" / "Browse Cards") appears immediately below the Collection tab heading; switching views does not alter `ownedSetIds`; the Sets view is the default; each button carries `aria-pressed` reflecting the active view
+- A BGG import panel appears at the top of the Sets view: a labeled text input for the BGG username and an "Import from BGG" submit button; the control is keyboard-accessible via a wrapping `<form>`; the button is disabled when the input is empty or trimmed-empty
+- While a BGG import is in progress the button is disabled and shows an inline loading indicator (`aria-busy="true"`); the set-ownership checkboxes below remain unaffected
+- A BGG API network error, HTTP error, or timeout surfaces an inline error message within the panel; the user can correct the username and retry
+- After a successful import a summary panel replaces the inline error (if any) and displays the count and names of matched expansions plus any BGG titles that could not be matched; the user can dismiss the summary; dismissing does not remove any newly imported owned sets
+- The BGG import merges matched expansions into the existing owned set without removing manually selected sets; the import is idempotent (running it twice produces the same result)
 - Checkboxes mirror the "Add to Collection" toggle from Browse tab
 - Capacity indicators show a ✓ or ⚠ per player count
 - "Reset All Selections" clears the collection (with confirmation)
+- When the Browse Cards view is active, a grouping selector ("By Category" / "By Expansion") appears at the top of the card-browser panel; switching grouping updates the list immediately without a page reload; the active grouping button carries `aria-pressed`; the selected grouping is retained for the browser session but not persisted across page reloads
+- By Category grouping renders five sections in canonical order (Heroes, Masterminds, Villain Groups, Henchman Groups, Schemes); each section heading appears only when the owned-expansion pool contains at least one card of that category; cards are listed A–Z by name within each section
+- By Expansion grouping renders one section per owned expansion sorted A–Z by expansion name; all cards from that expansion regardless of category are listed A–Z by card name within each section
+- When no expansions are owned, the card-browser panel renders a single informational message in place of any section headings
 
 ---
 
@@ -188,6 +248,16 @@ Typography roles are governed by `design-system/overview.md`.
   │   [ ⚡ Generate Setup ]  [ ✅ Accept & Log ]    │
   │                                                 │
   │  ▶ Forced Picks  (disclosure, collapsed)        │
+  │                                                 │
+  │  ── Active Expansions ─────────────────────────  │
+  │  ☑ Dark City      ☑ Fantastic Four              │
+  │  ☐ Secret Wars    ☑ Paint the Town Red          │
+  │  ...                                            │
+  │  [Use all expansions]  [Clear selection]        │
+  │  Using 3 of 4 expansions                        │
+  │                                                 │
+  │  ⚠ Not enough cards for a legal setup           │
+  │    (shown only when filter is infeasible)        │
   └─────────────────────────────────────────────────┘
 
   ── Result ──────────────────────────────────────────
@@ -230,6 +300,8 @@ Typography roles are governed by `design-system/overview.md`.
 - The primary action button appears directly below the setup-requirements summary, before optional content, so users can act without scrolling past forced picks
 - Forced picks are presented in a native `<details>` disclosure element below the primary action row; users who need forced picks can expand the disclosure without it adding visual weight for users who do not
 - Forced picks are one-shot setup constraints that remain active across all rerolls, then clear after a successful Accept & Log or reload
+- An "Active Expansions" panel appears below the Forced Picks disclosure on the New Game tab; it lists every owned expansion as a toggleable checkbox item; toggling an item adds or removes its ID from `activeSetIds`; "Use all expansions" sets `activeSetIds` to empty (restoring the all-owned fallback); "Clear selection" deselects every expansion; the panel shows a summary line reading "Using X of Y expansions" when a filter is active, or "All X expansions" when `activeSetIds` is empty
+- Before the Generate button is enabled, `validateSetupLegality` is evaluated against the resolved active pool for the current player count and play mode; if the result is not `ok`, the Generate button is disabled and the legality reasons are displayed inline beneath the selector; re-evaluation happens whenever the active pool, player count, or play mode changes
 - "Generate Setup" / "New Setup" validates collection size before randomizing
 - "Accept & Log Game" saves the setup to history, opens immediate result entry in History, and marks the setup as used; it is disabled until a setup is present
 - Result entry supports pending-result flows, later correction from History, focus moves into the editor on open, and invalid saves announce recoverable errors before returning focus to the correct field

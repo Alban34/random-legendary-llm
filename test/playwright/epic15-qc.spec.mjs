@@ -11,7 +11,7 @@ import {
 
 async function openForcedPicksPanel(page) {
   await page.evaluate(() => {
-    const details = document.querySelector('#panel-new-game details');
+    const details = document.querySelector('[data-forced-picks-panel]')?.closest('details');
     if (details) details.open = true;
   });
 }

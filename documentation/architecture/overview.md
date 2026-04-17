@@ -17,13 +17,14 @@ It explains how the application should use a project-owned canonical data format
 
 The current release keeps the architecture described below and implements it with these primary runtime entry points:
 
-- `index.html` — app mount point containing `<div id="app"></div>` and the Vite entry script
+- `index.html` — app mount point containing `<div id="app"></div>`, the Vite entry script, and PWA head tags (manifest link, `theme-color` meta, iOS Safari `apple-mobile-web-app` meta/link tags) added in Epic 40
 - `src/app/backup-utils.mjs` — versioned backup serialization, parsing, validation, and merge helpers
-- `src/app/collection-utils.mjs` — shared collection helpers including `mergeOwnedSets(state, newSetIds)` (sorted, deduplicated union of owned set IDs); shared by MyLudo import (Epic 45) and reserved for BGG import (Epic 42)
-- `src/app/localization-utils.mjs` — locale metadata, translation lookup, fallback handling, and locale-aware formatting helpers
+- `src/app/collection-utils.mjs` — shared collection helpers including `mergeOwnedSets(state, newSetIds)` (sorted, deduplicated union of owned set IDs); shared by MyLudo import (Epic 45) and BGG import (Epic 42); also exports `CARD_CATEGORIES` (ordered constant listing the five card-category identifiers and their locale label keys in canonical order: Heroes, Masterminds, Villain Groups, Henchman Groups, Schemes), `getCardsByCategory(ownedPools)` (returns all cards from the owned-expansion pool grouped into five category buckets, each sorted A–Z by card name, with empty categories included for render-time filtering), and `getCardsByExpansion(ownedPools)` (returns one bucket per owned expansion sorted A–Z by expansion name, aggregating all five categories per expansion with cards sorted A–Z by name); these three exports drive the Collection tab card-browser feature (Epic 44)
+- `src/app/localization-utils.mjs` — locale metadata, translation lookup, fallback handling, and locale-aware formatting helpers; message catalogs are imported from per-locale files under `src/app/locales/` (Epic 41)
 - `src/app/myludo-import-utils.mjs` — MyLudo collection import utilities: `parseMyludoFile(file)` (client-side CSV parsing) and `matchMyludoNamesToSets(names, sets)` (case-insensitive alias-aware catalog matching)
+- `src/app/bgg-import-utils.mjs` — BGG collection import utilities: `fetchBggCollection(username, options)` (fetches and parses the BGG XML API v2 collection endpoint with `own=1`, handling 202 queued responses with configurable retries and network errors) and `matchBggNamesToSets(bggGameNames, sets)` (case-insensitive alias-aware catalog matching, returns matched set IDs with display names and a list of unresolved BGG titles); added in Epic 42
 - `src/app/theme-utils.mjs` — supported theme metadata and theme-ID normalization helpers
-- `src/app/browser-entry.mjs` — mounts the root `App.svelte` component via Svelte 5 `mount()`
+- `src/app/browser-entry.mjs` — mounts the root `App.svelte` component via Svelte 5 `mount()` and registers the Service Worker via `navigator.serviceWorker.register()` (Epic 40)
 - `src/app/game-data-pipeline.mjs` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
 - `src/app/state-store.mjs` — owns the versioned root state persisted under `legendary_state_v1`
 - `src/app/state-store.svelte.js` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
@@ -38,6 +39,12 @@ The current release keeps the architecture described below and implements it wit
 - `src/components/TabNav.svelte` — Svelte 5 tab navigation component
 - `src/components/ToastStack.svelte` — Svelte 5 toast stack component
 - `src/components/BrowseTab.svelte`, `CollectionTab.svelte`, `NewGameTab.svelte`, `HistoryTab.svelte`, `BackupTab.svelte` — Svelte 5 feature-tab components; each owns its tab's reactive template logic, derived state, and full UI markup
+- `src/components/CardBrowserByCategory.svelte` — renders the card-browser "by category" view inside `CollectionTab`; accepts `pools` (owned-expansion pools object) and `locale` props; calls `getCardsByCategory` and renders one `<section>` per non-empty category with an `<h3>` heading and alphabetically sorted card list; shows an empty-collection message when no sets are owned (Epic 44)
+- `src/components/CardBrowserByExpansion.svelte` — renders the card-browser "by expansion" view inside `CollectionTab`; accepts `pools` and `locale` props; calls `getCardsByExpansion` and renders one `<section>` per owned expansion sorted A–Z by expansion name, with all cards from that expansion listed A–Z; shows the same empty-collection message when no sets are owned (Epic 44)
+- `src/app/locales/en.mjs`, `fr.mjs`, `de.mjs`, `ja.mjs`, `ko.mjs`, `es.mjs` — per-locale message catalog files; each exports its respective `*_MESSAGES` object; imported by `localization-utils.mjs` (Epic 41)
+- `public/manifest.webmanifest` — Web App Manifest declaring app identity, display mode, theme colour, and icon references; served at the GitHub Pages base path (Epic 40)
+- `public/sw.js` — cache-first Service Worker template; `%%SW_CACHE_VERSION%%` and `%%SW_PRECACHE_URLS%%` placeholders are injected by the `swInjectPlugin` Vite plugin during `npm run build` (Epic 40)
+- `public/icons/icon-192.png`, `icon-512.png`, `icon-512-maskable.png` — app icon assets referenced by the Web App Manifest and iOS Safari Add to Home Screen (Epic 40)
 
 The shipped runtime bundle created by `createEpic1Bundle(seed)` exposes project-owned canonical source data, normalized runtime data, summary counts, and validation test results for the browser shell.
 
@@ -87,7 +94,9 @@ However, once the game data has been verified and stored in the project's own ca
 The app should therefore:
 - use BGG as the verification source for the documentation phase,
 - store the final dataset in a clean project-owned format,
-- and run only on that project-owned format during implementation and maintenance.
+- and render the game catalog at runtime from that project-owned format only.
+
+> **Note (Epic 42):** The above applies specifically to the canonical game catalog data. Epic 42 introduced a separate runtime user-facing import flow: a BGG username input in the Collection tab that calls the BGG XML API (`/xmlapi2/collection?username={user}&own=1`) at runtime to fetch a user's public owned-game list and merge it into the app's collection state. The game catalog itself is unaffected; BGG is only contacted for user-collection data when the user explicitly triggers the import.
 
 ---
 
@@ -250,7 +259,8 @@ Current shape:
 {
   schemaVersion: 1,
   collection: {
-    ownedSetIds: string[]
+    ownedSetIds: string[],
+    activeSetIds: string[]      // empty = no filter (use all owned); non-empty = active expansion subset
   },
   usage: {
     heroes: Record<string, UsageStat>,
@@ -283,7 +293,7 @@ Within the current static modular app, Epic 2 should keep persistence concerns s
 
 Current module responsibilities:
 - `src/app/game-data-pipeline.mjs` — canonical data transformation, normalization, and runtime indexes only
-- `src/app/browser-entry.mjs` — mounts `App.svelte` via Svelte 5 `mount()`; no longer owns ephemeral UI state or rendering
+- `src/app/browser-entry.mjs` — mounts `App.svelte` via Svelte 5 `mount()` and registers the Service Worker (Epic 40); no longer owns ephemeral UI state or rendering
 - `src/components/App.svelte` — root Svelte 5 component; owns viewModel `$state` and wires state into all child tab components
 - a dedicated Epic 2 state/storage module under `src/app/` — default-state creation, load/save/update helpers, reset helpers, and storage availability handling
 - renderer modules — transitional render functions consumed via `{@html}` in Svelte tab components; surface recovery or validation messages, notifications, and confirmation UI, but do not own persistence logic

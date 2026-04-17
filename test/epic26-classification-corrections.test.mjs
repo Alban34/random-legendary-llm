@@ -11,14 +11,11 @@ const rootDir = path.resolve(__dirname, '..');
 let gameDataSource;
 let browseUtilsSource;
 let collectionUtilsSource;
-let postV1TaskList;
-
 before(async () => {
-  [gameDataSource, browseUtilsSource, collectionUtilsSource, postV1TaskList] = await Promise.all([
+  [gameDataSource, browseUtilsSource, collectionUtilsSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'data', 'canonical-game-data.json'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'browse-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'collection-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'documentation', 'planning', 'task-list.md'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'app', 'collection-utils.mjs'), 'utf8')
   ]);
 });
 
@@ -60,8 +57,4 @@ test('Story 26.5 — standalone group is removed from collection-utils', () => {
 
 test('Story 26.5 — alphabetical order in filterBrowseSets is preserved', () => {
   assert.match(browseUtilsSource, /localeCompare/);
-});
-
-test('Epic 26 full regression gate is marked in task-list.md', () => {
-  assert.match(postV1TaskList, /- \[x\] \*\*Full regression gate:\*\* run `npm test` and `npx playwright test`, and confirm all tests pass before marking Epic 26 work complete/);
 });

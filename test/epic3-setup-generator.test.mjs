@@ -83,6 +83,15 @@ test('Epic 3 resolves setup templates for all supported player modes including A
   assert.throws(() => resolveSetupTemplate(2, true), /Advanced Solo is only available/);
 });
 
+
+test('Epic 3 hero counts match official Legendary rules for each player count', () => {
+  assert.equal(resolveSetupTemplate(1, false).heroCount, 3, '1-player standard: 3 heroes');
+  assert.equal(resolveSetupTemplate(1, true).heroCount, 4, '1-player advanced solo: 4 heroes');
+  assert.equal(resolveSetupTemplate(2, false).heroCount, 5, '2-player: 5 heroes');
+  assert.equal(resolveSetupTemplate(3, false).heroCount, 5, '3-player: 5 heroes');
+  assert.equal(resolveSetupTemplate(4, false).heroCount, 5, '4-player: 5 heroes (not 6)');
+  assert.equal(resolveSetupTemplate(5, false).heroCount, 6, '5-player: 6 heroes');
+});
 test('Epic 3 legality validation rejects empty or unsupported collections with clear reasons', () => {
   const emptyState = createDefaultState();
   const emptyValidation = validateSetupLegality({ runtime: bundle.runtime, state: emptyState, playerCount: 1, advancedSolo: false });

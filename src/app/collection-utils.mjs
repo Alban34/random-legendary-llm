@@ -1,5 +1,41 @@
 import { buildOwnedPools, validateSetupLegality } from './setup-generator.mjs';
 
+export const CARD_CATEGORIES = [
+  { id: 'heroes', labelKey: 'common.heroes' },
+  { id: 'masterminds', labelKey: 'common.masterminds' },
+  { id: 'villainGroups', labelKey: 'common.villainGroups' },
+  { id: 'henchmanGroups', labelKey: 'common.henchmanGroups' },
+  { id: 'schemes', labelKey: 'common.schemes' },
+];
+
+export function getCardsByCategory(pools) {
+  return CARD_CATEGORIES.map(({ id, labelKey }) => ({
+    categoryId: id,
+    labelKey,
+    cards: [...(pools[id] ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
+  }));
+}
+
+export function getCardsByExpansion(pools) {
+  const expansionMap = new Map();
+  for (const set of pools.sets) {
+    expansionMap.set(set.id, { setId: set.id, setName: set.name, cards: [] });
+  }
+  for (const categoryKey of ['heroes', 'masterminds', 'villainGroups', 'henchmanGroups', 'schemes']) {
+    for (const card of pools[categoryKey]) {
+      if (expansionMap.has(card.setId)) {
+        expansionMap.get(card.setId).cards.push(card);
+      }
+    }
+  }
+  return [...expansionMap.values()]
+    .map((expansion) => ({
+      ...expansion,
+      cards: expansion.cards.sort((a, b) => a.name.localeCompare(b.name)),
+    }))
+    .sort((a, b) => a.setName.localeCompare(b.setName));
+}
+
 export const COLLECTION_TYPE_GROUPS = [
   { id: 'base', label: 'Base' },
   { id: 'large-expansion', label: 'Large Expansions' },

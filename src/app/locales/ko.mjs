@@ -1,4 +1,4 @@
-// Audit 2026-04-14: encoding check passed; no ASCII substitutes found.
+// Canonical key schema — all other locale files must mirror this structure.
 export const KO_MESSAGES = {
   'app.title': 'Legendary: Marvel 랜덤라이저',
   'app.subtitle': '세트를 둘러보고, 컬렉션을 관리하고, 합법적인 세팅을 생성하고, 브라우저 저장으로 기록을 추적합니다.',
@@ -167,6 +167,11 @@ export const KO_MESSAGES = {
   'collection.feasibility.warning': '경고',
   'collection.feasibility.okCopy': '현재 컬렉션이 이 세팅 모드를 지원합니다.',
   'collection.feasibility.badCopy': '현재 컬렉션이 이 세팅 모드를 지원할 수 없습니다.',
+  'collection.viewToggle.sets': '세트',
+  'collection.viewToggle.cards': '카드 탐색',
+  'collection.browser.noOwnedSets': '개별 카드를 탐색하려면 확장팩을 하나 이상 소유하세요.',
+  'collection.browser.groupBy.category': '카테고리별',
+  'collection.browser.groupBy.expansion': '확장별',
   'newGame.resetControls': '컨트롤 초기화',
   'newGame.selectedMode': '선택된 모드',
   'newGame.ownedSets': '보유 세트',

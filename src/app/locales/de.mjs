@@ -1,4 +1,4 @@
-// Audit 2026-04-14: encoding check passed; no ASCII substitutes found.
+// Canonical key schema — all other locale files must mirror this structure.
 export const DE_MESSAGES = {
   'app.title': 'Legendary: Marvel Zufallsgenerator',
   'app.subtitle': 'Durchsuche Sets, verwalte deine Sammlung, generiere legale Aufstellungen und verfolge den Verlauf mit Speicherung im Browser.',
@@ -167,6 +167,11 @@ export const DE_MESSAGES = {
   'collection.feasibility.warning': 'Warnung',
   'collection.feasibility.okCopy': 'Die Sammlung unterstützt diesen Spielmodus derzeit.',
   'collection.feasibility.badCopy': 'Die Sammlung kann diesen Spielmodus derzeit nicht unterstützen.',
+  'collection.viewToggle.sets': 'Sets',
+  'collection.viewToggle.cards': 'Karten durchsuchen',
+  'collection.browser.noOwnedSets': 'Besitzen Sie mindestens eine Erweiterung, um einzelne Karten zu durchsuchen.',
+  'collection.browser.groupBy.category': 'Nach Kategorie',
+  'collection.browser.groupBy.expansion': 'Nach Erweiterung',
   'newGame.resetControls': 'Steuerung zurücksetzen',
   'newGame.selectedMode': 'Ausgewählter Modus',
   'newGame.ownedSets': 'Besessene Sets',

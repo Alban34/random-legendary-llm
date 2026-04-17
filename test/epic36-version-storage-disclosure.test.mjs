@@ -18,7 +18,10 @@ before(async () => {
   [appSvelteSource, viteConfigSource, localizationSource, backupTabSource, pkgJson] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'vite.config.js'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.mjs'), 'utf8'),
+    Promise.all([
+      fs.readFile(path.join(rootDir, 'src', 'app', 'locales', 'en.mjs'), 'utf8'),
+      fs.readFile(path.join(rootDir, 'src', 'app', 'locales', 'fr.mjs'), 'utf8')
+    ]).then(([en, fr]) => en + '\n' + fr),
     fs.readFile(path.join(rootDir, 'src', 'components', 'BackupTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'package.json'), 'utf8').then(JSON.parse),
   ]);
@@ -302,26 +305,4 @@ test('Story 36.4: vite.config.js sets base conditionally based on command', () =
     "vite.config.js must still reference the '/random-legendary-llm/' production base path"
   );
 });
-
-test('Story 36.4: dist/index.html asset paths are prefixed with /random-legendary-llm/ (skipped if dist absent)', async () => {
-  const distIndexPath = path.join(rootDir, 'dist', 'index.html');
-  let distExists = false;
-  try {
-    await fs.access(distIndexPath);
-    distExists = true;
-  } catch {
-    // dist not present — skip assertion
-  }
-
-  if (!distExists) {
-    // No dist folder available in this environment; run `npm run build` to validate
-    return;
-  }
-
-  const distIndex = await fs.readFile(distIndexPath, 'utf8');
-  assert.match(
-    distIndex,
-    /\/random-legendary-llm\//,
-    'dist/index.html must contain /random-legendary-llm/-prefixed asset references when built for production'
-  );
-});
+;

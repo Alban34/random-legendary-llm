@@ -159,7 +159,6 @@ Historical note:
 - Export game history as JSON or CSV
 - Print-friendly setup summary
 - Card-level tracking within hero decks
-- PWA (offline install, service worker)
 
 ---
 

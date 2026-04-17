@@ -100,7 +100,7 @@
 
       {#if appState.collection.ownedSetIds.length > 0}
         <!-- Active expansion filter panel -->
-        <details data-active-filter-panel>
+        <details class="panel" data-active-filter-panel open>
           <summary>
             {locale.t('newGame.activeFilter.title')}
             <span class="muted">
@@ -153,20 +153,20 @@
                 type="button"
                 class="button button-secondary"
                 data-action="active-filter-clear-all"
-                onclick={() => onSetActiveSetIds([])}
+                onclick={onClearActiveSetIds}
               >{locale.t('newGame.activeFilter.clearAll')}</button>
             </div>
-            {#if !filterFeasibility.ok}
-              <div class="notice warning" style="margin-top: var(--space-sm)" data-active-filter-warning>
-                <ul>
-                  {#each filterFeasibility.reasons as reason}
-                    <li>{reason}</li>
-                  {/each}
-                </ul>
-              </div>
-            {/if}
           </section>
         </details>
+        {#if appState.collection.activeSetIds !== null && !filterFeasibility.ok}
+          <div class="notice warning" data-active-filter-warning>
+            <ul>
+              {#each filterFeasibility.reasons as reason}
+                <li>{reason}</li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
       {/if}
 
       <div data-mobile-task-anchor="new-game">
@@ -236,7 +236,7 @@
         <button
           class="button button-primary"
           data-action="generate-setup"
-          disabled={!filterFeasibility.ok}
+          disabled={appState.collection.activeSetIds !== null && !filterFeasibility.ok}
           onclick={onGenerateSetup}
         >{currentSetup ? locale.t('newGame.reroll') : locale.t('newGame.generate')}</button>
         <button

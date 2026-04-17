@@ -35,6 +35,7 @@ const BROWSER_GLOBALS = {
   AbortController: 'readonly',
   AbortSignal: 'readonly',
   structuredClone: 'readonly',
+  DOMParser: 'readonly',
 };
 
 export default [

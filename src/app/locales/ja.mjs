@@ -1,4 +1,4 @@
-// Audit 2026-04-14: encoding check passed; no ASCII substitutes found.
+// Canonical key schema — all other locale files must mirror this structure.
 export const JA_MESSAGES = {
   'app.title': 'Legendary: Marvel ランダマイザー',
   'app.subtitle': 'セットを閲覧し、コレクションを管理し、適法なセットアップを生成し、履歴をブラウザー保存で追跡します。',
@@ -167,6 +167,11 @@ export const JA_MESSAGES = {
   'collection.feasibility.warning': '警告',
   'collection.feasibility.okCopy': 'コレクションは現在このセットアップモードをサポートしています。',
   'collection.feasibility.badCopy': 'コレクションは現在このセットアップモードをサポートできません。',
+  'collection.viewToggle.sets': 'セット',
+  'collection.viewToggle.cards': 'カードを閲覧',
+  'collection.browser.noOwnedSets': '個々のカードを閲覧するには、少なくとも1つの拡張を所有してください。',
+  'collection.browser.groupBy.category': 'カテゴリ別',
+  'collection.browser.groupBy.expansion': '拡張別',
   'newGame.resetControls': 'コントロールをリセット',
   'newGame.selectedMode': '選択中のモード',
   'newGame.ownedSets': '所持セット',

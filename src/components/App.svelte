@@ -42,6 +42,7 @@
   } from '../app/backup-utils.mjs';
   import { mergeOwnedSets } from '../app/collection-utils.mjs';
   import { parseMyludoFile, matchMyludoNamesToSets } from '../app/myludo-import-utils.mjs';
+  import { fetchBggCollection, matchBggNamesToSets } from '../app/bgg-import-utils.mjs';
   import {
     getBrowseSearchTerm, setBrowseSearchTerm,
     getBrowseTypeFilter, setBrowseTypeFilter,
@@ -116,6 +117,9 @@
   let myludoImportStatus = $state('idle');
   let myludoImportError = $state('');
   let myludoImportSummary = $state(null);
+  let bggImportStatus = $state('idle');
+  let bggImportError = $state('');
+  let bggImportSummary = $state(null);
 
   // Non-reactive helpers
   let storageAdapter = null;
@@ -1129,6 +1133,34 @@
       myludoImportSummary = null;
       myludoImportError = '';
       myludoImportStatus = 'idle';
+    },
+
+    async importBggCollection(username) {
+      if (!username) return;
+      bggImportStatus = 'loading';
+      bggImportError = '';
+      bggImportSummary = null;
+      const result = await fetchBggCollection(username);
+      if (!result.ok) {
+        bggImportStatus = 'error';
+        bggImportError = result.error;
+        enqueueToast({ variant: 'error', message: result.error, behavior: 'persistent' });
+        return;
+      }
+      const { matched, unmatched } = matchBggNamesToSets(result.gameNames, bundle.runtime.sets);
+      const matchedSetIds = matched.map((m) => m.setId);
+      applyStateUpdate(
+        (currentState) => mergeOwnedSets(currentState, matchedSetIds),
+        'Updated collection from BGG import'
+      );
+      bggImportSummary = { matched, unmatched };
+      bggImportStatus = 'idle';
+    },
+
+    dismissBggSummary() {
+      bggImportSummary = null;
+      bggImportError = '';
+      bggImportStatus = 'idle';
     }
   };
 
@@ -1379,6 +1411,11 @@
                 {myludoImportStatus}
                 {myludoImportError}
                 {myludoImportSummary}
+                onImportBggCollection={actions.importBggCollection}
+                onDismissBggSummary={actions.dismissBggSummary}
+                {bggImportStatus}
+                {bggImportError}
+                {bggImportSummary}
               />
             {:else if tab.id === 'new-game'}
               <NewGameTab

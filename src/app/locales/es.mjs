@@ -1,4 +1,4 @@
-// Audit 2026-04-14: encoding check passed; no ASCII substitutes found.
+// Canonical key schema — all other locale files must mirror this structure.
 export const ES_MESSAGES = {
   'app.title': 'Aleatorizador de Legendary: Marvel',
   'app.subtitle': 'Explora expansiones, gestiona tu colección, genera configuraciones legales y sigue el historial con persistencia en el navegador.',
@@ -167,6 +167,11 @@ export const ES_MESSAGES = {
   'collection.feasibility.warning': 'Advertencia',
   'collection.feasibility.okCopy': 'La colección actualmente admite este modo de configuración.',
   'collection.feasibility.badCopy': 'La colección no puede admitir este modo de configuración actualmente.',
+  'collection.viewToggle.sets': 'Conjuntos',
+  'collection.viewToggle.cards': 'Explorar cartas',
+  'collection.browser.noOwnedSets': 'Posee al menos una expansión para explorar las cartas individuales.',
+  'collection.browser.groupBy.category': 'Por categoría',
+  'collection.browser.groupBy.expansion': 'Por expansión',
   'newGame.resetControls': 'Restablecer controles',
   'newGame.selectedMode': 'Modo seleccionado',
   'newGame.ownedSets': 'Expansiones en propiedad',

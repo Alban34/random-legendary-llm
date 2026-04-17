@@ -1,4 +1,4 @@
-// Audit 2026-04-14: encoding check passed; no ASCII substitutes found.
+// Canonical key schema — all other locale files must mirror this structure.
 export const EN_MESSAGES = {
   'app.title': 'Legendary: Marvel Randomizer',
   'app.subtitle': 'Browse sets, manage your collection, generate legal setups, and track history with browser-based persistence.',
@@ -99,6 +99,11 @@ export const EN_MESSAGES = {
   'collection.feasibility.warning': 'Warning',
   'collection.feasibility.okCopy': 'Collection currently supports this setup mode.',
   'collection.feasibility.badCopy': 'Collection cannot currently support this setup mode.',
+  'collection.viewToggle.sets': 'Sets',
+  'collection.viewToggle.cards': 'Browse Cards',
+  'collection.browser.noOwnedSets': 'Own at least one expansion to browse individual cards.',
+  'collection.browser.groupBy.category': 'By Category',
+  'collection.browser.groupBy.expansion': 'By Expansion',
   'newGame.playerCount': 'Player count',
   'newGame.playMode': 'Play mode',
   'newGame.resetControls': 'Reset controls',

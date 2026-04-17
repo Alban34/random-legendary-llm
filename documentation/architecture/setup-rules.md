@@ -34,8 +34,8 @@ The shipped implementation resolves these templates through `resolveSetupTemplat
 ## Core setup sequence
 
 1. determine the requested setup template from `SETUP_RULES`
-2. build owned pools from the selected collection
-3. validate that the owned collection can legally support the requested setup
+2. resolve the active pool: if `activeSetIds` is non-empty, build pools from `activeSetIds` (an active expansion filter is in effect); otherwise build pools from `ownedSetIds` (the full owned collection)
+3. validate that the resolved active pool can legally support the requested setup
 4. choose a Scheme
 5. choose a Mastermind
 6. apply forced groups from the Scheme and Mastermind
@@ -50,6 +50,8 @@ The shipped implementation resolves these templates through `resolveSetupTemplat
 
 The app must validate legality **before** applying freshness / least-played logic.
 
+Both `validateSetupLegality` and `generateSetup` resolve the active pool identically (see Core setup sequence step 2). When an active expansion filter is set, legality is checked against that filtered subset, not the full owned collection. This means the New Game tab can surface a pre-generation feasibility warning when the active filter's card pool is too small.
+
 Examples of legality checks:
 - enough total Heroes exist for the requested game
 - enough total Villain Groups exist after accounting for forced groups
@@ -58,7 +60,7 @@ Examples of legality checks:
 - Advanced Solo is only available in 1-player mode
 - Two-Handed Solo is only available in 1-player mode
 
-If the owned pool is not legally sufficient, the app must fail with a clear message.
+If the resolved active pool is not legally sufficient, the app must fail with a clear message.
 
 Two-Handed Solo uses the standard 2-player setup counts while keeping accepted history records labeled as a solo mode.
 

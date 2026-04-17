@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.mjs');
-const localizationPath = path.join(rootDir, 'src', 'app', 'localization-utils.mjs');
+const localizationPath = path.join(rootDir, 'src', 'app', 'locales', 'en.mjs');
 
 let rendererSource;
 let localizationSource;

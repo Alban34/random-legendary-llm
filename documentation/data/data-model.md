@@ -279,7 +279,8 @@ The app should persist **one versioned root state object**.
 {
   schemaVersion: 1,
   collection: {
-    ownedSetIds: string[]
+    ownedSetIds: string[],
+    activeSetIds: string[]      // empty = no filter (use all owned); non-empty = active expansion subset
   },
   usage: {
     heroes: Record<string, UsageStat>,

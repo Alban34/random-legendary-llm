@@ -1,4 +1,4 @@
-// Audit 2026-04-14: encoding check passed; no ASCII substitutes found.
+// Canonical key schema — all other locale files must mirror this structure.
 export const FR_MESSAGES = {
   'app.title': 'Randomiseur Legendary: Marvel',
   'app.subtitle': 'Parcourez les extensions, gérez votre collection, générez des mises en place valides et suivez votre historique avec une sauvegarde dans le navigateur.',
@@ -99,6 +99,11 @@ export const FR_MESSAGES = {
   'collection.feasibility.warning': 'Alerte',
   'collection.feasibility.okCopy': 'La collection prend actuellement en charge ce mode.',
   'collection.feasibility.badCopy': 'La collection ne prend pas encore en charge ce mode.',
+  'collection.viewToggle.sets': 'Ensembles',
+  'collection.viewToggle.cards': 'Parcourir les cartes',
+  'collection.browser.noOwnedSets': 'Possédez au moins une extension pour parcourir les cartes individuelles.',
+  'collection.browser.groupBy.category': 'Par catégorie',
+  'collection.browser.groupBy.expansion': 'Par extension',
   'newGame.playerCount': 'Nombre de joueurs',
   'newGame.playMode': 'Mode de jeu',
   'newGame.resetControls': 'Réinitialiser les contrôles',
