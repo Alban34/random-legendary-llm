@@ -203,14 +203,20 @@ function validateForcedPickAvailability(forcedPicks, pools, template, eligibleSc
 
   // Count mastermind villain lead toward the villain group slot limit
   const forcedMastermind = forcedPicks.mastermindId ? mastermindsById[forcedPicks.mastermindId] : null;
-  const mastermindLeadVillainGroupCount = forcedMastermind?.lead?.category === 'villains' ? 1 : 0;
+  const mastermindLeadIsVillain = forcedMastermind?.lead?.category === 'villains';
+  const mastermindLeadVillainAlreadyForced =
+    mastermindLeadIsVillain && forcedPicks.villainGroupIds.includes(forcedMastermind.lead.id);
+  const mastermindLeadVillainGroupCount = mastermindLeadIsVillain && !mastermindLeadVillainAlreadyForced ? 1 : 0;
   const effectiveForcedVillainCount = forcedPicks.villainGroupIds.length + mastermindLeadVillainGroupCount;
 
   if (effectiveForcedVillainCount > template.villainGroupCount) {
     reasons.push(`Forced Villain Groups (including mastermind lead) exceed the base Villain Group slots for this setup mode (${effectiveForcedVillainCount}/${template.villainGroupCount}).`);
   }
 
-  const mastermindLeadHenchmanGroupCount = forcedMastermind?.lead?.category === 'henchmen' ? 1 : 0;
+  const mastermindLeadIsHenchman = forcedMastermind?.lead?.category === 'henchmen';
+  const mastermindLeadHenchmanAlreadyForced =
+    mastermindLeadIsHenchman && forcedPicks.henchmanGroupIds.includes(forcedMastermind.lead.id);
+  const mastermindLeadHenchmanGroupCount = mastermindLeadIsHenchman && !mastermindLeadHenchmanAlreadyForced ? 1 : 0;
   const effectiveForcedHenchmanCount = forcedPicks.henchmanGroupIds.length + mastermindLeadHenchmanGroupCount;
 
   if (effectiveForcedHenchmanCount > template.henchmanGroupCount) {

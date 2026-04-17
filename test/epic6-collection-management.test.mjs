@@ -30,7 +30,7 @@ test('Epic 6 groups sets by type in the approved Base / Large / Small order', ()
   const groups = groupSetsByType(bundle.runtime.sets);
 
   assert.deepEqual(groups.map((group) => group.id), COLLECTION_TYPE_GROUPS.map((group) => group.id));
-  assert.deepEqual(groups[0].sets.map((set) => set.name), ['Core Set', 'Villains']);
+  assert.deepEqual(groups[0].sets.map((set) => set.name), ['Core Set', 'Villains', "Marvel Studios' What If...?"]);  
   assert.ok(groups[1].sets.some((set) => set.name === 'Dark City'));
   assert.ok(groups[2].sets.some((set) => set.name === 'Fantastic Four'));
 });

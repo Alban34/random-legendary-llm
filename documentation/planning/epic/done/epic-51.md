@@ -43,13 +43,15 @@ Bring the Marvel Legendary expansion catalog in `src/data/` to completeness and 
 
 ### Incorrect release dates
 
-Release date audit against BGG is pending — to be completed during Story 3 implementation. No confirmed date errors have been identified yet from the user-provided data.
+| # | Expansion name | Current `year` | Correct year | Source |
+|---|---------------|:--------------:|:------------:|--------|
+| 1 | World War Hulk | 2019 | 2018 | BoardGameGeek ("Year Published": 2018) |
 
 ### Status
 
 - [x] Story 1 gap report complete (missing expansions identified from BGG screenshot)
-- [ ] Story 2 — add missing expansions to `src/data/`
-- [ ] Story 3 — correct incorrect release dates
+- [x] Story 2 — add missing expansions to `src/data/`
+- [x] Story 3 — correct incorrect release dates
 
 ### Expansion card details
 

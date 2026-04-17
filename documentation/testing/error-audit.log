@@ -44,3 +44,8 @@ File: test/playwright/epic40-qc.spec.mjs (lines 38, 71, 92)
 Finding: The clean-code audit (documentation/planning/clean-code-reports/clean-code-audit-2026-04-17.md, 🟡 issue 14) flagged three `test.skip` calls: two production-only environment guards and one unconditional `test.skip(true, …)`. The fix pass did not address this issue — it is not listed among the shipped changes. The unconditional skip permanently prevents the SW-control assertion from running in any environment.
 Suggested action: Replace the unconditional `test.skip(true, …)` with `test.fixme` and add a tracking comment. For the two `!isProduction` guards, consider extracting them into a separate production-only spec file to make the skip intent explicit at the file level. This requires changes to test files outside `/documentation`.
 ---
+[2026-04-17] Epic: Epic 51 — Game Catalog Data Audit & Correction
+File: documentation/ux/reports/should-desktop-browse-entry-overload.md
+Finding: The UX audit report cites a `Visible sets 33 of 33` counter as evidence of Browse-screen clutter. After Epic 51 added 5 expansions (Midnight Sons, The Infinity Saga, Weapon X, 2099, Ant-Man and the Wasp), the live counter will display `38 of 38` (or filtered equivalent). The report is a historical audit record documenting what was observed at review time; the `33 of 33` figure was accurate then and should not be retroactively changed. However, future UX reviewers reading the report may be confused by the stale count.
+Suggested action: A UX team member should append a note to the report (e.g., "Note: Catalog has grown to 38 sets as of Epic 51; the `Visible sets` count will reflect the current total.") to prevent confusion without altering the historical evidence.
+---

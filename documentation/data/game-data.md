@@ -64,6 +64,11 @@ The documentation and future implementation will use the following rules:
 - `Messiah Complex`
 - `Marvel Noir`
 - `Spider-Man Homecoming`
+- `Midnight Sons`
+- `The Infinity Saga`
+- `Weapon X`
+- `2099`
+- `Ant-Man and the Wasp`
 
 ### MCU-branded sets included in scope
 - `Marvel Studios, Phase 1`
@@ -80,7 +85,7 @@ The documentation and future implementation will use the following rules:
 |------------|---------------|-------|
 | Base Game | 2 | `Core Set` and `Villains` are both classified as base games (Epic 22) |
 | Large Expansions | 8 | Includes `Dark City`, `Civil War`, `World War Hulk`, `X-Men`, `Venom`, and others classified as large in this project |
-| Small Expansions | 22 | Includes both comic-themed and MCU-branded small boxes / decks |
+| Small Expansions | 27 | Includes both comic-themed and MCU-branded small boxes / decks |
 | Standalone-Compatible | 1 | `Revelations`; `Villains` was reclassified to base game in Epic 22 |
 
 > **Pending:** small and large expansion assignments for some sets are awaiting user-provided corrections and are intentionally deferred.

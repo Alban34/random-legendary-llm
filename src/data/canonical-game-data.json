@@ -76,7 +76,7 @@
     },
     {
       "name": "Deadpool",
-      "year": 2017,
+      "year": 2016,
       "type": "small-expansion",
       "aliases": []
     },
@@ -96,7 +96,7 @@
     },
     {
       "name": "Marvel Studios' Guardians of the Galaxy",
-      "year": 2019,
+      "year": 2022,
       "type": "small-expansion",
       "aliases": [
         "MCU Guardians of the Galaxy"
@@ -104,7 +104,7 @@
     },
     {
       "name": "World War Hulk",
-      "year": 2019,
+      "year": 2018,
       "type": "large-expansion",
       "aliases": []
     },
@@ -118,7 +118,7 @@
     },
     {
       "name": "Ant-Man",
-      "year": 2019,
+      "year": 2018,
       "type": "small-expansion",
       "aliases": []
     },
@@ -148,19 +148,19 @@
     },
     {
       "name": "Black Widow",
-      "year": 2020,
+      "year": 2022,
       "type": "small-expansion",
       "aliases": []
     },
     {
       "name": "Black Panther",
-      "year": 2021,
+      "year": 2022,
       "type": "small-expansion",
       "aliases": []
     },
     {
       "name": "Doctor Strange and the Shadows of Nightmare",
-      "year": 2021,
+      "year": 2022,
       "type": "small-expansion",
       "aliases": []
     },
@@ -172,44 +172,80 @@
     },
     {
       "name": "Venom",
-      "year": 2021,
+      "year": 2019,
       "type": "small-expansion",
       "aliases": []
     },
     {
       "name": "The New Mutants",
-      "year": 2021,
+      "year": 2020,
       "type": "small-expansion",
       "aliases": []
     },
     {
       "name": "X-Men",
-      "year": 2022,
+      "year": 2017,
       "type": "large-expansion",
       "aliases": []
     },
     {
       "name": "Revelations",
-      "year": 2022,
+      "year": 2019,
       "type": "small-expansion",
       "aliases": []
     },
     {
       "name": "Messiah Complex",
-      "year": 2023,
+      "year": 2022,
       "type": "small-expansion",
       "aliases": []
     },
     {
       "name": "Marvel Noir",
+      "year": 2017,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Midnight Sons",
       "year": 2023,
       "type": "small-expansion",
       "aliases": []
     },
     {
+      "name": "The Infinity Saga",
+      "year": 2023,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Marvel Studios' What If...?",
+      "year": 2023,
+      "type": "base",
+      "aliases": []
+    },
+    {
       "name": "Spider-Man Homecoming",
+      "year": 2017,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Weapon X",
       "year": 2024,
       "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "2099",
+      "year": 2024,
+      "type": "small-expansion",
+      "aliases": []
+    },
+    {
+      "name": "Ant-Man and the Wasp",
+      "year": 2024,
+      "type": "large-expansion",
       "aliases": []
     }
   ],
@@ -279,11 +315,38 @@
         "cardCount": 14
       },
       {
+        "name": "Ant Army",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Ant-Man",
         "setName": "Ant-Man",
         "aliases": [],
         "teams": [
           "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ant-Man",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Apocalyptic Black Widow",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Multiverse"
         ],
         "cardCount": 14
       },
@@ -403,6 +466,18 @@
         "cardCount": 14
       },
       {
+        "name": "Black Panther",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14,
+        "notes": [
+          "Non-standard card distribution: 1/2/2/3/3/3."
+        ]
+      },
+      {
         "name": "Black Swan",
         "setName": "Secret Wars, Volume 2",
         "aliases": [],
@@ -448,6 +523,15 @@
         "cardCount": 14
       },
       {
+        "name": "Blade, Daywalker",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Bob, Agent of Hydra",
         "setName": "Deadpool",
         "aliases": [],
@@ -473,6 +557,18 @@
           "The Avengers"
         ],
         "cardCount": 14
+      },
+      {
+        "name": "Bruce Banner",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14,
+        "notes": [
+          "Non-standard card distribution: 1/2/2/3/3/3."
+        ]
       },
       {
         "name": "Bullseye",
@@ -565,6 +661,15 @@
         "cardCount": 14
       },
       {
+        "name": "Captain Carter",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Multiverse"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Captain Mar-Vell",
         "setName": "Into the Cosmos",
         "aliases": [],
@@ -592,11 +697,32 @@
         "cardCount": 14
       },
       {
+        "name": "Captain Marvel",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14,
+        "notes": [
+          "Non-standard card distribution: 1/2/2/3/3/3."
+        ]
+      },
+      {
         "name": "Carnage",
         "setName": "Venom",
         "aliases": [],
         "teams": [
           "Venomverse"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Cassie Lang",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
         ],
         "cardCount": 14
       },
@@ -736,11 +862,41 @@
         "cardCount": 14
       },
       {
+        "name": "Doctor Doom 2099",
+        "setName": "2099",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Doctor Strange",
         "setName": "Doctor Strange and the Shadows of Nightmare",
         "aliases": [],
         "teams": [
           "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Doctor Strange",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14,
+        "notes": [
+          "Non-standard card distribution: 1/2/2/3/3/3."
+        ]
+      },
+      {
+        "name": "Doctor Strange Supreme",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Multiverse"
         ],
         "cardCount": 14
       },
@@ -835,6 +991,15 @@
         "cardCount": 14
       },
       {
+        "name": "Elsa Bloodstone",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Emma Frost",
         "setName": "Core Set",
         "aliases": [],
@@ -880,11 +1045,29 @@
         "cardCount": 14
       },
       {
+        "name": "Fantomex",
+        "setName": "Weapon X",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Forge",
         "setName": "Dark City",
         "aliases": [],
         "teams": [
           "X-Force"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Freedom Fighters",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
         ],
         "cardCount": 14
       },
@@ -916,6 +1099,15 @@
         "cardCount": 14
       },
       {
+        "name": "Gamora, Destroyer of Thanos",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Multiverse"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "General Okoye",
         "setName": "Black Panther",
         "aliases": [],
@@ -927,6 +1119,15 @@
       {
         "name": "Ghost Rider",
         "setName": "Dark City",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Ghost Rider 2099",
+        "setName": "2099",
         "aliases": [],
         "teams": [
           "Marvel Knights"
@@ -1099,6 +1300,15 @@
         "cardCount": 14
       },
       {
+        "name": "Hulk 2099",
+        "setName": "2099",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Hulkbuster Iron Man",
         "setName": "World War Hulk",
         "aliases": [],
@@ -1180,11 +1390,29 @@
         "cardCount": 14
       },
       {
+        "name": "Janet Van Dyne",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Jean Grey",
         "setName": "Dark City",
         "aliases": [],
         "teams": [
           "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Jentorra",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
         ],
         "cardCount": 14
       },
@@ -1248,6 +1476,15 @@
         "aliases": [],
         "teams": [
           "Inhumans"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Killmonger, Spec Ops",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Multiverse"
         ],
         "cardCount": 14
       },
@@ -1413,6 +1650,15 @@
         "cardCount": 14
       },
       {
+        "name": "Marrow",
+        "setName": "Weapon X",
+        "aliases": [],
+        "teams": [
+          "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Maximus",
         "setName": "Secret Wars, Volume 1",
         "aliases": [],
@@ -1472,6 +1718,15 @@
         "aliases": [],
         "teams": [
           "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Morbius",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
         ],
         "cardCount": 14
       },
@@ -1634,6 +1889,15 @@
         "aliases": [],
         "teams": [
           "X-Men"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Party Thor",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Multiverse"
         ],
         "cardCount": 14
       },
@@ -1810,6 +2074,15 @@
         "cardCount": 14
       },
       {
+        "name": "Ravage 2099",
+        "setName": "2099",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Red Guardian",
         "setName": "Black Widow",
         "aliases": [],
@@ -1908,6 +2181,15 @@
       {
         "name": "Scarlet Witch",
         "setName": "Revelations",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Scott Lang Cat Burglar",
+        "setName": "Ant-Man and the Wasp",
         "aliases": [],
         "teams": [
           "The Avengers"
@@ -2066,6 +2348,15 @@
         "cardCount": 14
       },
       {
+        "name": "Spider-Man 2099",
+        "setName": "2099",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Spider-Man Noir",
         "setName": "Marvel Noir",
         "aliases": [],
@@ -2107,6 +2398,15 @@
         "aliases": [],
         "teams": [
           "Guardians of the Galaxy"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Star-Lord T'Challa",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Multiverse"
         ],
         "cardCount": 14
       },
@@ -2322,6 +2622,15 @@
         "cardCount": 14
       },
       {
+        "name": "Uatu, The Watcher",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "teams": [
+          "Guardians of the Multiverse"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "Ultimate Spider-Man",
         "setName": "Secret Wars, Volume 1",
         "aliases": [],
@@ -2410,6 +2719,18 @@
         "cardCount": 14
       },
       {
+        "name": "Wanda & Vision",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14,
+        "notes": [
+          "Non-standard card distribution: 1/2/2/3/3/3."
+        ]
+      },
+      {
         "name": "War Machine",
         "setName": "Revelations",
         "aliases": [],
@@ -2442,6 +2763,42 @@
         "aliases": [],
         "teams": [
           "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Wasp",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "teams": [
+          "The Avengers"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Weapon H",
+        "setName": "Weapon X",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Weapon X (Wolverine)",
+        "setName": "Weapon X",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
+        "name": "Werewolf by Night",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
         ],
         "cardCount": 14
       },
@@ -2516,6 +2873,15 @@
         "cardCount": 14
       },
       {
+        "name": "Wong, Master of the Mystic Arts",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "teams": [
+          "Marvel Knights"
+        ],
+        "cardCount": 14
+      },
+      {
         "name": "X-23",
         "setName": "X-Men",
         "aliases": [],
@@ -2551,6 +2917,16 @@
         "leadName": "Salvagers",
         "leadCategory": "villains",
         "notes": []
+      },
+      {
+        "name": "Alchemax Executives",
+        "setName": "2099",
+        "aliases": [],
+        "leadName": "Alchemax Enforcers",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Adapting Mastermind. Card count: 4."
+        ]
       },
       {
         "name": "Annihilus",
@@ -2654,6 +3030,16 @@
         "notes": []
       },
       {
+        "name": "Darren Cross / Yellowjacket",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "leadName": "Cross Technologies",
+        "leadCategory": "villains",
+        "notes": [
+          "Transforming Mastermind."
+        ]
+      },
+      {
         "name": "Deathbird",
         "setName": "X-Men",
         "aliases": [],
@@ -2687,6 +3073,16 @@
         "leadName": "Defenders",
         "leadCategory": "villains",
         "notes": []
+      },
+      {
+        "name": "Ebony Maw",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "leadName": "Children of Thanos",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Mastermind."
+        ]
       },
       {
         "name": "Ego, The Living Planet",
@@ -2755,6 +3151,16 @@
         "notes": []
       },
       {
+        "name": "Ghost Master Thief / Ghost Intangible",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "leadName": "Ghost Chasers",
+        "leadCategory": "villains",
+        "notes": [
+          "Transforming Mastermind."
+        ]
+      },
+      {
         "name": "Grandmaster",
         "setName": "Into the Cosmos",
         "aliases": [],
@@ -2769,6 +3175,16 @@
         "leadName": "Lethal Legion",
         "leadCategory": "villains",
         "notes": []
+      },
+      {
+        "name": "Hank Pym, Yellowjacket",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "leadName": "Black Order Guards",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Mastermind."
+        ]
       },
       {
         "name": "Hela, Goddess of Death",
@@ -2843,6 +3259,16 @@
         "notes": []
       },
       {
+        "name": "Kang Quantum Conqueror / Kang Multiverse Conqueror",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "leadName": "Armada of Kang",
+        "leadCategory": "villains",
+        "notes": [
+          "Transforming Mastermind."
+        ]
+      },
+      {
         "name": "Kang the Conqueror",
         "setName": "Annihilation",
         "aliases": [],
@@ -2857,6 +3283,16 @@
         "leadName": "Killmonger's League",
         "leadCategory": "villains",
         "notes": []
+      },
+      {
+        "name": "Killmonger, The Betrayer",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "leadName": "Vibranium Liberator Drones",
+        "leadCategory": "henchmen",
+        "notes": [
+          "Epic Mastermind."
+        ]
       },
       {
         "name": "King Hulk, Sakaarson",
@@ -2897,6 +3333,16 @@
         "leadName": "Reavers",
         "leadCategory": "villains",
         "notes": []
+      },
+      {
+        "name": "Lilith, Mother of Demons",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "leadName": "Lilin",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Mastermind."
+        ]
       },
       {
         "name": "Loki",
@@ -3075,6 +3521,17 @@
         "notes": []
       },
       {
+        "name": "Omega Red",
+        "setName": "Weapon X",
+        "aliases": [],
+        "leadName": "Berserkers",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Mastermind.",
+          "Expansion includes 10 Enraging Wounds (special wound variant)."
+        ]
+      },
+      {
         "name": "Onslaught",
         "setName": "X-Men",
         "aliases": [],
@@ -3131,12 +3588,34 @@
         "notes": []
       },
       {
+        "name": "Romulus",
+        "setName": "Weapon X",
+        "aliases": [],
+        "leadName": "Weapon Plus",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Mastermind.",
+          "Expansion includes 10 Enraging Wounds (special wound variant)."
+        ]
+      },
+      {
         "name": "Ronan the Accuser",
         "setName": "Marvel Studios' Guardians of the Galaxy",
         "aliases": [],
         "leadName": "Followers of Ronan",
         "leadCategory": "villains",
         "notes": []
+      },
+      {
+        "name": "Sabretooth",
+        "setName": "Weapon X",
+        "aliases": [],
+        "leadName": "Berserkers",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Mastermind.",
+          "Expansion includes 10 Enraging Wounds (special wound variant)."
+        ]
       },
       {
         "name": "Shadow King",
@@ -3153,6 +3632,16 @@
         "leadName": "Monster Metropolis",
         "leadCategory": "villains",
         "notes": []
+      },
+      {
+        "name": "Sinister Six 2099",
+        "setName": "2099",
+        "aliases": [],
+        "leadName": "False Aesir of Alchemax",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Adapting Mastermind. Card count: 6."
+        ]
       },
       {
         "name": "Spider Queen",
@@ -3193,6 +3682,16 @@
         "leadName": "Infinity Gems",
         "leadCategory": "villains",
         "notes": []
+      },
+      {
+        "name": "Thanos",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "leadName": "Infinity Stones",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Mastermind."
+        ]
       },
       {
         "name": "The Beyonder",
@@ -3243,6 +3742,16 @@
         "notes": []
       },
       {
+        "name": "Ultron Infinity",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "leadName": "Ultron Sentries",
+        "leadCategory": "henchmen",
+        "notes": [
+          "Epic Mastermind."
+        ]
+      },
+      {
         "name": "Uru-Enchanted Iron Man",
         "setName": "Fear Itself",
         "aliases": [],
@@ -3267,12 +3776,32 @@
         "notes": []
       },
       {
+        "name": "Zarathos",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "leadName": "Fallen",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Mastermind."
+        ]
+      },
+      {
         "name": "Zombie Green Goblin",
         "setName": "Secret Wars, Volume 1",
         "aliases": [],
         "leadName": "The Deadlands",
         "leadCategory": "villains",
         "notes": []
+      },
+      {
+        "name": "Zombie Scarlet Witch",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "leadName": "Zombie Avengers",
+        "leadCategory": "villains",
+        "notes": [
+          "Epic Mastermind."
+        ]
       }
     ],
     "villainGroups": [
@@ -3289,8 +3818,20 @@
         "cardCount": 8
       },
       {
+        "name": "Alchemax Enforcers",
+        "setName": "2099",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
         "name": "Annihilation Wave",
         "setName": "Annihilation",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Armada of Kang",
+        "setName": "Ant-Man and the Wasp",
         "aliases": [],
         "cardCount": 8
       },
@@ -3313,6 +3854,18 @@
         "cardCount": 8
       },
       {
+        "name": "Berserkers",
+        "setName": "Weapon X",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Black Order Guards",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
         "name": "Black Order of Thanos",
         "setName": "Into the Cosmos",
         "aliases": [],
@@ -3331,6 +3884,12 @@
         "cardCount": 8
       },
       {
+        "name": "Children of Thanos",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
         "name": "Chitauri",
         "setName": "Marvel Studios, Phase 1",
         "aliases": [],
@@ -3345,6 +3904,12 @@
       {
         "name": "Code Red",
         "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Cross Technologies",
+        "setName": "Ant-Man and the Wasp",
         "aliases": [],
         "cardCount": 8
       },
@@ -3445,6 +4010,18 @@
         "cardCount": 8
       },
       {
+        "name": "Fallen",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "False Aesir of Alchemax",
+        "setName": "2099",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
         "name": "Fear Lords",
         "setName": "Doctor Strange and the Shadows of Nightmare",
         "aliases": [],
@@ -3471,6 +4048,12 @@
       {
         "name": "Gamma Hunters",
         "setName": "Marvel Studios, Phase 1",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Ghost Chasers",
+        "setName": "Ant-Man and the Wasp",
         "aliases": [],
         "cardCount": 8
       },
@@ -3553,6 +4136,12 @@
         "cardCount": 8
       },
       {
+        "name": "Infinity Stones",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
         "name": "Inhuman Rebellion",
         "setName": "Realm of Kings",
         "aliases": [],
@@ -3561,6 +4150,12 @@
       {
         "name": "Intelligencia",
         "setName": "World War Hulk",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Intergalactic Party Animals",
+        "setName": "Marvel Studios' What If...?",
         "aliases": [],
         "cardCount": 8
       },
@@ -3597,6 +4192,12 @@
       {
         "name": "Life Foundation",
         "setName": "Venom",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Lilin",
+        "setName": "Midnight Sons",
         "aliases": [],
         "cardCount": 8
       },
@@ -3697,6 +4298,12 @@
         "cardCount": 8
       },
       {
+        "name": "Quantum Realm",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
         "name": "Queen's Vengeance",
         "setName": "Ant-Man",
         "aliases": [],
@@ -3723,6 +4330,12 @@
       {
         "name": "Registration Enforcers",
         "setName": "Civil War",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Rival Overlords",
+        "setName": "Marvel Studios' What If...?",
         "aliases": [],
         "cardCount": 8
       },
@@ -3795,6 +4408,12 @@
       {
         "name": "Spider Friends",
         "setName": "Villains",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Strange's Demons",
+        "setName": "Marvel Studios' What If...?",
         "aliases": [],
         "cardCount": 8
       },
@@ -3901,6 +4520,12 @@
         "cardCount": 8
       },
       {
+        "name": "Weapon Plus",
+        "setName": "Weapon X",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
         "name": "Wrecking Crew",
         "setName": "Champions",
         "aliases": [],
@@ -3927,6 +4552,12 @@
       {
         "name": "Zola's Creations",
         "setName": "Captain America 75th Anniversary",
+        "aliases": [],
+        "cardCount": 8
+      },
+      {
+        "name": "Zombie Avengers",
+        "setName": "Marvel Studios' What If...?",
         "aliases": [],
         "cardCount": 8
       }
@@ -3977,6 +4608,12 @@
       {
         "name": "Ghost Racers",
         "setName": "Secret Wars, Volume 1",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Giants of Jotunheim",
+        "setName": "Marvel Studios' What If...?",
         "aliases": [],
         "cardCount": 10
       },
@@ -4071,6 +4708,18 @@
         "cardCount": 10
       },
       {
+        "name": "Quantum Hound",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Quantumnauts",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
         "name": "S.H.I.E.L.D. Assault Squad",
         "setName": "Villains",
         "aliases": [],
@@ -4137,6 +4786,12 @@
         "cardCount": 10
       },
       {
+        "name": "Tardigrade",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
         "name": "Ten Rings Fanatics",
         "setName": "Marvel Studios, Phase 1",
         "aliases": [],
@@ -4155,8 +4810,20 @@
         "cardCount": 10
       },
       {
+        "name": "Ultron Sentries",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
         "name": "Universal Church of Truth",
         "setName": "Into the Cosmos",
+        "aliases": [],
+        "cardCount": 10
+      },
+      {
+        "name": "Vibranium Liberator Drones",
+        "setName": "Marvel Studios' What If...?",
         "aliases": [],
         "cardCount": 10
       }
@@ -4240,6 +4907,17 @@
         "notes": []
       },
       {
+        "name": "Auction Shrink Tech to Highest Bidder",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Avengers vs. X-Men",
         "setName": "Civil War",
         "aliases": [],
@@ -4262,6 +4940,28 @@
         "notes": []
       },
       {
+        "name": "Become President of the United States",
+        "setName": "2099",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Befoul Earth into a Polluted Wasteland",
+        "setName": "2099",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Brainwash the Military",
         "setName": "Captain America 75th Anniversary",
         "aliases": [],
@@ -4275,6 +4975,17 @@
       {
         "name": "Breach Parallel Dimensions",
         "setName": "Annihilation",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Breach the Nexus of All Realities",
+        "setName": "Marvel Studios' What If...?",
         "aliases": [],
         "constraints": {
           "minimumPlayerCount": null
@@ -4370,6 +5081,28 @@
       {
         "name": "Clash of the Monsters Unleashed",
         "setName": "Champions",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Collect an Interstellar Zoo",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Condition Logan into Weapon X",
+        "setName": "Weapon X",
         "aliases": [],
         "constraints": {
           "minimumPlayerCount": null
@@ -4703,6 +5436,17 @@
         ]
       },
       {
+        "name": "Escape an Imprisoning Dimension",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Everybody Hates Deadpool",
         "setName": "Deadpool",
         "aliases": [],
@@ -4855,6 +5599,17 @@
         "notes": []
       },
       {
+        "name": "Go After Heroes' Loved Ones",
+        "setName": "Weapon X",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Go Back in Time to Slay Heroes' Ancestors",
         "setName": "Captain America 75th Anniversary",
         "aliases": [],
@@ -4890,6 +5645,17 @@
       {
         "name": "Hail Hydra",
         "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Halve All Life in the Universe",
+        "setName": "The Infinity Saga",
         "aliases": [],
         "constraints": {
           "minimumPlayerCount": null
@@ -5082,6 +5848,17 @@
         "notes": []
       },
       {
+        "name": "Marvel Zombies",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Mass Produce War Machine Armor",
         "setName": "Villains",
         "aliases": [],
@@ -5137,6 +5914,17 @@
         "notes": []
       },
       {
+        "name": "Midnight Massacre",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Midtown Bank Robbery",
         "setName": "Core Set",
         "aliases": [],
@@ -5182,7 +5970,9 @@
         "aliases": [],
         "constraints": {
           "minimumPlayerCount": null,
-          "incompatiblePlayModes": ["standard-solo"]
+          "incompatiblePlayModes": [
+            "standard-solo"
+          ]
         },
         "forcedGroups": [],
         "modifiers": [
@@ -5328,6 +6118,17 @@
         "notes": []
       },
       {
+        "name": "Pull Reality Into Cyberspace",
+        "setName": "2099",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Pull Reality into the Negative Zone",
         "setName": "Fantastic Four",
         "aliases": [],
@@ -5438,6 +6239,17 @@
         "notes": []
       },
       {
+        "name": "Ritual Sacrifice To Summon Chthon // Great Old One Chthon",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Ruin the Perfect Wedding",
         "setName": "Realm of Kings",
         "aliases": [],
@@ -5451,6 +6263,28 @@
       {
         "name": "S.H.I.E.L.D. Vs. HYDRA War",
         "setName": "S.H.I.E.L.D.",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Sacrifice for the Soul Stone",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Safeguard Dark Secrets",
+        "setName": "Ant-Man and the Wasp",
         "aliases": [],
         "constraints": {
           "minimumPlayerCount": null
@@ -5582,6 +6416,28 @@
         "notes": []
       },
       {
+        "name": "Siphon Energy from the Quantum Realm",
+        "setName": "Ant-Man and the Wasp",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Sire Vampires at the Blood Bank",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Smash Two Dimensions Together",
         "setName": "Secret Wars, Volume 1",
         "aliases": [],
@@ -5666,6 +6522,17 @@
         ]
       },
       {
+        "name": "Subjugate Earth with Mega-Corporations",
+        "setName": "2099",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Subjugate With Obedience Disks",
         "setName": "World War Hulk",
         "aliases": [],
@@ -5682,7 +6549,9 @@
         "aliases": [],
         "constraints": {
           "minimumPlayerCount": 2,
-          "incompatiblePlayModes": ["standard-solo"]
+          "incompatiblePlayModes": [
+            "standard-solo"
+          ]
         },
         "forcedGroups": [],
         "modifiers": [],
@@ -5696,7 +6565,9 @@
         "aliases": [],
         "constraints": {
           "minimumPlayerCount": 2,
-          "incompatiblePlayModes": ["standard-solo"]
+          "incompatiblePlayModes": [
+            "standard-solo"
+          ]
         },
         "forcedGroups": [],
         "modifiers": [],
@@ -5859,6 +6730,17 @@
         "notes": []
       },
       {
+        "name": "The Time Heist",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "The Traitor",
         "setName": "Fear Itself",
         "aliases": [],
@@ -5947,6 +6829,17 @@
         "notes": []
       },
       {
+        "name": "Trash Earth with Hugest Party Ever",
+        "setName": "Marvel Studios' What If...?",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Turn the Soul of Adam Warlock",
         "setName": "Into the Cosmos",
         "aliases": [],
@@ -6013,6 +6906,17 @@
         "notes": []
       },
       {
+        "name": "Wager at Blackjack For Heroes' Souls",
+        "setName": "Midnight Sons",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "War for the Dream Dimension",
         "setName": "Doctor Strange and the Shadows of Nightmare",
         "aliases": [],
@@ -6046,8 +6950,30 @@
         "notes": []
       },
       {
+        "name": "Warp Reality into a TV Show",
+        "setName": "The Infinity Saga",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
         "name": "Weave a Web of Lies",
         "setName": "Paint the Town Red",
+        "aliases": [],
+        "constraints": {
+          "minimumPlayerCount": null
+        },
+        "forcedGroups": [],
+        "modifiers": [],
+        "notes": []
+      },
+      {
+        "name": "Wipe Heroes' Memories",
+        "setName": "Weapon X",
         "aliases": [],
         "constraints": {
           "minimumPlayerCount": null

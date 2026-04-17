@@ -110,12 +110,12 @@ test('Epic 1 validation rejects representative invalid lead references', () => {
 
 test('Epic 1 bundle summary remains internally green', () => {
   assert.deepEqual(bundle.counts, {
-    sets: 33,
-    heroes: 261,
-    masterminds: 90,
-    villainGroups: 109,
-    henchmanGroups: 38,
-    schemes: 163
+    sets: 39,
+    heroes: 296,
+    masterminds: 106,
+    villainGroups: 126,
+    henchmanGroups: 44,
+    schemes: 186
   });
   assert.equal(bundle.tests.length, 7);
   assert.equal(bundle.tests.filter((entry) => entry.status === 'fail').length, 0);

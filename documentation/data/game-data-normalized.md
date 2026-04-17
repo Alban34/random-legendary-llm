@@ -95,7 +95,7 @@ The normalized result must support flattened runtime indexes such as:
 | `Villains` | `villains` | 2014 | `base` | 15 | 4 | 7 | 4 | 8 |
 | `Marvel Studios, Phase 1` | `marvel-studios-phase-1` | 2019 | `small-expansion` | 7 | 3 | 5 | 4 | 8 |
 | `Marvel Studios' Guardians of the Galaxy` | `marvel-studios-guardians-of-the-galaxy` | 2019 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
-| `World War Hulk` | `world-war-hulk` | 2019 | `large-expansion` | 15 | 6 | 7 | 3 | 8 |
+| `World War Hulk` | `world-war-hulk` | 2018 | `large-expansion` | 15 | 6 | 7 | 3 | 8 |
 | `S.H.I.E.L.D.` | `shield` | 2019 | `large-expansion` | 4 | 2 | 2 | 0 | 4 |
 | `Ant-Man` | `ant-man` | 2019 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `Dimensions` | `dimensions` | 2019 | `small-expansion` | 5 | 1 | 0 | 2 | 0 |
@@ -114,7 +114,12 @@ The normalized result must support flattened runtime indexes such as:
 > **Taxonomy note (Epic 22):** `Villains` was reclassified from `standalone` to `base` to align with the corrected base-game grouping (Core Set and Villains are both base games). `Revelations` remains `standalone`. Small and large expansion assignments for some sets are **pending user-provided corrections** and will be confirmed in a future update; current assignments reflect the best available classification.
 | `Messiah Complex` | `messiah-complex` | 2023 | `small-expansion` | 8 | 3 | 4 | 2 | 4 |
 | `Marvel Noir` | `marvel-noir` | 2023 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
+| `Midnight Sons` | `midnight-sons` | 2023 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
+| `The Infinity Saga` | `the-infinity-saga` | 2023 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `Spider-Man Homecoming` | `spider-man-homecoming` | 2024 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
+| `2099` | `2099` | 2024 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
+| `Ant-Man and the Wasp` | `ant-man-and-the-wasp` | 2024 | `small-expansion` | 8 | 3 | 4 | 3 | 4 |
+| `Weapon X` | `weapon-x` | 2024 | `small-expansion` | 4 | 3 | 2 | 0 | 3 |
 
 ---
 
