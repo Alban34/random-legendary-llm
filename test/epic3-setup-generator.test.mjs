@@ -78,7 +78,7 @@ test('Epic 3 resolves setup templates for all supported player modes including A
     henchmanGroupCount: 1,
     wounds: 25
   });
-  assert.equal(resolveSetupTemplate(1, true).heroCount, 4);
+  assert.equal(resolveSetupTemplate(1, true).heroCount, 3);
   assert.equal(resolveSetupTemplate(5, false).villainGroupCount, 5);
   assert.throws(() => resolveSetupTemplate(2, true), /Advanced Solo is only available/);
 });
@@ -86,7 +86,7 @@ test('Epic 3 resolves setup templates for all supported player modes including A
 
 test('Epic 3 hero counts match official Legendary rules for each player count', () => {
   assert.equal(resolveSetupTemplate(1, false).heroCount, 3, '1-player standard: 3 heroes');
-  assert.equal(resolveSetupTemplate(1, true).heroCount, 4, '1-player advanced solo: 4 heroes');
+  assert.equal(resolveSetupTemplate(1, true).heroCount, 3, '1-player advanced solo: 3 heroes (same as standard solo, larger Master Strike deck)');
   assert.equal(resolveSetupTemplate(2, false).heroCount, 5, '2-player: 5 heroes');
   assert.equal(resolveSetupTemplate(3, false).heroCount, 5, '3-player: 5 heroes');
   assert.equal(resolveSetupTemplate(4, false).heroCount, 5, '4-player: 5 heroes (not 6)');

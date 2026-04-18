@@ -1,4 +1,5 @@
-- [ ] Let's start 1.0.3
+# List of needs for v1.0.3
+
 - [x] The "clear selection" is broken again: it MUST uncheck all checkboxes and you MUST set a e2e test on it so that it no longer regress.
 - [x] I do not see the PWA capability, could you explain why or is it broken?
 - [x] There are still some expansion missing and the release dates of many of the ones in the system are wrong

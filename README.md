@@ -32,7 +32,7 @@ Every accepted game is logged. Track wins, losses, and scores. Regroup your play
 
 ### All play modes covered
 - **Standard** — 1 to 5 players
-- **Advanced Solo** — 1 player, 4 heroes, 2 villain groups
+- **Advanced Solo** — 1 player, 3 heroes, 1 villain group (same as Standard Solo, with a larger Master Strike deck)
 - **Two-Handed Solo** — 1 player playing both sides
 
 ### Your data, your device

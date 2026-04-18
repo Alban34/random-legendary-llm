@@ -109,8 +109,8 @@ test('Epic 11 New Game helpers expose mode options, help text, and mode-aware re
 
   assert.deepEqual(getDisplayedSetupRequirements({ playerCount: 1, playMode: 'two-handed-solo', currentSetup }), currentSetup.requirements);
   assert.deepEqual(getDisplayedSetupRequirements({ playerCount: 1, playMode: 'advanced-solo', currentSetup }), {
-    heroCount: 4,
-    villainGroupCount: 2,
+    heroCount: 3,
+    villainGroupCount: 1,
     henchmanGroupCount: 1,
     wounds: 25,
     bystanders: 30

@@ -22,7 +22,7 @@ The shipped implementation resolves these templates through `resolveSetupTemplat
 | Players | Mode | Heroes | Villain Groups | Henchman Groups | Wounds |
 |---|---|---:|---:|---:|---:|
 | 1 | Standard Solo | 3 | 1 | 1 | 25 |
-| 1 | Advanced Solo | 4 | 2 | 1 | 25 |
+| 1 | Advanced Solo | 3 | 1 | 1 | 25 |
 | 1 | Two-Handed Solo | 5 | 2 | 1 | 30 |
 | 2 | Standard | 5 | 2 | 1 | 30 |
 | 3 | Standard | 5 | 3 | 1 | 30 |

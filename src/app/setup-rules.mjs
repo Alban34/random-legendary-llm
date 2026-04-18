@@ -1,6 +1,6 @@
 export const SETUP_RULES = {
   1: { heroCount: 3, villainGroupCount: 1, henchmanGroupCount: 1, wounds: 25 },
-  '1-advanced': { heroCount: 4, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 25 },
+  '1-advanced': { heroCount: 3, villainGroupCount: 1, henchmanGroupCount: 1, wounds: 25 },
   '1-two-handed': { heroCount: 5, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 30 },
   2: { heroCount: 5, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 30 },
   3: { heroCount: 5, villainGroupCount: 3, henchmanGroupCount: 1, wounds: 30 },
@@ -17,7 +17,7 @@ export const PLAY_MODE_OPTIONS = {
   'advanced-solo': {
     label: 'Advanced Solo',
     soloLabel: 'Advanced Solo',
-    description: 'Use the Advanced Solo setup counts with 4 Heroes and 2 Villain Groups.'
+    description: 'Use the Advanced Solo setup counts — same card counts as Standard Solo, with an increased Master Strike deck.'
   },
   'two-handed-solo': {
     label: 'Two-Handed Solo',
