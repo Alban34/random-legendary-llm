@@ -118,8 +118,19 @@ One punchy line. Lead with the key benefit. No superlatives without evidence.
 ### Feature Highlight (≤60 words)
 Name → one-line benefit → one-line how. Jargon-free.
 
-### Release Note Summary (≤150 words)
-What shipped, why it matters, any migration note. Tone: warm and informative. End with CTA.
+### Release Notes Document
+When the request is for release notes (a release announcement, release notes, or a changelog for a version), produce a **full release notes markdown file** and write it to `/documentation/release-notes/` using the naming convention `v{version}-release-notes.md` (e.g. `v1.0.3-release-notes.md`). Do **not** offer variants for this format — produce one canonical document.
+
+Structure the file as follows:
+1. **H1 title**: `Legendary: Marvel Randomizer — v{version} Release Notes`
+2. **Released date line**: `**Released: {date}**`
+3. **Fan-made disclaimer blockquote**: `> Fan-made tool. Not affiliated with Marvel or Upper Deck Entertainment.`
+4. **"What is this?" section** — one short paragraph explaining the app for first-time readers, followed by the app URL as a CTA link.
+5. **"What's in v{version}" section** — one paragraph framing the release theme.
+6. **One H3 section per notable feature or change** — name, one-sentence benefit, and 1–3 sentences of how it works; use progressive disclosure (simple first, detail after).
+7. **Closing CTA** — a short paragraph directing readers to try it, with the app URL as a markdown link.
+
+Read the existing release notes in `/documentation/release-notes/` before writing to match tone, heading depth, and structure precisely. Read `documentation/planning/epics.md` and `documentation/planning/task-list.md` to identify what shipped in the target version. Confirm every feature claim against actual source files before writing — never describe a feature that is not shipped.
 
 ## Hard Constraints
 
