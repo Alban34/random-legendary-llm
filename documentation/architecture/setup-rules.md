@@ -23,6 +23,7 @@ The shipped implementation resolves these templates through `resolveSetupTemplat
 |---|---|---:|---:|---:|---:|
 | 1 | Standard Solo | 3 | 1 | 1 | 25 |
 | 1 | Advanced Solo | 3 | 1 | 1 | 25 |
+| 1 | Standard Solo v2 | 3 | 1 | 1 | 25 |
 | 1 | Two-Handed Solo | 5 | 2 | 1 | 30 |
 | 2 | Standard | 5 | 2 | 1 | 30 |
 | 3 | Standard | 5 | 3 | 1 | 30 |
@@ -59,6 +60,7 @@ Examples of legality checks:
 - the selected Scheme is legal for the selected player count
 - the selected Scheme is not marked incompatible with the active play mode (e.g. `incompatiblePlayModes` does not contain the resolved mode key)
 - Advanced Solo is only available in 1-player mode
+- Standard Solo v2 is only available in 1-player mode
 - Two-Handed Solo is only available in 1-player mode
 
 If the resolved active pool is not legally sufficient, the app must fail with a clear message.

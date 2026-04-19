@@ -71,7 +71,7 @@ test('Epic 3 resolves setup templates for all supported player modes including A
     effectivePlayerCount: 1,
     advancedSolo: false,
     playMode: 'standard',
-    modeLabel: 'Standard Solo',
+    modeLabel: 'Standard Solo v1',
     modeDescription: 'Use the standard setup counts for the selected player count.',
     heroCount: 3,
     villainGroupCount: 1,

@@ -23,7 +23,7 @@ test.describe('Epic 11 automated QC', () => {
 
   test('renders explicit solo mode controls and updates the requirement messaging for Two-Handed Solo', async ({ page }) => {
     await selectTab(page, 'new-game');
-    await expect(page.locator('[data-action="set-play-mode"][data-play-mode="standard"]')).toContainText('Standard Solo');
+    await expect(page.locator('[data-action="set-play-mode"][data-play-mode="standard"]')).toContainText('Standard Solo v1');
     await expect(page.locator('[data-action="set-play-mode"][data-play-mode="advanced-solo"]')).toContainText('Advanced Solo');
     await expect(page.locator('[data-action="set-play-mode"][data-play-mode="two-handed-solo"]')).toContainText('Two-Handed Solo');
 
@@ -51,7 +51,7 @@ test.describe('Epic 11 automated QC', () => {
     await expect(page.locator('#panel-history .history-item')).toHaveCount(2);
     // Groups are sorted alphabetically by label, not by recency — check both labels appear
     await expect(page.locator('#panel-history')).toContainText('Two-Handed Solo');
-    await expect(page.locator('#panel-history')).toContainText('Standard Solo');
+    await expect(page.locator('#panel-history')).toContainText('Standard Solo v1');
   });
 
   test('keeps restored legacy records readable alongside mode-aware records', async ({ page }) => {
@@ -73,6 +73,6 @@ test.describe('Epic 11 automated QC', () => {
     await reloadApp(page);
 
     await selectTab(page, 'history');
-    await expect(page.locator('#panel-history .history-item').first()).toContainText('Standard Solo');
+    await expect(page.locator('#panel-history .history-item').first()).toContainText('Standard Solo v1');
   });
 });

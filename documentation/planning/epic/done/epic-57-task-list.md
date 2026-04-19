@@ -27,9 +27,9 @@ Map each eligible solo mode to its ordered list of rule-change items as locale s
 
 ### Tasks
 
-- [ ] **Read `documentation/my-inputs/solo-modes-rules.md` in full** to confirm the exact rule items for each of the three modes before writing any code.
+- [x] **Read `documentation/my-inputs/solo-modes-rules.md` in full** to confirm the exact rule items for each of the three modes before writing any code.
 
-- [ ] **Create `src/app/solo-rules.mjs`** — a new module that exports a constant `SOLO_RULES_PANEL_MODES` (a plain JS object keyed by play mode string) and a helper `getSoloRulesItems(playMode)` that returns an ordered array of locale string keys for that mode, or `null` if the mode is not eligible (i.e. `two-handed-solo` or any multiplayer mode).
+- [x] **Create `src/app/solo-rules.mjs`** — a new module that exports a constant `SOLO_RULES_PANEL_MODES` (a `Set` of eligible play mode strings) and a helper `getSoloRulesItems(playMode)` that returns an ordered array of locale string keys for that mode, or `null` if the mode is not eligible (i.e. `two-handed-solo` or any multiplayer mode).
 
   Structure example (key names are authoritative for this epic — do not rename them):
 
@@ -65,18 +65,18 @@ Map each eligible solo mode to its ordered list of rule-change items as locale s
   5. `newGame.soloRules.standardV2.mastermindAbility` — Mastermind abilities tied to their normal Villain Group transfer to whichever Villain Group or Henchman Group you are actually using
   6. `newGame.soloRules.standardV2.alwaysLeads` — ignore the Mastermind's "Always Leads" ability
 
-- [ ] **Add a section heading locale key** `newGame.soloRules.sectionTitle` for the collapsible panel label (value: "Rules for this mode").
+- [x] **Add a section heading locale key** `newGame.soloRules.sectionTitle` for the collapsible panel label (value: "Rules for this mode").
 
-- [ ] **Verify `npm run lint` passes** on `src/app/solo-rules.mjs` before committing.
+- [x] **Verify `npm run lint` passes** on `src/app/solo-rules.mjs` before committing.
 
-- [ ] **Test:** Write `test/epic57-solo-rules-panel.test.mjs`. In Story 1, add unit tests that:
+- [x] **Test:** Write `test/epic57-solo-rules-panel.test.mjs`. In Story 1, add unit tests that:
   - assert `getSoloRulesItems('standard')` returns an array of exactly 4 locale keys starting with `newGame.soloRules.standard.`
   - assert `getSoloRulesItems('advanced-solo')` returns an array of exactly 5 locale keys starting with `newGame.soloRules.advancedSolo.`
   - assert `getSoloRulesItems('standard-solo-v2')` returns an array of exactly 6 locale keys starting with `newGame.soloRules.standardV2.`
   - assert `getSoloRulesItems('two-handed-solo')` returns `null`
   - assert `getSoloRulesItems('standard')` returns `null` (or an empty/null result) when `SOLO_RULES_PANEL_MODES` does not include it — **actually**: assert that `SOLO_RULES_PANEL_MODES.has('two-handed-solo')` is `false` and `SOLO_RULES_PANEL_MODES.has('standard')` is `true`
 
-- [ ] **QC (Automated):** run `npm run lint && npm test` and confirm all pass.
+- [x] **QC (Automated):** run `npm run lint && npm test` and confirm all pass.
 
 ---
 
@@ -86,9 +86,9 @@ Add the rules panel to the setup result area, visible only when `currentSetup` i
 
 ### Tasks
 
-- [ ] **Import `getSoloRulesItems` and `SOLO_RULES_PANEL_MODES`** from `../app/solo-rules.mjs` at the top of `src/components/NewGameTab.svelte`.
+- [x] **Import `getSoloRulesItems` and `SOLO_RULES_PANEL_MODES`** from `../app/solo-rules.mjs` at the top of `src/components/NewGameTab.svelte`.
 
-- [ ] **Add a `$derived` reactive variable** `soloRulesItems` in the `<script>` block of `NewGameTab.svelte`:
+- [x] **Add a `$derived` reactive variable** `soloRulesItems` in the `<script>` block of `NewGameTab.svelte`:
 
   ```js
   let soloRulesItems = $derived(
@@ -98,7 +98,7 @@ Add the rules panel to the setup result area, visible only when `currentSetup` i
   );
   ```
 
-- [ ] **Add the collapsible rules section** to the setup result panel in `NewGameTab.svelte`, immediately after the `data-result-section="henchman-groups"` `<div>` and before the closing `{/if}` of the `{#if currentSetup}` block:
+- [x] **Add the collapsible rules section** to the setup result panel in `NewGameTab.svelte`, immediately after the `data-result-section="henchman-groups"`` `<div>` and before the closing `{/if}` of the `{#if currentSetup}` block:
 
   ```svelte
   {#if soloRulesItems}
@@ -119,7 +119,7 @@ Add the rules panel to the setup result area, visible only when `currentSetup` i
   - The section is absent (`soloRulesItems` is `null`) when `selectedPlayMode` is `two-handed-solo` or a multiplayer mode
   - The section is absent when `currentSetup` is `null` (no setup generated yet)
 
-- [ ] **Verify mode-switching behavior manually** (to document for QC):
+- [x] **Verify mode-switching behavior manually** (to document for QC):
   - 1P Standard Solo → panel visible with 4 items
   - 1P Advanced Solo → panel visible with 5 items
   - 1P Standard v2 → panel visible with 6 items
@@ -127,9 +127,9 @@ Add the rules panel to the setup result area, visible only when `currentSetup` i
   - 2P Standard → panel absent
   - Before generate is pressed → panel absent
 
-- [ ] **Verify `npm run lint` passes** on `src/components/NewGameTab.svelte` after the change.
+- [x] **Verify `npm run lint` passes** on `src/components/NewGameTab.svelte` after the change.
 
-- [ ] **Test:** Extend `test/epic57-solo-rules-panel.test.mjs` with Playwright-style or DOM-level tests (matching the existing test conventions in `test/epic11-play-modes.test.mjs` and `test/epic15-forced-picks.test.mjs`) that assert:
+- [x] **Test:** Extend `test/epic57-solo-rules-panel.test.mjs` with Playwright-style or DOM-level tests (matching the existing test conventions in `test/epic11-play-modes.test.mjs` and `test/epic15-forced-picks.test.mjs`) that assert:
   - `[data-result-section="solo-rules"]` is not present in the DOM before "Generate Setup" is clicked
   - After generating with 1P Standard Solo, `[data-result-section="solo-rules"]` exists and is `open`
   - After generating with 1P Advanced Solo, `[data-result-section="solo-rules"]` exists
@@ -139,7 +139,7 @@ Add the rules panel to the setup result area, visible only when `currentSetup` i
   - The content rendered for Standard Solo does not contain any Advanced Solo or Standard v2 locale-key text
   - The content rendered for Advanced Solo includes a list item referencing the Master Strike cascade rule
 
-- [ ] **QC (Automated):** run `npm run lint && npm test` and confirm all pass.
+- [x] **QC (Automated):** run `npm run lint && npm test` and confirm all pass.
 
 ---
 
@@ -177,7 +177,7 @@ Every rule item key defined in Story 1 must be present in all six locale files. 
 
 ### Per-locale tasks
 
-- [ ] **`src/app/locales/en.mjs` (English — canonical):** Add all 16 keys to `EN_MESSAGES`. Use the rules text from `documentation/my-inputs/solo-modes-rules.md` verbatim or closely paraphrased. This file is the reference; all other files must mirror the same key structure.
+- [x] **`src/app/locales/en.mjs` (English — canonical):** Add all 16 keys to `EN_MESSAGES`. Use the rules text from `documentation/my-inputs/solo-modes-rules.md` verbatim or closely paraphrased. This file is the reference; all other files must mirror the same key structure.
 
   Suggested English values (derive final text from the source doc):
   - `newGame.soloRules.sectionTitle`: `'Rules for this mode'`
@@ -197,26 +197,26 @@ Every rule item key defined in Story 1 must be present in all six locale files. 
   - `newGame.soloRules.standardV2.mastermindAbility`: `'Mastermind abilities tied to their normal Villain Group transfer to whichever Villain or Henchman Group you are actually using.'`
   - `newGame.soloRules.standardV2.alwaysLeads`: `'Ignore the Mastermind\'s "Always Leads" ability.'`
 
-- [ ] **`src/app/locales/fr.mjs` (French):** Add all 16 keys to `FR_MESSAGES` with French translations. Preserve brand names (Legendary, Mastermind, S.H.I.E.L.D., Villain Deck, Master Strike, Scheme Twist, HQ) untranslated or in their established French form as used elsewhere in this file. Do not alter any existing key.
+- [x] **`src/app/locales/fr.mjs` (French):** Add all 16 keys to `FR_MESSAGES` with French translations. Preserve brand names (Legendary, Mastermind, S.H.I.E.L.D., Villain Deck, Master Strike, Scheme Twist, HQ) untranslated or in their established French form as used elsewhere in this file. Do not alter any existing key.
 
-- [ ] **`src/app/locales/de.mjs` (German):** Add all 16 keys to `DE_MESSAGES` with German translations. Same brand-name preservation rules as above.
+- [x] **`src/app/locales/de.mjs` (German):** Add all 16 keys to `DE_MESSAGES` with German translations. Same brand-name preservation rules as above.
 
-- [ ] **`src/app/locales/es.mjs` (Spanish):** Add all 16 keys to `ES_MESSAGES` with Spanish translations. Same brand-name preservation rules as above.
+- [x] **`src/app/locales/es.mjs` (Spanish):** Add all 16 keys to `ES_MESSAGES` with Spanish translations. Same brand-name preservation rules as above.
 
-- [ ] **`src/app/locales/ja.mjs` (Japanese):** Add all 16 keys to `JA_MESSAGES` with Japanese translations. Same brand-name preservation rules as above.
+- [x] **`src/app/locales/ja.mjs` (Japanese):** Add all 16 keys to `JA_MESSAGES` with Japanese translations. Same brand-name preservation rules as above.
 
-- [ ] **`src/app/locales/ko.mjs` (Korean):** Add all 16 keys to `KO_MESSAGES` with Korean translations. Same brand-name preservation rules as above.
+- [x] **`src/app/locales/ko.mjs` (Korean):** Add all 16 keys to `KO_MESSAGES` with Korean translations. Same brand-name preservation rules as above.
 
-- [ ] **Verify key completeness:** After all six files are updated, confirm that every key present in `en.mjs` under `newGame.soloRules.*` also exists in `fr.mjs`, `de.mjs`, `es.mjs`, `ja.mjs`, and `ko.mjs`. No file should be missing any of the 16 keys.
+- [x] **Verify key completeness:** After all six files are updated, confirm that every key present in `en.mjs` under `newGame.soloRules.*` also exists in `fr.mjs`, `de.mjs`, `es.mjs`, `ja.mjs`, and `ko.mjs`. No file should be missing any of the 16 keys.
 
-- [ ] **Verify `npm run lint` passes** across all six locale files.
+- [x] **Verify `npm run lint` passes** across all six locale files.
 
-- [ ] **Test:** Extend `test/epic57-solo-rules-panel.test.mjs` with assertions that:
+- [x] **Test:** Extend `test/epic57-solo-rules-panel.test.mjs` with assertions that:
   - For each of the 6 locales, switching the app locale and generating a 1P Standard Solo setup causes the `[data-result-section="solo-rules"]` panel to contain non-empty text (i.e. no raw key strings such as `newGame.soloRules.standard.villainDeck` appear literally in the rendered output)
   - For each of the 6 locales, generating a 1P Advanced Solo setup renders the `advancedSolo.masterStrike` content visibly (non-empty, non-key string)
   - For each of the 6 locales, generating a 1P Standard v2 setup renders the `standardV2.firstTurnHenchmen` content visibly
 
-- [ ] **QC (Automated):** run `npm run lint && npm test` and confirm all pass.
+- [x] **QC (Automated):** run `npm run lint && npm test` and confirm all pass.
 
 ---
 

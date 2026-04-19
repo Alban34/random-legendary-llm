@@ -124,7 +124,7 @@ test.describe('Epic 37 Story 37.4 QC: version badge', () => {
     await gotoApp(page);
   });
 
-  test('Story 37.4: app version badge displays v1.0.3', async ({ page }) => {
-    await expect(page.locator('#app-version').first()).toHaveText('v1.0.3');
+  test('Story 37.4: app version badge displays v1.0.4', async ({ page }) => {
+    await expect(page.locator('#app-version').first()).toHaveText('v1.0.4');
   });
 });

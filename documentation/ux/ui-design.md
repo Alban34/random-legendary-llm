@@ -240,7 +240,7 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
   │  [1]  [2]  [3]  [4]  [5]                       │
   │                                                 │
   │  Play Mode                                      │
-  │  [Standard Solo] [Advanced Solo] [Two-Handed]  │
+  │  [Standard Solo] [Standard Solo v2] [Advanced Solo] [Two-Handed]  │
   │                                                 │
   │  Setup: 3 Heroes · 1 Villain Group ·            │
   │         1 Henchman Group · 25 Wounds            │
@@ -295,7 +295,7 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 
 **Interactions:**
 - Player count buttons are mutually exclusive (styled like toggle buttons)
-- 1-player mode exposes Standard Solo, Advanced Solo, and Two-Handed Solo
+- 1-player mode exposes Standard Solo, Standard Solo v2, Advanced Solo, and Two-Handed Solo
 - A single primary button handles both first generation and all subsequent rerolls. Its label is context-sensitive: "Generate Setup" before any result is present, "New Setup" once a setup is already displayed
 - The primary action button appears directly below the setup-requirements summary, before optional content, so users can act without scrolling past forced picks
 - Forced picks are presented in a native `<details>` disclosure element below the primary action row; users who need forced picks can expand the disclosure without it adding visual weight for users who do not
@@ -306,6 +306,7 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 - "Accept & Log Game" saves the setup to history, opens immediate result entry in History, and marks the setup as used; it is disabled until a setup is present
 - Result entry supports pending-result flows, later correction from History, focus moves into the editor on open, and invalid saves announce recoverable errors before returning focus to the correct field
 - ★ marks the forced Mastermind villain group
+- When a setup is generated and the active play mode is Standard Solo, Advanced Solo, or Standard Solo v2, a "Rules for this mode" collapsible panel (`<details open data-result-section="solo-rules">`) appears in the result area below the picked cards; the panel defaults to open (expanded) and lists mode-specific rule items as an ordered `<ul>`; the panel is absent when the play mode is Two-Handed Solo or any multiplayer mode, and is absent before a setup is generated (Epic 57)
 
 > **Design rationale (Epic 25):** Generate and Regenerate were merged into one context-sensitive action because they produce identical outcomes — both randomize a new setup from the current constraints. A dedicated "Regenerate" label implied a behaviorally distinct path when none exists. Forced picks moved below the primary action so the button is reached without scrolling through optional configuration. Both changes reduce action-density confusion and bring the mandatory step earlier in the visual flow.
 

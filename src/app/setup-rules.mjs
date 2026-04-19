@@ -2,6 +2,7 @@ export const SETUP_RULES = {
   1: { heroCount: 3, villainGroupCount: 1, henchmanGroupCount: 1, wounds: 25 },
   '1-advanced': { heroCount: 3, villainGroupCount: 1, henchmanGroupCount: 1, wounds: 25 },
   '1-two-handed': { heroCount: 5, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 30 },
+  '1-standard-v2': { heroCount: 3, villainGroupCount: 1, henchmanGroupCount: 1, wounds: 25 },
   2: { heroCount: 5, villainGroupCount: 2, henchmanGroupCount: 1, wounds: 30 },
   3: { heroCount: 5, villainGroupCount: 3, henchmanGroupCount: 1, wounds: 30 },
   4: { heroCount: 5, villainGroupCount: 3, henchmanGroupCount: 2, wounds: 35 },
@@ -11,18 +12,23 @@ export const SETUP_RULES = {
 export const PLAY_MODE_OPTIONS = {
   standard: {
     label: 'Standard',
-    soloLabel: 'Standard Solo',
+    soloLabel: 'Standard Solo v1',
     description: 'Use the standard setup counts for the selected player count.'
   },
   'advanced-solo': {
     label: 'Advanced Solo',
     soloLabel: 'Advanced Solo',
-    description: 'Use the Advanced Solo setup counts — same card counts as Standard Solo, with an increased Master Strike deck.'
+    description: 'Use the Advanced Solo setup counts — same card counts as Standard Solo v1, with an increased Master Strike deck.'
   },
   'two-handed-solo': {
     label: 'Two-Handed Solo',
     soloLabel: 'Two-Handed Solo',
     description: 'Track the game as solo, but use the standard 2-player setup counts.'
+  },
+  'standard-solo-v2': {
+    label: 'Standard v2',
+    soloLabel: 'Standard v2',
+    description: 'Use the Second Edition solo setup counts — 3 Heroes, 1 Villain Group, 1 Henchman Group.'
   }
 };
 
@@ -57,6 +63,10 @@ export function resolvePlayMode(playerCount, modeOptions = false) {
     throw new Error('Two-Handed Solo is only available for 1 player.');
   }
 
+  if (playMode === 'standard-solo-v2' && normalizedPlayerCount !== 1) {
+    throw new Error('Standard v2 is only available for 1 player.');
+  }
+
   return playMode;
 }
 
@@ -67,6 +77,10 @@ export function getPlayModeLabel(playMode, playerCount = 1) {
 
   if (playMode === 'two-handed-solo') {
     return PLAY_MODE_OPTIONS['two-handed-solo'].label;
+  }
+
+  if (playMode === 'standard-solo-v2') {
+    return PLAY_MODE_OPTIONS['standard-solo-v2'].label;
   }
 
   return Number(playerCount) === 1 ? PLAY_MODE_OPTIONS.standard.soloLabel : PLAY_MODE_OPTIONS.standard.label;
@@ -81,6 +95,8 @@ export function resolveSetupTemplate(playerCount, modeOptions = false) {
     key = '1-advanced';
   } else if (playMode === 'two-handed-solo') {
     key = '1-two-handed';
+  } else if (playMode === 'standard-solo-v2') {
+    key = '1-standard-v2';
   }
 
   const template = SETUP_RULES[key];

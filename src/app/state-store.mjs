@@ -1,7 +1,7 @@
 import { normalizeSelectedTab } from './app-tabs.mjs';
 import { DEFAULT_LOCALE_ID, normalizeLocaleId } from './localization-utils.mjs';
 import { deepClone, isPlainObject } from './object-utils.mjs';
-import { createCompletedGameResult, createPendingGameResult, sanitizeStoredGameResult } from './result-utils.mjs';
+import { createCompletedGameResult, createPendingGameResult, createPerPlayerScoreArray, GAME_RESULT_STATUS_PENDING, sanitizeStoredGameResult } from './result-utils.mjs';
 import { resolvePlayMode } from './setup-rules.mjs';
 import { DEFAULT_THEME_ID, normalizeThemeId } from './theme-utils.mjs';
 
@@ -155,7 +155,7 @@ function sanitizeGameRecord(record, indexes, notices) {
     return null;
   }
 
-  const sanitizedResult = sanitizeStoredGameResult(record.result);
+  const sanitizedResult = sanitizeStoredGameResult(record.result, record.playerCount);
   if (sanitizedResult.recovered) {
     notices.push(`Recovered invalid stored game result for '${record.id ?? 'unknown'}'.`);
   }
@@ -504,7 +504,11 @@ export function createGameRecordId() {
 
 export function createGameRecord({ playerCount, advancedSolo, playMode, setupSnapshot, createdAt = new Date().toISOString(), id = createGameRecordId(), result = createPendingGameResult() }) {
   const normalizedPlayMode = resolvePlayMode(playerCount, { advancedSolo, playMode });
-  const sanitizedResult = sanitizeStoredGameResult(result).result;
+  let effectiveResult = result;
+  if (playerCount >= 2 && result.status === GAME_RESULT_STATUS_PENDING) {
+    effectiveResult = { ...result, score: createPerPlayerScoreArray(playerCount) };
+  }
+  const sanitizedResult = sanitizeStoredGameResult(effectiveResult, playerCount).result;
   return {
     id,
     createdAt,
@@ -541,16 +545,22 @@ export function acceptGameSetup(state, gameConfig) {
   return nextState;
 }
 
-export function updateGameResult(state, { recordId, outcome, score, notes = '', updatedAt = new Date().toISOString() }) {
+export function updateGameResult(state, { recordId, outcome, score, notes = '', updatedAt = new Date().toISOString(), playerCount }) {
   const targetRecord = state.history.find((record) => record.id === recordId);
 
   if (!targetRecord) {
     return state;
   }
 
+  // Only activate the multiplayer path when score is explicitly a per-player array.
+  // Legacy callers that pass a number score for a multi-player record continue to use the solo path.
+  const resolvedPlayerCount = Array.isArray(score)
+    ? (targetRecord.playerCount ?? playerCount ?? 1)
+    : (playerCount ?? 1);
+
   const nextState = structuredClone(state);
   const mutableRecord = nextState.history.find((record) => record.id === recordId);
-  mutableRecord.result = createCompletedGameResult({ outcome, score, notes, updatedAt });
+  mutableRecord.result = createCompletedGameResult({ outcome, score, notes, updatedAt, playerCount: resolvedPlayerCount });
   return nextState;
 }
 

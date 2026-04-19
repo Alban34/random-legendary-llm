@@ -1567,6 +1567,11 @@ details[open] .stats-category-summary::after {
   background: var(--danger-soft);
 }
 
+.result-pill-draw {
+  border-color: var(--info-border-soft);
+  background: var(--info-soft);
+}
+
 #history-full-reset-confirmation {
   margin-top: var(--space-3);
 }

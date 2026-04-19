@@ -16,13 +16,13 @@ function makeRecord(id, result, runtime) {
   const { indexes } = runtime;
   const mastermindId = indexes.allMasterminds[0].id;
   const schemeId = indexes.allSchemes[0].id;
-  const heroIds = indexes.allHeroes.slice(0, 5).map((h) => h.id);
-  const villainGroupIds = indexes.allVillainGroups.slice(0, 2).map((v) => v.id);
+  const heroIds = indexes.allHeroes.slice(0, 3).map((h) => h.id);
+  const villainGroupIds = indexes.allVillainGroups.slice(0, 1).map((v) => v.id);
   const henchmanGroupIds = indexes.allHenchmanGroups.slice(0, 1).map((h) => h.id);
   return {
     id,
     createdAt: '2025-01-01T00:00:00.000Z',
-    playerCount: 2,
+    playerCount: 1,
     advancedSolo: false,
     playMode: 'standard',
     setupSnapshot: { mastermindId, schemeId, heroIds, villainGroupIds, henchmanGroupIds },

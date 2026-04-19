@@ -43,16 +43,16 @@ test.describe('Epic 7 automated QC', () => {
 
     await expect(requirementsCard).toContainText('3 Heroes · 1 Villain Group · 1 Henchman Group · 25 Wounds');
     await expect(page.locator('[data-action="accept-current-setup"]')).toBeDisabled();
-    await expect(page.locator('[data-action="set-play-mode"]')).toHaveCount(3);
+    await expect(page.locator('[data-action="set-play-mode"]')).toHaveCount(4);
 
     await page.locator('[data-action="set-player-count"][data-player-count="2"]').click();
     await expect(page.locator('[data-action="set-play-mode"]')).toHaveCount(1);
     await expect(requirementsCard).toContainText('5 Heroes · 2 Villain Groups · 1 Henchman Group · 30 Wounds');
 
     await page.locator('[data-action="set-player-count"][data-player-count="1"]').click();
-    await expect(page.locator('[data-action="set-play-mode"]')).toHaveCount(3);
+    await expect(page.locator('[data-action="set-play-mode"]')).toHaveCount(4);
     await page.locator('[data-action="set-play-mode"][data-play-mode="advanced-solo"]').click();
-    await expect(requirementsCard).toContainText('4 Heroes · 2 Villain Groups · 1 Henchman Group · 25 Wounds');
+    await expect(requirementsCard).toContainText('3 Heroes · 1 Villain Group · 1 Henchman Group · 25 Wounds');
   });
 
   test('renders a full generated setup result with mastermind, scheme, hero cards, villain groups, and henchman groups', async ({ page }) => {

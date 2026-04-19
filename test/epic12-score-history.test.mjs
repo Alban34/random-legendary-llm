@@ -6,7 +6,16 @@ import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
 import { formatHistorySummary } from '../src/app/history-utils.mjs';
-import { formatGameResultStatus } from '../src/app/result-utils.mjs';
+import {
+  GAME_OUTCOME_OPTIONS,
+  createCompletedGameResult,
+  createPerPlayerScoreArray,
+  createPlayerScoreEntry,
+  formatGameResultStatus,
+  normalizeGameResultDraft,
+  sanitizeStoredGameResult,
+  validateGameResultDraft
+} from '../src/app/result-utils.mjs';
 import {
   STORAGE_KEY,
   acceptGameSetup,
@@ -222,4 +231,385 @@ test('Epic 37.2 formatGameResultStatus formats score label and number locale-awa
   // pending result is unaffected by locale
   const pendingResult = { status: 'pending', outcome: null, score: null, notes: '', updatedAt: null };
   assert.equal(formatGameResultStatus(pendingResult, 'de-DE'), 'Pending result');
+});
+
+// ── Epic 58 Story 1 tests ────────────────────────────────────────────────────
+
+test('Epic 58.1 createPlayerScoreEntry normalises playerName and score', () => {
+  const entry = createPlayerScoreEntry({ playerName: '  Alice  ', score: 42 });
+  assert.deepEqual(entry, { playerName: 'Alice', score: 42 });
+
+  const defaultEntry = createPlayerScoreEntry();
+  assert.deepEqual(defaultEntry, { playerName: '', score: null });
+
+  const nullScore = createPlayerScoreEntry({ playerName: 'Bob', score: -1 });
+  assert.deepEqual(nullScore, { playerName: 'Bob', score: null });
+});
+
+test('Epic 58.1 createPerPlayerScoreArray returns correct length array of blank entries', () => {
+  const arr = createPerPlayerScoreArray(3);
+  assert.equal(arr.length, 3);
+  assert.deepEqual(arr[0], { playerName: '', score: null });
+  assert.deepEqual(arr[2], { playerName: '', score: null });
+});
+
+test('Epic 58.1 createCompletedGameResult with playerCount 2 and valid score array produces array', () => {
+  const result = createCompletedGameResult({
+    outcome: 'win',
+    score: [{ playerName: 'Alice', score: 42 }, { playerName: 'Bob', score: 35 }],
+    notes: '',
+    updatedAt: '2026-04-18T10:00:00.000Z',
+    playerCount: 2
+  });
+  assert.equal(result.status, 'completed');
+  assert.equal(result.outcome, 'win');
+  assert.ok(Array.isArray(result.score));
+  assert.equal(result.score.length, 2);
+  assert.deepEqual(result.score[0], { playerName: 'Alice', score: 42 });
+  assert.deepEqual(result.score[1], { playerName: 'Bob', score: 35 });
+});
+
+test('Epic 58.1 createCompletedGameResult with playerCount 2 and non-array score throws', () => {
+  assert.throws(() => createCompletedGameResult({
+    outcome: 'win',
+    score: 99,
+    updatedAt: '2026-04-18T10:00:00.000Z',
+    playerCount: 2
+  }), /per-player score array is required/i);
+});
+
+test('Epic 58.1 createCompletedGameResult with playerCount 2, outcome win, all score null throws', () => {
+  assert.throws(() => createCompletedGameResult({
+    outcome: 'win',
+    score: [{ playerName: 'Alice', score: null }, { playerName: 'Bob', score: null }],
+    updatedAt: '2026-04-18T10:00:00.000Z',
+    playerCount: 2
+  }), /whole-number score/i);
+});
+
+test('Epic 58.1 createCompletedGameResult with playerCount 2, outcome loss, all score null succeeds', () => {
+  const result = createCompletedGameResult({
+    outcome: 'loss',
+    score: [{ playerName: 'Alice', score: null }, { playerName: 'Bob', score: null }],
+    updatedAt: '2026-04-18T10:00:00.000Z',
+    playerCount: 2
+  });
+  assert.equal(result.status, 'completed');
+  assert.equal(result.outcome, 'loss');
+  assert.ok(result.score.every((e) => e.score === null));
+});
+
+test('Epic 58.1 sanitizeStoredGameResult with playerCount 2 and score as number returns pending with recovered', () => {
+  const { result, recovered } = sanitizeStoredGameResult(
+    { status: 'completed', outcome: 'win', score: 42, notes: '', updatedAt: '2026-04-18T10:00:00.000Z' },
+    2
+  );
+  assert.ok(recovered);
+  assert.equal(result.status, 'pending');
+});
+
+test('Epic 58.1 sanitizeStoredGameResult with valid per-player array round-trips correctly', () => {
+  const original = {
+    status: 'completed',
+    outcome: 'win',
+    score: [{ playerName: 'Alice', score: 42 }, { playerName: 'Bob', score: 35 }],
+    notes: 'great game',
+    updatedAt: '2026-04-18T10:00:00.000Z'
+  };
+  const { result, recovered } = sanitizeStoredGameResult(original, 2);
+  assert.ok(!recovered);
+  assert.equal(result.status, 'completed');
+  assert.equal(result.outcome, 'win');
+  assert.ok(Array.isArray(result.score));
+  assert.deepEqual(result.score[0], { playerName: 'Alice', score: 42 });
+  assert.deepEqual(result.score[1], { playerName: 'Bob', score: 35 });
+});
+
+test('Epic 58.1 normalizeGameResultDraft with playerCount 2 produces playerScores array', () => {
+  const completedResult = {
+    status: 'completed',
+    outcome: 'win',
+    score: [{ playerName: 'Alice', score: 42 }, { playerName: 'Bob', score: null }],
+    notes: 'Notes here',
+    updatedAt: '2026-04-18T10:00:00.000Z'
+  };
+  const draft = normalizeGameResultDraft(completedResult, 2);
+  assert.equal(draft.outcome, 'win');
+  assert.ok(Array.isArray(draft.playerScores));
+  assert.equal(draft.playerScores.length, 2);
+  assert.deepEqual(draft.playerScores[0], { playerName: 'Alice', score: '42' });
+  assert.deepEqual(draft.playerScores[1], { playerName: 'Bob', score: '' });
+  assert.equal(draft.notes, 'Notes here');
+  assert.equal(draft.score, undefined);
+});
+
+test('Epic 58.1 normalizeGameResultDraft with playerCount 1 returns existing solo shape', () => {
+  const completedSolo = {
+    status: 'completed',
+    outcome: 'win',
+    score: 54,
+    notes: 'Solo note',
+    updatedAt: '2026-04-18T10:00:00.000Z'
+  };
+  const draft = normalizeGameResultDraft(completedSolo, 1);
+  assert.equal(draft.score, '54');
+  assert.equal(draft.playerScores, undefined);
+});
+
+test('Epic 58.1 validateGameResultDraft with playerCount 2 validates each player entry independently', () => {
+  const validDraft = {
+    outcome: 'win',
+    playerScores: [
+      { playerName: 'Alice', score: '42' },
+      { playerName: 'Bob', score: '35' }
+    ],
+    notes: ''
+  };
+  const { ok, errors, result } = validateGameResultDraft(validDraft, 2);
+  assert.ok(ok);
+  assert.equal(errors.length, 0);
+  assert.equal(result.outcome, 'win');
+  assert.deepEqual(result.score[0], { playerName: 'Alice', score: 42 });
+  assert.deepEqual(result.score[1], { playerName: 'Bob', score: 35 });
+
+  // win with all empty scores fails
+  const allEmptyWin = {
+    outcome: 'win',
+    playerScores: [{ playerName: 'Alice', score: '' }, { playerName: 'Bob', score: '' }],
+    notes: ''
+  };
+  const failResult = validateGameResultDraft(allEmptyWin, 2);
+  assert.ok(!failResult.ok);
+
+  // loss with all empty scores succeeds
+  const allEmptyLoss = {
+    outcome: 'loss',
+    playerScores: [{ playerName: 'Alice', score: '' }, { playerName: 'Bob', score: '' }],
+    notes: ''
+  };
+  const lossResult = validateGameResultDraft(allEmptyLoss, 2);
+  assert.ok(lossResult.ok);
+
+  // invalid score string fails
+  const badScore = {
+    outcome: 'win',
+    playerScores: [{ playerName: 'Alice', score: '-5' }, { playerName: 'Bob', score: '10' }],
+    notes: ''
+  };
+  const badResult = validateGameResultDraft(badScore, 2);
+  assert.ok(!badResult.ok);
+  assert.ok(badResult.errors.some((e) => /whole number/i.test(e)));
+});
+
+test('Epic 58.1 formatGameResultStatus with per-player score array renders Name: Score format', () => {
+  const multiResult = {
+    status: 'completed',
+    outcome: 'win',
+    score: [{ playerName: 'Alice', score: 42 }, { playerName: 'Bob', score: 35 }],
+    notes: '',
+    updatedAt: '2026-04-18T10:00:00.000Z'
+  };
+  assert.equal(formatGameResultStatus(multiResult), 'Win · Alice: 42 · Bob: 35');
+
+  // blank name falls back to "Player N"
+  const blankNames = {
+    status: 'completed',
+    outcome: 'loss',
+    score: [{ playerName: '', score: 10 }, { playerName: '  ', score: 20 }],
+    notes: '',
+    updatedAt: '2026-04-18T10:00:00.000Z'
+  };
+  assert.equal(formatGameResultStatus(blankNames), 'Loss · Player 1: 10 · Player 2: 20');
+
+  // null score for a player shows em dash
+  const withNull = {
+    status: 'completed',
+    outcome: 'loss',
+    score: [{ playerName: 'Alice', score: null }, { playerName: 'Bob', score: 5 }],
+    notes: '',
+    updatedAt: '2026-04-18T10:00:00.000Z'
+  };
+  assert.equal(formatGameResultStatus(withNull), 'Loss · Alice: — · Bob: 5');
+});
+
+// ── Epic 58 Story 2 tests ────────────────────────────────────────────────────
+
+test('Epic 58.2 updateGameResult on 2-player record with per-player score array stores array result', () => {
+  const twoPlayerSetup = createSampleSetup(1); // playerCount: 2
+  const state = acceptGameSetup(createDefaultState(), twoPlayerSetup);
+
+  // pending result for 2-player game has score as array
+  assert.ok(Array.isArray(state.history[0].result.score));
+  assert.equal(state.history[0].result.score.length, 2);
+
+  const updatedState = updateGameResult(state, {
+    recordId: state.history[0].id,
+    outcome: 'win',
+    score: [{ playerName: 'Alice', score: 42 }, { playerName: 'Bob', score: 35 }],
+    notes: '',
+    updatedAt: '2026-04-18T11:00:00.000Z'
+  });
+
+  assert.equal(updatedState.history[0].result.status, 'completed');
+  assert.ok(Array.isArray(updatedState.history[0].result.score));
+  assert.equal(updatedState.history[0].result.score.length, 2);
+  assert.deepEqual(updatedState.history[0].result.score[0], { playerName: 'Alice', score: 42 });
+  assert.deepEqual(updatedState.history[0].result.score[1], { playerName: 'Bob', score: 35 });
+});
+
+test('Epic 58.2 updateGameResult on solo record with number score keeps score as number', () => {
+  const soloSetup = createSampleSetup(0); // playerCount: 1
+  const state = acceptGameSetup(createDefaultState(), soloSetup);
+
+  const updatedState = updateGameResult(state, {
+    recordId: state.history[0].id,
+    outcome: 'win',
+    score: 77,
+    notes: '',
+    updatedAt: '2026-04-18T11:00:00.000Z'
+  });
+
+  assert.equal(updatedState.history[0].result.status, 'completed');
+  assert.equal(typeof updatedState.history[0].result.score, 'number');
+  assert.equal(updatedState.history[0].result.score, 77);
+});
+
+test('Epic 58.2 loadState with 3-player record and valid per-player array emits no recovery notices', () => {
+  const threePlayerRecord = {
+    id: 'epic58-3p-game',
+    createdAt: '2026-04-18T10:00:00.000Z',
+    playerCount: 3,
+    advancedSolo: false,
+    playMode: 'standard',
+    setupSnapshot: createSampleSetup(0).setupSnapshot,
+    result: {
+      status: 'completed',
+      outcome: 'win',
+      score: [
+        { playerName: 'Alice', score: 42 },
+        { playerName: 'Bob', score: 35 },
+        { playerName: 'Carol', score: 50 }
+      ],
+      notes: '',
+      updatedAt: '2026-04-18T10:00:00.000Z'
+    }
+  };
+
+  const storedState = { ...createDefaultState(), history: [threePlayerRecord] };
+  const storage = createMemoryStorage({ [STORAGE_KEY]: JSON.stringify(storedState) });
+  const { state, notices } = loadState({ storageAdapter: createStorageAdapter(storage), indexes: bundle.runtime.indexes });
+
+  assert.ok(!notices.some((n) => /recovered/i.test(n)), `Unexpected recovery notices: ${notices.join(', ')}`);
+  assert.ok(Array.isArray(state.history[0].result.score));
+  assert.equal(state.history[0].result.score.length, 3);
+});
+
+test('Epic 58.2 loadState with 2-player record and score as number emits recovery notice', () => {
+  const invalidMultiRecord = {
+    id: 'epic58-2p-invalid',
+    createdAt: '2026-04-18T10:00:00.000Z',
+    playerCount: 2,
+    advancedSolo: false,
+    playMode: 'standard',
+    setupSnapshot: createSampleSetup(0).setupSnapshot,
+    result: {
+      status: 'completed',
+      outcome: 'win',
+      score: 42,
+      notes: '',
+      updatedAt: '2026-04-18T10:00:00.000Z'
+    }
+  };
+
+  const storedState = { ...createDefaultState(), history: [invalidMultiRecord] };
+  const storage = createMemoryStorage({ [STORAGE_KEY]: JSON.stringify(storedState) });
+  const { state, notices } = loadState({ storageAdapter: createStorageAdapter(storage), indexes: bundle.runtime.indexes });
+
+  assert.ok(notices.some((n) => /recovered/i.test(n)));
+  assert.equal(state.history[0].result.status, 'pending');
+});
+
+test('Epic 58.2 solo round-trip through saveState and loadState is unchanged', () => {
+  const storage = createMemoryStorage();
+  const storageAdapter = createStorageAdapter(storage);
+
+  let state = acceptGameSetup(createDefaultState(), createSampleSetup(0)); // solo
+  state = updateGameResult(state, {
+    recordId: state.history[0].id,
+    outcome: 'win',
+    score: 99,
+    notes: 'Solo round-trip',
+    updatedAt: '2026-04-18T12:00:00.000Z'
+  });
+
+  saveState({ storageAdapter, state });
+  const loaded = loadState({ storageAdapter, indexes: bundle.runtime.indexes });
+
+  assert.deepEqual(loaded.state.history[0].result, state.history[0].result);
+  assert.equal(typeof loaded.state.history[0].result.score, 'number');
+  assert.equal(loaded.state.history[0].result.score, 99);
+});
+
+// ── Epic 59 Story 1 tests ────────────────────────────────────────────────────
+
+test('Epic 59.1 GAME_OUTCOME_OPTIONS includes draw', () => {
+  const ids = GAME_OUTCOME_OPTIONS.map((o) => o.id);
+  assert.ok(ids.includes('draw'), `Expected 'draw' in GAME_OUTCOME_OPTIONS, got: ${ids.join(', ')}`);
+});
+
+test('Epic 59.1 createCompletedGameResult with outcome draw and score null produces valid result', () => {
+  const result = createCompletedGameResult({
+    outcome: 'draw',
+    score: null,
+    notes: '',
+    updatedAt: '2026-04-18T10:00:00.000Z'
+  });
+  assert.equal(result.status, 'completed');
+  assert.equal(result.outcome, 'draw');
+  assert.equal(result.score, null);
+});
+
+test('Epic 59.1 createCompletedGameResult with outcome draw and positive score produces valid result', () => {
+  const result = createCompletedGameResult({
+    outcome: 'draw',
+    score: 5,
+    notes: '',
+    updatedAt: '2026-04-18T10:00:00.000Z'
+  });
+  assert.equal(result.status, 'completed');
+  assert.equal(result.outcome, 'draw');
+  assert.equal(result.score, 5);
+});
+
+test('Epic 59.1 createCompletedGameResult with outcome draw and negative score throws validation error', () => {
+  assert.throws(
+    () => createCompletedGameResult({
+      outcome: 'draw',
+      score: -1,
+      notes: '',
+      updatedAt: '2026-04-18T10:00:00.000Z'
+    }),
+    /whole number/i
+  );
+});
+
+test('Epic 59.1 win validation is unaffected by draw addition', () => {
+  assert.throws(
+    () => createCompletedGameResult({ outcome: 'win', score: null, notes: '', updatedAt: '2026-04-18T10:00:00.000Z' }),
+    /whole-number score/i
+  );
+  const winResult = createCompletedGameResult({ outcome: 'win', score: 10, notes: '', updatedAt: '2026-04-18T10:00:00.000Z' });
+  assert.equal(winResult.outcome, 'win');
+  assert.equal(winResult.score, 10);
+});
+
+test('Epic 59.1 loss validation is unaffected by draw addition', () => {
+  const lossNullScore = createCompletedGameResult({ outcome: 'loss', score: null, notes: '', updatedAt: '2026-04-18T10:00:00.000Z' });
+  assert.equal(lossNullScore.outcome, 'loss');
+  assert.equal(lossNullScore.score, null);
+
+  assert.throws(
+    () => createCompletedGameResult({ outcome: 'loss', score: -1, notes: '', updatedAt: '2026-04-18T10:00:00.000Z' }),
+    /whole number/i
+  );
 });

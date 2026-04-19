@@ -141,7 +141,7 @@
               {@const resultLabel = locale.formatResultStatus(summary.result)}
               {@const errorId = `result-form-error-${summary.id}`}
               {@const outcomeInvalid = resultInvalidFields.includes('outcome')}
-              {@const scoreInvalid = resultInvalidFields.includes('score')}
+              {@const scoreInvalid = summary.playerCount === 1 && resultInvalidFields.includes('score')}
               {@const isPending = !isCompletedGameResult(summary.result)}
               <details
                 class="history-item"
@@ -159,6 +159,9 @@
                 </summary>
                 <div class="history-meta muted">{locale.t('history.acceptedAt', { date: locale.formatDateTime(summary.createdAt), mode: modeLabel })}</div>
                 <div class="history-meta"><strong>{locale.t('history.result')}</strong> {resultLabel}</div>
+                {#if summary.perPlayerScoreLabel}
+                  <div class="history-meta" data-history-per-player-scores>{summary.perPlayerScoreLabel}</div>
+                {/if}
                 {#if summary.resultNotes}
                   <div class="history-meta"><strong>{locale.t('history.notes')}</strong> {summary.resultNotes}</div>
                 {/if}
@@ -213,23 +216,54 @@
                       </select>
                     </div>
 
-                    <div class="stack gap-sm">
-                      <label for={"result-score-" + summary.id}><strong>{locale.t('history.resultEditor.score')}</strong> <span class="muted">{locale.t('history.resultEditor.scoreHint')}</span></label>
-                      <input
-                        id={"result-score-" + summary.id}
-                        class="text-input"
-                        data-result-field="score"
-                        type="number"
-                        min="0"
-                        step="1"
-                        inputmode="numeric"
-                        value={resultDraft.score}
-                        placeholder="0"
-                        aria-invalid={scoreInvalid || undefined}
-                        aria-describedby={scoreInvalid ? errorId : undefined}
-                        oninput={(e) => historyActions.setResultScore(e.target.value)}
-                      />
-                    </div>
+                    {#if summary.playerCount === 1}
+                      <div class="stack gap-sm">
+                        <label for={"result-score-" + summary.id}><strong>{locale.t('history.resultEditor.score')}</strong> <span class="muted">{locale.t('history.resultEditor.scoreHint')}</span></label>
+                        <input
+                          id={"result-score-" + summary.id}
+                          class="text-input"
+                          data-result-field="score"
+                          type="number"
+                          min="0"
+                          step="1"
+                          inputmode="numeric"
+                          value={resultDraft.score}
+                          placeholder="0"
+                          aria-invalid={scoreInvalid || undefined}
+                          aria-describedby={scoreInvalid ? errorId : undefined}
+                          oninput={(e) => historyActions.setResultScore(e.target.value)}
+                        />
+                      </div>
+                    {:else}
+                      {#each resultDraft.playerScores ?? [] as entry, i}
+                        {@const playerScoreInvalid = resultInvalidFields.includes(`player-score-${i}`)}
+                        <div class="stack gap-sm">
+                          <label for={`result-player-name-${summary.id}-${i}`}><strong>Player {i + 1}</strong></label>
+                          <input
+                            id={`result-player-name-${summary.id}-${i}`}
+                            type="text"
+                            class="text-input"
+                            data-result-field={`player-name-${i}`}
+                            placeholder={`Player ${i + 1}`}
+                            value={entry.playerName}
+                            oninput={(e) => historyActions.setResultPlayerName(i, e.target.value)}
+                          />
+                          <input
+                            type="number"
+                            class="text-input"
+                            data-result-field={`player-score-${i}`}
+                            min="0"
+                            step="1"
+                            inputmode="numeric"
+                            value={entry.score}
+                            placeholder="0"
+                            aria-invalid={playerScoreInvalid || undefined}
+                            aria-describedby={playerScoreInvalid ? errorId : undefined}
+                            oninput={(e) => historyActions.setResultPlayerScore(i, e.target.value)}
+                          />
+                        </div>
+                      {/each}
+                    {/if}
 
                     <div class="stack gap-sm">
                       <label for={"result-notes-" + summary.id}><strong>{locale.t('history.resultEditor.notes')}</strong> <span class="muted">{locale.t('history.resultEditor.optional')}</span></label>

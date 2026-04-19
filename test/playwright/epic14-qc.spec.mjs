@@ -47,10 +47,10 @@ test.describe('Epic 14 automated QC', () => {
     await acceptSetupIntoResultEntry(page, 1);
     await saveCurrentResult(page, { outcome: 'win', score: 80, notes: 'Strong opening.' });
 
-    await acceptSetupIntoResultEntry(page, 2);
+    await acceptSetupIntoResultEntry(page, 1);
     await saveCurrentResult(page, { outcome: 'loss', score: null, notes: 'City filled before the finish.' });
 
-    await acceptSetupIntoResultEntry(page, 3);
+    await acceptSetupIntoResultEntry(page, 1);
     await page.locator('[data-action="skip-game-result"]').click();
 
     await selectTab(page, 'history');

@@ -12,7 +12,7 @@
   import { addForcedPick, hasForcedPicks, removeForcedPick } from '../app/forced-picks-utils.mjs';
   import { DEFAULT_HISTORY_GROUPING_MODE, HISTORY_GROUPING_MODES } from '../app/history-utils.mjs';
   import { createLocaleTools, getSelectableLocales, normalizeLocaleId } from '../app/localization-utils.mjs';
-  import { normalizeGameResultDraft, validateGameResultDraft } from '../app/result-utils.mjs';
+  import { normalizeGameResultDraft, validateGameResultDraft, isCompletedGameResult } from '../app/result-utils.mjs';
   import OnboardingShell from './OnboardingShell.svelte';
   import { buildHistoryReadySetupSnapshot, generateSetup } from '../app/setup-generator.mjs';
   import { resolvePlayMode } from '../app/setup-rules.mjs';
@@ -65,8 +65,10 @@
     getResultEditorRecordId, setResultEditorRecordId,
     getResultEditorReturnFocusSelector, setResultEditorReturnFocusSelector,
     getResultDraft, setResultDraft, resetResultDraft,
+    resetResultDraftForPlayerCount,
     getResultFormError, setResultFormError,
-    getResultInvalidFields, setResultInvalidFields
+    getResultInvalidFields, setResultInvalidFields,
+    setResultPlayerScore, setResultPlayerName
   } from '../app/history-vm.svelte.js';
   import {
     getBackupImportError, setBackupImportError,
@@ -397,7 +399,15 @@
       options.returnFocusSelector ||
       `[data-action="edit-game-result"][data-record-id="${recordId}"]`
     );
-    setResultDraft(normalizeGameResultDraft(record.result));
+    if (record.playerCount >= 2) {
+      if (isCompletedGameResult(record.result)) {
+        setResultDraft(normalizeGameResultDraft(record.result, record.playerCount));
+      } else {
+        resetResultDraftForPlayerCount(record.playerCount);
+      }
+    } else {
+      setResultDraft(normalizeGameResultDraft(record.result));
+    }
     setResultFormError(null);
     setResultInvalidFields([]);
     setHistoryExpandedRecordId(recordId);
@@ -931,6 +941,16 @@
       if (hadValidationState) focusSelector('[data-result-field="notes"]');
     },
 
+    setResultPlayerScore(index, value) {
+      setResultPlayerScore(index, value);
+      setResultFormError(null);
+      setResultInvalidFields([]);
+    },
+
+    setResultPlayerName(index, value) {
+      setResultPlayerName(index, value);
+    },
+
     skipGameResultEntry() {
       const returnFocusSelector = closeResultEditor();
       ui.lastActionNotice = locale.t('actions.pendingResult');
@@ -946,13 +966,19 @@
 
     saveGameResult() {
       if (!getResultEditorRecordId()) return;
-      const validation = validateGameResultDraft(getResultDraft());
+      const activeRecordId = getResultEditorRecordId();
+      const record = appState.history.find((r) => r.id === activeRecordId);
+      const playerCount = record?.playerCount ?? 1;
+      const validation = validateGameResultDraft(getResultDraft(), playerCount);
       if (!validation.ok) {
         setResultFormError(validation.errors
           .map((message) => locale.localizeValidationMessage(message))
           .join(' '));
         setResultInvalidFields(validation.errors.flatMap((message) => {
           if (message.includes('Win or Loss')) return ['outcome'];
+          if (playerCount >= 2 && message.toLowerCase().includes('score')) {
+            return Array.from({ length: playerCount }, (_, i) => `player-score-${i}`);
+          }
           if (message.toLowerCase().includes('score')) return ['score'];
           return [];
         }));
@@ -960,7 +986,6 @@
         focusSelector('[data-result-form-error]');
         return;
       }
-      const activeRecordId = getResultEditorRecordId();
       const returnFocusSelector = getResultEditorReturnFocusSelector();
       const wasPending =
         appState.history.find((r) => r.id === activeRecordId)?.result?.status !== 'completed';
@@ -1162,7 +1187,9 @@
     cancelResultEntry: actions.cancelResultEntry,
     setResultOutcome: actions.setResultOutcome,
     setResultScore: actions.setResultScore,
-    setResultNotes: actions.setResultNotes
+    setResultNotes: actions.setResultNotes,
+    setResultPlayerScore: actions.setResultPlayerScore,
+    setResultPlayerName: actions.setResultPlayerName
   };
 
   const backupActions = {

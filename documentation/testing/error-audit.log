@@ -64,3 +64,10 @@ File: documentation/planning/epic/ready-for-dev/epic-50-task-list.md (Story 50.1
 Finding: Several tasks in the Epic 50 task list reference `documentation/planning/epic/approved/epic-50.md` as the target for the diagnosis note, but the file lives at `documentation/planning/epic/ready-for-dev/epic-50.md`. The `approved/` folder exists but is empty. The diagnosis and automated validation notes were correctly appended to the `ready-for-dev/` copy, so the content is accurate; only the path cited in the task list is stale.
 Suggested action: No content change required — the notes are in the correct file. The path discrepancy in the task list is a historical planning artefact. Epic 50's spec and task list should be moved to `done/` once the manual Lighthouse validation tasks (Story 50.3) are completed.
 ---
+[2026-04-18] Epic: Epic 57 — Solo Mode Rules Reference Panel
+File: documentation/ux/ui-design.md (Tab 3 — New Game mock diagram and interactions)
+Finding: The New Game tab mock diagram shows only three 1-player play-mode buttons: `[Standard Solo] [Advanced Solo] [Two-Handed]`. Epic 56 (dependency of Epic 57) introduced a fourth 1-player mode, `standard-solo-v2` ("Standard v2"). The diagram and the interaction bullet "1-player mode exposes Standard Solo, Advanced Solo, and Two-Handed Solo" are both missing `Standard v2`. This is a pre-existing documentation gap from Epic 56, not Epic 57.
+Suggested action: Update the Tab 3 mock diagram and the interactions bullet in `documentation/ux/ui-design.md` to add `[Standard v2]` to the play-mode button row and include "Standard v2" in the list of 1-player modes. Edit scope: within `/documentation`.
+---
+[2026-04-19] Resolution: Epic 57 finding resolved. Updated documentation/ux/ui-design.md Tab 3 mock diagram to add [Standard v2] button and updated the 1-player mode interactions bullet to include "Standard v2".
+---

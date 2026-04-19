@@ -2,6 +2,7 @@
   import { getAvailablePlayModes, getDisplayedSetupRequirements } from '../app/new-game-utils.mjs';
   import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from '../app/forced-picks-utils.mjs';
   import { buildOwnedPools, validateSetupLegality } from '../app/setup-generator.mjs';
+  import { getSoloRulesItems, SOLO_RULES_PANEL_MODES } from '../app/solo-rules.mjs';
 
   let {
     bundle,
@@ -26,6 +27,12 @@
     currentSetup
   }));
   let hasActiveForcedPicks = $derived(hasForcedPicks(forcedPicks));
+
+  let soloRulesItems = $derived(
+    currentSetup && selectedPlayerCount === 1 && SOLO_RULES_PANEL_MODES.has(selectedPlayMode)
+      ? getSoloRulesItems(selectedPlayMode)
+      : null
+  );
 
   let filterFeasibility = $derived.by(() => {
     return validateSetupLegality({
@@ -431,6 +438,17 @@
             {/each}
           </ul>
         </div>
+
+        {#if soloRulesItems}
+          <details class="result-card" data-result-section="solo-rules" open>
+            <summary><strong>{locale.t('newGame.soloRules.sectionTitle')}</strong></summary>
+            <ul class="clean result-list" style="margin-top: var(--space-sm)">
+              {#each soloRulesItems as key (key)}
+                <li>{locale.t(key)}</li>
+              {/each}
+            </ul>
+          </details>
+        {/if}
       {/if}
     </div>
   </section>

@@ -1,4 +1,5 @@
 import { DEFAULT_HISTORY_GROUPING_MODE } from './history-utils.mjs';
+import { createPerPlayerScoreArray } from './result-utils.mjs';
 
 let _historyExpandedRecordId = $state(null);
 let _historyInsightsExpanded = $state(false);
@@ -35,6 +36,34 @@ export function setResultEditorReturnFocusSelector(v) { _resultEditorReturnFocus
 export function getResultDraft() { return _resultDraft; }
 export function setResultDraft(v) { _resultDraft = v; }
 export function resetResultDraft() { _resultDraft = { outcome: '', score: '', notes: '' }; }
+
+export function resetResultDraftForPlayerCount(playerCount) {
+  if (playerCount >= 2) {
+    _resultDraft = {
+      outcome: '',
+      playerScores: createPerPlayerScoreArray(playerCount).map(() => ({ playerName: '', score: '' })),
+      notes: ''
+    };
+  } else {
+    _resultDraft = { outcome: '', score: '', notes: '' };
+  }
+}
+
+export function setResultPlayerScore(index, value) {
+  if (!Array.isArray(_resultDraft.playerScores) || index < 0 || index >= _resultDraft.playerScores.length) return;
+  const updated = _resultDraft.playerScores.map((entry, i) =>
+    i === index ? { ...entry, score: value } : entry
+  );
+  _resultDraft = { ..._resultDraft, playerScores: updated };
+}
+
+export function setResultPlayerName(index, value) {
+  if (!Array.isArray(_resultDraft.playerScores) || index < 0 || index >= _resultDraft.playerScores.length) return;
+  const updated = _resultDraft.playerScores.map((entry, i) =>
+    i === index ? { ...entry, playerName: typeof value === 'string' ? value.trim() : '' } : entry
+  );
+  _resultDraft = { ..._resultDraft, playerScores: updated };
+}
 
 export function getResultFormError() { return _resultFormError; }
 export function setResultFormError(v) { _resultFormError = v; }

@@ -91,7 +91,7 @@ test('Epic 11 keeps legality, collection feasibility, and generated setup output
 });
 
 test('Epic 11 New Game helpers expose mode options, help text, and mode-aware requirement rendering', () => {
-  assert.deepEqual(getAvailablePlayModes(1).map((mode) => mode.id), ['standard', 'advanced-solo', 'two-handed-solo']);
+  assert.deepEqual(getAvailablePlayModes(1).map((mode) => mode.id), ['standard', 'advanced-solo', 'two-handed-solo', 'standard-solo-v2']);
   assert.equal(getAvailablePlayModes(2)[0].id, 'standard');
   assert.match(getPlayModeHelpText(1, 'two-handed-solo'), /2-player setup counts/);
   assert.match(getPlayModeHelpText(2, 'standard'), /disabled until you switch back to 1 player/);

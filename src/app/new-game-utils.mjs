@@ -10,9 +10,10 @@ export function getAvailablePlayModes(playerCount) {
   }
 
   return [
-    { id: 'standard', label: 'Standard Solo', description: 'Use the standard 1-player setup counts.' },
-    { id: 'advanced-solo', label: 'Advanced Solo', description: 'Use the Advanced Solo setup counts with 4 Heroes and 2 Villain Groups.' },
-    { id: 'two-handed-solo', label: 'Two-Handed Solo', description: 'Track the game as solo, but use the standard 2-player setup counts.' }
+    { id: 'standard', label: 'Standard Solo v1', description: 'Use the standard 1-player setup counts.' },
+    { id: 'advanced-solo', label: 'Advanced Solo', description: 'Use the Advanced Solo setup counts — same card counts as Standard Solo v1, with an increased Master Strike deck.' },
+    { id: 'two-handed-solo', label: 'Two-Handed Solo', description: 'Track the game as solo, but use the standard 2-player setup counts.' },
+    { id: 'standard-solo-v2', label: 'Standard Solo v2', description: 'Use the Second Edition solo setup counts — 3 Heroes, 1 Villain Group, 1 Henchman Group.' }
   ];
 }
 
@@ -25,7 +26,7 @@ export function getPlayModeHelpText(playerCount, playMode) {
     return 'Two-Handed Solo keeps the game labeled as solo, but uses the standard 2-player setup counts.';
   }
 
-  return 'Choose between Standard Solo, Advanced Solo, and Two-Handed Solo while staying in 1-player mode.';
+  return 'Choose between Standard Solo v1, Advanced Solo, Two-Handed Solo, and Standard Solo v2 while staying in 1-player mode.';
 }
 
 export function getDisplayedSetupRequirements({ playerCount, advancedSolo, playMode, currentSetup }) {

@@ -161,6 +161,9 @@ export function createLocaleTools(localeId) {
       if (playMode === 'two-handed-solo') {
         return t('common.playMode.two-handed-solo');
       }
+      if (playMode === 'standard-solo-v2') {
+        return t('common.playMode.standard-solo-v2');
+      }
       return Number(playerCount) === 1 ? t('common.playMode.standardSolo') : t('common.playMode.standard');
     },
     getPlayModeDescription(playMode, playerCount = 1) {
@@ -169,6 +172,9 @@ export function createLocaleTools(localeId) {
       }
       if (playMode === 'two-handed-solo') {
         return t('common.playMode.two-handed-soloDescription');
+      }
+      if (playMode === 'standard-solo-v2') {
+        return t('common.playMode.standard-solo-v2Description');
       }
       return Number(playerCount) === 1 ? t('common.playMode.standardSoloDescription') : t('common.playMode.standardDescription');
     },

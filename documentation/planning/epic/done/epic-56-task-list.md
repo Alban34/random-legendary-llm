@@ -118,15 +118,15 @@ Assert all of the following in separate `test()` calls:
 
 6. **Generator respects the template:** `generateSetup({ runtime: bundle.runtime, state: allOwnedState, playerCount: 1, playMode: 'standard-solo-v2', random: () => 0 })` returns a setup whose `template.heroCount === 3`, `template.villainGroupCount === 1`, and `template.playMode === 'standard-solo-v2'`.
 
-- [ ] **Task 1 — Add `'1-standard-v2'` to `SETUP_RULES` in `src/app/setup-rules.mjs`** (see specification above)
-- [ ] **Task 2 — Add `'standard-solo-v2'` to `PLAY_MODE_OPTIONS` in `src/app/setup-rules.mjs`** (see specification above)
-- [ ] **Task 3 — Add player-count guard for `standard-solo-v2` to `resolvePlayMode` in `src/app/setup-rules.mjs`** (see specification above)
-- [ ] **Task 4 — Add `standard-solo-v2` case to `getPlayModeLabel` in `src/app/setup-rules.mjs`** (see specification above)
-- [ ] **Task 5 — Add `standard-solo-v2` → `'1-standard-v2'` mapping to `resolveSetupTemplate` in `src/app/setup-rules.mjs`** (see specification above)
-- [ ] **Task 6 — Update the `getAvailablePlayModes(1)` assertion at line 94 of `test/epic11-play-modes.test.mjs`** to include `'standard-solo-v2'` in the expected array
-- [ ] **Task 7 — Create `test/epic56-standard-v2-solo.test.mjs`** with the six assertions specified above
-- [ ] **Test (Story 1):** Verify manually that `resolveSetupTemplate(1, { playMode: 'standard-solo-v2' })` returns `{ heroCount: 3, villainGroupCount: 1, henchmanGroupCount: 1, wounds: 25 }` and that `resolvePlayMode(2, { playMode: 'standard-solo-v2' })` throws; confirm the new test file covers the Epic 53 non-regression assertions for scheme eligibility
-- [ ] **QC (Automated):** run `npm run lint && npm test` and confirm all pass
+- [x] **Task 1 — Add `'1-standard-v2'` to `SETUP_RULES` in `src/app/setup-rules.mjs`** (see specification above)
+- [x] **Task 2 — Add `'standard-solo-v2'` to `PLAY_MODE_OPTIONS` in `src/app/setup-rules.mjs`** (see specification above)
+- [x] **Task 3 — Add player-count guard for `standard-solo-v2` to `resolvePlayMode` in `src/app/setup-rules.mjs`** (see specification above)
+- [x] **Task 4 — Add `standard-solo-v2` case to `getPlayModeLabel` in `src/app/setup-rules.mjs`** (see specification above)
+- [x] **Task 5 — Add `standard-solo-v2` → `'1-standard-v2'` mapping to `resolveSetupTemplate` in `src/app/setup-rules.mjs`** (see specification above)
+- [x] **Task 6 — Update the `getAvailablePlayModes(1)` assertion at line 94 of `test/epic11-play-modes.test.mjs`** to include `'standard-solo-v2'` in the expected array
+- [x] **Task 7 — Create `test/epic56-standard-v2-solo.test.mjs`** with the six assertions specified above
+- [x] **Test (Story 1):** Verify manually that `resolveSetupTemplate(1, { playMode: 'standard-solo-v2' })` returns `{ heroCount: 3, villainGroupCount: 1, henchmanGroupCount: 1, wounds: 25 }` and that `resolvePlayMode(2, { playMode: 'standard-solo-v2' })` throws; confirm the new test file covers the Epic 53 non-regression assertions for scheme eligibility
+- [x] **QC (Automated):** run `npm run lint && npm test` and confirm all pass
 
 ---
 
@@ -196,13 +196,13 @@ if (playMode === 'standard-solo-v2') {
 
 Without this, the tooltip rendered via `locale.getPlayModeDescription(mode.id, selectedPlayerCount)` in `NewGameTab.svelte` would show the wrong description for the Standard v2 button.
 
-- [ ] **Task 1 — Fix the `advanced-solo` description in `getAvailablePlayModes` in `src/app/new-game-utils.mjs`** (remove "4 Heroes and 2 Villain Groups")
-- [ ] **Task 2 — Add `standard-solo-v2` entry to `getAvailablePlayModes` for 1-player in `src/app/new-game-utils.mjs`**
-- [ ] **Task 3 — Update the `chooseSolo` fallback return string in `getPlayModeHelpText` in `src/app/new-game-utils.mjs`** to mention Standard v2
-- [ ] **Task 4 — Add `standard-solo-v2` case to `getPlayModeLabel` in `src/app/localization-utils.mjs`** returning `t('common.playMode.standard-solo-v2')`
-- [ ] **Task 5 — Add `standard-solo-v2` case to `getPlayModeDescription` in `src/app/localization-utils.mjs`** returning `t('common.playMode.standard-solo-v2Description')`
-- [ ] **Test (Story 2):** Load the app in a browser at 1 player; confirm four mode buttons appear (Standard Solo, Advanced Solo, Two-Handed Solo, Standard v2); verify the Advanced Solo button tooltip no longer contains "4 Heroes" or "2 Villain Groups"; select Standard v2 and confirm the requirements summary shows Heroes 3, Villain Groups 1, Henchman Groups 1; switch to 2 players and confirm the Standard v2 button is absent
-- [ ] **QC (Automated):** run `npm run lint && npm test` and confirm all pass
+- [x] **Task 1 — Fix the `advanced-solo` description in `getAvailablePlayModes` in `src/app/new-game-utils.mjs`** (remove "4 Heroes and 2 Villain Groups")
+- [x] **Task 2 — Add `standard-solo-v2` entry to `getAvailablePlayModes` for 1-player in `src/app/new-game-utils.mjs`**
+- [x] **Task 3 — Update the `chooseSolo` fallback return string in `getPlayModeHelpText` in `src/app/new-game-utils.mjs`** to mention Standard v2
+- [x] **Task 4 — Add `standard-solo-v2` case to `getPlayModeLabel` in `src/app/localization-utils.mjs`** returning `t('common.playMode.standard-solo-v2')`
+- [x] **Task 5 — Add `standard-solo-v2` case to `getPlayModeDescription` in `src/app/localization-utils.mjs`** returning `t('common.playMode.standard-solo-v2Description')`
+- [x] **Test (Story 2):** Load the app in a browser at 1 player; confirm four mode buttons appear (Standard Solo, Advanced Solo, Two-Handed Solo, Standard v2); verify the Advanced Solo button tooltip no longer contains "4 Heroes" or "2 Villain Groups"; select Standard v2 and confirm the requirements summary shows Heroes 3, Villain Groups 1, Henchman Groups 1; switch to 2 players and confirm the Standard v2 button is absent
+- [x] **QC (Automated):** run `npm run lint && npm test` and confirm all pass
 
 ---
 
@@ -275,11 +275,11 @@ Place the two new keys immediately after `'common.playMode.two-handed-soloDescri
 
 ---
 
-- [ ] **Task 1 — Update `src/app/locales/en.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
-- [ ] **Task 2 — Update `src/app/locales/fr.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
-- [ ] **Task 3 — Update `src/app/locales/de.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
-- [ ] **Task 4 — Update `src/app/locales/es.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
-- [ ] **Task 5 — Update `src/app/locales/ja.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
-- [ ] **Task 6 — Update `src/app/locales/ko.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
-- [ ] **Test (Story 3):** Grep each locale file to confirm the string "4 Heroes and 2 Villain Groups" (and its translated equivalent) is absent; confirm `standard-solo-v2` and `standard-solo-v2Description` keys are present in all six files; switch the app language to each locale, select Standard v2, and confirm no raw key string appears in the mode button label or tooltip
-- [ ] **QC (Automated):** run `npm run lint && npm test` and confirm all pass
+- [x] **Task 1 — Update `src/app/locales/en.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
+- [x] **Task 2 — Update `src/app/locales/fr.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
+- [x] **Task 3 — Update `src/app/locales/de.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
+- [x] **Task 4 — Update `src/app/locales/es.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
+- [x] **Task 5 — Update `src/app/locales/ja.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
+- [x] **Task 6 — Update `src/app/locales/ko.mjs`:** fix `advanced-soloDescription`, add `standard-solo-v2`, add `standard-solo-v2Description`, update `chooseSolo` (see table above)
+- [x] **Test (Story 3):** Grep each locale file to confirm the string "4 Heroes and 2 Villain Groups" (and its translated equivalent) is absent; confirm `standard-solo-v2` and `standard-solo-v2Description` keys are present in all six files; switch the app language to each locale, select Standard v2, and confirm no raw key string appears in the mode button label or tooltip
+- [x] **QC (Automated):** run `npm run lint && npm test` and confirm all pass

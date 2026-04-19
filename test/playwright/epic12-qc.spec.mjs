@@ -59,7 +59,7 @@ test.describe('Epic 12 automated QC', () => {
   });
 
   test('supports skip, cancel, and later correction without duplicating the accepted record', async ({ page }) => {
-    await acceptSetupIntoResultEntry(page, 2);
+    await acceptSetupIntoResultEntry(page, 1);
 
     await page.locator('[data-action="skip-game-result"]').click();
     const firstHistoryItem = page.locator('#panel-history .history-item').first();

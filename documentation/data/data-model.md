@@ -377,20 +377,35 @@ Accepted setups should be stored using IDs only.
 }
 ```
 
+### `PlayerScoreEntry`
+
+```text
+{
+  playerName: string,
+  score: number | null
+}
+```
+
+Represents one player's name and score within a multiplayer result. `playerName` defaults to an empty string (the UI renders `"Player N"` as a placeholder when it is empty). `score` is `null` when not yet entered or intentionally omitted for a loss.
+
 ### `GameResult`
 
 ```text
 {
   status: "pending" | "completed",
-  outcome: "win" | "loss" | null,
-  score: number | null,
+  outcome: "win" | "loss" | "draw" | null,
+  score: number | null | PlayerScoreEntry[],
   notes: string,
   updatedAt: string | null
-  }
 }
 ```
 
-For completed results, `score` is required for wins and optional for losses.
+`score` is polymorphic by player count:
+
+- **Solo (`playerCount === 1`):** `number | null`. For a win, a non-negative integer is required. For a loss or draw it is optional (`null` or `≥ 0`).
+- **Multiplayer (`playerCount >= 2`):** `PlayerScoreEntry[]` — one entry per player. For a win, at least one entry must have a non-null score. For a loss or draw all scores may be `null`.
+
+A pending result always has `score: null` for solo, and `score: PlayerScoreEntry[]` (all `score: null` entries) for multiplayer. `createGameRecord()` seeds the per-player array automatically when `playerCount >= 2`.
 
 ### Why IDs only
 

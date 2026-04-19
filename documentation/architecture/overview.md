@@ -31,6 +31,7 @@ The current release keeps the architecture described below and implements it wit
 - `src/app/object-utils.mjs` — shared object utilities; exports `deepClone` (thin wrapper over `structuredClone`) and `isPlainObject`; extracted from `state-store.mjs`, `backup-utils.mjs`, and `setup-generator.mjs` to eliminate duplication
 - `src/app/history-utils.mjs` — history record formatting and filtering utilities; `formatHistorySummary` resolves entity display names, expansion set names, and grouping keys from runtime indexes for each history record; `filterHistoryByOutcome(records, filter)` filters a history array to the requested outcome (`'all'`, `'win'`, `'loss'`, `'pending'`) without mutating the input
 - `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs` — resolve templates and produce legal setups
+- `src/app/solo-rules.mjs` — solo mode rules reference data; exports `SOLO_RULES_PANEL_MODES` (a `Set` of the three eligible solo mode keys: `standard`, `advanced-solo`, `standard-solo-v2`) and `getSoloRulesItems(playMode)` (returns an ordered array of `newGame.soloRules.*` locale string keys for the eligible modes, or `null` for ineligible modes including `two-handed-solo` and all multiplayer modes); added in Epic 57
 - `src/app/app-renderer.mjs` — transitional render functions used via `{@html}` blocks in Svelte tab components
 - `src/app/browse-vm.svelte.js` — browse tab view-model; owns browse-specific reactive state
 - `src/app/new-game-vm.svelte.js` — new-game tab view-model; owns new-game-specific reactive state
@@ -440,6 +441,8 @@ The normalization layer should validate:
 The generator should validate:
 - the owned collection can legally support the selected setup,
 - Advanced Solo is only used with 1 player,
+- Standard Solo v2 (standard-solo-v2) is only used with 1 player,
+- Two-Handed Solo is only used with 1 player,
 - the forced Mastermind lead is counted in the correct category,
 - the least-played fallback only occurs after legality is established.
 
