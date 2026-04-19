@@ -102,6 +102,7 @@ Typography roles are governed by `design-system/overview.md`.
 [Hero with one dominant CTA]
 [Optional "Start here" disclosure]
 [Search / filter bar]                [Type filter: All | Base Game | Large | Small | Standalone]
+[Sort: Name (A–Z) | Release Year | In Collection]
 
 ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
 │ SET NAME     │  │ SET NAME     │  │ SET NAME     │
@@ -138,6 +139,7 @@ Typography roles are governed by `design-system/overview.md`.
 - "Add to Collection" toggles ownership directly from Browse and stays synchronized with Collection
 - Type filter pills filter the grid
 - Search bar filters by set name or alias
+- Sort selector (Name A–Z / Release Year / In Collection) re-orders the visible set list immediately; the active sort option is visually distinguished; the sort selection is session-only and resets to Name on page reload
 
 ---
 

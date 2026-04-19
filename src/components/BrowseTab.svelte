@@ -1,5 +1,5 @@
 <script>
-  import { BROWSE_TYPE_OPTIONS, filterBrowseSets, summarizeBrowseSet } from '../app/browse-utils.mjs';
+  import { BROWSE_TYPE_OPTIONS, BROWSE_SORT_OPTIONS, filterBrowseSets, summarizeBrowseSet } from '../app/browse-utils.mjs';
 
   let {
     bundle,
@@ -24,13 +24,16 @@
   } = $props();
 
   let firstRun = $derived(onboardingVisible || !appState.preferences.onboardingCompleted);
+  let browseSortKey = $state('name');
+  let ownedSetIds = $derived(new Set(appState.collection.ownedSetIds));
   let browseSets = $derived(
     filterBrowseSets(bundle.runtime.sets, {
       searchTerm: browseSearchTerm,
-      typeFilter: browseTypeFilter
+      typeFilter: browseTypeFilter,
+      sortKey: browseSortKey,
+      ownedSetIds
     })
   );
-  let ownedSetIds = $derived(new Set(appState.collection.ownedSetIds));
 
   function formatBrowseMastermind(mastermind) {
     if (!mastermind.lead) return mastermind.name;
@@ -166,6 +169,21 @@
               aria-pressed={browseTypeFilter === option.id}
               onclick={() => onSetTypeFilter(option.id)}
             >{locale.getBrowseTypeFilterLabel(option.id)}</button>
+          {/each}
+        </div>
+      </div>
+      <div class="stack gap-sm">
+        <span class="muted">{locale.t('browse.sort.label')}</span>
+        <div class="button-row" role="group" aria-label={locale.t('browse.sort.label')}>
+          {#each BROWSE_SORT_OPTIONS as option (option.id)}
+            <button
+              type="button"
+              class={"button " + (browseSortKey === option.id ? 'button-primary' : 'button-secondary') + " browse-sort-button"}
+              data-action="set-browse-sort-key"
+              data-sort-key={option.id}
+              aria-pressed={browseSortKey === option.id}
+              onclick={() => browseSortKey = option.id}
+            >{locale.getBrowseSortLabel(option.id)}</button>
           {/each}
         </div>
       </div>

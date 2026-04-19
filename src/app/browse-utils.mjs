@@ -7,6 +7,12 @@ export const BROWSE_TYPE_OPTIONS = [
   { id: 'small-expansion', label: 'Small' }
 ];
 
+export const BROWSE_SORT_OPTIONS = [
+  { id: 'name' },
+  { id: 'releaseYear' },
+  { id: 'collection' }
+];
+
 const TYPE_LABELS = {
   base: 'Base Game',
   'large-expansion': 'Large Expansion',
@@ -42,12 +48,22 @@ export function matchesBrowseSearch(set, searchTerm) {
     .some((value) => value.includes(normalizedQuery));
 }
 
-export function filterBrowseSets(sets, { searchTerm = '', typeFilter = 'all' } = {}) {
+export function filterBrowseSets(sets, { searchTerm = '', typeFilter = 'all', sortKey = 'name', ownedSetIds = new Set() } = {}) {
   return sets
     .filter((set) => {
       const matchesType = typeFilter === 'all' || set.type === typeFilter;
       return matchesType && matchesBrowseSearch(set, searchTerm);
     })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      if (sortKey === 'releaseYear') {
+        return (a.year - b.year) || a.name.localeCompare(b.name);
+      }
+      if (sortKey === 'collection') {
+        const aOwned = ownedSetIds.has(a.id) ? 0 : 1;
+        const bOwned = ownedSetIds.has(b.id) ? 0 : 1;
+        return (aOwned - bOwned) || a.name.localeCompare(b.name);
+      }
+      return a.name.localeCompare(b.name);
+    });
 }
 

@@ -199,6 +199,9 @@ export function createLocaleTools(localeId) {
     getBrowseTypeFilterLabel(type) {
       return t(`browse.type.${type}`);
     },
+    getBrowseSortLabel(sortKey) {
+      return t(`browse.sort.${sortKey}`);
+    },
     getCollectionGroupLabel(type) {
       return t(`collection.group.${type}`);
     },
