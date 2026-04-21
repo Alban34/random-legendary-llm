@@ -226,7 +226,9 @@ function validateForcedPickAvailability(forcedPicks, pools, template, eligibleSc
   return reasons;
 }
 
-function resolveForcedCollections(scheme, mastermind, pools, forcedPicks) {
+const SOLO_PLAY_MODES = new Set(['advanced-solo', 'two-handed-solo', 'standard-solo-v2']);
+
+function resolveForcedCollections(scheme, mastermind, pools, forcedPicks, template) {
   const poolVillainIds = createIdSet(pools.villainGroups);
   const poolHenchmanIds = createIdSet(pools.henchmanGroups);
   const villainMap = new Map();
@@ -245,7 +247,7 @@ function resolveForcedCollections(scheme, mastermind, pools, forcedPicks) {
     appendForcedReason(source, group.id, 'scheme');
   }
 
-  if (mastermind.lead) {
+  if (mastermind.lead && !SOLO_PLAY_MODES.has(template.playMode)) {
     const source = mastermind.lead.category === 'villains' ? villainMap : henchmanMap;
     appendForcedReason(source, mastermind.lead.id, 'mastermind');
   }
@@ -452,8 +454,8 @@ function buildRandomDetails(entities) {
   }));
 }
 
-function buildCategorySelection(pools, requirements, scheme, mastermind, usageBucket, random, forcedPicks) {
-  const forced = resolveForcedCollections(scheme, mastermind, pools, forcedPicks);
+function buildCategorySelection(pools, requirements, scheme, mastermind, usageBucket, random, forcedPicks, template) {
+  const forced = resolveForcedCollections(scheme, mastermind, pools, forcedPicks, template);
   if (!forced.allAvailable) {
     return { selection: null, reason: 'One or more forced Villain Group or Henchman Group picks are unavailable in the current owned collection.' };
   }
@@ -593,7 +595,7 @@ function resolveLeadEntity(mastermind, runtime) {
 }
 
 function tryMastermindForScheme(mastermind, { mastermindRanking, scheme, schemeSelection, pools, effectiveRequirements, normalizedForcedPicks, state, runtime, random, constraintFailureReasons, eligibleSchemes, template }) {
-  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks);
+  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks, template);
   if (!categorySelection.selection) {
     if (categorySelection.reason) {
       constraintFailureReasons.add(categorySelection.reason);
