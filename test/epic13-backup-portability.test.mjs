@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -42,12 +42,13 @@ function createSampleSetup(offset = 0) {
   };
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 13 creates a versioned portable backup payload with metadata and a useful filename', () => {
+test('Creates a versioned portable backup payload with metadata and a useful filename', () => {
+
   let state = createDefaultState();
   state.collection.ownedSetIds = ['core-set'];
   state.preferences.themeId = 'light';
@@ -63,7 +64,8 @@ test('Epic 13 creates a versioned portable backup payload with metadata and a us
   assert.match(buildBackupFilename(payload.exportedAt), /^legendary-marvel-randomizer-backup-2026-04-10T12-45-30-000Z\.json$/);
 });
 
-test('Epic 13 parses valid current and legacy-compatible backup payloads and summarizes them safely', () => {
+test('Parses valid current and legacy-compatible backup payloads and summarizes them safely', () => {
+
   let state = createDefaultState();
   state.collection.ownedSetIds = ['core-set', 'dark-city'];
   state.preferences.themeId = 'light';
@@ -106,7 +108,8 @@ test('Epic 13 parses valid current and legacy-compatible backup payloads and sum
   });
 });
 
-test('Epic 13 rejects malformed or unsupported backup payloads before mutating app state', () => {
+test('Rejects malformed or unsupported backup payloads before mutating app state', () => {
+
   const malformed = parseBackupText('{ definitely not json', { indexes: bundle.runtime.indexes });
   assert.equal(malformed.ok, false);
   assert.match(malformed.error, /valid JSON/i);
@@ -133,7 +136,8 @@ test('Epic 13 rejects malformed or unsupported backup payloads before mutating a
   assert.match(partialPayload.error, /missing usage data/i);
 });
 
-test('Epic 13 merge semantics union collection, dedupe history, keep stronger usage stats, and apply imported preferences', () => {
+test('Merge semantics union collection, dedupe history, keep stronger usage stats, and apply imported preferences', () => {
+
   let currentState = createDefaultState();
   currentState.collection.ownedSetIds = ['core-set'];
   currentState.preferences.themeId = 'dark';

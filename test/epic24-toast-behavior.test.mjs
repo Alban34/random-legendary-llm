@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +14,7 @@ let feedbackUtils;
 let appRenderer;
 let toastStackSource;
 
-before(async () => {
+beforeAll(async () => {
   [browserEntry, appShellCss, feedbackUtils, appRenderer, toastStackSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
@@ -25,7 +25,8 @@ before(async () => {
 });
 
 // Story 24.2 — theme action must not call enqueueToast
-test('Story 24.2: setTheme action does not call enqueueToast', () => {
+test('setTheme action does not call enqueueToast', () => {
+
   // Isolate the setTheme handler block and confirm enqueueToast is absent
   const setThemeMatch = browserEntry.match(/setTheme\(themeId\)[\s\S]*?focusSelector\(`\[data-action="set-theme"\]/);
   assert.ok(setThemeMatch, 'setTheme handler must be present in App.svelte');
@@ -33,16 +34,19 @@ test('Story 24.2: setTheme action does not call enqueueToast', () => {
 });
 
 // Story 24.2 — locale action still uses enqueueToast (unchanged)
-test('Story 24.2: setLocale action still calls enqueueToast', () => {
+test('setLocale action still calls enqueueToast', () => {
+
   assert.match(browserEntry, /setLocale[\s\S]*?enqueueToast/, 'setLocale must still emit a toast');
 });
 
 // Story 24.3 — toast region is bottom-anchored
-test('Story 24.3: #toast-region uses bottom positioning on mobile', () => {
+test('#toast-region uses bottom positioning on mobile', () => {
+
   assert.match(appShellCss, /#toast-region\s*\{[^}]*bottom\s*:[^}]*env\(safe-area-inset-bottom\)/, '#toast-region must use bottom with safe-area-inset-bottom offset');
 });
 
-test('Story 24.3: #toast-region does not use top positioning in the base declaration', () => {
+test('#toast-region does not use top positioning in the base declaration', () => {
+
   // The base (mobile) declaration must not have a top property; the top property was removed
   const baseRegion = appShellCss.match(/#toast-region\s*\{([^}]*)\}/);
   assert.ok(baseRegion, '#toast-region block must exist');
@@ -50,21 +54,25 @@ test('Story 24.3: #toast-region does not use top positioning in the base declara
 });
 
 // Story 24.3 — toast-enter keyframe exists
-test('Story 24.3: @keyframes toast-enter is defined', () => {
+test('@keyframes toast-enter is defined', () => {
+
   assert.match(appShellCss, /@keyframes\s+toast-enter/, '@keyframes toast-enter must be defined in app-shell.css');
 });
 
-test('Story 24.3: toast-enter keyframe starts from translateY(120%)', () => {
+test('Toast-enter keyframe starts from translateY(120%)', () => {
+
   assert.match(appShellCss, /toast-enter[\s\S]*?translateY\(120%\)/, 'toast-enter must start from translateY(120%) so toasts enter from below the viewport');
 });
 
 // Story 24.3 — enter animation is applied to .toast
-test('Story 24.3: .toast receives the toast-enter animation', () => {
+test('.toast receives the toast-enter animation', () => {
+
   assert.match(appShellCss, /\.toast\s*\{[^}]*animation\s*:[^}]*toast-enter/, '.toast must have animation: toast-enter applied');
 });
 
 // Story 24.4 — prefers-reduced-motion wraps the animation
-test('Story 24.4: toast-enter animation is wrapped in prefers-reduced-motion: no-preference', () => {
+test('Toast-enter animation is wrapped in prefers-reduced-motion: no-preference', () => {
+
   assert.match(
     appShellCss,
     /@media\s*\(prefers-reduced-motion:\s*no-preference\)[\s\S]*?\.toast[\s\S]*?toast-enter/,
@@ -73,14 +81,16 @@ test('Story 24.4: toast-enter animation is wrapped in prefers-reduced-motion: no
 });
 
 // Story 24.4 — feedback-utils.mjs persistent behavior is unchanged
-test('Story 24.4: feedback-utils persistent toast behavior is unchanged', () => {
+test('Feedback-utils persistent toast behavior is unchanged', () => {
+
   assert.match(feedbackUtils, /persistent\s*:\s*\{[\s\S]*?autoDismissMs\s*:\s*null/, 'persistent toast must have autoDismissMs: null in feedback-utils.mjs');
   assert.match(feedbackUtils, /isPersistent\s*:\s*true/, 'persistent toast must have isPersistent: true');
   assert.match(feedbackUtils, /dismissible\s*:\s*true/, 'persistent toast must remain dismissible');
 });
 
 // Story 24.4 — toast HTML preserves role and aria-live
-test('Story 24.4: toast HTML preserves role="status" or role="alert" and aria-live', () => {
+test('Toast HTML preserves role="status" or role="alert" and aria-live', () => {
+
   assert.match(toastStackSource, /role=\{toast\.live === 'assertive' \? 'alert' : 'status'\}/, 'toast must have conditional role attribute');
   assert.match(toastStackSource, /aria-live=\{toast\.live\}/, 'toast must have aria-live attribute');
 });

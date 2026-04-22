@@ -55,7 +55,7 @@ Used for:
 - persistence helpers
 
 Preferred form:
-- `node:test`-based module tests run locally through npm
+- Vitest-based module tests run locally through npm
 - deterministic sample inputs / expected outputs
 
 ### 2. UI behavior verification

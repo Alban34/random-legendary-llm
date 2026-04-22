@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -19,7 +19,7 @@ const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
@@ -53,27 +53,32 @@ function createRecord({
   };
 }
 
-test('Epic 34 HISTORY_GROUPING_MODES contains exactly five modes: mastermind, scheme, heroes, villains, play-mode', () => {
+test('HISTORY_GROUPING_MODES contains exactly five modes: mastermind, scheme, heroes, villains, play-mode', () => {
+
   const ids = HISTORY_GROUPING_MODES.map((m) => m.id);
   assert.deepEqual(ids, ['mastermind', 'scheme', 'heroes', 'villains', 'play-mode']);
 });
 
-test('Epic 34 DEFAULT_HISTORY_GROUPING_MODE is mastermind', () => {
+test('DEFAULT_HISTORY_GROUPING_MODE is mastermind', () => {
+
   assert.equal(DEFAULT_HISTORY_GROUPING_MODE, 'mastermind');
 });
 
-test('Epic 34 normalizeHistoryGroupingMode falls back to mastermind for removed modes player-count and none', () => {
+test('normalizeHistoryGroupingMode falls back to mastermind for removed modes player-count and none', () => {
+
   assert.equal(normalizeHistoryGroupingMode('player-count'), 'mastermind');
   assert.equal(normalizeHistoryGroupingMode('none'), 'mastermind');
 });
 
-test('Epic 34 normalizeHistoryGroupingMode accepts all five valid modes without fallback', () => {
+test('normalizeHistoryGroupingMode accepts all five valid modes without fallback', () => {
+
   for (const mode of ['mastermind', 'scheme', 'heroes', 'villains', 'play-mode']) {
     assert.equal(normalizeHistoryGroupingMode(mode), mode);
   }
 });
 
-test('Epic 34 scheme grouping produces one group per distinct schemeId with correct key format', () => {
+test('Scheme grouping produces one group per distinct schemeId with correct key format', () => {
+
   const schemeIds = Object.keys(bundle.runtime.indexes.schemesById);
   const schemeA = schemeIds[0];
   const schemeB = schemeIds[1];
@@ -96,7 +101,8 @@ test('Epic 34 scheme grouping produces one group per distinct schemeId with corr
   assert.equal(groupA.label, bundle.runtime.indexes.schemesById[schemeA].name);
 });
 
-test('Epic 34 heroes grouping places a record with 3 heroes into exactly 3 groups', () => {
+test('Heroes grouping places a record with 3 heroes into exactly 3 groups', () => {
+
   const heroIds = ['core-set-black-widow', 'core-set-cyclops', 'core-set-deadpool'];
   const records = [
     createRecord({ id: 'r1', createdAt: '2026-04-10T10:00:00.000Z', heroIds })
@@ -116,7 +122,8 @@ test('Epic 34 heroes grouping places a record with 3 heroes into exactly 3 group
   assert.ok(ids.includes('hero:core-set-deadpool'));
 });
 
-test('Epic 34 heroes grouping accumulates all records that share a hero into the same group', () => {
+test('Heroes grouping accumulates all records that share a hero into the same group', () => {
+
   const records = [
     createRecord({ id: 'r1', createdAt: '2026-04-10T10:00:00.000Z', heroIds: ['core-set-black-widow', 'core-set-cyclops', 'core-set-deadpool'] }),
     createRecord({ id: 'r2', createdAt: '2026-04-10T11:00:00.000Z', heroIds: ['core-set-black-widow', 'core-set-cyclops'] })
@@ -134,7 +141,8 @@ test('Epic 34 heroes grouping accumulates all records that share a hero into the
   assert.equal(deadpool.records[0].id, 'r1');
 });
 
-test('Epic 34 villains grouping places a record with 2 villain groups into exactly 2 groups', () => {
+test('Villains grouping places a record with 2 villain groups into exactly 2 groups', () => {
+
   const allVillainIds = Object.keys(bundle.runtime.indexes.villainGroupsById);
   assert.ok(allVillainIds.length >= 2, 'seed data must have at least 2 villain groups');
   const villainGroupIds = allVillainIds.slice(0, 2);
@@ -155,7 +163,8 @@ test('Epic 34 villains grouping places a record with 2 villain groups into exact
   assert.ok(groups.find((g) => g.id === `villain:${villainGroupIds[1]}`));
 });
 
-test('Epic 34 villains grouping accumulates all records that share a villain group', () => {
+test('Villains grouping accumulates all records that share a villain group', () => {
+
   const allVillainIds = Object.keys(bundle.runtime.indexes.villainGroupsById);
   const v1 = allVillainIds[0];
   const v2 = allVillainIds[1];
@@ -174,7 +183,8 @@ test('Epic 34 villains grouping accumulates all records that share a villain gro
   assert.equal(groupV2.count, 1);
 });
 
-test('Epic 34 Story 27.5 buildHistoryGroups returns groups sorted alphabetically by label for mastermind mode', () => {
+test('buildHistoryGroups returns groups sorted alphabetically by label for mastermind mode', () => {
+
   // Use three distinct masterminds whose names are intentionally out of alphabetical order
   // relative to the createdAt timestamps, to confirm alphabetical wins over newest-first.
   const allMastermindIds = Object.keys(bundle.runtime.indexes.mastermindsById);

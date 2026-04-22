@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -13,7 +13,7 @@ const rootDir = path.resolve(__dirname, '..');
 let shellCss;
 let indexHtmlDoc;
 
-before(async () => {
+beforeAll(async () => {
   const [css, indexHtml] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'index.html'), 'utf8')
@@ -23,7 +23,8 @@ before(async () => {
   indexHtmlDoc = indexHtml;
 });
 
-test('Design System Epic DS1 defines governed semantic token families in the stylesheet', () => {
+test('Defines governed semantic token families in the stylesheet', () => {
+
   for (const token of [
     '--color-primary:',
     '--color-secondary:',
@@ -47,7 +48,8 @@ test('Design System Epic DS1 defines governed semantic token families in the sty
   assert.match(shellCss, /--accent:\s*var\(--color-primary\);/);
 });
 
-test('Design System Epic DS1 keeps the canonical theme contract and legacy theme normalization aligned', () => {
+test('Keeps the canonical theme contract and legacy theme normalization aligned', () => {
+
   assert.equal(DEFAULT_THEME_ID, 'dark');
   assert.deepEqual(THEME_OPTIONS.map((theme) => theme.id), ['dark', 'light']);
   assert.equal(normalizeThemeId('midnight'), 'dark');

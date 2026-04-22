@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -54,12 +54,13 @@ function acceptLoggedGame(state, { id, createdAt, offset, outcome = null, score 
   return nextState;
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 14 derives stable outcome and score metrics for mixed completed and pending histories', () => {
+test('Derives stable outcome and score metrics for mixed completed and pending histories', () => {
+
   let state = createAllOwnedState();
   state = acceptLoggedGame(state, {
     id: 'game-win-1',
@@ -103,7 +104,8 @@ test('Epic 14 derives stable outcome and score metrics for mixed completed and p
   });
 });
 
-test('Epic 14 rankings stay deterministic and preserve duplicate-name context with set labels', () => {
+test('Rankings stay deterministic and preserve duplicate-name context with set labels', () => {
+
   const state = createAllOwnedState();
   const blackWidows = bundle.runtime.indexes.allHeroes.filter((entity) => entity.name === 'Black Widow');
   assert.equal(blackWidows.length >= 2, true);
@@ -122,7 +124,8 @@ test('Epic 14 rankings stay deterministic and preserve duplicate-name context wi
   assert.equal(heroInsights.leastPlayed[0].plays, 1);
 });
 
-test('Epic 14 dashboard exposes sparse-data helpers without producing misleading score metrics', () => {
+test('Dashboard exposes sparse-data helpers without producing misleading score metrics', () => {
+
   const dashboard = buildInsightsDashboard(bundle.runtime, createDefaultState(), { limit: 2 });
   assert.equal(dashboard.outcome.totalGames, 0);
   assert.equal(dashboard.outcome.winRate, null);
@@ -132,7 +135,8 @@ test('Epic 14 dashboard exposes sparse-data helpers without producing misleading
   assert.equal(dashboard.usage.every((category) => category.mostPlayed.length === 0), true);
 });
 
-test('Epic 14 dashboard reports played percentages for the owned collection, full catalog, and missing extensions', () => {
+test('Dashboard reports played percentages for the owned collection, full catalog, and missing extensions', () => {
+
   const state = createDefaultState();
   state.collection.ownedSetIds = ['core-set'];
   state.usage.heroes['core-set-black-widow'] = { plays: 2, lastPlayedAt: '2026-04-10T10:00:00.000Z' };

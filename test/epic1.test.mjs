@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -22,14 +22,15 @@ let source;
 let runtime;
 let bundle;
 
-before(async () => {
+beforeAll(async () => {
   seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   source = buildCanonicalSourceData(seed);
   runtime = normalizeGameData(source);
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 1 canonical inventory is present and count-aligned', () => {
+test('Canonical inventory is present and count-aligned', () => {
+
   assert.equal(source.sets.length, seed.setCatalog.length);
 
   for (const setEntry of seed.setCatalog) {
@@ -37,11 +38,13 @@ test('Epic 1 canonical inventory is present and count-aligned', () => {
   }
 });
 
-test('Epic 1 stable IDs are unique across every entity category', () => {
+test('Stable IDs are unique across every entity category', () => {
+
   assert.doesNotThrow(() => validateNormalizedData(runtime.sets, runtime.indexes));
 });
 
-test('Epic 1 duplicate display names remain distinct through set-scoped IDs', () => {
+test('Duplicate display names remain distinct through set-scoped IDs', () => {
+
   const blackWidows = runtime.indexes.allHeroes.filter((hero) => hero.name === 'Black Widow');
   const lokis = runtime.indexes.allMasterminds.filter((mastermind) => mastermind.name === 'Loki');
   const thors = runtime.indexes.allHeroes.filter((hero) => hero.name === 'Thor');
@@ -53,7 +56,8 @@ test('Epic 1 duplicate display names remain distinct through set-scoped IDs', ()
   assert.ok(thors.length >= 2, 'Expected duplicate Thor heroes');
 });
 
-test('Epic 1 mastermind lead references resolve correctly', () => {
+test('Mastermind lead references resolve correctly', () => {
+
   const redSkull = runtime.indexes.allMasterminds.find((entity) => entity.name === 'Red Skull' && entity.setId === 'core-set');
   const drDoom = runtime.indexes.allMasterminds.find((entity) => entity.name === 'Dr. Doom');
 
@@ -63,7 +67,8 @@ test('Epic 1 mastermind lead references resolve correctly', () => {
   assert.equal(drDoom.lead.category, 'henchmen');
 });
 
-test('Epic 1 scheme forced groups and modifiers normalize correctly', () => {
+test('Scheme forced groups and modifiers normalize correctly', () => {
+
   const secretInvasion = runtime.indexes.allSchemes.find((entity) => entity.name === 'Secret Invasion of the Skrull Shapeshifters');
   const negativeZone = runtime.indexes.allSchemes.find((entity) => entity.name === 'Negative Zone Prison Breakout');
 
@@ -80,7 +85,8 @@ test('Epic 1 scheme forced groups and modifiers normalize correctly', () => {
   );
 });
 
-test('Epic 1 runtime indexes match canonical entity totals', () => {
+test('Runtime indexes match canonical entity totals', () => {
+
   const canonicalHeroCount = source.sets.reduce((sum, set) => sum + set.heroes.length, 0);
   const canonicalMastermindCount = source.sets.reduce((sum, set) => sum + set.masterminds.length, 0);
   const canonicalVillainCount = source.sets.reduce((sum, set) => sum + set.villainGroups.length, 0);
@@ -94,7 +100,8 @@ test('Epic 1 runtime indexes match canonical entity totals', () => {
   assert.equal(runtime.indexes.allSchemes.length, canonicalSchemeCount, 'Scheme index total mismatch');
 });
 
-test('Epic 1 validation rejects representative invalid lead references', () => {
+test('Validation rejects representative invalid lead references', () => {
+
   const brokenSource = deepClone(source);
   const drDoom = brokenSource.sets
     .find((set) => set.id === 'core-set')
@@ -108,7 +115,8 @@ test('Epic 1 validation rejects representative invalid lead references', () => {
   );
 });
 
-test('Epic 1 bundle summary remains internally green', () => {
+test('Bundle summary remains internally green', () => {
+
   assert.deepEqual(bundle.counts, {
     sets: 39,
     heroes: 296,

@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -40,12 +40,13 @@ function createMemoryStorage(initialEntries = {}) {
   };
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 11 resolves two-handed solo as a solo mode that uses the 2-player setup counts', () => {
+test('Resolves two-handed solo as a solo mode that uses the 2-player setup counts', () => {
+
   const template = resolveSetupTemplate(1, { playMode: 'two-handed-solo' });
 
   assert.deepEqual(template, {
@@ -63,7 +64,8 @@ test('Epic 11 resolves two-handed solo as a solo mode that uses the 2-player set
   });
 });
 
-test('Epic 11 keeps legality, collection feasibility, and generated setup output aligned for two-handed solo', () => {
+test('Keeps legality, collection feasibility, and generated setup output aligned for two-handed solo', () => {
+
   const emptyValidation = validateSetupLegality({
     runtime: bundle.runtime,
     state: createDefaultState(),
@@ -90,7 +92,8 @@ test('Epic 11 keeps legality, collection feasibility, and generated setup output
   assert.equal(feasibility.find((mode) => mode.id === 'two-handed-solo')?.ok, true);
 });
 
-test('Epic 11 New Game helpers expose mode options, help text, and mode-aware requirement rendering', () => {
+test('New Game helpers expose mode options, help text, and mode-aware requirement rendering', () => {
+
   assert.deepEqual(getAvailablePlayModes(1).map((mode) => mode.id), ['standard', 'advanced-solo', 'two-handed-solo', 'standard-solo-v2']);
   assert.equal(getAvailablePlayModes(2)[0].id, 'standard');
   assert.match(getPlayModeHelpText(1, 'two-handed-solo'), /2-player setup counts/);
@@ -117,7 +120,8 @@ test('Epic 11 New Game helpers expose mode options, help text, and mode-aware re
   });
 });
 
-test('Epic 11 persists normalized play-mode metadata while keeping legacy history records readable', () => {
+test('Persists normalized play-mode metadata while keeping legacy history records readable', () => {
+
   const initialState = createAllOwnedState();
   const setup = generateSetup({ runtime: bundle.runtime, state: initialState, playerCount: 1, playMode: 'two-handed-solo', random: () => 0 });
   const acceptedState = acceptGameSetup(initialState, {

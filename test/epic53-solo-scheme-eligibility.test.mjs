@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -27,12 +27,13 @@ function createAllOwnedState() {
   return state;
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 53 standard solo eligibleSchemes excludes all three ineligible scheme ids', () => {
+test('Standard solo eligibleSchemes excludes all three ineligible scheme ids', () => {
+
   const state = createAllOwnedState();
   const legality = validateSetupLegality({
     runtime: bundle.runtime,
@@ -48,7 +49,8 @@ test('Epic 53 standard solo eligibleSchemes excludes all three ineligible scheme
   }
 });
 
-test('Epic 53 advanced-solo eligibleSchemes includes core-set-negative-zone-prison-breakout', () => {
+test('Advanced-solo eligibleSchemes includes core-set-negative-zone-prison-breakout', () => {
+
   const state = createAllOwnedState();
   const legality = validateSetupLegality({
     runtime: bundle.runtime,
@@ -62,7 +64,8 @@ test('Epic 53 advanced-solo eligibleSchemes includes core-set-negative-zone-pris
   );
 });
 
-test('Epic 53 two-handed-solo eligibleSchemes includes core-set-negative-zone-prison-breakout', () => {
+test('Two-handed-solo eligibleSchemes includes core-set-negative-zone-prison-breakout', () => {
+
   const state = createAllOwnedState();
   const legality = validateSetupLegality({
     runtime: bundle.runtime,
@@ -76,7 +79,8 @@ test('Epic 53 two-handed-solo eligibleSchemes includes core-set-negative-zone-pr
   );
 });
 
-test('Epic 53 standard 2-player eligibleSchemes includes core-set-negative-zone-prison-breakout', () => {
+test('Standard 2-player eligibleSchemes includes core-set-negative-zone-prison-breakout', () => {
+
   const state = createAllOwnedState();
   const legality = validateSetupLegality({
     runtime: bundle.runtime,
@@ -90,7 +94,8 @@ test('Epic 53 standard 2-player eligibleSchemes includes core-set-negative-zone-
   );
 });
 
-test('Epic 53 generateSetup standard solo never returns an ineligible scheme over 50 calls', () => {
+test('generateSetup standard solo never returns an ineligible scheme over 50 calls', () => {
+
   const state = createAllOwnedState();
   for (let i = 0; i < 50; i++) {
     const setup = generateSetup({
@@ -106,7 +111,8 @@ test('Epic 53 generateSetup standard solo never returns an ineligible scheme ove
   }
 });
 
-test('Epic 53 standard solo with forced ineligible scheme returns ok false and correct reason', () => {
+test('Standard solo with forced ineligible scheme returns ok false and correct reason', () => {
+
   const state = createAllOwnedState();
   const legality = validateSetupLegality({
     runtime: bundle.runtime,
@@ -124,7 +130,8 @@ test('Epic 53 standard solo with forced ineligible scheme returns ok false and c
   );
 });
 
-test('Epic 53 advanced-solo with forced core-set-negative-zone-prison-breakout returns ok true', () => {
+test('Advanced-solo with forced core-set-negative-zone-prison-breakout returns ok true', () => {
+
   const state = createAllOwnedState();
   const legality = validateSetupLegality({
     runtime: bundle.runtime,
@@ -138,7 +145,8 @@ test('Epic 53 advanced-solo with forced core-set-negative-zone-prison-breakout r
   assert.equal(legality.ok, true);
 });
 
-test('Epic 53 addendum: mastermind villain lead + 1 forced villain group exceeds 1 slot in standard solo (ok false)', () => {
+test('Mastermind villain lead + 1 forced villain group exceeds 1 slot in standard solo (ok false)', () => {
+
   const state = createAllOwnedState();
   const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'villains');
   assert.ok(mastermind, 'Expected at least one mastermind with a villain lead');
@@ -161,7 +169,8 @@ test('Epic 53 addendum: mastermind villain lead + 1 forced villain group exceeds
   );
 });
 
-test('Epic 53 addendum: mastermind villain lead + 1 forced villain group fits in 2-player standard (ok true)', () => {
+test('Mastermind villain lead + 1 forced villain group fits in 2-player standard (ok true)', () => {
+
   const state = createAllOwnedState();
   const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'villains');
   assert.ok(mastermind, 'Expected at least one mastermind with a villain lead');
@@ -180,7 +189,8 @@ test('Epic 53 addendum: mastermind villain lead + 1 forced villain group fits in
   assert.equal(legality.ok, true);
 });
 
-test('Epic 53 addendum: mastermind villain lead alone is valid in standard solo (ok true)', () => {
+test('Mastermind villain lead alone is valid in standard solo (ok true)', () => {
+
   const state = createAllOwnedState();
   const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'villains');
   assert.ok(mastermind, 'Expected at least one mastermind with a villain lead');
@@ -196,7 +206,8 @@ test('Epic 53 addendum: mastermind villain lead alone is valid in standard solo 
   assert.equal(legality.ok, true);
 });
 
-test('Epic 53 addendum: mastermind henchman lead + 1 forced henchman group exceeds 1 slot in standard solo (ok false)', () => {
+test('Mastermind henchman lead + 1 forced henchman group exceeds 1 slot in standard solo (ok false)', () => {
+
   const state = createAllOwnedState();
   const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'henchmen');
   assert.ok(mastermind, 'Expected at least one mastermind with a henchman lead');
@@ -219,7 +230,8 @@ test('Epic 53 addendum: mastermind henchman lead + 1 forced henchman group excee
   );
 });
 
-test('Epic 53 addendum: mastermind henchman lead + 1 forced henchman group fits in 4-player standard (ok true)', () => {
+test('Mastermind henchman lead + 1 forced henchman group fits in 4-player standard (ok true)', () => {
+
   const state = createAllOwnedState();
   const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'henchmen');
   assert.ok(mastermind, 'Expected at least one mastermind with a henchman lead');

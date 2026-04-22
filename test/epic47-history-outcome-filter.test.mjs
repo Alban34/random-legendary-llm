@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { filterHistoryByOutcome } from '../src/app/history-utils.ts';
 
@@ -29,27 +29,31 @@ const allRecords = [winRecord, lossRecord, pendingRecord, nullResultRecord];
 
 // ── Story 47.1 — filterHistoryByOutcome ──────────────────────────────────────
 
-test('Epic 47.1 filterHistoryByOutcome "all" returns all records unchanged', () => {
+test('filterHistoryByOutcome "all" returns all records unchanged', () => {
+
   const result = filterHistoryByOutcome(allRecords, 'all');
   assert.equal(result.length, allRecords.length);
   assert.equal(result, allRecords, 'should return the same array reference');
 });
 
-test('Epic 47.1 filterHistoryByOutcome "win" returns only won records', () => {
+test('filterHistoryByOutcome "win" returns only won records', () => {
+
   const result = filterHistoryByOutcome(allRecords, 'win');
   assert.equal(result.length, 1);
   assert.equal(result[0].id, 'r-win');
   assert.ok(result.every((r) => r.result?.outcome === 'win'));
 });
 
-test('Epic 47.1 filterHistoryByOutcome "loss" returns only lost records', () => {
+test('filterHistoryByOutcome "loss" returns only lost records', () => {
+
   const result = filterHistoryByOutcome(allRecords, 'loss');
   assert.equal(result.length, 1);
   assert.equal(result[0].id, 'r-loss');
   assert.ok(result.every((r) => r.result?.outcome === 'loss'));
 });
 
-test('Epic 47.1 filterHistoryByOutcome "pending" returns records with status pending or null result', () => {
+test('filterHistoryByOutcome "pending" returns records with status pending or null result', () => {
+
   const result = filterHistoryByOutcome(allRecords, 'pending');
   assert.equal(result.length, 2);
   const ids = result.map((r) => r.id);
@@ -57,7 +61,8 @@ test('Epic 47.1 filterHistoryByOutcome "pending" returns records with status pen
   assert.ok(ids.includes('r-null'));
 });
 
-test('Epic 47.1 filterHistoryByOutcome does not mutate the input array', () => {
+test('filterHistoryByOutcome does not mutate the input array', () => {
+
   const input = [...allRecords];
   filterHistoryByOutcome(input, 'win');
   filterHistoryByOutcome(input, 'loss');
@@ -65,7 +70,8 @@ test('Epic 47.1 filterHistoryByOutcome does not mutate the input array', () => {
   assert.equal(input.length, allRecords.length);
 });
 
-test('Epic 47.1 filterHistoryByOutcome empty array always returns []', () => {
+test('filterHistoryByOutcome empty array always returns []', () => {
+
   assert.deepEqual(filterHistoryByOutcome([], 'all'), []);
   assert.deepEqual(filterHistoryByOutcome([], 'win'), []);
   assert.deepEqual(filterHistoryByOutcome([], 'loss'), []);

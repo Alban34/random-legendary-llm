@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -39,14 +39,15 @@ const minimalIndexes = {
   schemesById: {}
 };
 
-before(async () => {
+beforeAll(async () => {
   [rendererSource, localizationSource] = await Promise.all([
     fs.readFile(rendererPath, 'utf8'),
     fs.readFile(localizationPath, 'utf8')
   ]);
 });
 
-test('Epic 17 stores onboarding completion in preferences and recovers invalid values safely', () => {
+test('Stores onboarding completion in preferences and recovers invalid values safely', () => {
+
   const state = createDefaultState();
   assert.equal(state.preferences.onboardingCompleted, false);
 
@@ -73,7 +74,8 @@ test('Epic 17 stores onboarding completion in preferences and recovers invalid v
   assert.equal(recovered.notices.some((notice) => notice.includes('Recovered invalid preference values during state hydration.')), true);
 });
 
-test('Epic 17 renderer source includes replayable onboarding and an About entry point instead of default diagnostics', () => {
+test('Renderer source includes replayable onboarding and an About entry point instead of default diagnostics', () => {
+
   assert.match(localizationSource, /First-run walkthrough/);
   assert.match(localizationSource, /Replay Walkthrough/);
   assert.match(localizationSource, /About this project/);

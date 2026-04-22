@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +14,7 @@ const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
@@ -44,7 +44,8 @@ function createRecord({
   };
 }
 
-test('Epic 20 defaults to mastermind grouping and sorts groups alphabetically by label', () => {
+test('Defaults to mastermind grouping and sorts groups alphabetically by label', () => {
+
   const records = [
     createRecord({ id: 'one', createdAt: '2026-04-10T10:00:00.000Z', mastermindId: 'core-set-red-skull' }),
     createRecord({ id: 'two', createdAt: '2026-04-10T12:00:00.000Z', mastermindId: 'core-set-magneto' }),
@@ -57,7 +58,8 @@ test('Epic 20 defaults to mastermind grouping and sorts groups alphabetically by
   assert.deepEqual(groups[1].records.map((record) => record.id), ['three', 'one']);
 });
 
-test('Epic 20 supports play-mode grouping without mutating history summaries', () => {
+test('Supports play-mode grouping without mutating history summaries', () => {
+
   const records = [
     createRecord({ id: 'solo-standard', createdAt: '2026-04-10T09:00:00.000Z', mastermindId: 'core-set-red-skull', playerCount: 1, playMode: 'standard' }),
     createRecord({ id: 'solo-two-handed', createdAt: '2026-04-10T10:00:00.000Z', mastermindId: 'core-set-magneto', playerCount: 1, playMode: 'two-handed-solo' }),
@@ -71,7 +73,8 @@ test('Epic 20 supports play-mode grouping without mutating history summaries', (
   assert.equal(summary.modeLabel, 'Two-Handed Solo');
 });
 
-test('Epic 20 keeps duplicate mastermind groups distinguishable', () => {
+test('Keeps duplicate mastermind groups distinguishable', () => {
+
   const indexes = {
     ...bundle.runtime.indexes,
     mastermindsById: {

@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -21,12 +21,13 @@ function createAllOwnedState() {
   return state;
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 15 supports forced picks across setup categories when a legal setup exists', () => {
+test('Supports forced picks across setup categories when a legal setup exists', () => {
+
   const state = createAllOwnedState();
   const simpleScheme = bundle.runtime.indexes.allSchemes.find((entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount);
   const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((entity) => !entity.lead);
@@ -57,7 +58,8 @@ test('Epic 15 supports forced picks across setup categories when a legal setup e
   assert.ok(setup.notices.some((notice) => notice.includes('Applied forced picks')));
 });
 
-test('Epic 15 surfaces actionable legality reasons for unavailable or illegal forced picks', () => {
+test('Surfaces actionable legality reasons for unavailable or illegal forced picks', () => {
+
   const state = createDefaultState();
   state.collection.ownedSetIds = ['core-set'];
   const missingScheme = bundle.runtime.indexes.allSchemes.find((entity) => entity.setId !== 'core-set');
@@ -79,7 +81,8 @@ test('Epic 15 surfaces actionable legality reasons for unavailable or illegal fo
   assert.ok(legality.reasons.some((reason) => reason.includes('Forced Heroes are not owned')));
 });
 
-test('Epic 15 explains impossible forced-pick collisions with scheme and mastermind requirements', () => {
+test('Explains impossible forced-pick collisions with scheme and mastermind requirements', () => {
+
   const state = createAllOwnedState();
   const scheme = bundle.runtime.indexes.allSchemes.find((entity) => entity.name === 'Secret Invasion of the Skrull Shapeshifters');
   const mastermind = bundle.runtime.indexes.allMasterminds.find((entity) => entity.name === 'Red Skull' && entity.setId === 'core-set');
@@ -99,7 +102,8 @@ test('Epic 15 explains impossible forced-pick collisions with scheme and masterm
   }), /Forced Villain Groups exceed the available slots/);
 });
 
-test('Epic 15 keeps forced picks out of persisted accepted history records', () => {
+test('Keeps forced picks out of persisted accepted history records', () => {
+
   const initialState = createAllOwnedState();
   const setup = generateSetup({
     runtime: bundle.runtime,

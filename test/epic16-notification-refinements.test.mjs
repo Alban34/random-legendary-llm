@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -25,7 +25,7 @@ let appSvelteSource;
 let toastStackSource;
 let localizationSource;
 
-before(async () => {
+beforeAll(async () => {
   [browserEntrySource, rendererSource, appSvelteSource, toastStackSource, localizationSource] = await Promise.all([
     fs.readFile(browserEntryPath, 'utf8'),
     fs.readFile(rendererPath, 'utf8'),
@@ -35,7 +35,8 @@ before(async () => {
   ]);
 });
 
-test('Epic 16 classifies transient and persistent toasts with different dismissal behavior', () => {
+test('Classifies transient and persistent toasts with different dismissal behavior', () => {
+
   const transientToast = createToastRecord({
     id: 'toast-1',
     variant: 'info',
@@ -58,7 +59,8 @@ test('Epic 16 classifies transient and persistent toasts with different dismissa
   assert.equal(shouldAutoDismissToast(persistentToast), false);
 });
 
-test('Epic 16 stack trimming preserves persistent alerts ahead of transient notices', () => {
+test('Stack trimming preserves persistent alerts ahead of transient notices', () => {
+
   const persistentToast = createToastRecord({
     id: 'toast-critical',
     variant: 'warning',
@@ -77,7 +79,8 @@ test('Epic 16 stack trimming preserves persistent alerts ahead of transient noti
   assert.deepEqual(stacked.map((toast) => toast.id), ['toast-critical', 'toast-2', 'toast-3', 'toast-4']);
 });
 
-test('Epic 16 suppresses redundant generator toasts and keeps critical alerts persistent in source behavior', () => {
+test('Suppresses redundant generator toasts and keeps critical alerts persistent in source behavior', () => {
+
   assert.doesNotMatch(appSvelteSource, /setup\.notices\.forEach\(\(notice\) => enqueueToast/);
   assert.doesNotMatch(appSvelteSource, /Generated a fully fresh setup\./);
   assert.match(appSvelteSource, /enqueueToast\(\{ variant: 'error', message: error\.message, behavior: 'persistent' \}\)/);

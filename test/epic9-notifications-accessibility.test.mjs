@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -46,7 +46,7 @@ function markAllUsedExcept(bucket, entities, keepIds) {
   });
 }
 
-before(async () => {
+beforeAll(async () => {
   const [seedRaw, rendererRaw, shellCssRaw, htmlRaw, tabNavRaw, toastStackRaw, modalRootRaw] = await Promise.all([
     fs.readFile(seedPath, 'utf8'),
     fs.readFile(rendererPath, 'utf8'),
@@ -66,7 +66,8 @@ before(async () => {
   modalRootSource = modalRootRaw;
 });
 
-test('Epic 9 toast helpers preserve variant metadata, dismiss records, and cap stacked notifications', () => {
+test('Toast helpers preserve variant metadata, dismiss records, and cap stacked notifications', () => {
+
   const successToast = createToastRecord({ id: 'toast-1', variant: 'success', message: 'Saved setup.' });
   const fallbackToast = createToastRecord({ id: 'toast-2', variant: 'missing', message: 'Fallback copy.' });
   const persistentWarning = createToastRecord({ id: 'toast-3', variant: 'warning', behavior: 'persistent', message: 'Storage is unavailable.' });
@@ -101,7 +102,8 @@ test('Epic 9 toast helpers preserve variant metadata, dismiss records, and cap s
   assert.equal(removeToast(stacked, 'toast-4').some((toast) => toast.id === 'toast-4'), false);
 });
 
-test('Epic 9 setup messaging surfaces invalid requests clearly and reports least-played fallback usage', () => {
+test('Setup messaging surfaces invalid requests clearly and reports least-played fallback usage', () => {
+
   assert.throws(
     () => generateSetup({
       runtime: bundle.runtime,
@@ -139,7 +141,8 @@ test('Epic 9 setup messaging surfaces invalid requests clearly and reports least
   assert.equal(JSON.stringify(state), before);
 });
 
-test('Epic 9 storage degradation keeps a default in-memory state and exposes a readable compatibility message', () => {
+test('Storage degradation keeps a default in-memory state and exposes a readable compatibility message', () => {
+
   const brokenStorage = {
     getItem() {
       return null;
@@ -164,7 +167,8 @@ test('Epic 9 storage degradation keeps a default in-memory state and exposes a r
   assert.ok(loaded.notices[0].includes('Browser storage is unavailable'));
 });
 
-test('Epic 9 ships semantic tab, toast, and modal markup plus visible focus styling', () => {
+test('Ships semantic tab, toast, and modal markup plus visible focus styling', () => {
+
   assert.match(htmlSource, /id="toast-region"[^>]*aria-live="polite"[^>]*aria-atomic="false"/);
   assert.match(htmlSource, /role="tablist"/);
 

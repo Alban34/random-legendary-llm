@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -12,7 +12,7 @@ let indexHtml;
 let rendererSource;
 let browseTabSource;
 
-before(async () => {
+beforeAll(async () => {
   [indexHtml, rendererSource, browseTabSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
@@ -20,7 +20,8 @@ before(async () => {
   ]);
 });
 
-test('Epic 21 moves the onboarding shell above the tab panels and removes the low-value Ready Tabs metric', () => {
+test('Moves the onboarding shell above the tab panels and removes the low-value Ready Tabs metric', () => {
+
   assert.match(indexHtml, /id="diagnostics-shell"[\s\S]*<div class="tab-panel-shell">/);  
   assert.doesNotMatch(rendererSource, /Ready Tabs/);
   assert.match(browseTabSource, /data-browse-help-disclosure/);

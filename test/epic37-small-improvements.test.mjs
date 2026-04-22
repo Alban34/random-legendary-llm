@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -16,20 +16,22 @@ const rootDir = path.resolve(__dirname, '..');
 
 let pkgJson;
 
-before(async () => {
+beforeAll(async () => {
   pkgJson = JSON.parse(await fs.readFile(path.join(rootDir, 'package.json'), 'utf8'));
 });
 
 // ── Story 37.3 — Stale test:epic10 script removed ──────────────────────────
 
-test('Story 37.3: test:epic10 script is absent from package.json', () => {
+test('Test:epic10 script is absent from package.json', () => {
+
   assert.ok(
     !Object.prototype.hasOwnProperty.call(pkgJson.scripts, 'test:epic10'),
     'package.json must not contain a test:epic10 script'
   );
 });
 
-test('Story 37.3: test:qc:epic10 Playwright script is still present', () => {
+test('Test:qc:epic10 Playwright script is still present', () => {
+
   assert.ok(
     Object.prototype.hasOwnProperty.call(pkgJson.scripts, 'test:qc:epic10'),
     'package.json must retain the test:qc:epic10 Playwright script'
@@ -38,7 +40,8 @@ test('Story 37.3: test:qc:epic10 Playwright script is still present', () => {
 
 // ── Story 37.4 — Version bumped to 1.0.2 ──────────────────────────────────
 
-test('Story 37.4: package.json version is 2.0.0', () => {
+test('Package.json version is 2.0.0', () => {
+
   assert.equal(pkgJson.version, '2.0.0', 'package.json version must be 2.0.0');
 });
 
@@ -52,7 +55,8 @@ const NON_ENGLISH_LOCALES = {
   'es-ES': ES_MESSAGES,
 };
 
-test('Story 37.1: all tab-related strings are translated in each non-English locale', () => {
+test('All tab-related strings are translated in each non-English locale', () => {
+
   const tabKeys = [
     'tabs.browse.label',
     'tabs.collection.label',
@@ -76,7 +80,8 @@ test('Story 37.1: all tab-related strings are translated in each non-English loc
   }
 });
 
-test('Story 37.1: header.locale.fallbackNotice is translated in all non-English locales', () => {
+test('Header.locale.fallbackNotice is translated in all non-English locales', () => {
+
   for (const [localeId, messages] of Object.entries(NON_ENGLISH_LOCALES)) {
     assert.ok(
       messages['header.locale.fallbackNotice'] !== undefined && messages['header.locale.fallbackNotice'] !== null,
@@ -90,7 +95,8 @@ test('Story 37.1: header.locale.fallbackNotice is translated in all non-English 
   }
 });
 
-test('Story 37.1: backup, history, and action strings are translated in all non-English locales', () => {
+test('Backup, history, and action strings are translated in all non-English locales', () => {
+
   const representativeKeys = [
     'backup.export',
     'backup.import',

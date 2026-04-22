@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -16,7 +16,7 @@ let appSvelteSource;
 
 const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 
-before(async () => {
+beforeAll(async () => {
   [rendererSource, cssSource, localeSource, generatorSource, appSvelteSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
@@ -26,7 +26,8 @@ before(async () => {
   ]);
 });
 
-test('Story 27.1 — debug snapshot <details> element is absent from renderer', () => {
+test('Debug snapshot <details> element is absent from renderer', () => {
+
   assert.doesNotMatch(
     rendererSource,
     /newGame\.result\.snapshot/,
@@ -39,7 +40,8 @@ test('Story 27.1 — debug snapshot <details> element is absent from renderer', 
   );
 });
 
-test('Story 27.1 — snapshot locale key is removed from localization-utils', () => {
+test('Snapshot locale key is removed from localization-utils', () => {
+
   assert.doesNotMatch(
     localeSource,
     /newGame\.result\.snapshot/,
@@ -47,7 +49,8 @@ test('Story 27.1 — snapshot locale key is removed from localization-utils', ()
   );
 });
 
-test('Story 27.2 — app-header h1 font size is larger than 1.1rem', () => {
+test('App-header h1 font size is larger than 1.1rem', () => {
+
   // The font-size must have been increased from the old 1.1rem
   assert.doesNotMatch(
     cssSource,
@@ -61,7 +64,8 @@ test('Story 27.2 — app-header h1 font size is larger than 1.1rem', () => {
   );
 });
 
-test('Story 27.2 — header-top-row uses center alignment', () => {
+test('Header-top-row uses center alignment', () => {
+
   // align-items: center moved from .header-inner to .header-top-row in the column layout refactor
   assert.match(
     cssSource,
@@ -70,13 +74,15 @@ test('Story 27.2 — header-top-row uses center alignment', () => {
   );
 });
 
-test('Story 27.3 — app-version element is still present (compact version display)', () => {
+test('App-version element is still present (compact version display)', () => {
+
   // Version display introduced in Epic 25 must remain
   assert.match(appSvelteSource, /app-version/, 'app-version reference must remain');
 });
 
 // Story 27.4 — schemeFallback condition uses .some() not .length
-test('Story 27.4 — schemeFallback gate uses fallbackItems.some() not fallbackItems.length', () => {
+test('schemeFallback gate uses fallbackItems.some() not fallbackItems.length', () => {
+
   // The old bug: fallbackItems.length causes the notification to fire whenever ANY scheme
   // in the pool has been played, even when the selected scheme is the freshest/never-played.
   // The fix: gate on whether the selected scheme itself is in fallbackItems.

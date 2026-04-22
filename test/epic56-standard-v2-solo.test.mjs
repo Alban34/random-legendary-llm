@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -23,12 +23,13 @@ function createAllOwnedState() {
   return state;
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 56 resolveSetupTemplate returns correct shape for standard-solo-v2', () => {
+test('resolveSetupTemplate returns correct shape for standard-solo-v2', () => {
+
   const template = resolveSetupTemplate(1, { playMode: 'standard-solo-v2' });
 
   assert.equal(template.heroCount, 3);
@@ -38,14 +39,16 @@ test('Epic 56 resolveSetupTemplate returns correct shape for standard-solo-v2', 
   assert.equal(template.playMode, 'standard-solo-v2');
 });
 
-test('Epic 56 resolvePlayMode throws when standard-solo-v2 is used with more than 1 player', () => {
+test('resolvePlayMode throws when standard-solo-v2 is used with more than 1 player', () => {
+
   assert.throws(
     () => resolvePlayMode(2, { playMode: 'standard-solo-v2' }),
     /only available for 1 player/
   );
 });
 
-test('Epic 56 getAvailablePlayModes includes standard-solo-v2 for 1 player but not for 2 players', () => {
+test('getAvailablePlayModes includes standard-solo-v2 for 1 player but not for 2 players', () => {
+
   const soloModes = getAvailablePlayModes(1).map((m) => m.id);
   assert.ok(soloModes.includes('standard-solo-v2'), 'standard-solo-v2 should be in 1-player modes');
 
@@ -53,7 +56,8 @@ test('Epic 56 getAvailablePlayModes includes standard-solo-v2 for 1 player but n
   assert.ok(!multiModes.includes('standard-solo-v2'), 'standard-solo-v2 should not be in 2-player modes');
 });
 
-test('Epic 56 standard-solo-v2 does not inherit the Epic 53 scheme eligibility restriction', () => {
+test('Standard-solo-v2 does not inherit the Epic 53 scheme eligibility restriction', () => {
+
   const state = createAllOwnedState();
   const legality = validateSetupLegality({
     runtime: bundle.runtime,
@@ -85,7 +89,8 @@ test('Epic 56 standard-solo-v2 does not inherit the Epic 53 scheme eligibility r
   }
 });
 
-test('Epic 56 generateSetup with standard-solo-v2 returns setup matching the v2 template', () => {
+test('generateSetup with standard-solo-v2 returns setup matching the v2 template', () => {
+
   const state = createAllOwnedState();
   const setup = generateSetup({
     runtime: bundle.runtime,

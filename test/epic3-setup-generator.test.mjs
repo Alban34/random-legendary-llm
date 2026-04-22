@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -59,12 +59,13 @@ function makeTargetedState({ schemeName, mastermindName, heroUsageOverride } = {
   return state;
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 3 resolves setup templates for all supported player modes including Advanced Solo', () => {
+test('Resolves setup templates for all supported player modes including Advanced Solo', () => {
+
   assert.deepEqual(resolveSetupTemplate(1, false), {
     key: '1',
     playerCount: 1,
@@ -84,7 +85,8 @@ test('Epic 3 resolves setup templates for all supported player modes including A
 });
 
 
-test('Epic 3 hero counts match official Legendary rules for each player count', () => {
+test('Hero counts match official Legendary rules for each player count', () => {
+
   assert.equal(resolveSetupTemplate(1, false).heroCount, 3, '1-player standard: 3 heroes');
   assert.equal(resolveSetupTemplate(1, true).heroCount, 3, '1-player advanced solo: 3 heroes (same as standard solo, larger Master Strike deck)');
   assert.equal(resolveSetupTemplate(2, false).heroCount, 5, '2-player: 5 heroes');
@@ -92,7 +94,8 @@ test('Epic 3 hero counts match official Legendary rules for each player count', 
   assert.equal(resolveSetupTemplate(4, false).heroCount, 5, '4-player: 5 heroes (not 6)');
   assert.equal(resolveSetupTemplate(5, false).heroCount, 6, '5-player: 6 heroes');
 });
-test('Epic 3 legality validation rejects empty or unsupported collections with clear reasons', () => {
+test('Legality validation rejects empty or unsupported collections with clear reasons', () => {
+
   const emptyState = createDefaultState();
   const emptyValidation = validateSetupLegality({ runtime: bundle.runtime, state: emptyState, playerCount: 1, advancedSolo: false });
 
@@ -105,7 +108,8 @@ test('Epic 3 legality validation rejects empty or unsupported collections with c
   assert.ok(invalidAdvancedSolo.reasons[0].includes('Advanced Solo'));
 });
 
-test('Epic 3 applies scheme constraints, forced groups, and modifiers to generated setups', () => {
+test('Applies scheme constraints, forced groups, and modifiers to generated setups', () => {
+
   const state = makeTargetedState({ schemeName: 'Secret Invasion of the Skrull Shapeshifters' });
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 2, advancedSolo: false, random: () => 0 });
 
@@ -120,7 +124,8 @@ test('Epic 3 applies scheme constraints, forced groups, and modifiers to generat
   assert.equal(restrictedScheme.constraints.minimumPlayerCount, 2);
 });
 
-test('Epic 3 mastermind leads consume the correct villain or henchman slot', () => {
+test('Mastermind leads consume the correct villain or henchman slot', () => {
+
   const redSkullState = makeTargetedState({ mastermindName: 'Red Skull' });
   const redSkullSetup = generateSetup({ runtime: bundle.runtime, state: redSkullState, playerCount: 1, advancedSolo: false, random: () => 0 });
   assert.equal(redSkullSetup.mastermind.name, 'Red Skull');
@@ -134,7 +139,8 @@ test('Epic 3 mastermind leads consume the correct villain or henchman slot', () 
   assert.ok(drDoomSetup.henchmanGroups.some((group) => group.name === 'Doombot Legion' && group.forced));
 });
 
-test('Epic 3 hero freshness ranking prefers never-played first, then least-played, items with equal plays are shuffled together', () => {
+test('Hero freshness ranking prefers never-played first, then least-played, items with equal plays are shuffled together', () => {
+
   const heroes = bundle.runtime.indexes.allHeroes.slice(0, 6);
   const usage = {
     [heroes[2].id]: { plays: 1, lastPlayedAt: '2026-04-03T12:00:00.000Z' },
@@ -161,7 +167,8 @@ test('Epic 3 hero freshness ranking prefers never-played first, then least-playe
   ]));
 });
 
-test('Epic 3 least-played fallback is used when fresh heroes are insufficient', () => {
+test('Least-played fallback is used when fresh heroes are insufficient', () => {
+
   const simpleScheme = bundle.runtime.indexes.allSchemes.find((entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount);
   const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((entity) => !entity.lead);
   const state = makeTargetedState({
@@ -186,7 +193,8 @@ test('Epic 3 least-played fallback is used when fresh heroes are insufficient', 
   assert.equal(setup.notices.some((notice) => notice.includes('Hero selection')), true);
 });
 
-test('Epic 3 Generate/Regenerate remain ephemeral and do not mutate persisted state inputs', () => {
+test('Generate/Regenerate remain ephemeral and do not mutate persisted state inputs', () => {
+
   const state = makeTargetedState();
   const before = JSON.parse(JSON.stringify(state));
 
@@ -196,7 +204,8 @@ test('Epic 3 Generate/Regenerate remain ephemeral and do not mutate persisted st
   assert.deepEqual(state, before);
 });
 
-test('Epic 3 generated setups expose history-ready ID-only snapshots that still resolve through runtime indexes', () => {
+test('Generated setups expose history-ready ID-only snapshots that still resolve through runtime indexes', () => {
+
   const setup = generateSetup({ runtime: bundle.runtime, state: createAllOwnedState(), playerCount: 3, advancedSolo: false, random: () => 0 });
 
   assert.equal(typeof setup.setupSnapshot.mastermindId, 'string');

@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -19,12 +19,13 @@ const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 5 browse filtering keeps every included set available with stable type metadata', () => {
+test('Browse filtering keeps every included set available with stable type metadata', () => {
+
   const sets = bundle.runtime.sets;
   const allVisible = filterBrowseSets(sets, { searchTerm: '', typeFilter: 'all' });
   const standalone = filterBrowseSets(sets, { searchTerm: '', typeFilter: 'standalone' });
@@ -39,7 +40,8 @@ test('Epic 5 browse filtering keeps every included set available with stable typ
   assert.equal(getBrowseTypeLabel('small-expansion'), 'Small Expansion');
 });
 
-test('Epic 5 search filtering supports canonical names, aliases, and no-match cases', () => {
+test('Search filtering supports canonical names, aliases, and no-match cases', () => {
+
   const sets = bundle.runtime.sets;
   const shield = sets.find((set) => set.name === 'S.H.I.E.L.D.');
   const coreSet = sets.find((set) => set.name === 'Core Set');
@@ -59,7 +61,8 @@ test('Epic 5 search filtering supports canonical names, aliases, and no-match ca
   assert.equal(filterBrowseSets(sets, { searchTerm: 'no match', typeFilter: 'all' }).length, 0);
 });
 
-test('Epic 5 browse metadata summaries preserve representative edge-case counts', () => {
+test('Browse metadata summaries preserve representative edge-case counts', () => {
+
   const coreSet = bundle.runtime.sets.find((set) => set.name === 'Core Set');
   const dimensions = bundle.runtime.sets.find((set) => set.name === 'Dimensions');
   const shield = bundle.runtime.sets.find((set) => set.name === 'S.H.I.E.L.D.');

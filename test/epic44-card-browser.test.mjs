@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -19,14 +19,15 @@ const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
 // --- CARD_CATEGORIES ---
 
-test('Epic 44 CARD_CATEGORIES has exactly 5 entries in canonical order', () => {
+test('CARD_CATEGORIES has exactly 5 entries in canonical order', () => {
+
   assert.equal(CARD_CATEGORIES.length, 5);
   assert.deepEqual(
     CARD_CATEGORIES.map((c) => c.id),
@@ -39,7 +40,8 @@ test('Epic 44 CARD_CATEGORIES has exactly 5 entries in canonical order', () => {
 
 // --- getCardsByCategory ---
 
-test('Epic 44 getCardsByCategory returns exactly 5 category buckets', () => {
+test('getCardsByCategory returns exactly 5 category buckets', () => {
+
   const pools = buildOwnedPools(bundle.runtime, ['core-set']);
   const categories = getCardsByCategory(pools);
   assert.equal(categories.length, 5);
@@ -49,7 +51,8 @@ test('Epic 44 getCardsByCategory returns exactly 5 category buckets', () => {
   );
 });
 
-test('Epic 44 getCardsByCategory Heroes bucket contains known core-set hero names sorted A-Z', () => {
+test('getCardsByCategory Heroes bucket contains known core-set hero names sorted A-Z', () => {
+
   const pools = buildOwnedPools(bundle.runtime, ['core-set']);
   const categories = getCardsByCategory(pools);
   const heroesBucket = categories.find((c) => c.categoryId === 'heroes');
@@ -69,7 +72,8 @@ test('Epic 44 getCardsByCategory Heroes bucket contains known core-set hero name
   assert.deepEqual(heroNames, sorted, 'Heroes must be sorted A-Z by name');
 });
 
-test('Epic 44 getCardsByCategory Masterminds bucket contains known mastermind names sorted A-Z', () => {
+test('getCardsByCategory Masterminds bucket contains known mastermind names sorted A-Z', () => {
+
   const pools = buildOwnedPools(bundle.runtime, ['core-set']);
   const categories = getCardsByCategory(pools);
   const mastermindsBucket = categories.find((c) => c.categoryId === 'masterminds');
@@ -88,7 +92,8 @@ test('Epic 44 getCardsByCategory Masterminds bucket contains known mastermind na
   assert.deepEqual(mastermindNames, sorted, 'Masterminds must be sorted A-Z by name');
 });
 
-test('Epic 44 getCardsByCategory empty set list returns 5 empty-cards buckets', () => {
+test('getCardsByCategory empty set list returns 5 empty-cards buckets', () => {
+
   const pools = buildOwnedPools(bundle.runtime, []);
   const categories = getCardsByCategory(pools);
   assert.equal(categories.length, 5);
@@ -99,7 +104,8 @@ test('Epic 44 getCardsByCategory empty set list returns 5 empty-cards buckets', 
 
 // --- getCardsByExpansion ---
 
-test('Epic 44 getCardsByExpansion with 2 owned expansions returns 2 objects sorted A-Z by expansion name', () => {
+test('getCardsByExpansion with 2 owned expansions returns 2 objects sorted A-Z by expansion name', () => {
+
   const pools = buildOwnedPools(bundle.runtime, ['core-set', 'fantastic-four']);
   const expansions = getCardsByExpansion(pools);
 
@@ -114,7 +120,8 @@ test('Epic 44 getCardsByExpansion with 2 owned expansions returns 2 objects sort
   assert.equal(expansions[1].setName, 'Fantastic Four');
 });
 
-test('Epic 44 getCardsByExpansion each expansion cards array is sorted A-Z by name', () => {
+test('getCardsByExpansion each expansion cards array is sorted A-Z by name', () => {
+
   const pools = buildOwnedPools(bundle.runtime, ['core-set', 'fantastic-four']);
   const expansions = getCardsByExpansion(pools);
 
@@ -130,7 +137,8 @@ test('Epic 44 getCardsByExpansion each expansion cards array is sorted A-Z by na
   }
 });
 
-test('Epic 44 getCardsByExpansion each expansion contains only cards from that expansion', () => {
+test('getCardsByExpansion each expansion contains only cards from that expansion', () => {
+
   const pools = buildOwnedPools(bundle.runtime, ['core-set', 'fantastic-four']);
   const expansions = getCardsByExpansion(pools);
 
@@ -145,7 +153,8 @@ test('Epic 44 getCardsByExpansion each expansion contains only cards from that e
   }
 });
 
-test('Epic 44 getCardsByExpansion with zero owned sets returns empty array', () => {
+test('getCardsByExpansion with zero owned sets returns empty array', () => {
+
   const pools = buildOwnedPools(bundle.runtime, []);
   const expansions = getCardsByExpansion(pools);
   assert.deepEqual(expansions, []);

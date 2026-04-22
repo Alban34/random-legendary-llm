@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 
 import { createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.ts';
@@ -28,7 +28,8 @@ const minimalIndexes = {
   schemesById: {}
 };
 
-test('Epic 18 theme utilities normalize supported IDs and expose stable theme metadata', () => {
+test('Theme utilities normalize supported IDs and expose stable theme metadata', () => {
+
   assert.equal(DEFAULT_THEME_ID, 'dark');
   assert.deepEqual(THEME_OPTIONS.map((theme) => theme.id), ['dark', 'light']);
   assert.equal(normalizeThemeId('light'), 'light');
@@ -39,7 +40,8 @@ test('Epic 18 theme utilities normalize supported IDs and expose stable theme me
   assert.equal(getThemeDefinition('unknown').id, DEFAULT_THEME_ID);
 });
 
-test('Epic 18 persists the selected theme and safely recovers invalid stored theme values', () => {
+test('Persists the selected theme and safely recovers invalid stored theme values', () => {
+
   const state = createDefaultState();
   assert.equal(state.preferences.themeId, DEFAULT_THEME_ID);
 

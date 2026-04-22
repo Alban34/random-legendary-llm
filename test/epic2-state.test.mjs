@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -61,12 +61,13 @@ function createSampleSetup(offset = 0) {
   };
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 2 default root state matches the expected schema', () => {
+test('Default root state matches the expected schema', () => {
+
   const state = createDefaultState();
 
   assert.equal(state.schemaVersion, 1);
@@ -90,7 +91,8 @@ test('Epic 2 default root state matches the expected schema', () => {
   });
 });
 
-test('Epic 2 save/load roundtrip preserves the root state shape', () => {
+test('Save/load roundtrip preserves the root state shape', () => {
+
   const storage = createMemoryStorage();
   const storageAdapter = createStorageAdapter(storage);
   let state = createDefaultState();
@@ -106,7 +108,8 @@ test('Epic 2 save/load roundtrip preserves the root state shape', () => {
   assert.deepEqual(loaded.state, state);
 });
 
-test('Epic 2 hydration removes invalid stored set IDs safely', () => {
+test('Hydration removes invalid stored set IDs safely', () => {
+
   const invalidState = createDefaultState();
   invalidState.collection.ownedSetIds = [bundle.runtime.sets[0].id, 'missing-set-id'];
 
@@ -121,7 +124,8 @@ test('Epic 2 hydration removes invalid stored set IDs safely', () => {
   assert.ok(loaded.notices.some((notice) => notice.includes('Removed invalid stored set IDs')));
 });
 
-test('Epic 2 accepted setups update usage statistics and history newest-first', () => {
+test('Accepted setups update usage statistics and history newest-first', () => {
+
   let state = createDefaultState();
 
   state = acceptGameSetup(state, createSampleSetup(0));
@@ -136,7 +140,8 @@ test('Epic 2 accepted setups update usage statistics and history newest-first', 
   assert.equal(state.preferences.lastAdvancedSolo, false);
 });
 
-test('Epic 2 per-category reset only clears the intended usage bucket', () => {
+test('Per-category reset only clears the intended usage bucket', () => {
+
   let state = createDefaultState();
   state = acceptGameSetup(state, createSampleSetup(0));
 
@@ -147,7 +152,8 @@ test('Epic 2 per-category reset only clears the intended usage bucket', () => {
   assert.notDeepEqual(resetState.usage.villainGroups, {});
 });
 
-test('Epic 2 full reset clears persisted state safely', () => {
+test('Full reset clears persisted state safely', () => {
+
   const storage = createMemoryStorage();
   const storageAdapter = createStorageAdapter(storage);
   const state = acceptGameSetup(createDefaultState(), createSampleSetup(0));
@@ -162,7 +168,8 @@ test('Epic 2 full reset clears persisted state safely', () => {
   assert.deepEqual(result.state, createDefaultState());
 });
 
-test('Epic 2 corrupted saved JSON recovers with default state and a visible notice', () => {
+test('Corrupted saved JSON recovers with default state and a visible notice', () => {
+
   const storage = createMemoryStorage({
     [STORAGE_KEY]: '{ not-valid-json'
   });
@@ -174,7 +181,8 @@ test('Epic 2 corrupted saved JSON recovers with default state and a visible noti
   assert.ok(loaded.notices.some((notice) => notice.includes('saved JSON was corrupted')));
 });
 
-test('Epic 2 handles unavailable browser storage gracefully', () => {
+test('Handles unavailable browser storage gracefully', () => {
+
   const storageAdapter = createStorageAdapter(undefined);
   const loaded = loadState({ storageAdapter, indexes: bundle.runtime.indexes });
 
@@ -183,7 +191,8 @@ test('Epic 2 handles unavailable browser storage gracefully', () => {
   assert.ok(loaded.notices[0].includes('Browser storage is unavailable'));
 });
 
-test('Epic 2 updateState sanitizes invalid persisted references before saving', () => {
+test('updateState sanitizes invalid persisted references before saving', () => {
+
   const storage = createMemoryStorage();
   const storageAdapter = createStorageAdapter(storage);
 
@@ -204,7 +213,8 @@ test('Epic 2 updateState sanitizes invalid persisted references before saving', 
   assert.ok(result.notices.length >= 2);
 });
 
-test('Epic 2 exposes all documented usage categories', () => {
+test('Exposes all documented usage categories', () => {
+
   assert.deepEqual(USAGE_CATEGORIES, ['heroes', 'masterminds', 'villainGroups', 'henchmanGroups', 'schemes']);
 });
 

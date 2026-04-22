@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -31,7 +31,7 @@ function createSampleSetup(offset = 0) {
   };
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
@@ -110,7 +110,8 @@ test('henchmanGroupSetNames is an array with same length as henchmanGroupNames a
   }
 });
 
-test('all five expansion name fields are populated and correct across multiple sample setups', () => {
+test('All five expansion name fields are populated and correct across multiple sample setups', () => {
+
   const indexes = bundle.runtime.indexes;
 
   for (const offset of [0, 1, 2]) {

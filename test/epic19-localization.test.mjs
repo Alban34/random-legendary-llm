@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 
 import { createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.ts';
@@ -28,7 +28,8 @@ const minimalIndexes = {
   schemesById: {}
 };
 
-test('Epic 19 defaults locale preferences safely and persists supported locale selections', () => {
+test('Defaults locale preferences safely and persists supported locale selections', () => {
+
   const state = createDefaultState();
   assert.equal(state.preferences.localeId, DEFAULT_LOCALE_ID);
   assert.equal(normalizeLocaleId('fr-FR'), 'fr-FR');
@@ -56,7 +57,8 @@ test('Epic 19 defaults locale preferences safely and persists supported locale s
   assert.equal(recovered.notices.some((notice) => notice.includes('Recovered invalid preference values during state hydration.')), true);
 });
 
-test('Epic 19 locale helpers expose the six production locales and translated UI copy', () => {
+test('Locale helpers expose the six production locales and translated UI copy', () => {
+
   assert.deepEqual(getSelectableLocales().map((locale) => locale.id), ['en-US', 'fr-FR', 'de-DE', 'ja-JP', 'ko-KR', 'es-ES']);
 
   const frenchLocale = createLocaleTools('fr-FR');

@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -13,7 +13,7 @@ let backupTabSource;
 let cssSource;
 let localeSource;
 
-before(async () => {
+beforeAll(async () => {
   [rendererSource, backupTabSource, cssSource, localeSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'BackupTab.svelte'), 'utf8'),
@@ -27,7 +27,8 @@ before(async () => {
 
 // UX6.1 — Portability panel
 
-test('UX6.1 — renderer contains data-backup-portability-panel section', () => {
+test('Renderer contains data-backup-portability-panel section', () => {
+
   assert.match(
     backupTabSource,
     /data-backup-portability-panel/,
@@ -35,7 +36,8 @@ test('UX6.1 — renderer contains data-backup-portability-panel section', () => 
   );
 });
 
-test('UX6.1 — portability panel contains export-backup and open-import-backup actions', () => {
+test('Portability panel contains export-backup and open-import-backup actions', () => {
+
   // Portability panel appears before maintenance panel — find its slice
   const portabilityIdx = backupTabSource.indexOf('data-backup-portability-panel');
   const maintenanceIdx = backupTabSource.indexOf('data-backup-maintenance-panel');
@@ -48,7 +50,8 @@ test('UX6.1 — portability panel contains export-backup and open-import-backup 
   assert.match(portabilitySlice, /data-action="open-import-backup"/, 'open-import-backup must be in portability panel');
 });
 
-test('UX6.1 — portability panel does NOT contain request-reset-all-state', () => {
+test('Portability panel does NOT contain request-reset-all-state', () => {
+
   const portabilityIdx = backupTabSource.indexOf('data-backup-portability-panel');
   const maintenanceIdx = backupTabSource.indexOf('data-backup-maintenance-panel');
   const portabilitySlice = backupTabSource.slice(portabilityIdx, maintenanceIdx);
@@ -61,7 +64,8 @@ test('UX6.1 — portability panel does NOT contain request-reset-all-state', () 
 
 // UX6.1 / UX6.3 — Maintenance panel
 
-test('UX6.1 — renderer contains data-backup-maintenance-panel section or accordion', () => {
+test('Renderer contains data-backup-maintenance-panel section or accordion', () => {
+
   assert.match(
     backupTabSource,
     /data-backup-maintenance-panel/,
@@ -69,7 +73,8 @@ test('UX6.1 — renderer contains data-backup-maintenance-panel section or accor
   );
 });
 
-test('UX6.3 — renderer uses maintenance-accordion for the compact (mobile) layout', () => {
+test('Renderer uses maintenance-accordion for the compact (mobile) layout', () => {
+
   assert.match(
     backupTabSource,
     /maintenance-accordion/,
@@ -77,7 +82,8 @@ test('UX6.3 — renderer uses maintenance-accordion for the compact (mobile) lay
   );
 });
 
-test('UX6.1 — maintenance panel contains reset-usage actions', () => {
+test('Maintenance panel contains reset-usage actions', () => {
+
   const maintenanceIdx = backupTabSource.indexOf('data-backup-maintenance-panel');
   const dangerIdx = backupTabSource.indexOf('data-backup-danger-zone');
   assert.ok(maintenanceIdx !== -1, 'data-backup-maintenance-panel must exist');
@@ -87,7 +93,8 @@ test('UX6.1 — maintenance panel contains reset-usage actions', () => {
   assert.match(maintenanceSlice, /data-action="reset-usage"/, 'reset-usage must be in maintenance panel');
 });
 
-test('UX6.2 — maintenance panel does NOT contain request-reset-all-state', () => {
+test('Maintenance panel does NOT contain request-reset-all-state', () => {
+
   const maintenanceIdx = backupTabSource.indexOf('data-backup-maintenance-panel');
   const dangerIdx = backupTabSource.indexOf('data-backup-danger-zone');
   const maintenanceSlice = backupTabSource.slice(maintenanceIdx, dangerIdx);
@@ -100,7 +107,8 @@ test('UX6.2 — maintenance panel does NOT contain request-reset-all-state', () 
 
 // UX6.2 — Danger zone panel
 
-test('UX6.2 — renderer contains data-backup-danger-zone section', () => {
+test('Renderer contains data-backup-danger-zone section', () => {
+
   assert.match(
     backupTabSource,
     /data-backup-danger-zone/,
@@ -108,7 +116,8 @@ test('UX6.2 — renderer contains data-backup-danger-zone section', () => {
   );
 });
 
-test('UX6.2 — danger zone contains request-reset-all-state and NOT reset-usage', () => {
+test('Danger zone contains request-reset-all-state and NOT reset-usage', () => {
+
   const dangerIdx = backupTabSource.indexOf('data-backup-danger-zone');
   assert.ok(dangerIdx !== -1, 'data-backup-danger-zone must exist');
   const dangerSlice = backupTabSource.slice(dangerIdx);
@@ -123,7 +132,8 @@ test('UX6.2 — danger zone contains request-reset-all-state and NOT reset-usage
   );
 });
 
-test('UX6.2 — danger zone uses panel danger-zone CSS class', () => {
+test('Danger zone uses panel danger-zone CSS class', () => {
+
   assert.match(
     backupTabSource,
     /class="panel danger-zone"/,
@@ -131,7 +141,8 @@ test('UX6.2 — danger zone uses panel danger-zone CSS class', () => {
   );
 });
 
-test('UX6.2 — danger zone consequence copy key is used in renderer', () => {
+test('Danger zone consequence copy key is used in renderer', () => {
+
   assert.match(
     backupTabSource,
     /backup\.dangerZoneConsequence/,
@@ -141,7 +152,8 @@ test('UX6.2 — danger zone consequence copy key is used in renderer', () => {
 
 // UX6.2 — CSS danger zone
 
-test('UX6.2 — CSS contains .danger-zone with danger-border-soft token', () => {
+test('CSS contains .danger-zone with danger-border-soft token', () => {
+
   assert.match(
     cssSource,
     /\.danger-zone\s*\{[^}]*--danger-border/,
@@ -149,7 +161,8 @@ test('UX6.2 — CSS contains .danger-zone with danger-border-soft token', () => 
   );
 });
 
-test('UX6.2 — CSS contains .danger-zone with danger-soft token', () => {
+test('CSS contains .danger-zone with danger-soft token', () => {
+
   assert.match(
     cssSource,
     /\.danger-zone\s*\{[^}]*--danger-soft/,
@@ -157,7 +170,8 @@ test('UX6.2 — CSS contains .danger-zone with danger-soft token', () => {
   );
 });
 
-test('UX6.2 — CSS contains .danger-zone h2 rule with danger color', () => {
+test('CSS contains .danger-zone h2 rule with danger color', () => {
+
   assert.match(
     cssSource,
     /\.danger-zone h2\s*\{[^}]*--danger/,
@@ -167,7 +181,8 @@ test('UX6.2 — CSS contains .danger-zone h2 rule with danger color', () => {
 
 // UX6.3 — CSS maintenance accordion
 
-test('UX6.3 — CSS contains .maintenance-accordion class', () => {
+test('CSS contains .maintenance-accordion class', () => {
+
   assert.match(
     cssSource,
     /\.maintenance-accordion\s*\{/,
@@ -175,7 +190,8 @@ test('UX6.3 — CSS contains .maintenance-accordion class', () => {
   );
 });
 
-test('UX6.3 — CSS contains .maintenance-accordion-summary class', () => {
+test('CSS contains .maintenance-accordion-summary class', () => {
+
   assert.match(
     cssSource,
     /\.maintenance-accordion-summary\s*\{/,
@@ -183,7 +199,8 @@ test('UX6.3 — CSS contains .maintenance-accordion-summary class', () => {
   );
 });
 
-test('UX6.3 — CSS contains .maintenance-accordion-body class', () => {
+test('CSS contains .maintenance-accordion-body class', () => {
+
   assert.match(
     cssSource,
     /\.maintenance-accordion-body\s*\{/,
@@ -191,7 +208,8 @@ test('UX6.3 — CSS contains .maintenance-accordion-body class', () => {
   );
 });
 
-test('UX6.3 — CSS includes prefers-reduced-motion rule for accordion arrow', () => {
+test('CSS includes prefers-reduced-motion rule for accordion arrow', () => {
+
   assert.match(
     cssSource,
     /prefers-reduced-motion:\s*reduce[\s\S]*?\.maintenance-accordion-summary::after[\s\S]*?transition:\s*none/,
@@ -201,7 +219,8 @@ test('UX6.3 — CSS includes prefers-reduced-motion rule for accordion arrow', (
 
 // UX6.4 — Localization keys
 
-test('UX6.4 — EN locale contains backup.portabilityDescription key', () => {
+test('EN locale contains backup.portabilityDescription key', () => {
+
   assert.match(
     localeSource,
     /'backup\.portabilityDescription'/,
@@ -209,7 +228,8 @@ test('UX6.4 — EN locale contains backup.portabilityDescription key', () => {
   );
 });
 
-test('UX6.4 — EN locale contains backup.maintenanceTitle key', () => {
+test('EN locale contains backup.maintenanceTitle key', () => {
+
   assert.match(
     localeSource,
     /'backup\.maintenanceTitle'/,
@@ -217,7 +237,8 @@ test('UX6.4 — EN locale contains backup.maintenanceTitle key', () => {
   );
 });
 
-test('UX6.4 — EN locale contains backup.dangerZoneTitle key', () => {
+test('EN locale contains backup.dangerZoneTitle key', () => {
+
   assert.match(
     localeSource,
     /'backup\.dangerZoneTitle'/,
@@ -225,7 +246,8 @@ test('UX6.4 — EN locale contains backup.dangerZoneTitle key', () => {
   );
 });
 
-test('UX6.4 — EN locale contains backup.dangerZoneConsequence key', () => {
+test('EN locale contains backup.dangerZoneConsequence key', () => {
+
   assert.match(
     localeSource,
     /'backup\.dangerZoneConsequence'/,
@@ -233,23 +255,27 @@ test('UX6.4 — EN locale contains backup.dangerZoneConsequence key', () => {
   );
 });
 
-test('UX6.4 — FR locale contains backup.portabilityDescription', () => {
+test('FR locale contains backup.portabilityDescription', () => {
+
   // Appears twice (EN + FR), just confirm it appears at all
   const allMatches = [...localeSource.matchAll(/'backup\.portabilityDescription'/g)];
   assert.ok(allMatches.length >= 2, 'backup.portabilityDescription must exist in both EN and FR locales');
 });
 
-test('UX6.4 — FR locale contains backup.maintenanceTitle', () => {
+test('FR locale contains backup.maintenanceTitle', () => {
+
   const allMatches = [...localeSource.matchAll(/'backup\.maintenanceTitle'/g)];
   assert.ok(allMatches.length >= 2, 'backup.maintenanceTitle must exist in both EN and FR locales');
 });
 
-test('UX6.4 — FR locale contains backup.dangerZoneTitle', () => {
+test('FR locale contains backup.dangerZoneTitle', () => {
+
   const allMatches = [...localeSource.matchAll(/'backup\.dangerZoneTitle'/g)];
   assert.ok(allMatches.length >= 2, 'backup.dangerZoneTitle must exist in both EN and FR locales');
 });
 
-test('UX6.4 — FR locale contains backup.dangerZoneConsequence', () => {
+test('FR locale contains backup.dangerZoneConsequence', () => {
+
   const allMatches = [...localeSource.matchAll(/'backup\.dangerZoneConsequence'/g)];
   assert.ok(allMatches.length >= 2, 'backup.dangerZoneConsequence must exist in both EN and FR locales');
 });

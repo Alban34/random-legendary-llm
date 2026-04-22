@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +14,7 @@ let localizationSource;
 let backupTabSource;
 let pkgJson;
 
-before(async () => {
+beforeAll(async () => {
   [appSvelteSource, viteConfigSource, localizationSource, backupTabSource, pkgJson] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'vite.config.js'), 'utf8'),
@@ -29,7 +29,8 @@ before(async () => {
 
 // ── Story 36.1 — Version from package.json ─────────────────────────────────
 
-test('Story 36.1: vite.config.js imports package.json to read version', () => {
+test('Vite.config.js imports package.json to read version', () => {
+
   assert.match(
     viteConfigSource,
     /package\.json/,
@@ -42,7 +43,8 @@ test('Story 36.1: vite.config.js imports package.json to read version', () => {
   );
 });
 
-test('Story 36.1: vite.config.js exposes __APP_VERSION__ via define using pkg.version', () => {
+test('Vite.config.js exposes __APP_VERSION__ via define using pkg.version', () => {
+
   assert.match(viteConfigSource, /define/, 'vite config must contain a define block');
   assert.match(viteConfigSource, /__APP_VERSION__/, 'vite config must define __APP_VERSION__');
   assert.ok(
@@ -51,11 +53,13 @@ test('Story 36.1: vite.config.js exposes __APP_VERSION__ via define using pkg.ve
   );
 });
 
-test('Story 36.1: package.json has a version field', () => {
+test('Package.json has a version field', () => {
+
   assert.ok(pkgJson.version, 'package.json must have a non-empty version field');
 });
 
-test('Story 36.1: App.svelte does not contain a hardcoded APP_VERSION const', () => {
+test('App.svelte does not contain a hardcoded APP_VERSION const', () => {
+
   assert.doesNotMatch(
     appSvelteSource,
     /const APP_VERSION\s*=/,
@@ -68,7 +72,8 @@ test('Story 36.1: App.svelte does not contain a hardcoded APP_VERSION const', ()
   );
 });
 
-test('Story 36.1: App.svelte uses injected __APP_VERSION__ global', () => {
+test('App.svelte uses injected __APP_VERSION__ global', () => {
+
   assert.match(
     appSvelteSource,
     /__APP_VERSION__/,
@@ -76,7 +81,8 @@ test('Story 36.1: App.svelte uses injected __APP_VERSION__ global', () => {
   );
 });
 
-test('Story 36.1: App.svelte has /* global __APP_VERSION__ */ comment for linters', () => {
+test('App.svelte has /* global __APP_VERSION__ */ comment for linters', () => {
+
   assert.match(
     appSvelteSource,
     /\/\*\s*global\s+__APP_VERSION__\s*\*\//,
@@ -84,7 +90,8 @@ test('Story 36.1: App.svelte has /* global __APP_VERSION__ */ comment for linter
   );
 });
 
-test('Story 36.1: app-version element renders the injected global in App.svelte', () => {
+test('App-version element renders the injected global in App.svelte', () => {
+
   assert.match(
     appSvelteSource,
     /class="app-version"[^>]*>v\{__APP_VERSION__\}/,
@@ -94,21 +101,24 @@ test('Story 36.1: app-version element renders the injected global in App.svelte'
 
 // ── Story 36.2 — localStorage disclosure ───────────────────────────────────
 
-test('Story 36.2: EN_MESSAGES contains storage.disclosureTitle', () => {
+test('EN_MESSAGES contains storage.disclosureTitle', () => {
+
   const enStart = localizationSource.indexOf('const EN_MESSAGES');
   const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
   const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
   assert.match(enBlock, /storage\.disclosureTitle/, 'EN_MESSAGES must have storage.disclosureTitle');
 });
 
-test('Story 36.2: EN_MESSAGES contains storage.disclosureBody', () => {
+test('EN_MESSAGES contains storage.disclosureBody', () => {
+
   const enStart = localizationSource.indexOf('const EN_MESSAGES');
   const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
   const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
   assert.match(enBlock, /storage\.disclosureBody/, 'EN_MESSAGES must have storage.disclosureBody');
 });
 
-test('Story 36.2: FR_MESSAGES contains storage.disclosureTitle and storage.disclosureBody', () => {
+test('FR_MESSAGES contains storage.disclosureTitle and storage.disclosureBody', () => {
+
   const frStart = localizationSource.indexOf('const FR_MESSAGES');
   const frEnd = localizationSource.indexOf('\nconst ', frStart + 10);
   const frBlock = localizationSource.slice(frStart, frEnd > -1 ? frEnd : undefined);
@@ -116,7 +126,8 @@ test('Story 36.2: FR_MESSAGES contains storage.disclosureTitle and storage.discl
   assert.match(frBlock, /storage\.disclosureBody/, 'FR_MESSAGES must have storage.disclosureBody');
 });
 
-test('Story 36.2: EN disclosure body mentions localStorage', () => {
+test('EN disclosure body mentions localStorage', () => {
+
   const enStart = localizationSource.indexOf('const EN_MESSAGES');
   const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
   const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
@@ -126,7 +137,8 @@ test('Story 36.2: EN disclosure body mentions localStorage', () => {
   assert.match(bodyCtx, /localStorage/i, 'EN disclosure must mention localStorage');
 });
 
-test('Story 36.2: EN disclosure body mentions collection ownership', () => {
+test('EN disclosure body mentions collection ownership', () => {
+
   const enStart = localizationSource.indexOf('const EN_MESSAGES');
   const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
   const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
@@ -135,7 +147,8 @@ test('Story 36.2: EN disclosure body mentions collection ownership', () => {
   assert.ok(bodyCtx.includes('collection'), 'EN disclosure must mention collection ownership');
 });
 
-test('Story 36.2: EN disclosure body mentions game history', () => {
+test('EN disclosure body mentions game history', () => {
+
   const enStart = localizationSource.indexOf('const EN_MESSAGES');
   const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
   const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
@@ -144,7 +157,8 @@ test('Story 36.2: EN disclosure body mentions game history', () => {
   assert.ok(bodyCtx.includes('history'), 'EN disclosure must mention game history');
 });
 
-test('Story 36.2: EN disclosure body mentions user preferences', () => {
+test('EN disclosure body mentions user preferences', () => {
+
   const enStart = localizationSource.indexOf('const EN_MESSAGES');
   const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
   const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
@@ -153,7 +167,8 @@ test('Story 36.2: EN disclosure body mentions user preferences', () => {
   assert.ok(bodyCtx.includes('preference'), 'EN disclosure must mention user preferences');
 });
 
-test('Story 36.2: EN disclosure body confirms data is never transmitted', () => {
+test('EN disclosure body confirms data is never transmitted', () => {
+
   const enStart = localizationSource.indexOf('const EN_MESSAGES');
   const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
   const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
@@ -165,7 +180,8 @@ test('Story 36.2: EN disclosure body confirms data is never transmitted', () => 
   );
 });
 
-test('Story 36.2: EN disclosure does not mention cookies', () => {
+test('EN disclosure does not mention cookies', () => {
+
   const enStart = localizationSource.indexOf('const EN_MESSAGES');
   const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
   const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
@@ -174,7 +190,8 @@ test('Story 36.2: EN disclosure does not mention cookies', () => {
   assert.doesNotMatch(bodyCtx, /cookie/i, 'EN disclosure must not mention cookie or cookies');
 });
 
-test('Story 36.2: FR disclosure does not mention cookies', () => {
+test('FR disclosure does not mention cookies', () => {
+
   const frStart = localizationSource.indexOf('const FR_MESSAGES');
   const frEnd = localizationSource.indexOf('\nconst ', frStart + 10);
   const frBlock = localizationSource.slice(frStart, frEnd > -1 ? frEnd : undefined);
@@ -184,7 +201,8 @@ test('Story 36.2: FR disclosure does not mention cookies', () => {
   assert.doesNotMatch(bodyCtx, /cookie/i, 'FR disclosure must not mention cookie or cookies');
 });
 
-test('Story 36.2: FR disclosure mentions localStorage', () => {
+test('FR disclosure mentions localStorage', () => {
+
   const frStart = localizationSource.indexOf('const FR_MESSAGES');
   const frEnd = localizationSource.indexOf('\nconst ', frStart + 10);
   const frBlock = localizationSource.slice(frStart, frEnd > -1 ? frEnd : undefined);
@@ -193,7 +211,8 @@ test('Story 36.2: FR disclosure mentions localStorage', () => {
   assert.match(bodyCtx, /localStorage/i, 'FR disclosure must mention localStorage');
 });
 
-test('Story 36.2: BackupTab renders storage disclosure element', () => {
+test('BackupTab renders storage disclosure element', () => {
+
   assert.match(
     backupTabSource,
     /data-storage-disclosure/,
@@ -201,7 +220,8 @@ test('Story 36.2: BackupTab renders storage disclosure element', () => {
   );
 });
 
-test('Story 36.2: BackupTab references both disclosure locale keys', () => {
+test('BackupTab references both disclosure locale keys', () => {
+
   assert.match(
     backupTabSource,
     /storage\.disclosureTitle/,
@@ -216,7 +236,8 @@ test('Story 36.2: BackupTab references both disclosure locale keys', () => {
 
 // ── Story 36.3 — GitHub repository link in the header ──────────────────────
 
-test('Story 36.3: App.svelte contains an anchor pointing to the GitHub repository', () => {
+test('App.svelte contains an anchor pointing to the GitHub repository', () => {
+
   assert.match(
     appSvelteSource,
     /href="https:\/\/github\.com\/Alban34\/random-legendary-llm"/,
@@ -224,7 +245,8 @@ test('Story 36.3: App.svelte contains an anchor pointing to the GitHub repositor
   );
 });
 
-test('Story 36.3: GitHub anchor has rel="noopener noreferrer"', () => {
+test('GitHub anchor has rel="noopener noreferrer"', () => {
+
   assert.match(
     appSvelteSource,
     /rel="noopener noreferrer"/,
@@ -232,7 +254,8 @@ test('Story 36.3: GitHub anchor has rel="noopener noreferrer"', () => {
   );
 });
 
-test('Story 36.3: GitHub anchor has an accessible aria-label', () => {
+test('GitHub anchor has an accessible aria-label', () => {
+
   assert.match(
     appSvelteSource,
     /aria-label="View source on GitHub"/,
@@ -240,7 +263,8 @@ test('Story 36.3: GitHub anchor has an accessible aria-label', () => {
   );
 });
 
-test('Story 36.3: GitHub anchor opens in a new tab', () => {
+test('GitHub anchor opens in a new tab', () => {
+
   assert.match(
     appSvelteSource,
     /target="_blank"/,
@@ -248,7 +272,8 @@ test('Story 36.3: GitHub anchor opens in a new tab', () => {
   );
 });
 
-test('Story 36.3: GitHub link appears inside header-icon-strip in the loaded header', () => {
+test('GitHub link appears inside header-icon-strip in the loaded header', () => {
+
   // The loaded header (isLoaded branch) must have the github-link anchor inside header-icon-strip
   const loadedHeaderRegion = appSvelteSource.slice(
     appSvelteSource.indexOf('isLoaded}'),
@@ -261,7 +286,8 @@ test('Story 36.3: GitHub link appears inside header-icon-strip in the loaded hea
   );
 });
 
-test('Story 36.3: GitHub link is inside header-icon-strip, not in the loading-shell header', () => {
+test('GitHub link is inside header-icon-strip, not in the loading-shell header', () => {
+
   // The loading shell is the {:else} branch at the end of the template — it should NOT have a github-link
   const loadingShellStart = appSvelteSource.lastIndexOf('Loading shell');
   assert.ok(loadingShellStart > -1, 'Loading shell comment must be present');
@@ -285,7 +311,8 @@ test('Story 36.3: GitHub link is inside header-icon-strip, not in the loading-sh
 
 // ── Story 36.4 — Fix Vite base path for local dev vs. GitHub Pages ──────────
 
-test('Story 36.4: vite.config.js uses the callback form of defineConfig', () => {
+test('Vite.config.js uses the callback form of defineConfig', () => {
+
   assert.match(
     viteConfigSource,
     /defineConfig\s*\(\s*\(\s*\{[^}]*command[^}]*\}\s*\)/,
@@ -293,7 +320,8 @@ test('Story 36.4: vite.config.js uses the callback form of defineConfig', () => 
   );
 });
 
-test('Story 36.4: vite.config.js sets base conditionally based on command', () => {
+test('Vite.config.js sets base conditionally based on command', () => {
+
   assert.match(
     viteConfigSource,
     /command\s*===\s*['"]build['"]/,

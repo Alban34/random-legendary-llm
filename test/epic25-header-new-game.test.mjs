@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -16,7 +16,7 @@ let appSvelteSource;
 
 const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 
-before(async () => {
+beforeAll(async () => {
   [rendererSource, newGameTabSource, cssSource, entrySource, appSvelteSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'NewGameTab.svelte'), 'utf8'),
@@ -26,12 +26,14 @@ before(async () => {
   ]);
 });
 
-test('Story 25.1/25.2: renderer exposes app-version element for version display in header', () => {
+test('Renderer exposes app-version element for version display in header', () => {
+
   assert.match(appSvelteSource, /app-version/, 'renderer must reference app-version (class or id)');
   assert.match(appSvelteSource, /APP_VERSION/, 'renderer must define or use APP_VERSION constant');
 });
 
-test('Story 25.2: CSS contains reduced header padding', () => {
+test('CSS contains reduced header padding', () => {
+
   // Old padding was var(--space-5) var(--space-5) var(--space-4) — now must be smaller
   assert.doesNotMatch(
     cssSource,
@@ -41,7 +43,8 @@ test('Story 25.2: CSS contains reduced header padding', () => {
   assert.match(cssSource, /\.app-header\s*\{/, 'app-header rule must still exist');
 });
 
-test('Story 25.2: CSS contains reduced h1 font size in header', () => {
+test('CSS contains reduced h1 font size in header', () => {
+
   // Old size was var(--type-display-md-size) = 1.75rem — must be reduced
   assert.doesNotMatch(
     cssSource,
@@ -50,12 +53,14 @@ test('Story 25.2: CSS contains reduced h1 font size in header', () => {
   );
 });
 
-test('Story 25.2: CSS contains .app-version style rule', () => {
+test('CSS contains .app-version style rule', () => {
+
   assert.match(cssSource, /\.app-version\s*\{/, 'CSS must include .app-version rule');
   assert.match(cssSource, /\.app-version[^}]*opacity/, '.app-version must set opacity for subdued presentation');
 });
 
-test('Story 25.3: renderer does NOT render Generate Setup and Regenerate as simultaneous separate buttons', () => {
+test('Renderer does NOT render Generate Setup and Regenerate as simultaneous separate buttons', () => {
+
   // Old pattern: generate-setup button followed immediately by regenerate-setup button in the same button-row
   assert.doesNotMatch(
     newGameTabSource,
@@ -64,7 +69,8 @@ test('Story 25.3: renderer does NOT render Generate Setup and Regenerate as simu
   );
 });
 
-test('Story 25.3: renderer uses a single context-sensitive generate button', () => {
+test('Renderer uses a single context-sensitive generate button', () => {
+
   assert.match(
     newGameTabSource,
     /data-action="generate-setup"/,
@@ -77,7 +83,8 @@ test('Story 25.3: renderer uses a single context-sensitive generate button', () 
   );
 });
 
-test('Story 25.4: generate button row appears before forced picks panel in render source', () => {
+test('Generate button row appears before forced picks panel in render source', () => {
+
   const generateButtonIdx = newGameTabSource.indexOf('data-action="generate-setup"');
   const forcedPicksPanelIdx = newGameTabSource.indexOf('data-forced-picks-panel');
   assert.ok(generateButtonIdx !== -1, 'generate-setup button must exist in NewGameTab');

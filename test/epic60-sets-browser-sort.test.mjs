@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 
 import {
@@ -15,7 +15,8 @@ const SETS = [
   { id: 'set-d', name: 'Dark City', type: 'large-expansion', year: 2014 }
 ];
 
-test('Epic 60.1 — BROWSE_SORT_OPTIONS is an array of exactly three objects with the correct ids in order', () => {
+test('BROWSE_SORT_OPTIONS is an array of exactly three objects with the correct ids in order', () => {
+
   assert.ok(Array.isArray(BROWSE_SORT_OPTIONS));
   assert.equal(BROWSE_SORT_OPTIONS.length, 3);
   assert.equal(BROWSE_SORT_OPTIONS[0].id, 'name');
@@ -23,7 +24,8 @@ test('Epic 60.1 — BROWSE_SORT_OPTIONS is an array of exactly three objects wit
   assert.equal(BROWSE_SORT_OPTIONS[2].id, 'collection');
 });
 
-test('Epic 60.1 — filterBrowseSets with sortKey "name" returns sets sorted A–Z by set.name', () => {
+test('filterBrowseSets with sortKey "name" returns sets sorted A–Z by set.name', () => {
+
   const result = filterBrowseSets(SETS, { sortKey: 'name' });
   assert.deepEqual(
     result.map((s) => s.name),
@@ -31,7 +33,8 @@ test('Epic 60.1 — filterBrowseSets with sortKey "name" returns sets sorted A�
   );
 });
 
-test('Epic 60.1 — filterBrowseSets with sortKey "releaseYear" sorts ascending by year, A–Z name as tiebreaker', () => {
+test('filterBrowseSets with sortKey "releaseYear" sorts ascending by year, A–Z name as tiebreaker', () => {
+
   const result = filterBrowseSets(SETS, { sortKey: 'releaseYear' });
   // Dark City: 2014; Civil War: 2016; Breakout: 2016 (tie → B before C); Annihilation: 2018
   assert.deepEqual(
@@ -40,7 +43,8 @@ test('Epic 60.1 — filterBrowseSets with sortKey "releaseYear" sorts ascending 
   );
 });
 
-test('Epic 60.1 — filterBrowseSets with sortKey "collection" puts owned set first; unowned sorted A–Z', () => {
+test('filterBrowseSets with sortKey "collection" puts owned set first; unowned sorted A–Z', () => {
+
   const ownedSetIds = new Set(['set-c']); // Civil War is owned
   const result = filterBrowseSets(SETS, { sortKey: 'collection', ownedSetIds });
   // Owned first: Civil War; then unowned A–Z: Annihilation, Breakout, Dark City
@@ -50,7 +54,8 @@ test('Epic 60.1 — filterBrowseSets with sortKey "collection" puts owned set fi
   );
 });
 
-test('Epic 60.1 — filterBrowseSets with no options produces the same order as sortKey "name" (no regression)', () => {
+test('filterBrowseSets with no options produces the same order as sortKey "name" (no regression)', () => {
+
   const defaultResult = filterBrowseSets(SETS);
   const namedResult = filterBrowseSets(SETS, { sortKey: 'name' });
   assert.deepEqual(

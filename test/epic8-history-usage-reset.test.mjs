@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -47,12 +47,13 @@ function createMemoryStorage(initialEntries = {}) {
   };
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 8 usage indicators reflect persisted usage statistics and never-played totals', () => {
+test('Usage indicators reflect persisted usage statistics and never-played totals', () => {
+
   let state = createAllOwnedState();
   state = acceptGameSetup(state, {
     id: 'epic8-usage',
@@ -72,7 +73,8 @@ test('Epic 8 usage indicators reflect persisted usage statistics and never-playe
   assert.equal(mastermindIndicator.label, 'common.masterminds');
 });
 
-test('Epic 8 history summaries resolve IDs back to readable newest-first metadata', () => {
+test('History summaries resolve IDs back to readable newest-first metadata', () => {
+
   let state = createAllOwnedState();
   state = acceptGameSetup(state, {
     id: 'older-game',
@@ -98,7 +100,8 @@ test('Epic 8 history summaries resolve IDs back to readable newest-first metadat
   assert.equal(summary.villainGroupNames.length, 1);
 });
 
-test('Epic 8 category resets and full reset preview/behavior stay scoped correctly', () => {
+test('Category resets and full reset preview/behavior stay scoped correctly', () => {
+
   let state = createAllOwnedState();
   state = acceptGameSetup(state, {
     id: 'reset-game',

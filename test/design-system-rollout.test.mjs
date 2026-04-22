@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +14,7 @@ let appSvelteSource;
 let historyTabSource;
 let focusUtilsSource;
 
-before(async () => {
+beforeAll(async () => {
   const [css, renderer, appSvelte, historyTab, focusUtils] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
@@ -30,7 +30,8 @@ before(async () => {
   focusUtilsSource = focusUtils;
 });
 
-test('Design system rollout ships governed typography roles and tokenized shell primitives', () => {
+test('Ships governed typography roles and tokenized shell primitives', () => {
+
   for (const selector of ['.display-lg', '.display-md', '.heading-lg', '.heading-md', '.body-lg', '.body-md', '.body-sm', '.label']) {
     assert.match(shellCss, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
@@ -43,7 +44,8 @@ test('Design system rollout ships governed typography roles and tokenized shell 
   assert.match(shellCss, /\.text-input\s*\{[\s\S]*border-radius:\s*var\(--radius-md\);[\s\S]*min-height:\s*2\.875rem;/);
 });
 
-test('Design system rollout adds reduced-motion and focus-restoration guardrails', () => {
+test('Adds reduced-motion and focus-restoration guardrails', () => {
+
   assert.match(shellCss, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(shellCss, /\.button:hover,[\s\S]*\.set-card:hover,[\s\S]*\.collection-row:hover\s*\{[\s\S]*transform:\s*none;/);
   assert.match(shellCss, /\.collection-row:focus-within,[\s\S]*\.history-item:focus-within,[\s\S]*\.history-group:focus-within/);

@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -21,12 +21,13 @@ const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 6 groups sets by type in the approved Base / Large / Small order', () => {
+test('Groups sets by type in the approved Base / Large / Small order', () => {
+
   const groups = groupSetsByType(bundle.runtime.sets);
 
   assert.deepEqual(groups.map((group) => group.id), COLLECTION_TYPE_GROUPS.map((group) => group.id));
@@ -35,7 +36,8 @@ test('Epic 6 groups sets by type in the approved Base / Large / Small order', ()
   assert.ok(groups[2].sets.some((set) => set.name === 'Fantastic Four'));
 });
 
-test('Epic 6 collection totals derive directly from the currently owned sets', () => {
+test('Collection totals derive directly from the currently owned sets', () => {
+
   let state = createDefaultState();
   state = toggleOwnedSet(state, 'core-set');
   state = toggleOwnedSet(state, 'fantastic-four');
@@ -57,7 +59,8 @@ test('Epic 6 collection totals derive directly from the currently owned sets', (
   });
 });
 
-test('Epic 6 feasibility indicators react to empty, thin, and healthy collections', () => {
+test('Feasibility indicators react to empty, thin, and healthy collections', () => {
+
   const emptyState = createDefaultState();
   const emptyFeasibility = getCollectionFeasibility(bundle.runtime, emptyState);
   assert.equal(emptyFeasibility.every((mode) => mode.ok === false), true);
@@ -78,7 +81,8 @@ test('Epic 6 feasibility indicators react to empty, thin, and healthy collection
   assert.ok(healthyFeasibility.some((mode) => mode.id === 'two-handed-solo'));
 });
 
-test('Epic 6 clearing the collection removes owned sets without disturbing history or usage', () => {
+test('Clearing the collection removes owned sets without disturbing history or usage', () => {
+
   const state = createDefaultState();
   state.collection.ownedSetIds = ['core-set', 'dark-city'];
   state.history = [{ id: 'existing-history' }];

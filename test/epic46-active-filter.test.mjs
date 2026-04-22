@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -22,19 +22,21 @@ const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
 // ── Story 46.1 ───────────────────────────────────────────────────────────────
 
-test('Epic 46.1 createDefaultState produces activeSetIds: null', () => {
+test('createDefaultState produces activeSetIds: null', () => {
+
   const state = createDefaultState();
   assert.equal(state.collection.activeSetIds, null);
 });
 
-test('Epic 46.1 setActiveSetIds replaces the field', () => {
+test('setActiveSetIds replaces the field', () => {
+
   const state = createDefaultState();
   const next = setActiveSetIds(state, ['core-set']);
   assert.deepEqual(next.collection.activeSetIds, ['core-set']);
@@ -42,14 +44,16 @@ test('Epic 46.1 setActiveSetIds replaces the field', () => {
   assert.equal(state.collection.activeSetIds, null);
 });
 
-test('Epic 46.1 clearActiveSetIds resets activeSetIds to null', () => {
+test('clearActiveSetIds resets activeSetIds to null', () => {
+
   const state = createDefaultState();
   const withFilter = setActiveSetIds(state, ['core-set']);
   const cleared = clearActiveSetIds(withFilter);
   assert.equal(cleared.collection.activeSetIds, null);
 });
 
-test('Epic 46.1 sanitization keeps only IDs present in ownedSetIds', () => {
+test('Sanitization keeps only IDs present in ownedSetIds', () => {
+
   const candidate = {
     schemaVersion: SCHEMA_VERSION,
     collection: {
@@ -70,7 +74,8 @@ test('Epic 46.1 sanitization keeps only IDs present in ownedSetIds', () => {
   );
 });
 
-test('Epic 46.1 sanitization emits no notice when activeSetIds is absent (old data)', () => {
+test('Sanitization emits no notice when activeSetIds is absent (old data)', () => {
+
   const candidate = {
     schemaVersion: SCHEMA_VERSION,
     collection: {
@@ -91,7 +96,8 @@ test('Epic 46.1 sanitization emits no notice when activeSetIds is absent (old da
   );
 });
 
-test('Epic 46.1 toggleOwnedSet removes set from activeSetIds when ownership toggled OFF', () => {
+test('toggleOwnedSet removes set from activeSetIds when ownership toggled OFF', () => {
+
   let state = createDefaultState();
   state = toggleOwnedSet(state, 'core-set');
   state = setActiveSetIds(state, ['core-set']);
@@ -105,7 +111,8 @@ test('Epic 46.1 toggleOwnedSet removes set from activeSetIds when ownership togg
   assert.ok(!state.collection.activeSetIds.includes('core-set'));
 });
 
-test('Epic 46.1 toggleOwnedSet does not affect activeSetIds when toggling ON', () => {
+test('toggleOwnedSet does not affect activeSetIds when toggling ON', () => {
+
   let state = createDefaultState(); // activeSetIds: null (no filter)
   state = toggleOwnedSet(state, 'core-set');
 
@@ -114,7 +121,8 @@ test('Epic 46.1 toggleOwnedSet does not affect activeSetIds when toggling ON', (
 
 // ── Story 46.2 ───────────────────────────────────────────────────────────────
 
-test('Epic 46.2 validateSetupLegality uses activeSetIds pool when non-empty', () => {
+test('validateSetupLegality uses activeSetIds pool when non-empty', () => {
+
   const { runtime } = bundle;
   let state = createDefaultState();
   state.collection.ownedSetIds = ['core-set', 'dark-city'];
@@ -127,7 +135,8 @@ test('Epic 46.2 validateSetupLegality uses activeSetIds pool when non-empty', ()
   assert.ok(!setIds.includes('dark-city'), 'dark-city should NOT be in pools when filtered out');
 });
 
-test('Epic 46.2 validateSetupLegality uses ownedSetIds pool when activeSetIds is null (no filter)', () => {
+test('validateSetupLegality uses ownedSetIds pool when activeSetIds is null (no filter)', () => {
+
   const { runtime } = bundle;
   let state = createDefaultState();
   state.collection.ownedSetIds = ['core-set', 'dark-city'];
@@ -140,7 +149,8 @@ test('Epic 46.2 validateSetupLegality uses ownedSetIds pool when activeSetIds is
   assert.ok(setIds.includes('dark-city'), 'dark-city should be in pools when no filter active');
 });
 
-test('Epic 46.2 generateSetup with activeSetIds filter runs without error', () => {
+test('generateSetup with activeSetIds filter runs without error', () => {
+
   const { runtime } = bundle;
   // Use core-set alone — it must have enough heroes/villains/schemes for a 2-player game
   let state = createDefaultState();
@@ -167,7 +177,8 @@ test('Epic 46.2 generateSetup with activeSetIds filter runs without error', () =
   assert.ok(setup, 'generateSetup should return a setup object');
 });
 
-test('Epic 46.2 validateSetupLegality works when activeSetIds field is missing (legacy state)', () => {
+test('validateSetupLegality works when activeSetIds field is missing (legacy state)', () => {
+
   const { runtime } = bundle;
   const state = createDefaultState();
   // Simulate legacy state without activeSetIds

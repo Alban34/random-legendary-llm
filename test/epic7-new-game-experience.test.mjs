@@ -1,4 +1,4 @@
-import test, { before } from 'node:test';
+import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -39,12 +39,13 @@ function markAllUsedExcept(bucket, entities, keepIds) {
   });
 }
 
-before(async () => {
+beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
 });
 
-test('Epic 7 control helpers expose visible requirements and Advanced Solo availability correctly', () => {
+test('Control helpers expose visible requirements and Advanced Solo availability correctly', () => {
+
   assert.equal(isAdvancedSoloAvailable(1), true);
   assert.equal(isAdvancedSoloAvailable(2), false);
 
@@ -74,7 +75,8 @@ test('Epic 7 control helpers expose visible requirements and Advanced Solo avail
   assert.deepEqual(getDisplayedSetupRequirements({ playerCount: 2, advancedSolo: false, playMode: 'standard', currentSetup }), currentSetup.requirements);
 });
 
-test('Epic 7 exposes UI-facing lead, team, and forced-group details for representative setups', () => {
+test('Exposes UI-facing lead, team, and forced-group details for representative setups', () => {
+
   const state = createAllOwnedState();
   const scheme = bundle.runtime.indexes.allSchemes.find((entity) => entity.name === 'Secret Invasion of the Skrull Shapeshifters');
   const mastermind = bundle.runtime.indexes.allMasterminds.find((entity) => entity.name === 'Red Skull' && entity.setId === 'core-set');
@@ -92,7 +94,8 @@ test('Epic 7 exposes UI-facing lead, team, and forced-group details for represen
   assert.notEqual(formatHeroTeamLabel(setup.heroes[0]), '');
 });
 
-test('Epic 7 Accept & Log mutates history and usage exactly once from the current generated setup snapshot', () => {
+test('Accept & Log mutates history and usage exactly once from the current generated setup snapshot', () => {
+
   const initialState = createAllOwnedState();
   const setup = generateSetup({ runtime: bundle.runtime, state: initialState, playerCount: 3, advancedSolo: false, random: () => 0 });
   const snapshot = buildHistoryReadySetupSnapshot(setup);
