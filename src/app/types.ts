@@ -1,4 +1,5 @@
 // Epic 62 — Domain Type Declarations
+import type { MessageKey } from './locales/en.ts';
 
 // =============================================================================
 // Section 1: Game data (canonical source)
@@ -325,7 +326,7 @@ export type LocaleTools = {
   localeId: LocaleId;
   documentLang: string;
   localeLabel: string;
-  t(key: string, params?: Record<string, unknown>): string;
+  t(key: MessageKey, params?: Record<string, unknown>): string;
   formatNumber(value: number | null | undefined | '', fallback?: string): string;
   formatDate(value: string | null | undefined | false, fallback?: string): string;
   formatDateTime(value: string | null | undefined | false, fallback?: string): string;
@@ -333,7 +334,7 @@ export type LocaleTools = {
   formatPlayerLabel(count: number): string;
   formatGameCount(count: number): string;
   formatPlayCount(count: number): string;
-  formatEntityCount(count: number, singularKey: string, pluralKey?: string): string;
+  formatEntityCount(count: number, singularKey: MessageKey, pluralKey?: MessageKey): string;
   formatResultStatus(result: unknown): string;
   formatPersistedPlayMode(playerCount: number, playMode: string): string;
   formatGroupingModeLabel(modeId: string): string;

@@ -1,4 +1,5 @@
 import { EN_MESSAGES } from './locales/en.ts';
+import type { MessageKey } from './locales/en.ts';
 import { FR_MESSAGES } from './locales/fr.ts';
 import { DE_MESSAGES } from './locales/de.ts';
 import { JA_MESSAGES } from './locales/ja.ts';
@@ -79,10 +80,10 @@ export function createLocaleTools(localeId: LocaleId): LocaleTools {
   const dateTimeFormatter = new Intl.DateTimeFormat(normalizedLocaleId, { dateStyle: 'medium', timeStyle: 'short' });
   const listFormatter = new Intl.ListFormat(normalizedLocaleId, { style: 'long', type: 'conjunction' });
 
-  const t = (key: string, params: Record<string, unknown> = {}): string => interpolate(messages[key] ?? EN_MESSAGES[key] ?? key, params);
+  const t = (key: MessageKey, params: Record<string, unknown> = {}): string => interpolate(messages[key] ?? EN_MESSAGES[key] ?? key, params);
 
-  const getOutcomeLabel = (outcomeId: string): string => t(`common.outcome.${outcomeId}`);
-  const getHistoryGroupingLabel = (modeId: string): string => t(`history.group.${modeId}`);
+  const getOutcomeLabel = (outcomeId: string): string => t(`common.outcome.${outcomeId}` as MessageKey);
+  const getHistoryGroupingLabel = (modeId: string): string => t(`history.group.${modeId}` as MessageKey);
 
   const getPlayModeLabel = (playMode: string, playerCount = 1): string => {
     if (playMode === 'advanced-solo') return t('common.playMode.advanced-solo');
@@ -129,33 +130,33 @@ export function createLocaleTools(localeId: LocaleId): LocaleTools {
         playWord: count === 1 ? t('common.play') : t('common.plays')
       });
     },
-    formatEntityCount(count: number, singularKey: string, pluralKey = singularKey) {
+    formatEntityCount(count: number, singularKey: MessageKey, pluralKey: MessageKey = singularKey) {
       const noun = count === 1 ? t(singularKey) : t(pluralKey);
       return `${numberFormatter.format(count)} ${noun}`;
     },
     getTabLabel(tabId: string) {
-      return t(`tabs.${tabId}.label`);
+      return t(`tabs.${tabId}.label` as MessageKey);
     },
     getTabShortLabel(tabId: string) {
-      return t(`tabs.${tabId}.shortLabel`);
+      return t(`tabs.${tabId}.shortLabel` as MessageKey);
     },
     getTabDescription(tabId: string) {
-      return t(`tabs.${tabId}.description`);
+      return t(`tabs.${tabId}.description` as MessageKey);
     },
     getThemeLabel(themeId: string) {
-      return t(`theme.${themeId}.label`);
+      return t(`theme.${themeId}.label` as MessageKey);
     },
     getThemeDescription(themeId: string) {
-      return t(`theme.${themeId}.description`);
+      return t(`theme.${themeId}.description` as MessageKey);
     },
     getHistoryGroupingLabel(modeId: string) {
-      return t(`history.group.${modeId}`);
+      return t(`history.group.${modeId}` as MessageKey);
     },
     getUsageLabel(category: string) {
-      return t(`common.${category}`);
+      return t(`common.${category}` as MessageKey);
     },
     getOutcomeLabel(outcomeId: string) {
-      return t(`common.outcome.${outcomeId}`);
+      return t(`common.outcome.${outcomeId}` as MessageKey);
     },
     formatResultStatus(result: unknown) {
       const r = result as { status?: string; outcome?: string; score?: unknown } | null | undefined;
@@ -207,19 +208,19 @@ export function createLocaleTools(localeId: LocaleId): LocaleTools {
       });
     },
     getBrowseTypeLabel(type: string) {
-      return t(`browse.typeLabel.${type}`);
+      return t(`browse.typeLabel.${type}` as MessageKey);
     },
     getBrowseTypeFilterLabel(type: string) {
-      return t(`browse.type.${type}`);
+      return t(`browse.type.${type}` as MessageKey);
     },
     getBrowseSortLabel(sortKey: string) {
-      return t(`browse.sort.${sortKey}`);
+      return t(`browse.sort.${sortKey}` as MessageKey);
     },
     getCollectionGroupLabel(type: string) {
-      return t(`collection.group.${type}`);
+      return t(`collection.group.${type}` as MessageKey);
     },
     getToastVariantLabel(variant: string) {
-      return t(`toast.variant.${variant}`);
+      return t(`toast.variant.${variant}` as MessageKey);
     },
     localizeNotice(notice: string) {
       if (notice === 'Recovered invalid preference values during state hydration.') {

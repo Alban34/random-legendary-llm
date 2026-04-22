@@ -460,3 +460,5 @@ export const EN_MESSAGES: Record<string, string> = {
   'newGame.soloRules.standardV2.alwaysLeads': 'Ignore the Mastermind\'s "Always Leads" ability.'
 };
 
+export type MessageKey = keyof typeof EN_MESSAGES;
+
