@@ -1,5 +1,8 @@
-<script>
-  import { BROWSE_TYPE_OPTIONS, BROWSE_SORT_OPTIONS, filterBrowseSets, summarizeBrowseSet } from '../app/browse-utils.mjs';
+<script lang="ts">
+  import { BROWSE_TYPE_OPTIONS, BROWSE_SORT_OPTIONS, filterBrowseSets, summarizeBrowseSet } from '../app/browse-utils.ts';
+  import { getBrowseSortKey, setBrowseSortKey } from '../app/browse-vm.svelte.ts';
+  import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
+  import type { AppState, LocaleTools, AppPersistenceState, GeneratedSetup, GameSet, MastermindCard, MastermindRuntime, HeroRuntime } from '../app/types.ts';
 
   let {
     bundle,
@@ -21,32 +24,51 @@
     onJumpTab,
     onToggleAboutPanel,
     onStartOnboarding
+  }: {
+    bundle: Epic1Bundle;
+    appState: AppState;
+    locale: LocaleTools;
+    persistence: AppPersistenceState;
+    browseSearchTerm: string;
+    browseTypeFilter: string;
+    expandedBrowseSetId: string | null;
+    compactViewport: boolean;
+    aboutPanelOpen: boolean;
+    onboardingVisible: boolean;
+    currentSetup: GeneratedSetup | null;
+    selectedTab: string;
+    onToggleOwnedSet: (id: string) => void;
+    onSetSearchTerm: (term: string) => void;
+    onSetTypeFilter: (filter: string) => void;
+    onToggleSetExpanded: (id: string) => void;
+    onJumpTab: (tabId: string) => void;
+    onToggleAboutPanel: () => void;
+    onStartOnboarding: () => void;
   } = $props();
 
-  let firstRun = $derived(onboardingVisible || !appState.preferences.onboardingCompleted);
-  let browseSortKey = $state('name');
-  let ownedSetIds = $derived(new Set(appState.collection.ownedSetIds));
-  let browseSets = $derived(
+  let firstRun: boolean = $derived(onboardingVisible || !appState.preferences.onboardingCompleted);
+  let ownedSetIds: Set<string> = $derived(new Set(appState.collection.ownedSetIds));
+  let browseSets: GameSet[] = $derived(
     filterBrowseSets(bundle.runtime.sets, {
       searchTerm: browseSearchTerm,
       typeFilter: browseTypeFilter,
-      sortKey: browseSortKey,
+      sortKey: getBrowseSortKey(),
       ownedSetIds
     })
   );
 
-  function formatBrowseMastermind(mastermind) {
-    if (!mastermind.lead) return mastermind.name;
+  function formatBrowseMastermind(mastermind: MastermindCard | MastermindRuntime): string {
+    if (!('lead' in mastermind) || !mastermind.lead) return mastermind.name;
     const indexes = bundle.runtime.indexes;
-    const leadEntity = mastermind.lead.category === 'villains'
-      ? indexes.villainGroupsById[mastermind.lead.id]
-      : indexes.henchmanGroupsById[mastermind.lead.id];
-    return `${mastermind.name} → ${leadEntity?.name || mastermind.lead.id}`;
+    const leadEntity = (mastermind as MastermindRuntime).lead!.category === 'villains'
+      ? indexes.villainGroupsById[(mastermind as MastermindRuntime).lead!.id]
+      : indexes.henchmanGroupsById[(mastermind as MastermindRuntime).lead!.id];
+    return `${mastermind.name} → ${leadEntity?.name || (mastermind as MastermindRuntime).lead!.id}`;
   }
 
   const KNOWN_DUPLICATE_ENTITY_NAMES = ['Black Widow', 'Loki', 'Thor', 'Nova', 'Venom'];
 
-  function formatDuplicateEntries() {
+  function formatDuplicateEntries(): Array<{ name: string; all: Array<HeroRuntime | MastermindRuntime> }> {
     return KNOWN_DUPLICATE_ENTITY_NAMES
       .map((name) => {
         const heroes = bundle.runtime.indexes.allHeroes.filter((entity) => entity.name === name);
@@ -154,7 +176,7 @@
           type="search"
           placeholder={locale.t('browse.searchPlaceholder')}
           value={browseSearchTerm}
-          oninput={(e) => onSetSearchTerm(e.target.value)}
+          oninput={(e) => onSetSearchTerm((e.target as HTMLInputElement).value)}
         />
       </label>
       <div class="stack gap-sm">
@@ -178,11 +200,11 @@
           {#each BROWSE_SORT_OPTIONS as option (option.id)}
             <button
               type="button"
-              class={"button " + (browseSortKey === option.id ? 'button-primary' : 'button-secondary') + " browse-sort-button"}
+              class={"button " + (getBrowseSortKey() === option.id ? 'button-primary' : 'button-secondary') + " browse-sort-button"}
               data-action="set-browse-sort-key"
               data-sort-key={option.id}
-              aria-pressed={browseSortKey === option.id}
-              onclick={() => browseSortKey = option.id}
+              aria-pressed={getBrowseSortKey() === option.id}
+              onclick={() => setBrowseSortKey(option.id as import('../app/browse-vm.svelte.ts').BrowseSortKey)}
             >{locale.getBrowseSortLabel(option.id)}</button>
           {/each}
         </div>

@@ -17,10 +17,10 @@ let focusUtilsSource;
 before(async () => {
   const [css, renderer, appSvelte, historyTab, focusUtils] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryTab.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'focus-utils.mjs'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'app', 'focus-utils.ts'), 'utf8')
   ]);
 
   shellCss = css;
@@ -49,7 +49,7 @@ test('Design system rollout adds reduced-motion and focus-restoration guardrails
   assert.match(shellCss, /\.collection-row:focus-within,[\s\S]*\.history-item:focus-within,[\s\S]*\.history-group:focus-within/);
   assert.match(historyTabSource, /role="alert"[\s\S]*data-result-form-error/);
 
-  assert.match(focusUtilsSource, /function focusSelector\(selector\)/);
+  assert.match(focusUtilsSource, /function focusSelector\(selector/);
   assert.match(appSvelteSource, /focusSelector\(`\[data-action="set-theme"\]\[data-theme-id="\$\{normalizedThemeId\}"\]`\);/);
   assert.match(appSvelteSource, /focusSelector\('#header-locale-select'\);/);
   assert.match(appSvelteSource, /focusSelector[\s\S]*?\[data-action="select-tab"\]\[data-tab-id="\$\{normalizeSelectedTab\(tabId\)\}"\]\[aria-selected="true"\]/);

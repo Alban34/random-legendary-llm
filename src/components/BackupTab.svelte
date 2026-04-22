@@ -1,5 +1,18 @@
-<script>
-  import { summarizeUsageIndicators } from '../app/history-utils.mjs';
+<script lang="ts">
+  import { summarizeUsageIndicators } from '../app/history-utils.ts';
+  import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
+  import type { AppState, LocaleTools, StagedBackup } from '../app/types.ts';
+
+  type BackupActions = {
+    exportBackup: () => void;
+    openImportBackup: () => void;
+    importBackupFile: (file: File) => void;
+    cancelBackupPreview: () => void;
+    requestMergeBackup: () => void;
+    requestReplaceBackup: () => void;
+    resetUsageCategory: (category: string) => void;
+    requestResetAllState: () => void;
+  };
 
   let {
     bundle,
@@ -9,14 +22,22 @@
     backupImportError,
     stagedBackup,
     backupActions
+  }: {
+    bundle: Epic1Bundle;
+    appState: AppState;
+    locale: LocaleTools;
+    compactViewport: boolean;
+    backupImportError: string | null;
+    stagedBackup: StagedBackup | null;
+    backupActions: BackupActions;
   } = $props();
 
-  let indicators = $derived(summarizeUsageIndicators(bundle.runtime, appState));
+  let indicators: ReturnType<typeof summarizeUsageIndicators> = $derived(summarizeUsageIndicators(bundle.runtime as unknown as Parameters<typeof summarizeUsageIndicators>[0], appState));
 
-  function handleFileChange(e) {
-    const [file] = [...(e.target.files || [])];
+  function handleFileChange(e: Event): void {
+    const [file] = [...((e.target as HTMLInputElement).files || [])];
     if (file) backupActions.importBackupFile(file);
-    e.target.value = '';
+    (e.target as HTMLInputElement).value = '';
   }
 </script>
 

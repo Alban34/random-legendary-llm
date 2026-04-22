@@ -9,8 +9,8 @@ import {
   createEpic1Bundle,
   normalizeGameData,
   validateNormalizedData
-} from '../src/app/game-data-pipeline.mjs';
-import { deepClone } from '../src/app/object-utils.mjs';
+} from '../src/app/game-data-pipeline.ts';
+import { deepClone } from '../src/app/object-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -14,9 +14,9 @@ let rendererSource;
 
 before(async () => {
   [browseUtilsSource, gameDataSource, rendererSource] = await Promise.all([
-    fs.readFile(path.join(rootDir, 'src', 'app', 'browse-utils.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'browse-utils.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'data', 'canonical-game-data.json'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8')
   ]);
 });
 

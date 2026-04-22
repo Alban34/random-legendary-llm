@@ -19,8 +19,8 @@ before(async () => {
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'vite.config.js'), 'utf8'),
     Promise.all([
-      fs.readFile(path.join(rootDir, 'src', 'app', 'locales', 'en.mjs'), 'utf8'),
-      fs.readFile(path.join(rootDir, 'src', 'app', 'locales', 'fr.mjs'), 'utf8')
+      fs.readFile(path.join(rootDir, 'src', 'app', 'locales', 'en.ts'), 'utf8'),
+      fs.readFile(path.join(rootDir, 'src', 'app', 'locales', 'fr.ts'), 'utf8')
     ]).then(([en, fr]) => en + '\n' + fr),
     fs.readFile(path.join(rootDir, 'src', 'components', 'BackupTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'package.json'), 'utf8').then(JSON.parse),

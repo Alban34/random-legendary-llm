@@ -4,10 +4,10 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
-import { parseMyludoFile, matchMyludoNamesToSets } from '../src/app/myludo-import-utils.mjs';
-import { mergeOwnedSets } from '../src/app/collection-utils.mjs';
-import { createDefaultState } from '../src/app/state-store.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
+import { parseMyludoFile, matchMyludoNamesToSets } from '../src/app/myludo-import-utils.ts';
+import { mergeOwnedSets } from '../src/app/collection-utils.ts';
+import { createDefaultState } from '../src/app/state-store.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

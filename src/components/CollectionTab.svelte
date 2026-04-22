@@ -1,8 +1,10 @@
-<script>
-  import { getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from '../app/collection-utils.mjs';
-  import { summarizeBrowseSet } from '../app/browse-utils.mjs';
+<script lang="ts">
+  import { getCollectionFeasibility, groupSetsByType, summarizeOwnedCollection } from '../app/collection-utils.ts';
+  import { summarizeBrowseSet } from '../app/browse-utils.ts';
   import CardBrowserByCategory from './CardBrowserByCategory.svelte';
   import CardBrowserByExpansion from './CardBrowserByExpansion.svelte';
+  import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
+  import type { AppState, LocaleTools, AppPersistenceState, MyludoMatchResult, BggMatchResult } from '../app/types.ts';
 
   let {
     bundle,
@@ -17,11 +19,31 @@
     bggImportStatus = 'idle',
     bggImportError = '',
     bggImportSummary = null
+  }: {
+    bundle: Epic1Bundle;
+    appState: AppState;
+    locale: LocaleTools;
+    persistence: AppPersistenceState;
+    lastActionNotice: string | null;
+    collectionActions: {
+      toggleOwnedSet: (id: string) => void;
+      requestResetOwnedCollection: () => void;
+      importMyludoFile: (file: File) => void;
+      dismissMyludoSummary: () => void;
+      importBggCollection: (username: string) => void;
+      dismissBggSummary: () => void;
+    };
+    myludoImportStatus?: string;
+    myludoImportError?: string;
+    myludoImportSummary?: MyludoMatchResult | null;
+    bggImportStatus?: string;
+    bggImportError?: string;
+    bggImportSummary?: BggMatchResult | null;
   } = $props();
 
-  let bggUsername = $state('');
-  let collectionView = $state('sets');
-  let cardBrowserGrouping = $state('category');
+  let bggUsername = $state<string>('');
+  let collectionView = $state<string>('sets');
+  let cardBrowserGrouping = $state<string>('category');
 
   // Feature flags — set to true when each import panel is ready for release
   const FEATURE_BGG_IMPORT = false;
@@ -30,7 +52,7 @@
   let totals = $derived(summarizeOwnedCollection(bundle.runtime, appState.collection.ownedSetIds));
   let feasibility = $derived(getCollectionFeasibility(bundle.runtime, appState));
   let groupedSets = $derived(groupSetsByType(bundle.runtime.sets));
-  let ownedSetSet = $derived(new Set(appState.collection.ownedSetIds));
+  let ownedSetSet = $derived(new Set<string>(appState.collection.ownedSetIds));
   let persistenceNotices = $derived([...persistence.hydrateNotices, ...persistence.updateNotices]);
 </script>
 
@@ -231,10 +253,10 @@
           accept=".csv,.json,.txt,text/csv,application/json,text/plain"
           disabled={myludoImportStatus === 'parsing'}
           onchange={(event) => {
-            const file = event.target.files?.[0];
+            const file = (event.target as HTMLInputElement).files?.[0];
             if (file) {
               collectionActions.importMyludoFile(file);
-              event.target.value = '';
+              (event.target as HTMLInputElement).value = '';
             }
           }}
         />

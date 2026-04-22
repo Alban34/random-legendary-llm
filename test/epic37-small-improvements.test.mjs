@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { EN_MESSAGES } from '../src/app/locales/en.mjs';
-import { FR_MESSAGES } from '../src/app/locales/fr.mjs';
-import { DE_MESSAGES } from '../src/app/locales/de.mjs';
-import { JA_MESSAGES } from '../src/app/locales/ja.mjs';
-import { KO_MESSAGES } from '../src/app/locales/ko.mjs';
-import { ES_MESSAGES } from '../src/app/locales/es.mjs';
+import { EN_MESSAGES } from '../src/app/locales/en.ts';
+import { FR_MESSAGES } from '../src/app/locales/fr.ts';
+import { DE_MESSAGES } from '../src/app/locales/de.ts';
+import { JA_MESSAGES } from '../src/app/locales/ja.ts';
+import { KO_MESSAGES } from '../src/app/locales/ko.ts';
+import { ES_MESSAGES } from '../src/app/locales/es.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,8 +38,8 @@ test('Story 37.3: test:qc:epic10 Playwright script is still present', () => {
 
 // ── Story 37.4 — Version bumped to 1.0.2 ──────────────────────────────────
 
-test('Story 37.4: package.json version is 1.0.4', () => {
-  assert.equal(pkgJson.version, '1.0.4', 'package.json version must be 1.0.4');
+test('Story 37.4: package.json version is 2.0.0', () => {
+  assert.equal(pkgJson.version, '2.0.0', 'package.json version must be 2.0.0');
 });
 
 // ── Story 37.1 — Locale coverage ──────────────────────────────────────────

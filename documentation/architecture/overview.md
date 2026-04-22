@@ -18,34 +18,35 @@ It explains how the application should use a project-owned canonical data format
 The current release keeps the architecture described below and implements it with these primary runtime entry points:
 
 - `index.html` — app mount point containing `<div id="app"></div>`, the Vite entry script, and PWA head tags (manifest link, `theme-color` meta, iOS Safari `apple-mobile-web-app` meta/link tags) added in Epic 40
-- `src/app/backup-utils.mjs` — versioned backup serialization, parsing, validation, and merge helpers
-- `src/app/collection-utils.mjs` — shared collection helpers including `mergeOwnedSets(state, newSetIds)` (sorted, deduplicated union of owned set IDs); shared by MyLudo import (Epic 45) and BGG import (Epic 42); also exports `CARD_CATEGORIES` (ordered constant listing the five card-category identifiers and their locale label keys in canonical order: Heroes, Masterminds, Villain Groups, Henchman Groups, Schemes), `getCardsByCategory(ownedPools)` (returns all cards from the owned-expansion pool grouped into five category buckets, each sorted A–Z by card name, with empty categories included for render-time filtering), and `getCardsByExpansion(ownedPools)` (returns one bucket per owned expansion sorted A–Z by expansion name, aggregating all five categories per expansion with cards sorted A–Z by name); these three exports drive the Collection tab card-browser feature (Epic 44)
-- `src/app/localization-utils.mjs` — locale metadata, translation lookup, and locale-aware formatting helpers; message catalogs are imported from per-locale files under `src/app/locales/` (Epic 41)
-- `src/app/myludo-import-utils.mjs` — MyLudo collection import utilities: `parseMyludoFile(file)` (client-side CSV parsing) and `matchMyludoNamesToSets(names, sets)` (case-insensitive alias-aware catalog matching)
-- `src/app/bgg-import-utils.mjs` — BGG collection import utilities: `fetchBggCollection(username, options)` (fetches and parses the BGG XML API v2 collection endpoint with `own=1`, handling 202 queued responses with configurable retries and network errors) and `matchBggNamesToSets(bggGameNames, sets)` (case-insensitive alias-aware catalog matching, returns matched set IDs with display names and a list of unresolved BGG titles); added in Epic 42
-- `src/app/theme-utils.mjs` — supported theme metadata and theme-ID normalization helpers
-- `src/app/browser-entry.mjs` — mounts the root `App.svelte` component via Svelte 5 `mount()` and registers the Service Worker via `navigator.serviceWorker.register()` (Epic 40)
-- `src/app/game-data-pipeline.mjs` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
-- `src/app/state-store.mjs` — owns the versioned root state persisted under `legendary_state_v1`; also exports `setActiveSetIds(state, ids)` (sets `collection.activeSetIds` to `ids`, or `null` when `ids` is null), `clearActiveSetIds(state)` (sets `collection.activeSetIds` to `null`, restoring the all-owned fallback), and `deactivateAllSets(state)` (sets `collection.activeSetIds` to `[]`, the "Clear selection" / all-unchecked state that produces an infeasible pool and disables generation); these three actions were added in Epic 46
-- `src/app/state-store.svelte.js` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
-- `src/app/object-utils.mjs` — shared object utilities; exports `deepClone` (thin wrapper over `structuredClone`) and `isPlainObject`; extracted from `state-store.mjs`, `backup-utils.mjs`, and `setup-generator.mjs` to eliminate duplication
-- `src/app/history-utils.mjs` — history record formatting and filtering utilities; `formatHistorySummary` resolves entity display names, expansion set names, and grouping keys from runtime indexes for each history record; `filterHistoryByOutcome(records, filter)` filters a history array to the requested outcome (`'all'`, `'win'`, `'loss'`, `'pending'`) without mutating the input
-- `src/app/setup-rules.mjs` and `src/app/setup-generator.mjs` — resolve templates and produce legal setups
-- `src/app/solo-rules.mjs` — solo mode rules reference data; exports `SOLO_RULES_PANEL_MODES` (a `Set` of the three eligible solo mode keys: `standard`, `advanced-solo`, `standard-solo-v2`) and `getSoloRulesItems(playMode)` (returns an ordered array of `newGame.soloRules.*` locale string keys for the eligible modes, or `null` for ineligible modes including `two-handed-solo` and all multiplayer modes); added in Epic 57
-- `src/app/app-renderer.mjs` — transitional render functions used via `{@html}` blocks in Svelte tab components
-- `src/app/browse-vm.svelte.js` — browse tab view-model; owns browse-specific reactive state
-- `src/app/new-game-vm.svelte.js` — new-game tab view-model; owns new-game-specific reactive state
-- `src/app/history-vm.svelte.js` — history tab view-model; owns history-specific reactive state
-- `src/app/backup-vm.svelte.js` — backup tab view-model; owns backup-specific reactive state
-- `src/app/import-vm.svelte.js` — import view-model; owns BGG and MyLudo import reactive state (`$state`); extracted from `App.svelte`
-- `src/app/focus-utils.mjs` — focus-management helpers; exports `focusActionButton`, `focusSelector`, and `focusModalCancelButton`; extracted from `App.svelte`
+- `src/app/types.ts` — single authoritative TypeScript type file (Epic 62); exports all domain type declarations: game data shapes (`GameSet`, `HeroCard`, etc.), runtime index types (`HeroRuntime`, `RuntimeIndexes`, etc.), application state types (`AppState`, `PlayMode`, `ThemeId`, `LocaleId`, `Preferences`, `HistoryRecord`, `GameResult`, etc.), setup output types (`SetupRequirements`, `GeneratedSetup`), and import utility return types (`BggMatchResult`, `MyludoMatchResult`); migrated modules in Epics 63–67 import shared types from this file rather than re-declaring them locally
+- `src/app/backup-utils.ts` — versioned backup serialization, parsing, validation, and merge helpers
+- `src/app/collection-utils.ts` — shared collection helpers including `mergeOwnedSets(state, newSetIds)` (sorted, deduplicated union of owned set IDs); shared by MyLudo import (Epic 45) and BGG import (Epic 42); also exports `CARD_CATEGORIES` (ordered constant listing the five card-category identifiers and their locale label keys in canonical order: Heroes, Masterminds, Villain Groups, Henchman Groups, Schemes), `getCardsByCategory(ownedPools)` (returns all cards from the owned-expansion pool grouped into five category buckets, each sorted A–Z by card name, with empty categories included for render-time filtering), and `getCardsByExpansion(ownedPools)` (returns one bucket per owned expansion sorted A–Z by expansion name, aggregating all five categories per expansion with cards sorted A–Z by name); these three exports drive the Collection tab card-browser feature (Epic 44)
+- `src/app/localization-utils.ts` — locale metadata, translation lookup, and locale-aware formatting helpers; message catalogs are imported from per-locale files under `src/app/locales/` (Epic 41)
+- `src/app/myludo-import-utils.ts` — MyLudo collection import utilities: `parseMyludoFile(file)` (client-side CSV parsing) and `matchMyludoNamesToSets(names, sets)` (case-insensitive alias-aware catalog matching)
+- `src/app/bgg-import-utils.ts` — BGG collection import utilities: `fetchBggCollection(username, options)` (fetches and parses the BGG XML API v2 collection endpoint with `own=1`, handling 202 queued responses with configurable retries and network errors) and `matchBggNamesToSets(bggGameNames, sets)` (case-insensitive alias-aware catalog matching, returns matched set IDs with display names and a list of unresolved BGG titles); added in Epic 42
+- `src/app/theme-utils.ts` — supported theme metadata and theme-ID normalization helpers
+- `src/app/browser-entry.ts` — mounts the root `App.svelte` component via Svelte 5 `mount()` and registers the Service Worker via `navigator.serviceWorker.register()` (Epic 40)
+- `src/app/game-data-pipeline.ts` — builds the Epic 1 bundle through `createEpic1Bundle(seed)`
+- `src/app/state-store.ts` — owns the versioned root state persisted under `legendary_state_v1`; also exports `setActiveSetIds(state, ids)` (sets `collection.activeSetIds` to `ids`, or `null` when `ids` is null), `clearActiveSetIds(state)` (sets `collection.activeSetIds` to `null`, restoring the all-owned fallback), and `deactivateAllSets(state)` (sets `collection.activeSetIds` to `[]`, the "Clear selection" / all-unchecked state that produces an infeasible pool and disables generation); these three actions were added in Epic 46
+- `src/app/state-store.svelte.ts` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
+- `src/app/object-utils.ts` — shared object utilities; exports `deepClone` (thin wrapper over `structuredClone`) and `isPlainObject`; extracted from `state-store.ts`, `backup-utils.ts`, and `setup-generator.ts` to eliminate duplication
+- `src/app/history-utils.ts` — history record formatting and filtering utilities; `formatHistorySummary` resolves entity display names, expansion set names, and grouping keys from runtime indexes for each history record; `filterHistoryByOutcome(records, filter)` filters a history array to the requested outcome (`'all'`, `'win'`, `'loss'`, `'pending'`) without mutating the input
+- `src/app/setup-rules.ts` and `src/app/setup-generator.ts` — resolve templates and produce legal setups
+- `src/app/solo-rules.ts` — solo mode rules reference data; exports `SOLO_RULES_PANEL_MODES` (a `Set` of the three eligible solo mode keys: `standard`, `advanced-solo`, `standard-solo-v2`) and `getSoloRulesItems(playMode)` (returns an ordered array of `newGame.soloRules.*` locale string keys for the eligible modes, or `null` for ineligible modes including `two-handed-solo` and all multiplayer modes); added in Epic 57
+- `src/app/app-renderer.ts` — transitional render functions used via `{@html}` blocks in Svelte tab components
+- `src/app/browse-vm.svelte.ts` — browse tab view-model; owns browse-specific reactive state
+- `src/app/new-game-vm.svelte.ts` — new-game tab view-model; owns new-game-specific reactive state
+- `src/app/history-vm.svelte.ts` — history tab view-model; owns history-specific reactive state
+- `src/app/backup-vm.svelte.ts` — backup tab view-model; owns backup-specific reactive state
+- `src/app/import-vm.svelte.ts` — import view-model; owns BGG and MyLudo import reactive state (`$state`); extracted from `App.svelte`
+- `src/app/focus-utils.ts` — focus-management helpers; exports `focusActionButton`, `focusSelector`, and `focusModalCancelButton`; extracted from `App.svelte`
 - `src/components/App.svelte` — root Svelte 5 component; orchestrates routing and persistence; tab-specific state is delegated to per-tab view-model modules
 - `src/components/TabNav.svelte` — Svelte 5 tab navigation component
 - `src/components/ToastStack.svelte` — Svelte 5 toast stack component
 - `src/components/BrowseTab.svelte`, `CollectionTab.svelte`, `NewGameTab.svelte`, `HistoryTab.svelte`, `BackupTab.svelte` — Svelte 5 feature-tab components; each owns its tab's reactive template logic, derived state, and full UI markup
 - `src/components/CardBrowserByCategory.svelte` — renders the card-browser "by category" view inside `CollectionTab`; accepts `pools` (owned-expansion pools object) and `locale` props; calls `getCardsByCategory` and renders one `<section>` per non-empty category with an `<h3>` heading and alphabetically sorted card list; shows an empty-collection message when no sets are owned (Epic 44)
 - `src/components/CardBrowserByExpansion.svelte` — renders the card-browser "by expansion" view inside `CollectionTab`; accepts `pools` and `locale` props; calls `getCardsByExpansion` and renders one `<section>` per owned expansion sorted A–Z by expansion name, with all cards from that expansion listed A–Z; shows the same empty-collection message when no sets are owned (Epic 44)
-- `src/app/locales/en.mjs`, `fr.mjs`, `de.mjs`, `ja.mjs`, `ko.mjs`, `es.mjs` — per-locale message catalog files; each exports its respective `*_MESSAGES` object; imported by `localization-utils.mjs` (Epic 41)
+- `src/app/locales/en.ts`, `fr.ts`, `de.ts`, `ja.ts`, `ko.ts`, `es.ts` — per-locale message catalog files; each exports its respective `*_MESSAGES` object; imported by `localization-utils.ts` (Epic 41)
 - `public/manifest.webmanifest` — Web App Manifest declaring app identity, display mode, theme colour, and icon references; served at the GitHub Pages base path (Epic 40)
 - `public/sw.js` — cache-first Service Worker template; `%%SW_CACHE_VERSION%%` and `%%SW_PRECACHE_URLS%%` placeholders are injected by the `swInjectPlugin` Vite plugin during `npm run build` (Epic 40)
 - `public/icons/icon-192.png`, `icon-512.png`, `icon-512-maskable.png` — app icon assets referenced by the Web App Manifest and iOS Safari Add to Home Screen (Epic 40)
@@ -79,10 +80,10 @@ Recommended conceptual layers:
 
 Recommended physical split:
 - `index.html` — app mount point
-- `src/app/*.mjs` — runtime modules
-- `src/app/*.svelte.js` — Svelte 5 reactive module wrappers
+- `src/app/*.ts` — runtime modules
+- `src/app/*.svelte.ts` — Svelte 5 reactive module wrappers
 - `src/app/*.css` — styles
-- `src/components/*.svelte` — Svelte 5 UI components
+- `src/components/*.svelte` — Svelte 5 UI components (all with `<script lang="ts">`)
 - `src/data/*` — project-owned static data assets
 
 Even though these now live in separate files, they should remain logically separate as layers.
@@ -296,8 +297,8 @@ Current shape:
 Within the current static modular app, Epic 2 should keep persistence concerns separate from data normalization and rendering.
 
 Current module responsibilities:
-- `src/app/game-data-pipeline.mjs` — canonical data transformation, normalization, and runtime indexes only
-- `src/app/browser-entry.mjs` — mounts `App.svelte` via Svelte 5 `mount()` and registers the Service Worker (Epic 40); no longer owns ephemeral UI state or rendering
+- `src/app/game-data-pipeline.ts` — canonical data transformation, normalization, and runtime indexes only
+- `src/app/browser-entry.ts` — mounts `App.svelte` via Svelte 5 `mount()` and registers the Service Worker (Epic 40); no longer owns ephemeral UI state or rendering
 - `src/components/App.svelte` — root Svelte 5 component; owns viewModel `$state` and wires state into all child tab components
 - a dedicated Epic 2 state/storage module under `src/app/` — default-state creation, load/save/update helpers, reset helpers, and storage availability handling
 - renderer modules — transitional render functions consumed via `{@html}` in Svelte tab components; surface recovery or validation messages, notifications, and confirmation UI, but do not own persistence logic

@@ -4,16 +4,16 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
-import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from '../src/app/feedback-utils.mjs';
-import { generateSetup } from '../src/app/setup-generator.mjs';
-import { createDefaultState, createStorageAdapter, loadState } from '../src/app/state-store.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
+import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from '../src/app/feedback-utils.ts';
+import { generateSetup } from '../src/app/setup-generator.ts';
+import { createDefaultState, createStorageAdapter, loadState } from '../src/app/state-store.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
-const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.mjs');
+const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.ts');
 const shellCssPath = path.join(rootDir, 'src', 'app', 'app-shell.css');
 const htmlPath = path.join(rootDir, 'src', 'components', 'App.svelte');
 const tabNavPath = path.join(rootDir, 'src', 'components', 'TabNav.svelte');

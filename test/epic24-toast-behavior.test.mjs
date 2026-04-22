@@ -18,8 +18,8 @@ before(async () => {
   [browserEntry, appShellCss, feedbackUtils, appRenderer, toastStackSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'feedback-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'feedback-utils.ts'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'ToastStack.svelte'), 'utf8')
   ]);
 });

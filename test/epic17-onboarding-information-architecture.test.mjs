@@ -4,13 +4,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.mjs';
+import { createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
-const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.mjs');
-const localizationPath = path.join(rootDir, 'src', 'app', 'locales', 'en.mjs');
+const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.ts');
+const localizationPath = path.join(rootDir, 'src', 'app', 'locales', 'en.ts');
 
 let rendererSource;
 let localizationSource;

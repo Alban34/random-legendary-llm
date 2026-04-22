@@ -13,9 +13,9 @@ import {
   parseBackupPayload,
   parseBackupText,
   summarizeBackupState
-} from '../src/app/backup-utils.mjs';
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
-import { acceptGameSetup, createDefaultState, updateGameResult } from '../src/app/state-store.mjs';
+} from '../src/app/backup-utils.ts';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
+import { acceptGameSetup, createDefaultState, updateGameResult } from '../src/app/state-store.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

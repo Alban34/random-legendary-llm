@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { getSoloRulesItems, SOLO_RULES_PANEL_MODES } from '../src/app/solo-rules.mjs';
-import { EN_MESSAGES } from '../src/app/locales/en.mjs';
+import { getSoloRulesItems, SOLO_RULES_PANEL_MODES } from '../src/app/solo-rules.ts';
+import { EN_MESSAGES } from '../src/app/locales/en.ts';
 
 // ── Story 1: Content model ────────────────────────────────────────────────────
 

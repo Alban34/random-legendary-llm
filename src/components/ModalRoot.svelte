@@ -1,18 +1,20 @@
-<script>
-  let { modalConfig, locale } = $props();
+<script lang="ts">
+  import type { LocaleTools, ModalConfig } from '../app/types.ts';
 
-  function handleModalKeydown(event) {
+  let { modalConfig, locale }: { modalConfig: ModalConfig | null; locale: LocaleTools } = $props();
+
+  function handleModalKeydown(event: KeyboardEvent): void {
     const modalDialog = document.querySelector('#modal-root [role="dialog"]');
     if (!modalDialog) return;
     const focusables = [...modalDialog.querySelectorAll('button:not([disabled])')];
     if (event.key === 'Escape') {
       event.preventDefault();
-      modalDialog.querySelector('[data-modal-focus="cancel"]')?.click();
+      (modalDialog.querySelector('[data-modal-focus="cancel"]') as HTMLElement)?.click();
       return;
     }
-    if (event.key === 'Enter' && modalDialog.contains(event.target)) {
+    if (event.key === 'Enter' && modalDialog.contains(event.target as Node | null)) {
       event.preventDefault();
-      modalDialog.querySelector('[data-modal-focus="confirm"]')?.click();
+      (modalDialog.querySelector('[data-modal-focus="confirm"]') as HTMLElement)?.click();
       return;
     }
     if (event.key === 'Tab' && focusables.length) {
@@ -20,10 +22,10 @@
       const last = focusables.at(-1);
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
-        last.focus();
+        (last as HTMLElement)?.focus();
       } else if (!event.shiftKey && document.activeElement === last) {
         event.preventDefault();
-        first.focus();
+        (first as HTMLElement)?.focus();
       }
     }
   }

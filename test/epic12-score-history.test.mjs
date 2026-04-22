@@ -4,8 +4,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
-import { formatHistorySummary } from '../src/app/history-utils.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
+import { formatHistorySummary } from '../src/app/history-utils.ts';
 import {
   GAME_OUTCOME_OPTIONS,
   createCompletedGameResult,
@@ -15,7 +15,7 @@ import {
   normalizeGameResultDraft,
   sanitizeStoredGameResult,
   validateGameResultDraft
-} from '../src/app/result-utils.mjs';
+} from '../src/app/result-utils.ts';
 import {
   STORAGE_KEY,
   acceptGameSetup,
@@ -24,7 +24,7 @@ import {
   loadState,
   saveState,
   updateGameResult
-} from '../src/app/state-store.mjs';
+} from '../src/app/state-store.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

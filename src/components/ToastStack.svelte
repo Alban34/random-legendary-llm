@@ -1,5 +1,14 @@
-<script>
-  let { toasts, locale, onDismiss, onPause, onResume } = $props();
+<script lang="ts">
+  import type { LocaleTools } from '../app/types.ts';
+  import type { ToastRecord } from '../app/feedback-utils.ts';
+
+  let { toasts, locale, onDismiss, onPause, onResume }: {
+    toasts: ToastRecord[];
+    locale: LocaleTools;
+    onDismiss: (id: string, options?: { focusToastId?: string | null }) => void;
+    onPause: (id: string) => void;
+    onResume: (id: string) => void;
+  } = $props();
 </script>
 
 <div class="toast-stack" role="region" aria-label={locale.t('toast.region')}>
@@ -18,7 +27,7 @@
       onfocusin={() => { if (toast.autoDismissMs) onPause(toast.id); }}
       onfocusout={() => { if (toast.autoDismissMs) onResume(toast.id); }}
       onclick={(e) => {
-        if (toast.dismissOnClick && !e.target.closest('[data-action="dismiss-toast"]')) {
+        if (toast.dismissOnClick && !(e.target as Element)?.closest('[data-action="dismiss-toast"]')) {
           onDismiss(toast.id);
         }
       }}

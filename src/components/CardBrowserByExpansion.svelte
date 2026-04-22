@@ -1,9 +1,11 @@
-<script>
-  import { getCardsByExpansion } from '../app/collection-utils.mjs';
+<script lang="ts">
+  import { getCardsByExpansion } from '../app/collection-utils.ts';
+  import type { LocaleTools } from '../app/types.ts';
+  import type { GamePool } from '../app/setup-generator.ts';
 
-  let { pools, locale } = $props();
+  let { pools, locale }: { pools: GamePool; locale: LocaleTools } = $props();
 
-  let expansions = $derived(getCardsByExpansion(pools));
+  let expansions: ReturnType<typeof getCardsByExpansion> = $derived(getCardsByExpansion(pools));
 </script>
 
 {#if pools.sets.length === 0}

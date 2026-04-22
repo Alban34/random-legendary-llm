@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.mjs';
-import { DEFAULT_LOCALE_ID, createLocaleTools, getSelectableLocales, normalizeLocaleId } from '../src/app/localization-utils.mjs';
+import { createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.ts';
+import { DEFAULT_LOCALE_ID, createLocaleTools, getSelectableLocales, normalizeLocaleId } from '../src/app/localization-utils.ts';
 
 function createMemoryStorage(initialEntries = {}) {
   const store = new Map(Object.entries(initialEntries));

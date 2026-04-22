@@ -14,8 +14,8 @@ let collectionUtilsSource;
 before(async () => {
   [gameDataSource, browseUtilsSource, collectionUtilsSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'data', 'canonical-game-data.json'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'browse-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'collection-utils.mjs'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'app', 'browse-utils.ts'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'collection-utils.ts'), 'utf8')
   ]);
 });
 

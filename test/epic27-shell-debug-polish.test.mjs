@@ -18,10 +18,10 @@ const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 
 before(async () => {
   [rendererSource, cssSource, localeSource, generatorSource, appSvelteSource] = await Promise.all([
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.mjs'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'setup-generator.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'localization-utils.ts'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'setup-generator.ts'), 'utf8'),
     fs.readFile(appSveltePath, 'utf8')
   ]);
 });

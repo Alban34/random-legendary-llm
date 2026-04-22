@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { APP_TABS, DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from '../src/app/app-tabs.mjs';
-import { STORAGE_KEY, createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.mjs';
+import { APP_TABS, DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from '../src/app/app-tabs.ts';
+import { STORAGE_KEY, createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.ts';
 
 function createMemoryStorage(initialEntries = {}) {
   const store = new Map(Object.entries(initialEntries));

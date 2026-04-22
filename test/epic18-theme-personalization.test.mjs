@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.mjs';
-import { DEFAULT_THEME_ID, THEME_OPTIONS, getThemeDefinition, normalizeThemeId } from '../src/app/theme-utils.mjs';
+import { createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.ts';
+import { DEFAULT_THEME_ID, THEME_OPTIONS, getThemeDefinition, normalizeThemeId } from '../src/app/theme-utils.ts';
 
 function createMemoryStorage(initialEntries = {}) {
   const store = new Map(Object.entries(initialEntries));

@@ -1,4 +1,4 @@
-[2026-04-13] Epic: Epics 29–33 (Svelte 5 Migration)
+[FIXED 2026-04-14] Epic: Epics 29–33 (Svelte 5 Migration)
 File: README.md
 Finding: The root README is stale in four ways after the Svelte 5 migration:
   1. "Project state" section says "Epic 1 through Epic 20 implementation" — Epics 29–33 have been implemented but are not mentioned.
@@ -14,60 +14,65 @@ Suggested action: Update README.md to mention Epics 29–33 are implemented, rep
   4. app-renderer.mjs description updated to reflect transitional {@html} helper role.
   Additional corrections applied in the same pass: locale list expanded to all 6 shipped locales, history grouping modes updated to current shipped modes, state-store.svelte.js and App.svelte added to entry-point list.
 ---
-[2026-04-16] Epic: Epic 43 — Expansion Attribution in History
+[FIXED 2026-04-16] Epic: Epic 43 — Expansion Attribution in History
 File: src/components/HistoryTab.svelte
 Finding: The architecture/overview.md description of BrowseTab.svelte, CollectionTab.svelte, NewGameTab.svelte, HistoryTab.svelte, and BackupTab.svelte as "thin {@html} wrapper components" was stale before Epic 43 and was fixed in-scope during this audit. HistoryTab.svelte contains no {@html} blocks; it is a full Svelte 5 component with $props(), $derived(), {#each} loops, and direct template markup. The "thin {@html} wrapper" characterisation was almost certainly left over from the pre-Svelte-5-migration state and should have been corrected during the Epics 29–33 alignment pass. No action required on the source file itself.
 Suggested action: No code change required. The documentation/architecture/overview.md description has been corrected in this audit pass. Future migration alignment audits should verify tab-component descriptions whenever a tab component is substantially changed.
 ---
-[2026-04-16] Epic: Epic 41 — Translation Data Model Migration
+[FIXED 2026-04-22] Epic: Epic 41 — Translation Data Model Migration
 File: test/epic-ux6-backup-safety.test.mjs, test/epic16-notification-refinements.test.mjs, test/epic17-onboarding-information-architecture.test.mjs, test/epic36-version-storage-disclosure.test.mjs
 Finding: The Epic 41 spec (story 41.3 acceptance criteria and the epic-wide validation gate in epic-41-task-list.md) states that "no file outside localization-utils.mjs required modification" and that git diff should list only localization-utils.mjs and the six locale files. The delivered implementation summary reports that four test files were also modified ("updated to read from locale files"). The validation gate checkbox is marked [x] done despite this deviation. The root cause is likely that these tests previously imported *_MESSAGES constants inline from localization-utils.mjs and had to be updated to import from the per-locale files directly after the inline constants were removed — making the spec's "no consumer changes" claim inaccurate for test code.
-Suggested action: A human should verify whether the four test file changes were strictly necessary (i.e., whether localization-utils.mjs's public API is still fully backward-compatible and the test changes were only to obtain locale data for assertions) or whether they indicate an unintended API surface break. If the changes were unavoidable, the epic-41-task-list.md validation gate criterion and the Epic 41 spec acceptance criteria should be updated to acknowledge that test files required adjustment. No documentation edit is possible here as the affected files are outside /documentation.
+Resolution (2026-04-22): This is the intended architecture. localization-utils.mjs is a dispatcher only; tests that need locale-specific strings should import directly from the relevant locale file. Confirmed: none of the four test files import from localization-utils.mjs. The spec's "no consumer changes" claim was overly strict and does not reflect an API surface break — it reflects the correct separation of concerns.
 ---
-[2026-04-16] Epic: Epic 42 — BGG Collection Import
+[FIXED 2026-04-22] Epic: Epic 42 — BGG Collection Import
 File: documentation/planning/epic/ready-for-dev/epic-42.md, documentation/planning/epic/ready-for-dev/epic-42-task-list.md
 Finding: Epic 42 is fully implemented and QC-approved but its spec file and task list remain in the `ready-for-dev/` folder instead of `done/`. All other completed epics keep their spec and task-list files in `done/`.
 Suggested action: Move `documentation/planning/epic/ready-for-dev/epic-42.md` and `documentation/planning/epic/ready-for-dev/epic-42-task-list.md` to `documentation/planning/epic/done/`. This is a filesystem operation (`mv`) that falls outside the tech-writer's file-edit scope.
 ---
-[2026-04-16] Epic: Epic 42 — BGG Collection Import
+[FIXED 2026-04-16] Epic: Epic 42 — BGG Collection Import
 File: src/app/bgg-import-utils.mjs (implementation summary)
 Finding: The Epic 42 implementation summary provided to the tech-writer states that `src/app/bgg-import-utils.mjs` exports `mergeOwnedSets`. Source inspection shows `mergeOwnedSets` lives in `src/app/collection-utils.mjs` and `App.svelte` imports it from there; `bgg-import-utils.mjs` only exports `fetchBggCollection` and `matchBggNamesToSets`. The implementation summary was inaccurate. The architecture documentation has been updated to reflect the actual source layout; no corrective change is needed to the source files.
 Suggested action: No code change required. Future implementation summaries should be verified against actual source exports before being passed to the tech-writer to avoid misleading audit trails.
 ---
-[2026-04-16] Epic: Epic 44 — Card Browser by Category or Expansion in Collection
+[FIXED 2026-04-22] Epic: Epic 44 — Card Browser by Category or Expansion in Collection
 File: documentation/planning/epic/ready-for-dev/epic-44.md, documentation/planning/epic/ready-for-dev/epic-44-task-list.md
 Finding: Epic 44 is fully implemented and QC-approved but its spec file and task list remain in the `ready-for-dev/` folder instead of `done/`. All other completed epics keep their spec and task-list files in `done/`.
 Suggested action: Move `documentation/planning/epic/ready-for-dev/epic-44.md` and `documentation/planning/epic/ready-for-dev/epic-44-task-list.md` to `documentation/planning/epic/done/`. This is a filesystem operation (`mv`) that falls outside the tech-writer's file-edit scope.
 ---
-[2026-04-17] Epic: Clean Code Fix Pass — 17 April 2026
+[FIXED 2026-04-22] Epic: Clean Code Fix Pass — 17 April 2026
 File: test/playwright/epic40-qc.spec.mjs (lines 38, 71, 92)
 Finding: The clean-code audit (documentation/planning/clean-code-reports/clean-code-audit-2026-04-17.md, 🟡 issue 14) flagged three `test.skip` calls: two production-only environment guards and one unconditional `test.skip(true, …)`. The fix pass did not address this issue — it is not listed among the shipped changes. The unconditional skip permanently prevents the SW-control assertion from running in any environment.
 Suggested action: Replace the unconditional `test.skip(true, …)` with `test.fixme` and add a tracking comment. For the two `!isProduction` guards, consider extracting them into a separate production-only spec file to make the skip intent explicit at the file level. This requires changes to test files outside `/documentation`.
 ---
-[2026-04-17] Epic: Epic 51 — Game Catalog Data Audit & Correction
+[FIXED 2026-04-22] Epic: Epic 51 — Game Catalog Data Audit & Correction
 File: documentation/ux/reports/should-desktop-browse-entry-overload.md
 Finding: The UX audit report cites a `Visible sets 33 of 33` counter as evidence of Browse-screen clutter. After Epic 51 added 5 expansions (Midnight Sons, The Infinity Saga, Weapon X, 2099, Ant-Man and the Wasp), the live counter will display `38 of 38` (or filtered equivalent). The report is a historical audit record documenting what was observed at review time; the `33 of 33` figure was accurate then and should not be retroactively changed. However, future UX reviewers reading the report may be confused by the stale count.
 Suggested action: A UX team member should append a note to the report (e.g., "Note: Catalog has grown to 38 sets as of Epic 51; the `Visible sets` count will reflect the current total.") to prevent confusion without altering the historical evidence.
 ---
-[2026-04-17] Epic: Epic 46 — Active Expansion Filter ("Play Set")
+[FIXED 2026-04-22] Epic: Epic 46 — Active Expansion Filter ("Play Set")
 File: documentation/planning/epic/ready-for-dev/epic-46-task-list.md
 Finding: A copy of `epic-46-task-list.md` exists in both `documentation/planning/epic/done/` and `documentation/planning/epic/ready-for-dev/`. The canonical completed copy should live only in `done/`. The `ready-for-dev/` copy is a stale duplicate.
 Suggested action: Delete `documentation/planning/epic/ready-for-dev/epic-46-task-list.md`. File deletion falls outside the tech-writer's edit scope.
 ---
-[2026-04-17] Epic: Epic 46 — Active Expansion Filter ("Play Set")
+[OBSOLETE 2026-04-17] Epic: Epic 46 — Active Expansion Filter ("Play Set")
 File: documentation/planning/epic/done/epic-46-task-list.md (Story 46.3 task 5)
 Finding: The task list states "Add a 'Clear all' affordance that calls `clearActiveSetIds()` (implementation sentinel is `null`=all-owned, so both Select all and Clear all restore the all-owned state)." The shipped implementation introduces a distinct `deactivateAllSets()` action (exported from `src/app/state-store.mjs`) that sets `activeSetIds` to `[]` (empty array, not null). "Clear all" calls `deactivateAllSets()` while "Use all expansions" calls `clearActiveSetIds()`. The two buttons have different runtime effects: `null` is the all-owned fallback (checkboxes all checked), while `[]` is the explicitly-deselected state (all unchecked, pool empty, Generate disabled). The task list note is therefore incorrect about the shipped behavior of "Clear all".
 Suggested action: The task list is a historical planning artifact in the `done/` folder and should not be retroactively edited. However, future readers should be aware the shipped behavior diverges from the task description. The corrected behavior is reflected in `documentation/architecture/setup-rules.md` and `documentation/architecture/overview.md` as of this audit pass.
 ---
-[2026-04-17] Epic: Epic 50 — PWA Installability Repair
+[FIXED 2026-04-22] Epic: Epic 50 — PWA Installability Repair
 File: documentation/planning/epic/ready-for-dev/epic-50-task-list.md (Story 50.1 task 12, Story 50.3)
 Finding: Several tasks in the Epic 50 task list reference `documentation/planning/epic/approved/epic-50.md` as the target for the diagnosis note, but the file lives at `documentation/planning/epic/ready-for-dev/epic-50.md`. The `approved/` folder exists but is empty. The diagnosis and automated validation notes were correctly appended to the `ready-for-dev/` copy, so the content is accurate; only the path cited in the task list is stale.
 Suggested action: No content change required — the notes are in the correct file. The path discrepancy in the task list is a historical planning artefact. Epic 50's spec and task list should be moved to `done/` once the manual Lighthouse validation tasks (Story 50.3) are completed.
 ---
-[2026-04-18] Epic: Epic 57 — Solo Mode Rules Reference Panel
+[FIXED 2026-04-19] Epic: Epic 57 — Solo Mode Rules Reference Panel
 File: documentation/ux/ui-design.md (Tab 3 — New Game mock diagram and interactions)
 Finding: The New Game tab mock diagram shows only three 1-player play-mode buttons: `[Standard Solo] [Advanced Solo] [Two-Handed]`. Epic 56 (dependency of Epic 57) introduced a fourth 1-player mode, `standard-solo-v2` ("Standard v2"). The diagram and the interaction bullet "1-player mode exposes Standard Solo, Advanced Solo, and Two-Handed Solo" are both missing `Standard v2`. This is a pre-existing documentation gap from Epic 56, not Epic 57.
 Suggested action: Update the Tab 3 mock diagram and the interactions bullet in `documentation/ux/ui-design.md` to add `[Standard v2]` to the play-mode button row and include "Standard v2" in the list of 1-player modes. Edit scope: within `/documentation`.
 ---
 [2026-04-19] Resolution: Epic 57 finding resolved. Updated documentation/ux/ui-design.md Tab 3 mock diagram to add [Standard v2] button and updated the 1-player mode interactions bullet to include "Standard v2".
+---
+[FIXED 2026-04-22] Epic: Epic 61 — TypeScript Toolchain Foundation
+File: documentation/planning/epic/ready-for-dev/epic-61-task-list.md (Story 5, task 3)
+Finding: Story 5 of the task list has one unchecked verification task: "Start `npm run dev` and confirm the dev server starts without TypeScript-related errors in the terminal output." The Confirmation block in Story 5 is marked [x] and documents that `npm run build`, `npm run lint`, and `npx tsc --noEmit` all passed, but makes no mention of `npm run dev`. The implementation summary provided to the tech-writer also omits any reference to dev-server verification. It is therefore unclear whether this check was performed before the epic was closed.
+Suggested action: A developer should start the dev server with `npm run dev` and confirm it starts cleanly with no TypeScript-related errors, then check this task box in `documentation/planning/epic/ready-for-dev/epic-61-task-list.md`. If the server does not start cleanly, any errors should be triaged as defects for Epic 62 or earlier.
 ---

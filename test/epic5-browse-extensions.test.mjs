@@ -4,13 +4,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
 import {
   filterBrowseSets,
   getBrowseTypeLabel,
   matchesBrowseSearch,
   summarizeBrowseSet
-} from '../src/app/browse-utils.mjs';
+} from '../src/app/browse-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

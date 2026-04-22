@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {
   BROWSE_SORT_OPTIONS,
   filterBrowseSets
-} from '../src/app/browse-utils.mjs';
+} from '../src/app/browse-utils.ts';
 
 // Realistic sample data exercising all three sort paths.
 // Each object carries the minimum fields used by filterBrowseSets: id, name, type, year.

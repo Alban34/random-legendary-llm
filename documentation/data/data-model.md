@@ -15,6 +15,8 @@ The BoardGameGeek pages remain the verification source during documentation and 
 
 ## Current shipped implementation snapshot
 
+> **TypeScript types (Epic 62):** All domain type declarations described in this document are now defined as named exports in `src/app/types.ts`. That file is the authoritative TypeScript source for all shapes listed below.
+
 The current release builds a bundle with `createEpic1Bundle(seed)` and persists exactly one browser-state object under `legendary_state_v1`.
 
 Persisted slices in V1:
@@ -46,7 +48,7 @@ Two-Handed Solo is now modeled as a first-class play mode. It is still recorded 
 ### `PlayMode`
 
 ```text
-"standard" | "advanced-solo" | "two-handed-solo"
+"standard" | "advanced-solo" | "two-handed-solo" | "standard-solo-v2"
 ```
 
 `advancedSolo` remains in persisted state and history for backward compatibility with earlier saved data, but new runtime logic resolves `playMode` as the normalized source of truth.
@@ -298,7 +300,8 @@ The app should persist **one versioned root state object**.
     lastPlayMode: PlayMode,
     selectedTab: string | null,
     onboardingCompleted: boolean,
-    themeId: ThemeId
+    themeId: ThemeId,
+    localeId: LocaleId
   }
 }
 ```
@@ -357,7 +360,9 @@ This is the concrete implementation form of the approved "reuse the least-played
 
 Accepted setups should be stored using IDs only.
 
-### `GameRecord`
+### `GameRecord` / `HistoryRecord`
+
+> **TypeScript name:** The TypeScript interface in `src/app/types.ts` is exported as `HistoryRecord`. The conceptual name `GameRecord` is used throughout this document for readability.
 
 ```text
 {

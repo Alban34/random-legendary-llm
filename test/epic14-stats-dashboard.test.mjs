@@ -4,9 +4,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
-import { buildInsightsDashboard, buildOutcomeInsights, buildUsageInsights } from '../src/app/stats-utils.mjs';
-import { acceptGameSetup, createDefaultState, updateGameResult } from '../src/app/state-store.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
+import { buildInsightsDashboard, buildOutcomeInsights, buildUsageInsights } from '../src/app/stats-utils.ts';
+import { acceptGameSetup, createDefaultState, updateGameResult } from '../src/app/state-store.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

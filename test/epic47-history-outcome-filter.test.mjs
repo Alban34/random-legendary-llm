@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterHistoryByOutcome } from '../src/app/history-utils.mjs';
+import { filterHistoryByOutcome } from '../src/app/history-utils.ts';
 
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────

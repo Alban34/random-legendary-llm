@@ -141,7 +141,7 @@ Automated verification: `test/epic43-expansion-attribution.test.mjs`
 
 Automated verification: `test/epic45-myludo-import.test.mjs`
 
-Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, `mergeOwnedSets` (via `collection-utils.mjs`), CollectionTab import panel rendering, post-import summary, and dismiss flow. All 23 tests pass.
+Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, `mergeOwnedSets` (via `collection-utils.ts`), CollectionTab import panel rendering, post-import summary, and dismiss flow. All 23 tests pass.
 
 ---
 
@@ -151,7 +151,7 @@ Automated verification: `test/epic44-card-browser.test.mjs`
 
 Browser QC: `test/playwright/epic44-card-browser.spec.mjs`
 
-Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion` (via `collection-utils.mjs`), `CardBrowserByCategory.svelte`, `CardBrowserByExpansion.svelte`, the "Sets" / "Browse Cards" view toggle in `CollectionTab.svelte`, the "By Category" / "By Expansion" grouping selector, session-scoped grouping persistence, and `aria-pressed` state on all toggle controls.
+Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion` (via `collection-utils.ts`), `CardBrowserByCategory.svelte`, `CardBrowserByExpansion.svelte`, the "Sets" / "Browse Cards" view toggle in `CollectionTab.svelte`, the "By Category" / "By Expansion" grouping selector, session-scoped grouping persistence, and `aria-pressed` state on all toggle controls.
 
 ---
 

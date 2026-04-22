@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+  import type { LocaleTools, OnboardingActions } from '../app/types.ts';
+
   const ONBOARDING_STEPS = [
     { id: 'browse', tabId: 'browse' },
     { id: 'collection', tabId: 'collection' },
@@ -11,13 +13,20 @@
     locale,
     visible,
     step,
+    onboardingCompleted: _onboardingCompleted,
     onboardingActions
+  }: {
+    locale: LocaleTools;
+    visible: boolean;
+    step: number;
+    onboardingCompleted?: boolean;
+    onboardingActions: OnboardingActions;
   } = $props();
 
-  let clampedStep = $derived(Math.max(0, Math.min(step, ONBOARDING_STEPS.length - 1)));
-  let currentStep = $derived(ONBOARDING_STEPS[clampedStep]);
-  let isLastStep = $derived(currentStep.id === ONBOARDING_STEPS.at(-1).id);
-  let currentStepNumber = $derived(clampedStep + 1);
+  let clampedStep: number = $derived(Math.max(0, Math.min(step, ONBOARDING_STEPS.length - 1)));
+  let currentStep: { id: string; tabId: string } = $derived(ONBOARDING_STEPS[clampedStep]);
+  let isLastStep: boolean = $derived(currentStep.id === ONBOARDING_STEPS.at(-1)!.id);
+  let currentStepNumber: number = $derived(clampedStep + 1);
 </script>
 
 {#if visible}

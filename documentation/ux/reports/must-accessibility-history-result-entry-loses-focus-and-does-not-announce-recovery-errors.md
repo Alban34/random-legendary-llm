@@ -14,7 +14,7 @@ Must
 - documentation/post-v1-roadmap.md Milestone 3 acceptance criteria for safe result entry and correction
 - documentation/post-v1-epics.md Epic 12 result-editing scope
 - Runtime audit with Playwright on 2026-04-10
-- Source inspection in src/app/browser-entry.mjs and src/app/app-renderer.mjs
+- Source inspection in src/app/browser-entry.mjs and src/app/app-renderer.ts
 
 ## Where it appears
 - The inline result editor opened after Accept and Log
@@ -25,7 +25,7 @@ Must
 - In src/app/browser-entry.mjs, acceptCurrentSetup() opens the result editor and rerenders, but does not move focus into the newly opened form.
 - Runtime check after Accept and Log returned activeTag BODY while a result editor and first outcome field were present.
 - In src/app/browser-entry.mjs, saveGameResult() rerenders on validation failure without focusing the error or the invalid field.
-- In src/app/app-renderer.mjs, the validation message renders only as <div class="notice warning" data-result-form-error>...</div> with no role, no aria-live behavior, and no field-level aria-invalid or aria-describedby wiring.
+- In src/app/app-renderer.ts, the validation message renders only as <div class="notice warning" data-result-form-error>...</div> with no role, no aria-live behavior, and no field-level aria-invalid or aria-describedby wiring.
 - Runtime check after saving an empty result returned activeTag BODY and an error string of "Choose Win or Loss before saving the result." with errorRole null.
 
 ## Why it matters

@@ -4,11 +4,11 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
-import { generateSetup, validateSetupLegality } from '../src/app/setup-generator.mjs';
-import { createDefaultState } from '../src/app/state-store.mjs';
-import { getAvailablePlayModes } from '../src/app/new-game-utils.mjs';
-import { resolvePlayMode, resolveSetupTemplate } from '../src/app/setup-rules.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
+import { generateSetup, validateSetupLegality } from '../src/app/setup-generator.ts';
+import { createDefaultState } from '../src/app/state-store.ts';
+import { getAvailablePlayModes } from '../src/app/new-game-utils.ts';
+import { resolvePlayMode, resolveSetupTemplate } from '../src/app/setup-rules.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

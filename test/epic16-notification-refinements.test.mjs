@@ -8,16 +8,16 @@ import {
   createToastRecord,
   pushToast,
   shouldAutoDismissToast
-} from '../src/app/feedback-utils.mjs';
+} from '../src/app/feedback-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
-const browserEntryPath = path.join(rootDir, 'src', 'app', 'browser-entry.mjs');
-const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.mjs');
+const browserEntryPath = path.join(rootDir, 'src', 'app', 'browser-entry.ts');
+const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.ts');
 const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 const toastStackPath = path.join(rootDir, 'src', 'components', 'ToastStack.svelte');
-const localizationPath = path.join(rootDir, 'src', 'app', 'locales', 'en.mjs');
+const localizationPath = path.join(rootDir, 'src', 'app', 'locales', 'en.ts');
 
 let browserEntrySource;
 let rendererSource;

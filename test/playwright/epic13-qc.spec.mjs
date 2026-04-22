@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 
 import { test, expect } from '@playwright/test';
 
-import { BACKUP_SCHEMA_ID, BACKUP_SCHEMA_VERSION, createBackupPayload } from '../../src/app/backup-utils.mjs';
+import { BACKUP_SCHEMA_ID, BACKUP_SCHEMA_VERSION, createBackupPayload } from '../../src/app/backup-utils.ts';
 import {
   gotoApp,
   readAppState,

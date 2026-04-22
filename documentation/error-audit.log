@@ -1,0 +1,29 @@
+[2026-04-21] Epic: Epic 64 — Migrate Core Game Engine to TypeScript
+File: documentation/planning/defects-v2.0.0.md
+Finding: Line 10–11 reference `src/app/setup-generator.mjs` in a closed (✓) defect record describing a past fix. The file has since been renamed to `setup-generator.ts` by Epic 64. The statement is a historical past-tense record; editing it would misrepresent when the fix occurred.
+Suggested action: No change required — the entry is an accurate historical record. If the team adopts a convention of updating past defect log entries to reflect current file names, a human should update lines 10–11 to `src/app/setup-generator.ts`.
+---
+[2026-04-21] Epic: Epic 65 — Migrate App Services & Integrations to TypeScript
+File: src/app/state-store.svelte.js
+Finding: Lines 4, 16, and 39 still reference `state-store.mjs`. Line 4 has "Node unit tests must import from state-store.mjs directly". Line 16 has "via hydrateState / loadState from state-store.mjs". Line 39 has a JSDoc `@param` typed as `import('./state-store.mjs').createDefaultState`. All three should read `state-store.ts` after Epic 65 renamed the module.
+Suggested action: Update the three comment/JSDoc references in `src/app/state-store.svelte.js` to use `state-store.ts`.
+---
+[2026-04-22] Epic: Epic 68 — Test Runner Upgrade, Type Coverage & 2.0.0 Release
+File: src/components/App.svelte, src/components/TabNav.svelte, src/components/ToastStack.svelte
+Finding: The QC verification task for Epic 68 Stories 1 and 2 (`npm run lint`) is marked `[x]` complete in `epic-68-task-list.md` but also annotated `BLOCKED: pre-existing no-unused-vars errors in App.svelte, TabNav.svelte, ToastStack.svelte (introduced in Epics 61–67)`. The lint gate was not cleared; `npm run lint` does not exit 0. The `svelte-check` type-coverage gate added to the lint script (Epic 68 Story 1) cannot be confirmed as passing against the component layer until these lint errors are resolved.
+Suggested action: An Epic Frontend Expert pass is required to resolve the `no-unused-vars` lint errors in `src/components/App.svelte`, `src/components/TabNav.svelte`, and `src/components/ToastStack.svelte`. Once fixed, re-run `npm run lint` and confirm exit 0 before considering Epic 68 Stories 1 and 2 fully signed off.
+---
+[2026-04-21] Epic: Epic 65 — Migrate App Services & Integrations to TypeScript
+File: src/components/App.svelte
+Finding: Line 165 contains the comment "// Debug globals (mirrors syncDebugGlobals from browser-entry.mjs)" which should read `browser-entry.ts` after Epic 65 renamed the module.
+Suggested action: Update the comment on line 165 of `src/components/App.svelte` to reference `browser-entry.ts`.
+---
+[2026-04-21] Epic: Epic 66 — Migrate Svelte Reactive View Models to TypeScript
+File: src/app/state-store.svelte.ts
+Finding: The prior Epic 65 finding (above) was filed against `src/app/state-store.svelte.js` and noted stale `state-store.mjs` comment/JSDoc references at lines 4, 16, and 39. Epic 66 renamed that file to `state-store.svelte.ts`. It is unknown whether the stale comments were resolved during the TypeScript migration or whether they persist in the renamed file.
+Suggested action: Check `src/app/state-store.svelte.ts` lines 4, 16, and 39 to confirm whether the `state-store.mjs` comment/JSDoc references were corrected. If they remain, update them to `state-store.ts`.
+---
+---
+[2026-04-22] Resolution note for Epic 68 finding above:
+The lint errors in App.svelte, TabNav.svelte, ToastStack.svelte were fully resolved during the Epic 67/68 implementation session. `npm run lint` (ESLint + svelte-check) now exits 0 with 0 errors and 0 warnings. `npm test` passes 359/359. The [2026-04-22] finding above is superseded by this resolution.
+---

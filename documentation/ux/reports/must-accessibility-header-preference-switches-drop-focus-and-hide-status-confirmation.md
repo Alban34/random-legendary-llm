@@ -14,7 +14,7 @@ Must
 - README.md shared-header preference flow
 - documentation/post-v1-roadmap.md Milestone 4 acceptance criteria for legible, accessible theme behavior
 - Runtime audit with Playwright on 2026-04-10
-- Source inspection in src/app/browser-entry.mjs and src/app/app-renderer.mjs
+- Source inspection in src/app/browser-entry.mjs and src/app/app-renderer.ts
 
 ## Where it appears
 - Shared header theme buttons

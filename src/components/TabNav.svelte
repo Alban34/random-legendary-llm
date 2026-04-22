@@ -1,5 +1,25 @@
-<script>
-  let { tabs, activeTab, locale, variant, navId, navLabel, onTabSelect, onTabKeydown } = $props();
+<script lang="ts">
+  import type { AppTab, LocaleTools } from '../app/types.ts';
+
+  let {
+    tabs,
+    activeTab,
+    locale,
+    variant,
+    navId,
+    navLabel,
+    onTabSelect,
+    onTabKeydown
+  }: {
+    tabs: AppTab[];
+    activeTab: string;
+    locale: LocaleTools;
+    variant: string;
+    navId: string;
+    navLabel: string;
+    onTabSelect: (id: string) => void;
+    onTabKeydown: (id: string, key: string) => void;
+  } = $props();
 </script>
 
 <div

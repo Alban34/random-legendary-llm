@@ -4,13 +4,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
-import { getCollectionFeasibility } from '../src/app/collection-utils.mjs';
-import { buildHistoryReadySetupSnapshot, generateSetup, validateSetupLegality } from '../src/app/setup-generator.mjs';
-import { formatHistorySummary } from '../src/app/history-utils.mjs';
-import { acceptGameSetup, createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.mjs';
-import { getAvailablePlayModes, getDisplayedSetupRequirements, getPlayModeHelpText } from '../src/app/new-game-utils.mjs';
-import { resolveSetupTemplate } from '../src/app/setup-rules.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
+import { getCollectionFeasibility } from '../src/app/collection-utils.ts';
+import { buildHistoryReadySetupSnapshot, generateSetup, validateSetupLegality } from '../src/app/setup-generator.ts';
+import { formatHistorySummary } from '../src/app/history-utils.ts';
+import { acceptGameSetup, createDefaultState, createStorageAdapter, loadState, saveState } from '../src/app/state-store.ts';
+import { getAvailablePlayModes, getDisplayedSetupRequirements, getPlayModeHelpText } from '../src/app/new-game-utils.ts';
+import { resolveSetupTemplate } from '../src/app/setup-rules.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -1,5 +1,9 @@
 # Documentation
 
+## Stack
+
+The v2.0.0 baseline uses TypeScript for all runtime source modules (`src/app/*.ts`). The migration from plain JavaScript (`.mjs`) to TypeScript was completed across Epics 61–68. All test files import from `.ts` source paths and run via `tsx` (`node --import tsx/esm --test`). `svelte-check` is integrated as a type-coverage gate in `npm run lint`.
+
 ## Architecture
 - [Overview](architecture/overview.md) — Runtime stack, layers, entry points, shipped tab IDs
 - [Setup Rules](architecture/setup-rules.md) — Player-count table, 10-step sequence, legality-first policy

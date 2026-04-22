@@ -1,13 +1,61 @@
-<script>
+<script lang="ts">
   import {
     buildHistoryGroups,
     DEFAULT_HISTORY_GROUPING_MODE,
     filterHistoryByOutcome,
     HISTORY_GROUPING_MODES
-  } from '../app/history-utils.mjs';
-  import { buildInsightsDashboard, RECENT_SCORE_WINDOW } from '../app/stats-utils.mjs';
-  import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from '../app/result-utils.mjs';
-  import { getHistoryOutcomeFilter, setHistoryOutcomeFilter } from '../app/history-vm.svelte.js';
+  } from '../app/history-utils.ts';
+  import type { HistoryGroup } from '../app/history-utils.ts';
+  import type { HistoryRecord } from '../app/types.ts';
+  import { buildInsightsDashboard, RECENT_SCORE_WINDOW } from '../app/stats-utils.ts';
+  import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from '../app/result-utils.ts';
+  import { getHistoryOutcomeFilter, setHistoryOutcomeFilter } from '../app/history-vm.svelte.ts';
+  import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
+  import type { AppState, LocaleTools } from '../app/types.ts';
+
+  type ResultDraft = { outcome: string; score?: string; playerScores?: { playerName: string; score: string }[]; notes: string };
+  type HistoryActions = {
+    setHistoryGrouping: (mode: string) => void;
+    editGameResult: (recordId: string) => void;
+    toggleHistoryInsights: () => void;
+    saveGameResult: () => void;
+    skipGameResultEntry: () => void;
+    cancelResultEntry: () => void;
+    setResultOutcome: (outcome: string) => void;
+    setResultScore: (score: string) => void;
+    setResultNotes: (notes: string) => void;
+    setResultPlayerScore: (index: number, value: string) => void;
+    setResultPlayerName: (index: number, value: string) => void;
+  };
+  type OutcomeInsight = {
+    totalGames: number;
+    completedResults: number;
+    pendingResults: number;
+    wins: number;
+    losses: number;
+    scoredGames: number;
+    winRate: number | null;
+    averageScore: number | null;
+    recentAverageScore: number | null;
+    bestScore: number | null;
+  };
+  type UsageCategoryInsight = {
+    category: string;
+    label: string;
+    total: number;
+    used: number;
+    neverPlayed: number;
+    mostPlayed: Array<{ id: string; label: string; plays: number; lastPlayedAt: string | null }>;
+    leastPlayed: Array<{ id: string; label: string; plays: number; lastPlayedAt: string | null }>;
+  };
+  type FreshnessInsight = { totalEntitiesTracked: number; totalNeverPlayed: number; usedEntities: number };
+  type CollectionByType = Array<{ category: string; label: string; played: number; total: number; playedPercent: number | null }>;
+  type CollectionGroup = { played: number; total: number; playedPercent: number | null; byType: CollectionByType };
+  type CollectionCoverageInsight = {
+    userCollection: CollectionGroup;
+    overallCollection: CollectionGroup;
+    missingExtensions: { missing: number; total: number; missingPercent: number | null };
+  };
 
   let {
     bundle,
@@ -22,23 +70,37 @@
     resultFormError,
     resultInvalidFields,
     historyActions
+  }: {
+    bundle: Epic1Bundle;
+    appState: AppState;
+    locale: LocaleTools;
+    compactViewport: boolean;
+    historyGroupingMode: string | null;
+    historyInsightsExpanded: boolean;
+    historyExpandedRecordId: string | null;
+    resultEditorRecordId: string | null;
+    resultDraft: ResultDraft;
+    resultFormError: string | null;
+    resultInvalidFields: string[];
+    historyActions: HistoryActions;
   } = $props();
 
-  let activeGroupingMode = $derived(historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE);
-  let filteredHistory = $derived(filterHistoryByOutcome(appState.history, getHistoryOutcomeFilter()));
-  let groups = $derived(
+  let activeGroupingMode: string = $derived(historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE);
+  let filteredHistory: HistoryRecord[] = $derived(filterHistoryByOutcome(appState.history, getHistoryOutcomeFilter()));
+  let groups: HistoryGroup[] = $derived(
     buildHistoryGroups(filteredHistory, bundle.runtime.indexes, { mode: activeGroupingMode })
   );
-  let filteredCount = $derived(filteredHistory.length);
-  let dashboard = $derived(buildInsightsDashboard(bundle.runtime, appState, { limit: 3 }));
-  let insightsExpanded = $derived(compactViewport ? Boolean(historyInsightsExpanded) : true);
+  let filteredCount: number = $derived(filteredHistory.length);
+  type DashboardResult = { outcome: OutcomeInsight; usage: UsageCategoryInsight[]; freshness: FreshnessInsight; collectionCoverage: CollectionCoverageInsight } | null;
+  let dashboard: DashboardResult = $derived(buildInsightsDashboard(bundle.runtime, appState, { limit: 3 }) as DashboardResult);
+  let insightsExpanded: boolean = $derived(compactViewport ? Boolean(historyInsightsExpanded) : true);
 
-  function formatInsightMetric(value, { suffix = '', fallback = '—' } = {}) {
+  function formatInsightMetric(value: unknown, { suffix = '', fallback = '—' }: { suffix?: string; fallback?: string } = {}): string {
     if (value === null || value === undefined) return fallback;
     return `${value}${suffix}`;
   }
 
-  function getLocalizedGroupLabel(group) {
+  function getLocalizedGroupLabel(group: HistoryGroup): string {
     if (group.mode === 'play-mode') {
       const playMode = group.id.split(':')[1] || 'standard';
       return locale.getPlayModeLabel(playMode, playMode === 'standard' ? 2 : 1);
@@ -46,7 +108,7 @@
     return group.label;
   }
 
-  function getHelperCopy(outcome) {
+  function getHelperCopy(outcome: OutcomeInsight): string {
     const scoredWindow = Math.min(outcome.scoredGames, RECENT_SCORE_WINDOW);
     if (outcome.totalGames === 0) return locale.t('history.insights.helper.noGames');
     if (outcome.completedResults === 0) return locale.t('history.insights.helper.pendingOnly');
@@ -99,7 +161,7 @@
             class={"button " + (getHistoryOutcomeFilter() === opt.value ? 'button-primary' : 'button-secondary')}
             aria-pressed={getHistoryOutcomeFilter() === opt.value}
             data-outcome-filter={opt.value}
-            onclick={() => setHistoryOutcomeFilter(opt.value)}
+            onclick={() => setHistoryOutcomeFilter(opt.value as Parameters<typeof setHistoryOutcomeFilter>[0])}
           >{opt.label}</button>
         {/each}
       </div>
@@ -207,7 +269,7 @@
                         data-result-field="outcome"
                         aria-invalid={outcomeInvalid || undefined}
                         aria-describedby={outcomeInvalid ? errorId : undefined}
-                        onchange={(e) => historyActions.setResultOutcome(e.target.value)}
+                        onchange={(e) => historyActions.setResultOutcome((e.target as HTMLSelectElement).value)}
                       >
                         <option value="">{locale.t('history.resultEditor.chooseOutcome')}</option>
                         {#each GAME_OUTCOME_OPTIONS as option (option.id)}
@@ -231,7 +293,7 @@
                           placeholder="0"
                           aria-invalid={scoreInvalid || undefined}
                           aria-describedby={scoreInvalid ? errorId : undefined}
-                          oninput={(e) => historyActions.setResultScore(e.target.value)}
+                          oninput={(e) => historyActions.setResultScore((e.target as HTMLInputElement).value)}
                         />
                       </div>
                     {:else}
@@ -246,7 +308,7 @@
                             data-result-field={`player-name-${i}`}
                             placeholder={`Player ${i + 1}`}
                             value={entry.playerName}
-                            oninput={(e) => historyActions.setResultPlayerName(i, e.target.value)}
+                            oninput={(e) => historyActions.setResultPlayerName(i, (e.target as HTMLInputElement).value)}
                           />
                           <input
                             type="number"
@@ -259,7 +321,7 @@
                             placeholder="0"
                             aria-invalid={playerScoreInvalid || undefined}
                             aria-describedby={playerScoreInvalid ? errorId : undefined}
-                            oninput={(e) => historyActions.setResultPlayerScore(i, e.target.value)}
+                            oninput={(e) => historyActions.setResultPlayerScore(i, (e.target as HTMLInputElement).value)}
                           />
                         </div>
                       {/each}
@@ -274,7 +336,7 @@
                         rows="3"
                         maxlength="500"
                         placeholder={locale.t('history.resultEditor.notesPlaceholder')}
-                        oninput={(e) => historyActions.setResultNotes(e.target.value)}
+                        oninput={(e) => historyActions.setResultNotes((e.target as HTMLTextAreaElement).value)}
                       >{resultDraft.notes}</textarea>
                     </div>
 

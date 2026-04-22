@@ -4,13 +4,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
 import {
   buildHistoryGroups,
   DEFAULT_HISTORY_GROUPING_MODE,
   HISTORY_GROUPING_MODES,
   normalizeHistoryGroupingMode
-} from '../src/app/history-utils.mjs';
+} from '../src/app/history-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

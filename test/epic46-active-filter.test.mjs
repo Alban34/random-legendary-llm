@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
 import {
   SCHEMA_VERSION,
   clearActiveSetIds,
@@ -12,8 +12,8 @@ import {
   sanitizePersistedState,
   setActiveSetIds,
   toggleOwnedSet
-} from '../src/app/state-store.mjs';
-import { generateSetup, validateSetupLegality } from '../src/app/setup-generator.mjs';
+} from '../src/app/state-store.ts';
+import { generateSetup, validateSetupLegality } from '../src/app/setup-generator.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -15,7 +15,7 @@ let browseTabSource;
 before(async () => {
   [indexHtml, rendererSource, browseTabSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'BrowseTab.svelte'), 'utf8')
   ]);
 });

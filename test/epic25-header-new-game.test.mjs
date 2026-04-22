@@ -18,10 +18,10 @@ const appSveltePath = path.join(rootDir, 'src', 'components', 'App.svelte');
 
 before(async () => {
   [rendererSource, newGameTabSource, cssSource, entrySource, appSvelteSource] = await Promise.all([
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'NewGameTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'browser-entry.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'browser-entry.ts'), 'utf8'),
     fs.readFile(appSveltePath, 'utf8')
   ]);
 });

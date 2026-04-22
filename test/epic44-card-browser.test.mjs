@@ -4,13 +4,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
 import {
   CARD_CATEGORIES,
   getCardsByCategory,
   getCardsByExpansion,
-} from '../src/app/collection-utils.mjs';
-import { buildOwnedPools } from '../src/app/setup-generator.mjs';
+} from '../src/app/collection-utils.ts';
+import { buildOwnedPools } from '../src/app/setup-generator.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

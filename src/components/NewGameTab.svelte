@@ -1,8 +1,12 @@
-<script>
-  import { getAvailablePlayModes, getDisplayedSetupRequirements } from '../app/new-game-utils.mjs';
-  import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from '../app/forced-picks-utils.mjs';
-  import { buildOwnedPools, validateSetupLegality } from '../app/setup-generator.mjs';
-  import { getSoloRulesItems, SOLO_RULES_PANEL_MODES } from '../app/solo-rules.mjs';
+<script lang="ts">
+  import { getAvailablePlayModes, getDisplayedSetupRequirements } from '../app/new-game-utils.ts';
+  import type { PlayModeOption } from '../app/new-game-utils.ts';
+  import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from '../app/forced-picks-utils.ts';
+  import type { ForcedPicks } from '../app/forced-picks-utils.ts';
+  import { buildOwnedPools, validateSetupLegality } from '../app/setup-generator.ts';
+  import { getSoloRulesItems, SOLO_RULES_PANEL_MODES } from '../app/solo-rules.ts';
+  import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
+  import type { AppState, LocaleTools, GeneratedSetup, PlayMode, SchemeRuntime, HeroRuntime, MastermindRuntime, VillainGroupRuntime, HenchmanGroupRuntime } from '../app/types.ts';
 
   let {
     bundle,
@@ -17,24 +21,49 @@
     forcedPicks,
     compactViewport,
     gameActions
+  }: {
+    bundle: Epic1Bundle;
+    appState: AppState;
+    locale: LocaleTools;
+    selectedPlayerCount: number;
+    selectedPlayMode: PlayMode;
+    advancedSolo: boolean;
+    currentSetup: GeneratedSetup | null;
+    generatorError: string | null;
+    generatorNotices: string[];
+    forcedPicks: ForcedPicks;
+    compactViewport: boolean;
+    gameActions: {
+      setPlayerCount: (n: number) => void;
+      setPlayMode: (mode: string) => void;
+      generateSetup: () => void;
+      acceptCurrentSetup: () => void;
+      addForcedPick: (field: string, value: string) => void;
+      removeForcedPick: (field: string, id: string) => void;
+      clearForcedPicks: () => void;
+      clearToDefaults: () => void;
+      setActiveSetIds: (ids: string[]) => void;
+      clearActiveSetIds: () => void;
+      deactivateAllSets: () => void;
+    };
   } = $props();
 
-  let availablePlayModes = $derived(getAvailablePlayModes(selectedPlayerCount));
-  let displayedRequirements = $derived(getDisplayedSetupRequirements({
+  let availablePlayModes: PlayModeOption[] = $derived(getAvailablePlayModes(selectedPlayerCount));
+  let displayedRequirements: ReturnType<typeof getDisplayedSetupRequirements> = $derived(getDisplayedSetupRequirements({
     playerCount: selectedPlayerCount,
     advancedSolo,
     playMode: selectedPlayMode,
     currentSetup
   }));
-  let hasActiveForcedPicks = $derived(hasForcedPicks(forcedPicks));
+  let hasActiveForcedPicks: boolean = $derived(hasForcedPicks(forcedPicks));
 
-  let soloRulesItems = $derived(
+  let soloRulesItems: string[] | null = $derived(
     currentSetup && selectedPlayerCount === 1 && SOLO_RULES_PANEL_MODES.has(selectedPlayMode)
       ? getSoloRulesItems(selectedPlayMode)
       : null
   );
 
-  let filterFeasibility = $derived.by(() => {
+  let filterFeasibility: ReturnType<typeof validateSetupLegality> = $derived.by(() => {
     return validateSetupLegality({
       runtime: bundle.runtime,
       state: appState,
@@ -45,7 +74,13 @@
     });
   });
 
-  let ownedForcedPickOptions = $derived.by(() => {
+  let ownedForcedPickOptions: {
+    schemeId: SchemeRuntime[];
+    mastermindId: MastermindRuntime[];
+    heroIds: HeroRuntime[];
+    villainGroupIds: VillainGroupRuntime[];
+    henchmanGroupIds: HenchmanGroupRuntime[];
+  } = $derived.by(() => {
     const pools = buildOwnedPools(bundle.runtime, appState.collection.ownedSetIds);
     return {
       schemeId: [...pools.schemes].sort((a, b) => a.name.localeCompare(b.name)),
@@ -56,16 +91,16 @@
     };
   });
 
-  let modeIneligibleSchemeIds = $derived.by(() => {
-    if (selectedPlayMode !== 'standard' || selectedPlayerCount !== 1) return new Set();
-    return new Set(
+  let modeIneligibleSchemeIds: Set<string> = $derived.by(() => {
+    if (selectedPlayMode !== 'standard' || selectedPlayerCount !== 1) return new Set<string>();
+    return new Set<string>(
       ownedForcedPickOptions.schemeId
         .filter((s) => s.constraints?.incompatiblePlayModes?.includes('standard-solo'))
         .map((s) => s.id)
     );
   });
 
-  let entityIndexes = $derived({
+  let entityIndexes: Record<string, Record<string, { id: string; name: string }>> = $derived({
     schemeId: bundle.runtime.indexes.schemesById,
     mastermindId: bundle.runtime.indexes.mastermindsById,
     heroIds: bundle.runtime.indexes.heroesById,
@@ -73,7 +108,7 @@
     henchmanGroupIds: bundle.runtime.indexes.henchmanGroupsById
   });
 
-  function formatForcedByLabel(forcedBy) {
+  function formatForcedByLabel(forcedBy: string | string[]): string {
     const values = Array.isArray(forcedBy) ? forcedBy : [forcedBy];
     return locale.formatList(values.map((v) => {
       if (v === 'mastermind') return locale.t('newGame.forcedPicks.reason.mastermind');
@@ -82,22 +117,23 @@
     }));
   }
 
-  function getActiveIds(config) {
-    if (config.multi) return forcedPicks[config.field];
-    return forcedPicks[config.field] ? [forcedPicks[config.field]] : [];
+  function getActiveIds(config: { field: string; multi: boolean }): string[] {
+    const val = (forcedPicks as unknown as Record<string, string | string[] | null>)[config.field];
+    if (config.multi) return (val as string[]) ?? [];
+    return val ? [val as string] : [];
   }
 
-  function getAvailableOptions(config) {
-    let opts = ownedForcedPickOptions[config.field];
+  function getAvailableOptions(config: { field: string; multi: boolean }): Array<{ id: string; name: string; constraints?: { incompatiblePlayModes?: string[] } }> {
+    let opts = (ownedForcedPickOptions as Record<string, Array<{ id: string; name: string; constraints?: { incompatiblePlayModes?: string[] } }>>)[config.field] ?? [];
     if (config.field === 'schemeId') {
       opts = opts.filter((e) => !modeIneligibleSchemeIds.has(e.id));
     }
     return config.multi ? opts.filter((e) => !getActiveIds(config).includes(e.id)) : opts;
   }
 
-  function handleAddForcedPick(field) {
+  function handleAddForcedPick(field: string): void {
     const sel = document.querySelector(`[data-forced-pick-select="${field}"]`);
-    gameActions.addForcedPick(field, sel?.value || '');
+    gameActions.addForcedPick(field, (sel as HTMLSelectElement | null)?.value || '');
   }
 </script>
 
@@ -132,7 +168,7 @@
                     checked={isChecked}
                     data-active-filter-checkbox={setId}
                     onchange={(e) => {
-                      const nowChecked = e.target.checked;
+                      const nowChecked = (e.target as HTMLInputElement).checked;
                       const activeIds = appState.collection.activeSetIds;
                       const ownedIds = appState.collection.ownedSetIds;
                       if (nowChecked) {
@@ -418,7 +454,7 @@
               <li class="result-list-item">
                 <span>{group.name}</span>
                 {#if group.forced}
-                  <span class="pill">{locale.t('newGame.forcedPicks.forcedBy', { value: formatForcedByLabel(group.forcedBy) })}</span>
+                  <span class="pill">{locale.t('newGame.forcedPicks.forcedBy', { value: formatForcedByLabel(group.forcedBy!) })}</span>
                 {/if}
               </li>
             {/each}
@@ -432,7 +468,7 @@
               <li class="result-list-item">
                 <span>{group.name}</span>
                 {#if group.forced}
-                  <span class="pill">{locale.t('newGame.forcedPicks.forcedBy', { value: formatForcedByLabel(group.forcedBy) })}</span>
+                  <span class="pill">{locale.t('newGame.forcedPicks.forcedBy', { value: formatForcedByLabel(group.forcedBy!) })}</span>
                 {/if}
               </li>
             {/each}

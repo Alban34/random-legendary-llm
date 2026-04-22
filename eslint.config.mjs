@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import svelte from 'eslint-plugin-svelte';
+import tseslint from 'typescript-eslint';
 
 // Shared browser globals for all src/ files (used in both .mjs and .svelte contexts)
 const BROWSER_GLOBALS = {
@@ -17,6 +18,19 @@ const BROWSER_GLOBALS = {
   Event: 'readonly',
   Element: 'readonly',
   HTMLElement: 'readonly',
+  HTMLInputElement: 'readonly',
+  HTMLSelectElement: 'readonly',
+  HTMLButtonElement: 'readonly',
+  HTMLTextAreaElement: 'readonly',
+  HTMLAnchorElement: 'readonly',
+  HTMLFormElement: 'readonly',
+  HTMLDivElement: 'readonly',
+  KeyboardEvent: 'readonly',
+  MouseEvent: 'readonly',
+  FocusEvent: 'readonly',
+  InputEvent: 'readonly',
+  SubmitEvent: 'readonly',
+  MediaQueryListEvent: 'readonly',
   MutationObserver: 'readonly',
   ResizeObserver: 'readonly',
   requestAnimationFrame: 'readonly',
@@ -36,6 +50,8 @@ const BROWSER_GLOBALS = {
   AbortSignal: 'readonly',
   structuredClone: 'readonly',
   DOMParser: 'readonly',
+  Node: 'readonly',
+  NodeList: 'readonly',
 };
 
 export default [
@@ -63,6 +79,10 @@ export default [
     // Disabled — all HTML is generated through escapeHtml-protected template functions, not from raw user input.
     files: ['src/**/*.svelte', 'src/**/*.svelte.js'],
     languageOptions: {
+      // Use TypeScript parser for <script lang="ts"> blocks inside Svelte files
+      parserOptions: {
+        parser: tseslint.parser,
+      },
       globals: {
         ...BROWSER_GLOBALS,
         // Svelte 5 runes (compiler-injected globals)
@@ -74,6 +94,28 @@ export default [
         $inspect: 'readonly',
         $host: 'readonly',
       },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
+    rules: {
+      // Disable base no-unused-vars for Svelte TypeScript files; the TS-aware rule below handles it.
+      // The base rule incorrectly flags callback parameter names used in TypeScript type annotations.
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
+    },
+  },
+  ...tseslint.configs.recommended.map(config => ({
+    ...config,
+    files: ['src/**/*.ts'],
+    ignores: ['src/**/*.d.ts'],
+  })),
+  {
+    files: ['src/**/*.ts'],
+    ignores: ['src/**/*.d.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+      globals: BROWSER_GLOBALS,
     },
   },
 ];

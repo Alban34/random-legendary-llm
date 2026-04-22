@@ -15,7 +15,7 @@ let cssSource;
 
 before(async () => {
   [rendererSource, historyTabSource, collectionTabSource, cssSource] = await Promise.all([
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.mjs'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'app', 'app-renderer.ts'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'CollectionTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8')

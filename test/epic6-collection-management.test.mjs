@@ -4,15 +4,15 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createEpic1Bundle } from '../src/app/game-data-pipeline.mjs';
+import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
 import {
   COLLECTION_FEASIBILITY_MODES,
   COLLECTION_TYPE_GROUPS,
   getCollectionFeasibility,
   groupSetsByType,
   summarizeOwnedCollection
-} from '../src/app/collection-utils.mjs';
-import { createDefaultState, resetOwnedCollection, toggleOwnedSet } from '../src/app/state-store.mjs';
+} from '../src/app/collection-utils.ts';
+import { createDefaultState, resetOwnedCollection, toggleOwnedSet } from '../src/app/state-store.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
