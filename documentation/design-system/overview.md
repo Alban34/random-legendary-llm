@@ -347,11 +347,9 @@ Warning or forced-state badges:
 Default:
 - toast and inline alerts share a semantic pattern: icon, title or summary line, supporting text when needed
 
-**Refined toast contract (Epic 24):**
+**Refined toast contract (Epic 24, updated Epic 69):**
 - Toasts are bottom-anchored, fixed to the viewport bottom edge and outside the layout flow
-- Enter animation: slides up from below the visible window edge with a fade-in (approximately 200ms ease-out)
-- Exit animation: slides back down and fades out (approximately 300ms)
-- When `prefers-reduced-motion` is set, translation is removed and only the fade applies
+- Animations (spring-animated enter and exit, `prefers-reduced-motion` fallback to fade-only) are managed by `svelte-sonner`; the custom `@keyframes` and `.toast*` CSS rules have been removed from `app-shell.css`
 - Theme switching is intentionally silent — it does not emit a toast; the immediate UI repaint is the confirmation
 - Toasts are reserved for meaningful feedback events (errors, warnings, and non-obvious preference outcomes such as locale changes)
 

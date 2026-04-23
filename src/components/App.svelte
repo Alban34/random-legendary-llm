@@ -1,6 +1,5 @@
 <script lang="ts">
   import TabNav from './TabNav.svelte';
-  import ToastStack from './ToastStack.svelte';
   import BrowseTab from './BrowseTab.svelte';
   import CollectionTab from './CollectionTab.svelte';
   import NewGameTab from './NewGameTab.svelte';
@@ -9,8 +8,7 @@
   import { createEpic1Bundle } from '../app/game-data-pipeline.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
   import { APP_TABS, DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from '../app/app-tabs.ts';
-  import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from '../app/feedback-utils.ts';
-  import type { ToastRecord } from '../app/feedback-utils.ts';
+  import { toast, Toaster } from 'svelte-sonner';
   import { addForcedPick, hasForcedPicks, removeForcedPick } from '../app/forced-picks-utils.ts';
   import { DEFAULT_HISTORY_GROUPING_MODE, HISTORY_GROUPING_MODES } from '../app/history-utils.ts';
   import { createLocaleTools, getSelectableLocales, normalizeLocaleId } from '../app/localization-utils.ts';
@@ -121,7 +119,6 @@
     confirmResetOwnedCollection: boolean;
     confirmResetAllState: boolean;
     modalReturnFocusAction: string | null;
-    toasts: ToastRecord[];
     onboardingVisible: boolean;
     onboardingStep: number;
     aboutPanelOpen: boolean;
@@ -132,7 +129,6 @@
     confirmResetOwnedCollection: false,
     confirmResetAllState: false,
     modalReturnFocusAction: null,
-    toasts: [],
     onboardingVisible: false,
     onboardingStep: 0,
     aboutPanelOpen: false,
@@ -144,8 +140,6 @@
 
   // Non-reactive helpers
   let storageAdapter: StorageAdapter | null = null;
-  const toastTimers = new Map<string, { remainingMs: number; timeoutId: ReturnType<typeof setTimeout> | null; startedAt: number }>();
-  let nextToastId = 1;
 
   // ---------------------------------------------------------------------------
   // Derived
@@ -232,7 +226,6 @@
       lastExportFileName: getLastBackupExportFileName() || null
     };
     (globalThis as Record<string, unknown>).__FORCED_PICKS_UI__ = getForcedPicks();
-    (globalThis as Record<string, unknown>).__TOASTS__ = ui.toasts;
   }
 
   // ---------------------------------------------------------------------------
@@ -291,64 +284,6 @@
       };
     }
     return null;
-  }
-
-  // ---------------------------------------------------------------------------
-  // Toast management
-  // ---------------------------------------------------------------------------
-  function clearToastTimer(id: string) {
-    const record = toastTimers.get(id);
-    if (!record) return;
-    if (record.timeoutId) clearTimeout(record.timeoutId);
-    toastTimers.delete(id);
-  }
-
-  function scheduleToastDismissal(toast: ToastRecord) {
-    if (!shouldAutoDismissToast(toast)) return;
-    const record: { remainingMs: number; timeoutId: ReturnType<typeof setTimeout> | null; startedAt: number } = { remainingMs: toast.autoDismissMs ?? 0, timeoutId: null, startedAt: Date.now() };
-    record.timeoutId = setTimeout(() => dismissToast(toast.id), record.remainingMs);
-    toastTimers.set(toast.id, record);
-  }
-
-  function pauseToastDismissal(id: string) {
-    const record = toastTimers.get(id);
-    if (!record?.timeoutId) return;
-    clearTimeout(record.timeoutId);
-    record.remainingMs = Math.max(1000, record.remainingMs - (Date.now() - record.startedAt));
-    record.timeoutId = null;
-    toastTimers.set(id, record);
-  }
-
-  function resumeToastDismissal(id: string) {
-    const record = toastTimers.get(id);
-    if (!record || record.timeoutId) return;
-    record.startedAt = Date.now();
-    record.timeoutId = setTimeout(() => dismissToast(id), record.remainingMs);
-    toastTimers.set(id, record);
-  }
-
-  function dismissToast(id: string, options: { focusToastId?: string | null } = {}) {
-    clearToastTimer(id);
-    ui.toasts = removeToast(ui.toasts, id);
-    if (options.focusToastId) {
-      queueMicrotask(() => {
-        document
-          .querySelector<HTMLElement>(`[data-action="dismiss-toast"][data-toast-id="${options.focusToastId}"]`)
-          ?.focus();
-      });
-    }
-  }
-
-  function enqueueToast({ variant, message, behavior = 'transient' }: { variant: string; message: string; behavior?: string }) {
-    const toast = createToastRecord({ id: `toast-${nextToastId++}`, variant, message, behavior });
-    const previousToasts = ui.toasts;
-    const nextToasts = pushToast(previousToasts, toast);
-    const nextToastIds = new Set(nextToasts.map((entry) => entry.id));
-    previousToasts.forEach((entry) => {
-      if (!nextToastIds.has(entry.id)) clearToastTimer(entry.id);
-    });
-    ui.toasts = nextToasts;
-    if (nextToastIds.has(toast.id)) scheduleToastDismissal(toast);
   }
 
   // ---------------------------------------------------------------------------
@@ -465,14 +400,14 @@
     persistence.lastSaveOk = result.save.ok;
     ui.lastActionNotice = actionNotice;
     result.notices.forEach((notice) =>
-      enqueueToast({ variant: 'warning', message: localizeNotice(notice), behavior: 'persistent' })
+      toast.warning(localizeNotice(notice), { duration: Infinity })
     );
     if (!result.save.ok) {
-      enqueueToast({
-        variant: result.save.storageAvailable === false ? 'warning' : 'error',
-        message: result.save.message,
-        behavior: 'persistent'
-      });
+      if (result.save.storageAvailable === false) {
+        toast.warning(result.save.message, { duration: Infinity });
+      } else {
+        toast.error(result.save.message, { duration: Infinity });
+      }
     }
     return result;
   }
@@ -544,9 +479,6 @@
     clearToDefaults: () => void;
     dismissMyludoSummary: () => void;
     dismissBggSummary: () => void;
-    dismissToast: (id: string, options?: { focusToastId?: string | null }) => void;
-    pauseToastDismissal: (id: string) => void;
-    resumeToastDismissal: (id: string) => void;
     clearActiveSetIds: () => void;
     deactivateAllSets: () => void;
     skipOnboarding: () => void;
@@ -580,10 +512,6 @@
     injectInvalidOwnedSet?: () => void;
   };
   const actions = {
-    dismissToast,
-    pauseToastDismissal,
-    resumeToastDismissal,
-
     selectTab(tabId) {
       persistSelectedTab(
         tabId,
@@ -737,7 +665,7 @@
         (currentState: AppState) => resetOwnedCollection(currentState),
         locale!.t('actions.clearedCollection')
       );
-      enqueueToast({ variant: 'success', message: locale!.t('actions.clearedCollection') });
+      toast.success(locale!.t('actions.clearedCollection'));
     },
 
     requestResetAllState() {
@@ -768,7 +696,7 @@
     setPlayMode(playMode) {
       if (getSelectedPlayerCount() !== 1 && playMode !== 'standard') {
         ui.lastActionNotice = locale!.t('actions.invalidSoloMode');
-        enqueueToast({ variant: 'warning', message: locale!.t('actions.invalidSoloMode') });
+        toast.warning(locale!.t('actions.invalidSoloMode'));
         return;
       }
       persistPreferences(
@@ -798,10 +726,7 @@
         currentState.preferences.localeId = normalizedLocaleId;
         return currentState;
       }, locale!.t('actions.appliedLocale', { locale: newLocaleTools.localeLabel }));
-      enqueueToast({
-        variant: 'success',
-        message: locale!.t('actions.appliedLocale', { locale: newLocaleTools.localeLabel })
-      });
+      toast.success(locale!.t('actions.appliedLocale', { locale: newLocaleTools.localeLabel }));
       focusSelector('#header-locale-select');
     },
 
@@ -819,10 +744,7 @@
       queueMicrotask(() => URL.revokeObjectURL(downloadUrl));
       setLastBackupExportFileName(fileName);
       ui.lastActionNotice = locale!.t('actions.exportedBackup', { fileName });
-      enqueueToast({
-        variant: 'success',
-        message: locale!.t('actions.exportedBackupToast', { fileName })
-      });
+      toast.success(locale!.t('actions.exportedBackupToast', { fileName }));
     },
 
     openImportBackup() {
@@ -838,7 +760,7 @@
         setConfirmBackupRestoreMode(null);
         setBackupImportError(parsedBackup.error);
         ui.lastActionNotice = locale!.t('actions.backupImportFailed');
-        enqueueToast({ variant: 'error', message: parsedBackup.error, behavior: 'persistent' });
+        toast.error(parsedBackup.error, { duration: Infinity });
         return;
       }
       setBackupImportError(null);
@@ -885,7 +807,7 @@
       const nextState = mergeImportedState($state.snapshot(appState!), $state.snapshot(getStagedBackup()!.importedState));
       const result = applyStateUpdate(() => nextState, locale!.t('actions.mergedBackup'));
       syncUiFromPersistedState(result.state);
-      enqueueToast({ variant: 'success', message: locale!.t('actions.mergedBackup') });
+      toast.success(locale!.t('actions.mergedBackup'));
     },
 
     confirmReplaceBackup() {
@@ -896,7 +818,7 @@
         locale!.t('actions.replacedBackup')
       );
       syncUiFromPersistedState(result.state);
-      enqueueToast({ variant: 'warning', message: locale!.t('actions.replacedBackup') });
+      toast.warning(locale!.t('actions.replacedBackup'));
     },
 
     addForcedPick(field, value) {
@@ -950,14 +872,14 @@
         setGeneratorNotices([]);
         setGeneratorError(error.message);
         ui.lastActionNotice = locale!.t('actions.failedSetup');
-        enqueueToast({ variant: 'error', message: error.message, behavior: 'persistent' });
+        toast.error(error.message, { duration: Infinity });
       }
     },
 
     acceptCurrentSetup() {
       if (!getCurrentSetup()) {
         ui.lastActionNotice = locale!.t('actions.acceptBeforeLog');
-        enqueueToast({ variant: 'warning', message: locale!.t('actions.acceptBeforeLog') });
+        toast.warning(locale!.t('actions.acceptBeforeLog'));
         return;
       }
       const acceptedRecordId = createGameRecordId();
@@ -983,7 +905,7 @@
       clearForcedPicksState();
       clearGeneratedSetup();
       focusSelector('[data-result-field="outcome"]');
-      enqueueToast({ variant: 'success', message: locale!.t('actions.acceptedToast') });
+      toast.success(locale!.t('actions.acceptedToast'));
     },
 
     editGameResult(recordId) {
@@ -1034,7 +956,7 @@
       const returnFocusSelector = closeResultEditor();
       ui.lastActionNotice = locale!.t('actions.pendingResult');
       focusSelector(returnFocusSelector ?? '');
-      enqueueToast({ variant: 'info', message: locale!.t('actions.pendingResultToast') });
+      toast.info(locale!.t('actions.pendingResultToast'));
     },
 
     cancelResultEntry() {
@@ -1083,12 +1005,9 @@
       );
       closeResultEditor();
       focusSelector(returnFocusSelector);
-      enqueueToast({
-        variant: 'success',
-        message: wasPending
-          ? locale!.t('actions.savedResultToast')
-          : locale!.t('actions.savedCorrectedResultToast')
-      });
+      toast.success(wasPending
+        ? locale!.t('actions.savedResultToast')
+        : locale!.t('actions.savedCorrectedResultToast'));
     },
 
     toggleHistoryInsights() {
@@ -1104,7 +1023,7 @@
         (currentState: AppState) => resetUsageCategoryStore(currentState, category),
         locale!.t('actions.resetUsageStats', { label })
       );
-      enqueueToast({ variant: 'info', message: locale!.t('actions.resetUsageStats', { label }) });
+      toast.info(locale!.t('actions.resetUsageStats', { label }));
     },
 
     resetAllState() {
@@ -1118,13 +1037,11 @@
       ui.selectedTab = DEFAULT_TAB_ID;
       ui.lastActionNotice = locale!.t('actions.resetAllDefaults');
       if (result.save.ok) {
-        enqueueToast({ variant: 'warning', message: locale!.t('actions.resetAllDefaults') });
+        toast.warning(locale!.t('actions.resetAllDefaults'));
+      } else if (result.save.storageAvailable === false) {
+        toast.warning(result.save.message, { duration: Infinity });
       } else {
-        enqueueToast({
-          variant: result.save.storageAvailable === false ? 'warning' : 'error',
-          message: result.save.message,
-          behavior: 'persistent'
-        });
+        toast.error(result.save.message, { duration: Infinity });
       }
     },
 
@@ -1136,11 +1053,11 @@
         ui.lastActionNotice = save.ok
           ? 'Wrote corrupted JSON to browser storage. Reload the page to verify recovery.'
           : 'Could not write corrupted JSON to browser storage.';
-        enqueueToast({
-          variant: save.ok ? 'warning' : 'error',
-          message: ui.lastActionNotice,
-          behavior: 'persistent'
-        });
+        if (save.ok) {
+          toast.warning(ui.lastActionNotice!, { duration: Infinity });
+        } else {
+          toast.error(ui.lastActionNotice!, { duration: Infinity });
+        }
       },
       injectInvalidOwnedSet() {
         const corruptedState = $state.snapshot(appState!);
@@ -1154,11 +1071,11 @@
         ui.lastActionNotice = save.ok
           ? 'Wrote an invalid owned set ID to storage. Reload the page to verify safe cleanup.'
           : 'Could not write an invalid owned set ID to browser storage.';
-        enqueueToast({
-          variant: save.ok ? 'warning' : 'error',
-          message: ui.lastActionNotice,
-          behavior: 'persistent'
-        });
+        if (save.ok) {
+          toast.warning(ui.lastActionNotice!, { duration: Infinity });
+        } else {
+          toast.error(ui.lastActionNotice!, { duration: Infinity });
+        }
       },
     } : {}),
 
@@ -1171,7 +1088,7 @@
       closeResultEditor();
       clearGeneratedSetup();
       ui.lastActionNotice = locale!.t('actions.clearDefaults');
-      enqueueToast({ variant: 'info', message: locale!.t('actions.clearDefaults') });
+      toast.info(locale!.t('actions.clearDefaults'));
     },
 
     async importMyludoFile(file) {
@@ -1183,7 +1100,7 @@
       if (!result.ok) {
         setMyludoImportStatus('error');
         setMyludoImportError(result.error);
-        enqueueToast({ variant: 'error', message: result.error, behavior: 'persistent' });
+        toast.error(result.error, { duration: Infinity });
         return;
       }
       const { matched, unmatched } = matchMyludoNamesToSets(result.gameNames, bundle!.runtime.sets);
@@ -1211,7 +1128,7 @@
       if (!result.ok) {
         setBggImportStatus('error');
         setBggImportError(result.error);
-        enqueueToast({ variant: 'error', message: result.error, behavior: 'persistent' });
+        toast.error(result.error, { duration: Infinity });
         return;
       }
       const { matched, unmatched } = matchBggNamesToSets(result.gameNames, bundle!.runtime.sets);
@@ -1332,11 +1249,7 @@
 
         if (hydration.notices.length) {
           hydration.notices.forEach((notice) =>
-            enqueueToast({
-              variant: 'warning',
-              message: localizeNotice(notice),
-              behavior: 'persistent'
-            })
+            toast.warning(localizeNotice(notice), { duration: Infinity })
           );
         }
       } catch (error) {
@@ -1456,18 +1369,14 @@
   </header>
 
   <main class="app-main">
-    <!-- Toast region -->
-    <section id="toast-region" aria-live="polite" aria-atomic="false">
-      {#if ui.toasts.length}
-        <ToastStack
-          toasts={ui.toasts}
-          locale={locale!}
-          onDismiss={dismissToast}
-          onPause={pauseToastDismissal}
-          onResume={resumeToastDismissal}
-        />
-      {/if}
-    </section>
+    <Toaster
+      position="bottom-center"
+      offset="calc(80px + env(safe-area-inset-bottom))"
+      expand={true}
+      richColors={true}
+      duration={4000}
+      theme={activeThemeId as 'dark' | 'light'}
+    />
 
     <!-- Onboarding shell -->
     <section class="stack gap-md" id="diagnostics-shell" hidden={!ui.onboardingVisible}>

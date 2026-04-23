@@ -458,8 +458,8 @@ The Backup tab is divided into three clearly separated panels (Epic UX6):
 |---------|-----------|
 | Tab switch | Fade in (150ms ease) |
 | Card expand | max-height slide (200ms ease) |
-| Toast appear | Slide up from below viewport + fade in (200ms); fades in only when `prefers-reduced-motion` is set |
-| Toast dismiss | Slide down out of viewport + fade out (300ms); fades out only when `prefers-reduced-motion` is set |
+| Toast appear | Spring-animated slide and expand (managed by svelte-sonner); fade only when `prefers-reduced-motion` is set |
+| Toast dismiss | Spring-animated collapse and slide out (managed by svelte-sonner); fade only when `prefers-reduced-motion` is set |
 | Button hover | background lightens (100ms) |
 | Generate Setup result | Fade + translate up (250ms) |
 | Modal open | Scale from 0.9 + fade (200ms) |

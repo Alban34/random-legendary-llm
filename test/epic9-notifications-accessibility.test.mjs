@@ -5,7 +5,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from '../src/app/game-data-pipeline.ts';
-import { createToastRecord, pushToast, removeToast, shouldAutoDismissToast } from '../src/app/feedback-utils.ts';
 import { generateSetup } from '../src/app/setup-generator.ts';
 import { createDefaultState, createStorageAdapter, loadState } from '../src/app/state-store.ts';
 
@@ -17,7 +16,6 @@ const rendererPath = path.join(rootDir, 'src', 'app', 'app-renderer.ts');
 const shellCssPath = path.join(rootDir, 'src', 'app', 'app-shell.css');
 const htmlPath = path.join(rootDir, 'src', 'components', 'App.svelte');
 const tabNavPath = path.join(rootDir, 'src', 'components', 'TabNav.svelte');
-const toastStackPath = path.join(rootDir, 'src', 'components', 'ToastStack.svelte');
 const modalRootPath = path.join(rootDir, 'src', 'components', 'ModalRoot.svelte');
 
 let bundle;
@@ -25,7 +23,6 @@ let rendererSource;
 let shellCssSource;
 let htmlSource;
 let tabNavSource;
-let toastStackSource;
 let modalRootSource;
 
 function createAllOwnedState() {
@@ -47,13 +44,12 @@ function markAllUsedExcept(bucket, entities, keepIds) {
 }
 
 beforeAll(async () => {
-  const [seedRaw, rendererRaw, shellCssRaw, htmlRaw, tabNavRaw, toastStackRaw, modalRootRaw] = await Promise.all([
+  const [seedRaw, rendererRaw, shellCssRaw, htmlRaw, tabNavRaw, modalRootRaw] = await Promise.all([
     fs.readFile(seedPath, 'utf8'),
     fs.readFile(rendererPath, 'utf8'),
     fs.readFile(shellCssPath, 'utf8'),
     fs.readFile(htmlPath, 'utf8'),
     fs.readFile(tabNavPath, 'utf8'),
-    fs.readFile(toastStackPath, 'utf8'),
     fs.readFile(modalRootPath, 'utf8')
   ]);
 
@@ -62,44 +58,7 @@ beforeAll(async () => {
   shellCssSource = shellCssRaw;
   htmlSource = htmlRaw;
   tabNavSource = tabNavRaw;
-  toastStackSource = toastStackRaw;
   modalRootSource = modalRootRaw;
-});
-
-test('Toast helpers preserve variant metadata, dismiss records, and cap stacked notifications', () => {
-
-  const successToast = createToastRecord({ id: 'toast-1', variant: 'success', message: 'Saved setup.' });
-  const fallbackToast = createToastRecord({ id: 'toast-2', variant: 'missing', message: 'Fallback copy.' });
-  const persistentWarning = createToastRecord({ id: 'toast-3', variant: 'warning', behavior: 'persistent', message: 'Storage is unavailable.' });
-
-  assert.equal(successToast.variant, 'success');
-  assert.equal(successToast.label, 'Success');
-  assert.equal(successToast.icon, '✅');
-  assert.equal(successToast.live, 'polite');
-  assert.equal(successToast.behavior, 'transient');
-  assert.equal(shouldAutoDismissToast(successToast), true);
-
-  assert.equal(fallbackToast.variant, 'info');
-  assert.equal(fallbackToast.label, 'Info');
-  assert.equal(fallbackToast.icon, 'ℹ️');
-  assert.equal(fallbackToast.live, 'polite');
-  assert.equal(fallbackToast.behavior, 'transient');
-
-  assert.equal(persistentWarning.variant, 'warning');
-  assert.equal(persistentWarning.behavior, 'persistent');
-  assert.equal(persistentWarning.isPersistent, true);
-  assert.equal(shouldAutoDismissToast(persistentWarning), false);
-
-  const stacked = ['toast-1', 'toast-2', 'toast-4', 'toast-5'].reduce((toasts, id, index) => {
-    return pushToast(toasts, createToastRecord({
-      id,
-      variant: index % 2 === 0 ? 'info' : 'warning',
-      message: `Message ${index}`
-    }));
-  }, [persistentWarning]);
-
-  assert.deepEqual(stacked.map((toast) => toast.id), ['toast-3', 'toast-2', 'toast-4', 'toast-5']);
-  assert.equal(removeToast(stacked, 'toast-4').some((toast) => toast.id === 'toast-4'), false);
 });
 
 test('Setup messaging surfaces invalid requests clearly and reports least-played fallback usage', () => {
@@ -169,20 +128,14 @@ test('Storage degradation keeps a default in-memory state and exposes a readable
 
 test('Ships semantic tab, toast, and modal markup plus visible focus styling', () => {
 
-  assert.match(htmlSource, /id="toast-region"[^>]*aria-live="polite"[^>]*aria-atomic="false"/);
   assert.match(htmlSource, /role="tablist"/);
 
   assert.match(tabNavSource, /role="tab"/);
   assert.match(modalRootSource, /role="dialog"[\s\S]*?aria-modal="true"[\s\S]*?aria-labelledby="modal-title"[\s\S]*?aria-describedby="modal-description"/);
   assert.match(htmlSource, /aria-labelledby=\{"tab-desktop-" \+ tab\.id \+ " tab-mobile-" \+ tab\.id\}/);
-  assert.match(toastStackSource, /role="region" aria-label=\{locale\.t\('toast\.region'\)\}/);
-  assert.match(toastStackSource, /data-toast-dismiss-on-click=\{toast\.dismissOnClick \? 'true' : 'false'\}/);
-  assert.match(toastStackSource, /" toast-" \+ toast\.behavior/);
 
   assert.match(shellCssSource, /button:focus-visible/);
   assert.match(shellCssSource, /\.tab-button:focus-visible/);
   assert.match(shellCssSource, /summary:focus-visible/);
-  assert.match(shellCssSource, /#toast-region\s*\{[\s\S]*position:\s*fixed;/);
-  assert.match(shellCssSource, /\.toast-persistent\s*\{/);
 });
 
