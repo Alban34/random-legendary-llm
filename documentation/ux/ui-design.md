@@ -307,6 +307,7 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 - Inside the Forced Picks disclosure, a **Preferred Expansion** sub-section appears first: a `<select>` populated with the player's owned expansions lets them designate one expansion whose cards the generator prefers within each play-count tier for unclaimed slots; when an expansion is active it is shown with its name and a one-tap clear button; the sub-section is hidden and replaced with an unavailable message when the player owns fewer than two expansions
 - Forced picks are one-shot setup constraints that remain active across all rerolls, then clear after a successful Accept & Log or reload
 - An "Active Expansions" panel appears below the Forced Picks disclosure on the New Game tab; it lists every owned expansion as a toggleable checkbox item; toggling an item adds or removes its ID from `activeSetIds`; "Use all expansions" sets `activeSetIds` to `null` (restoring the all-owned fallback); "Clear selection" sets `activeSetIds` to `[]`, deselecting every expansion checkbox; the panel shows a summary line reading "Using X of Y expansions" when a non-empty filter is active, or "All X expansions" when `activeSetIds` is `null`
+- An **Epic Mastermind** toggle appears in the setup view when at least one expansion in `EPIC_MASTERMIND_SUPPORTED_SETS` (currently `"X-Men"`) is in the player's collection; when the condition is not met the control is fully absent from the DOM; enabling the toggle restricts the mastermind draw to the Epic Mastermind card pool from supported expansions; the toggle state persists across page reloads via `lastEpicMastermind` in `Preferences`
 - Before the Generate button is enabled, `validateSetupLegality` is evaluated against the resolved active pool for the current player count and play mode; if the result is not `ok`, the Generate button is disabled and the legality reasons are displayed inline beneath the selector; re-evaluation happens whenever the active pool, player count, or play mode changes
 - "Generate Setup" / "New Setup" validates collection size before randomizing
 - "Accept & Log Game" saves the setup to history, opens immediate result entry in History, and marks the setup as used; it is disabled until a setup is present
@@ -321,7 +322,7 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 ## Tab 4 — History
 
 ```
-  Group by: [Mastermind] [Scheme] [Heroes] [Villains] [Player Mode]
+  Group by: [Mastermind] [Scheme] [Heroes] [Villains] [Player Mode] [Epic Mastermind]
 
   Filter: [All] [Won] [Lost] [Pending]
   3 games                                ← count line (hidden when All is active)
@@ -350,6 +351,8 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 
 **Interactions:**
 - Grouping defaults to Mastermind and can be switched without changing saved data
+- The "Epic Mastermind" grouping mode splits history into two groups — Epic Mastermind games (entries where `epicMastermind` is `true`) and standard games — using localised group-header labels
+- History entries where `epicMastermind` is `true` display a visual badge indicator (accessible label `history.epicMastermind.indicator`); the badge is absent on standard entries
 - Group headers can collapse or expand their records for faster scanning of long histories
 - History items collapse/expand on click
 - History is ordered newest-first

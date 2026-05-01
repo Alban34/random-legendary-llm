@@ -16,7 +16,8 @@ export const HISTORY_GROUPING_MODES: ReadonlyArray<{ id: string; label: string }
   { id: 'scheme', label: 'Scheme' },
   { id: 'heroes', label: 'Heroes' },
   { id: 'villains', label: 'Villains' },
-  { id: 'play-mode', label: 'Player Mode' }
+  { id: 'play-mode', label: 'Player Mode' },
+  { id: 'epic-mastermind', label: 'history.group.epic-mastermind' }
 ];
 
 export const DEFAULT_HISTORY_GROUPING_MODE = 'mastermind';
@@ -68,6 +69,7 @@ export interface HistorySummary {
   perPlayerScoreLabel: string | null;
   resultNotes: string;
   resultUpdatedAt: string | null;
+  epicMastermind: boolean;
 }
 
 export interface HistoryGroup {
@@ -139,7 +141,8 @@ export function formatHistorySummary(record: HistoryRecord, indexes: RuntimeInde
       }).join(' \u00b7 ');
     })(),
     resultNotes: result.notes,
-    resultUpdatedAt: result.updatedAt
+    resultUpdatedAt: result.updatedAt,
+    epicMastermind: record.epicMastermind ?? false
   };
 }
 
@@ -219,6 +222,11 @@ export function buildHistoryGroups(
       summary.villainGroupIds.forEach((villainGroupId, i) => {
         pushToGroup({ id: `villain:${villainGroupId}`, label: summary.villainGroupNames[i] }, summary);
       });
+    } else if (normalizedMode === 'epic-mastermind') {
+      const config = summary.epicMastermind
+        ? { id: 'epic-mastermind:epic', label: 'history.group.epic-mastermind.epicGames' }
+        : { id: 'epic-mastermind:standard', label: 'history.group.epic-mastermind.standardGames' };
+      pushToGroup(config, summary);
     } else {
       const duplicateMastermindNameCount = mastermindNameCounts.get(summary.mastermindName) || 0;
       pushToGroup(buildGroupConfig(normalizedMode, summary, duplicateMastermindNameCount), summary);

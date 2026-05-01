@@ -103,6 +103,7 @@ interface GenerateSetupOptions {
   advancedSolo?: boolean;
   playMode?: PlayMode | string;
   forcedPicks?: unknown;
+  epicMastermind?: boolean;
   random?: () => number;
 }
 
@@ -953,13 +954,22 @@ function trySchemeForSetup(scheme: SchemeRuntime, context: TrySchemeContext): Ge
   return null;
 }
 
-export function generateSetup({ runtime, state, playerCount, advancedSolo = false, playMode, forcedPicks, random = Math.random }: GenerateSetupOptions): GeneratedSetup {
+export function generateSetup({ runtime, state, playerCount, advancedSolo = false, playMode, forcedPicks, epicMastermind, random = Math.random }: GenerateSetupOptions): GeneratedSetup {
   const legality = validateSetupLegality({ runtime, state, playerCount, advancedSolo, playMode, forcedPicks });
   if (!legality.ok) {
     throw new Error(legality.reasons.join(' '));
   }
 
   const { template, pools, eligibleSchemes, forcedPicks: normalizedForcedPicks } = legality;
+
+  if (epicMastermind === true) {
+    const epicPool = pools!.masterminds.filter((m) => m.isEpicMastermind === true);
+    if (epicPool.length === 0) {
+      throw new Error('newGame.epicMastermind.noCardsError');
+    }
+    pools!.masterminds = epicPool;
+  }
+
   const hasConstraintSelections = hasForcedPicks(normalizedForcedPicks);
   const constraintFailureReasons = new Set<string>();
   const schemeSelection = selectScheme(eligibleSchemes!, normalizedForcedPicks!, state.usage.schemes, random, normalizedForcedPicks!.preferredExpansionId);

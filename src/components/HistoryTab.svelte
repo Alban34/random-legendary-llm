@@ -7,6 +7,7 @@
   } from '../app/history-utils.ts';
   import type { HistoryGroup } from '../app/history-utils.ts';
   import type { HistoryRecord } from '../app/types.ts';
+  import type { MessageKey } from '../app/locales/en.ts';
   import { buildInsightsDashboard, RECENT_SCORE_WINDOW } from '../app/stats-utils.ts';
   import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from '../app/result-utils.ts';
   import { getHistoryOutcomeFilter, setHistoryOutcomeFilter } from '../app/history-vm.svelte.ts';
@@ -104,6 +105,9 @@
     if (group.mode === 'play-mode') {
       const playMode = group.id.split(':')[1] || 'standard';
       return locale.getPlayModeLabel(playMode, playMode === 'standard' ? 2 : 1);
+    }
+    if (group.mode === 'epic-mastermind') {
+      return locale.t(group.label as MessageKey);
     }
     return group.label;
   }
@@ -218,6 +222,9 @@
                     class={"pill " + resultPillClass}
                     data-history-result-status={summary.result.status}
                   >{resultLabel}</span>
+                  {#if summary.epicMastermind}
+                    <span class="pill" data-epic-mastermind-indicator>{locale.t('history.epicMastermind.indicator')}</span>
+                  {/if}
                 </summary>
                 <div class="history-meta muted">{locale.t('history.acceptedAt', { date: locale.formatDateTime(summary.createdAt), mode: modeLabel })}</div>
                 <div class="history-meta"><strong>{locale.t('history.result')}</strong> {resultLabel}</div>

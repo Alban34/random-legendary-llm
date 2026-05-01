@@ -12,6 +12,7 @@ import type {
   HenchmanGroupRuntime,
   SchemeRuntime
 } from './types.ts';
+import { EPIC_MASTERMIND_SUPPORTED_SETS } from './types.ts';
 
 // ---------------------------------------------------------------------------
 // Local pipeline types
@@ -310,7 +311,8 @@ export function normalizeGameData(source: CanonicalSourceData): PipelineRuntime 
         name: mastermind.name,
         aliases: mastermind.aliases || [],
         lead,
-        notes: (mastermind as MastermindCard).notes || []
+        notes: (mastermind as MastermindCard).notes || [],
+        isEpicMastermind: EPIC_MASTERMIND_SUPPORTED_SETS.includes(set.name) || undefined
       };
     });
 

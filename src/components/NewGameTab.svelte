@@ -7,6 +7,7 @@
   import { getSoloRulesItems, SOLO_RULES_PANEL_MODES } from '../app/solo-rules.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
   import type { AppState, LocaleTools, GeneratedSetup, PlayMode, SchemeRuntime, HeroRuntime, MastermindRuntime, VillainGroupRuntime, HenchmanGroupRuntime } from '../app/types.ts';
+  import { EPIC_MASTERMIND_SUPPORTED_SETS } from '../app/types.ts';
 
   let {
     bundle,
@@ -46,6 +47,7 @@
       clearActiveSetIds: () => void;
       deactivateAllSets: () => void;
       setPreferredExpansion: (id: string | null) => void;
+      setEpicMastermind: (enabled: boolean) => void;
     };
   } = $props();
 
@@ -57,6 +59,14 @@
     currentSetup
   }));
   let hasActiveForcedPicks: boolean = $derived(hasForcedPicks(forcedPicks));
+
+  let epicMastermindEnabled: boolean = $derived(appState.preferences.lastEpicMastermind ?? false);
+  let hasEpicMastermindSets: boolean = $derived(
+    (appState.collection.activeSetIds ?? appState.collection.ownedSetIds).some((id) => {
+      const setEntry = bundle.runtime.indexes.setsById[id];
+      return setEntry !== undefined && EPIC_MASTERMIND_SUPPORTED_SETS.includes(setEntry.name);
+    })
+  );
 
   let soloRulesItems: string[] | null = $derived(
     currentSetup && selectedPlayerCount === 1 && SOLO_RULES_PANEL_MODES.has(selectedPlayMode)
@@ -251,6 +261,18 @@
           {/each}
         </div>
       </div>
+
+      {#if hasEpicMastermindSets}
+        <label>
+          <input
+            type="checkbox"
+            checked={epicMastermindEnabled}
+            data-epic-mastermind-toggle
+            onchange={() => gameActions.setEpicMastermind(!epicMastermindEnabled)}
+          /> {locale.t('newGame.epicMastermind')}
+          <small class="muted">{locale.t('newGame.epicMastermind.help')}</small>
+        </label>
+      {/if}
 
       <div class="row wrap gap-sm align-center">
         <button

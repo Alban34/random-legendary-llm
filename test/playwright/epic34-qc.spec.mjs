@@ -12,7 +12,8 @@ const EXPECTED_MODES = [
   { id: 'scheme', labelEn: 'Scheme', labelFr: 'Scénario' },
   { id: 'heroes', labelEn: 'Heroes', labelFr: 'Héros' },
   { id: 'villains', labelEn: 'Villains', labelFr: 'Vilains' },
-  { id: 'play-mode', labelEn: 'Player Mode', labelFr: 'Mode joueur' }
+  { id: 'play-mode', labelEn: 'Player Mode', labelFr: 'Mode joueur' },
+  { id: 'epic-mastermind', labelEn: 'Epic Mastermind', labelFr: 'Epic Mastermind' }
 ];
 
 async function acceptSetup(page) {
@@ -31,13 +32,13 @@ test.describe('Epic 34 automated QC — History Grouping Expansion', () => {
 
   // Story 34.3 — Grouping UI controls expose exactly five modes
 
-  test('History tab renders exactly five grouping mode buttons and no others', async ({ page }) => {
+  test('History tab renders exactly six grouping mode buttons and no others', async ({ page }) => {
     await acceptSetup(page);
     await page.locator('[data-action="skip-game-result"]').click();
     await selectTab(page, 'history');
 
     const buttons = page.locator('[data-history-grouping-controls] [data-action="set-history-grouping"]');
-    await expect(buttons).toHaveCount(5);
+    await expect(buttons).toHaveCount(6);
 
     for (const mode of EXPECTED_MODES) {
       await expect(

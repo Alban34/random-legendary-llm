@@ -1,6 +1,37 @@
 // Epic 62 — Domain Type Declarations
 import type { MessageKey } from './locales/en.ts';
 
+// Add future expansion names here when their Epic Mastermind cards are catalogued.
+export const EPIC_MASTERMIND_SUPPORTED_SETS: readonly string[] = [
+  'X-Men',
+  'Marvel Noir',
+  'Spider-Man Homecoming',
+  'Champions',
+  'World War Hulk',
+  'Ant-Man',
+  'Marvel Studios, Phase 1',
+  'S.H.I.E.L.D.',
+  'Dimensions',
+  'Venom',
+  'Revelations',
+  'The New Mutants',
+  'Into the Cosmos',
+  'Realm of Kings',
+  'Heroes of Asgard',
+  'Annihilation',
+  'Black Widow',
+  'Black Panther',
+  'Doctor Strange and the Shadows of Nightmare',
+  'Messiah Complex',
+  "Marvel Studios' Guardians of the Galaxy",
+  'Midnight Sons',
+  'The Infinity Saga',
+  "Marvel Studios' What If...?",
+  'Weapon X',
+  '2099',
+  'Ant-Man and the Wasp',
+] as const;
+
 // =============================================================================
 // Section 1: Game data (canonical source)
 // =============================================================================
@@ -86,6 +117,7 @@ export interface MastermindRuntime {
   aliases: string[];
   lead: { category: string; id: string } | null;
   notes: string[];
+  isEpicMastermind?: boolean;
 }
 
 export interface VillainGroupRuntime {
@@ -162,6 +194,7 @@ export interface CollectionState {
 export interface Preferences {
   lastPlayerCount: number;
   lastAdvancedSolo: boolean;
+  lastEpicMastermind?: boolean;
   lastPlayMode: PlayMode;
   selectedTab: string | null;
   onboardingCompleted: boolean;
@@ -196,6 +229,7 @@ export interface HistoryRecord {
     henchmanGroupIds: string[];
   };
   result: GameResult;
+  epicMastermind?: boolean;
 }
 
 export interface AppState {

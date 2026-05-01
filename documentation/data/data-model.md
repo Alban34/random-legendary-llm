@@ -23,7 +23,7 @@ Persisted slices in V1:
 - `collection` — owned set IDs
 - `usage` — per-category `plays` and `lastPlayedAt`
 - `history` — accepted game records stored with IDs only plus optional result data
-- `preferences` — last player count, legacy Advanced Solo flag, normalized play mode, selected tab, onboarding completion, the active theme ID, and the active locale ID
+- `preferences` — last player count, legacy Advanced Solo flag, normalized play mode, selected tab, onboarding completion, the active theme ID, the active locale ID, and the last Epic Mastermind toggle state
 
 ### `ThemeId`
 
@@ -218,9 +218,12 @@ The shipped runtime bundle shape is:
     category: "villains" | "henchmen",
     id: string
   } | null,
+  isEpicMastermind?: boolean,
   notes: string[]
 }
 ```
+
+`isEpicMastermind` is `true` for mastermind cards that belong to the Epic Mastermind card pool (introduced in the X-Men expansion). When absent or `false`, the mastermind is treated as a standard card. The Epic Mastermind setup-generator filter uses this field in conjunction with `EPIC_MASTERMIND_SUPPORTED_SETS` to restrict the mastermind pool when Epic Mastermind mode is active (Epic 71).
 
 ### `NormalizedScheme`
 
@@ -301,7 +304,8 @@ The app should persist **one versioned root state object**.
     selectedTab: string | null,
     onboardingCompleted: boolean,
     themeId: ThemeId,
-    localeId: LocaleId
+    localeId: LocaleId,
+    lastEpicMastermind?: boolean
   }
 }
 ```
@@ -388,6 +392,7 @@ Accepted setups should be stored using IDs only.
   playerCount: 1 | 2 | 3 | 4 | 5,
   advancedSolo: boolean,
   playMode: PlayMode,
+  epicMastermind?: boolean,
   setupSnapshot: {
     mastermindId: string,
     schemeId: string,

@@ -53,10 +53,10 @@ function createRecord({
   };
 }
 
-test('HISTORY_GROUPING_MODES contains exactly five modes: mastermind, scheme, heroes, villains, play-mode', () => {
+test('HISTORY_GROUPING_MODES contains exactly six modes: mastermind, scheme, heroes, villains, play-mode, epic-mastermind', () => {
 
   const ids = HISTORY_GROUPING_MODES.map((m) => m.id);
-  assert.deepEqual(ids, ['mastermind', 'scheme', 'heroes', 'villains', 'play-mode']);
+  assert.deepEqual(ids, ['mastermind', 'scheme', 'heroes', 'villains', 'play-mode', 'epic-mastermind']);
 });
 
 test('DEFAULT_HISTORY_GROUPING_MODE is mastermind', () => {

@@ -504,6 +504,7 @@
     toggleBrowseSetExpanded: (setId: string) => void;
     setPlayerCount: (playerCount: number) => void;
     setPlayMode: (playMode: string) => void;
+    setEpicMastermind: (enabled: boolean) => void;
     editGameResult: (recordId: string) => void;
     setResultOutcome: (outcome: string) => void;
     setResultScore: (score: string) => void;
@@ -749,6 +750,13 @@
       );
     },
 
+    setEpicMastermind(enabled) {
+      applyStateUpdate((currentState: AppState) => {
+        currentState.preferences.lastEpicMastermind = enabled;
+        return currentState;
+      }, locale!.t('newGame.epicMastermind'));
+    },
+
     setTheme(themeId) {
       const normalizedThemeId = normalizeThemeId(themeId);
       if (appState!.preferences.themeId === normalizedThemeId) return;
@@ -908,7 +916,8 @@
           playerCount: getSelectedPlayerCount(),
           advancedSolo: getAdvancedSolo(),
           playMode: getSelectedPlayMode(),
-          forcedPicks: getForcedPicks()
+          forcedPicks: getForcedPicks(),
+          epicMastermind: appState!.preferences.lastEpicMastermind ?? false
         });
         setCurrentSetup(setup);
         setGeneratorError(null);
@@ -938,6 +947,7 @@
           playerCount: getSelectedPlayerCount(),
           advancedSolo: getAdvancedSolo(),
           playMode: getSelectedPlayMode(),
+          epicMastermind: appState!.preferences.lastEpicMastermind ?? false,
           setupSnapshot: buildHistoryReadySetupSnapshot($state.snapshot(getCurrentSetup()!))
         });
         nextState.preferences.selectedTab = 'history';
@@ -1210,6 +1220,7 @@
   const gameActions = {
     setPlayerCount: actions.setPlayerCount,
     setPlayMode: actions.setPlayMode,
+    setEpicMastermind: actions.setEpicMastermind,
     generateSetup: actions.generateSetup,
     acceptCurrentSetup: actions.acceptCurrentSetup,
     addForcedPick: actions.addForcedPick,

@@ -194,7 +194,8 @@ function sanitizeGameRecord(record: unknown, indexes: Indexes, notices: string[]
       villainGroupIds: [...(setupSnapshot.villainGroupIds as string[])],
       henchmanGroupIds: [...(setupSnapshot.henchmanGroupIds as string[])]
     },
-    result: sanitizedResult.result as GameResult
+    result: sanitizedResult.result as GameResult,
+    epicMastermind: r.epicMastermind === true
   };
 }
 
@@ -222,6 +223,7 @@ function sanitizePreferences(candidatePreferences: unknown, notices: string[]): 
   const defaultPreferences = createDefaultPreferences();
   const lastPlayerCount = sanitizeIntegerRange(cp.lastPlayerCount, 1, 5, defaultPreferences.lastPlayerCount);
   const lastAdvancedSolo = sanitizeBoolean(cp.lastAdvancedSolo, defaultPreferences.lastAdvancedSolo);
+  const lastEpicMastermind = sanitizeBoolean(cp.lastEpicMastermind, false);
   let lastPlayMode: PlayMode;
   try {
     lastPlayMode = resolvePlayMode(lastPlayerCount, {
@@ -257,7 +259,7 @@ function sanitizePreferences(candidatePreferences: unknown, notices: string[]): 
     notices.push('Recovered invalid preference values during state hydration.');
   }
 
-  return { lastPlayerCount, lastAdvancedSolo, lastPlayMode, selectedTab, onboardingCompleted, themeId, localeId };
+  return { lastPlayerCount, lastAdvancedSolo, lastEpicMastermind, lastPlayMode, selectedTab, onboardingCompleted, themeId, localeId };
 }
 
 function sanitizeStateCandidate(candidate: unknown, indexes: Indexes): { state: AppState; notices: string[] } {
@@ -546,6 +548,7 @@ interface CreateGameRecordParams {
   playerCount: number;
   advancedSolo: boolean;
   playMode: PlayMode;
+  epicMastermind?: boolean;
   setupSnapshot: {
     mastermindId: string;
     schemeId: string;
@@ -558,7 +561,7 @@ interface CreateGameRecordParams {
   result?: GameResult;
 }
 
-export function createGameRecord({ playerCount, advancedSolo, playMode, setupSnapshot, createdAt = new Date().toISOString(), id = createGameRecordId(), result = createPendingGameResult() as GameResult }: CreateGameRecordParams): HistoryRecord {
+export function createGameRecord({ playerCount, advancedSolo, playMode, epicMastermind, setupSnapshot, createdAt = new Date().toISOString(), id = createGameRecordId(), result = createPendingGameResult() as GameResult }: CreateGameRecordParams): HistoryRecord {
   const normalizedPlayMode = resolvePlayMode(playerCount, { advancedSolo, playMode });
   let effectiveResult = result;
   if (playerCount >= 2 && result.status === GAME_RESULT_STATUS_PENDING) {
@@ -578,7 +581,8 @@ export function createGameRecord({ playerCount, advancedSolo, playMode, setupSna
       villainGroupIds: [...setupSnapshot.villainGroupIds],
       henchmanGroupIds: [...setupSnapshot.henchmanGroupIds]
     },
-    result: sanitizedResult
+    result: sanitizedResult,
+    epicMastermind: epicMastermind ?? false
   };
 }
 
@@ -591,6 +595,7 @@ export function acceptGameSetup(state: AppState, gameConfig: CreateGameRecordPar
   nextState.preferences.lastPlayerCount = record.playerCount;
   nextState.preferences.lastAdvancedSolo = record.advancedSolo;
   nextState.preferences.lastPlayMode = record.playMode;
+  nextState.preferences.lastEpicMastermind = record.epicMastermind ?? false;
 
   record.setupSnapshot.heroIds.forEach((id) => incrementUsageStat(nextState.usage.heroes, id, playedAt));
   incrementUsageStat(nextState.usage.masterminds, record.setupSnapshot.mastermindId, playedAt);

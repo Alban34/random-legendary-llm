@@ -30,7 +30,7 @@ The current release keeps the architecture described below and implements it wit
 - `src/app/state-store.ts` — owns the versioned root state persisted under `legendary_state_v1`; also exports `setActiveSetIds(state, ids)` (sets `collection.activeSetIds` to `ids`, or `null` when `ids` is null), `clearActiveSetIds(state)` (sets `collection.activeSetIds` to `null`, restoring the all-owned fallback), and `deactivateAllSets(state)` (sets `collection.activeSetIds` to `[]`, the "Clear selection" / all-unchecked state that produces an infeasible pool and disables generation); these three actions were added in Epic 46
 - `src/app/state-store.svelte.ts` — Svelte 5 reactive wrapper; `_appState` backed by `$state`
 - `src/app/object-utils.ts` — shared object utilities; exports `deepClone` (thin wrapper over `structuredClone`) and `isPlainObject`; extracted from `state-store.ts`, `backup-utils.ts`, and `setup-generator.ts` to eliminate duplication
-- `src/app/history-utils.ts` — history record formatting and filtering utilities; `formatHistorySummary` resolves entity display names, expansion set names, and grouping keys from runtime indexes for each history record; `filterHistoryByOutcome(records, filter)` filters a history array to the requested outcome (`'all'`, `'win'`, `'loss'`, `'pending'`) without mutating the input
+- `src/app/history-utils.ts` — history record formatting and filtering utilities; `formatHistorySummary` resolves entity display names, expansion set names, and grouping keys from runtime indexes for each history record; `filterHistoryByOutcome(records, filter)` filters a history array to the requested outcome (`'all'`, `'win'`, `'loss'`, `'pending'`) without mutating the input; exports `HISTORY_GROUPING_MODES` (the ordered list of supported grouping mode identifiers: `'mastermind'`, `'scheme'`, `'hero'`, `'villain'`, `'play-mode'`, and `'epic-mastermind'` added in Epic 71) and `normalizeHistoryGroupingMode(raw)` (validates a raw string against the list and falls back to the default mode)
 - `src/app/setup-rules.ts` and `src/app/setup-generator.ts` — resolve templates and produce legal setups
 - `src/app/solo-rules.ts` — solo mode rules reference data; exports `SOLO_RULES_PANEL_MODES` (a `Set` of the three eligible solo mode keys: `standard`, `advanced-solo`, `standard-solo-v2`) and `getSoloRulesItems(playMode)` (returns an ordered array of `newGame.soloRules.*` locale string keys for the eligible modes, or `null` for ineligible modes including `two-handed-solo` and all multiplayer modes); added in Epic 57
 - `src/app/app-renderer.ts` — transitional render functions used via `{@html}` blocks in Svelte tab components
@@ -280,7 +280,8 @@ Current shape:
     lastPlayMode: string,
     onboardingCompleted: boolean,
     themeId: string,
-    selectedTab: string | null
+    selectedTab: string | null,
+    lastEpicMastermind?: boolean
   }
 }
 ```
