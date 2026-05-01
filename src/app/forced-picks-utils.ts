@@ -4,6 +4,7 @@ export interface ForcedPicks {
   heroIds: string[];
   villainGroupIds: string[];
   henchmanGroupIds: string[];
+  preferredExpansionId: string | null;
 }
 
 interface ForcedPickFieldConfig {
@@ -29,7 +30,8 @@ export function createEmptyForcedPicks(): ForcedPicks {
     mastermindId: null,
     heroIds: [],
     villainGroupIds: [],
-    henchmanGroupIds: []
+    henchmanGroupIds: [],
+    preferredExpansionId: null
   };
 }
 
@@ -43,7 +45,8 @@ export function normalizeForcedPicks(candidateForcedPicks: unknown): ForcedPicks
     mastermindId: typeof candidate.mastermindId === 'string' && candidate.mastermindId ? candidate.mastermindId : null,
     heroIds: [...new Set(Array.isArray(candidate.heroIds) ? (candidate.heroIds as unknown[]).filter((id): id is string => typeof id === 'string' && !!id) : [])],
     villainGroupIds: [...new Set(Array.isArray(candidate.villainGroupIds) ? (candidate.villainGroupIds as unknown[]).filter((id): id is string => typeof id === 'string' && !!id) : [])],
-    henchmanGroupIds: [...new Set(Array.isArray(candidate.henchmanGroupIds) ? (candidate.henchmanGroupIds as unknown[]).filter((id): id is string => typeof id === 'string' && !!id) : [])]
+    henchmanGroupIds: [...new Set(Array.isArray(candidate.henchmanGroupIds) ? (candidate.henchmanGroupIds as unknown[]).filter((id): id is string => typeof id === 'string' && !!id) : [])],
+    preferredExpansionId: typeof candidate.preferredExpansionId === 'string' && candidate.preferredExpansionId ? candidate.preferredExpansionId : null
   };
 }
 
@@ -55,6 +58,7 @@ export function hasForcedPicks(forcedPicks: unknown): boolean {
     || normalized.heroIds.length
     || normalized.villainGroupIds.length
     || normalized.henchmanGroupIds.length
+    || normalized.preferredExpansionId
   );
 }
 

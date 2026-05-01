@@ -516,6 +516,7 @@
     importBggCollection: (username: string) => Promise<void>;
     addForcedPick: (field: string, value: string) => void;
     removeForcedPick: (field: string, value: string) => void;
+    setPreferredExpansion: (id: string | null) => void;
     clearToDefaults: () => void;
     dismissMyludoSummary: () => void;
     dismissBggSummary: () => void;
@@ -893,6 +894,12 @@
       ui.lastActionNotice = locale!.t('actions.clearedForcedPicks');
     },
 
+    setPreferredExpansion(id) {
+      setForcedPicks({ ...getForcedPicks(), preferredExpansionId: id });
+      clearGeneratedSetup();
+      ui.lastActionNotice = locale!.t('actions.updatedForcedPicks');
+    },
+
     generateSetup() {
       try {
         const setup = generateSetup({
@@ -1208,6 +1215,7 @@
     addForcedPick: actions.addForcedPick,
     removeForcedPick: actions.removeForcedPick,
     clearForcedPicks: actions.clearForcedPicks,
+    setPreferredExpansion: actions.setPreferredExpansion,
     clearToDefaults: actions.clearToDefaults,
     setActiveSetIds: actions.setActiveSetIds,
     clearActiveSetIds: actions.clearActiveSetIds,

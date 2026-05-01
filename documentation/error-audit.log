@@ -24,6 +24,11 @@ Finding: The prior Epic 65 finding (above) was filed against `src/app/state-stor
 Suggested action: Check `src/app/state-store.svelte.ts` lines 4, 16, and 39 to confirm whether the `state-store.mjs` comment/JSDoc references were corrected. If they remain, update them to `state-store.ts`.
 ---
 ---
-[2026-04-22] Resolution note for Epic 68 finding above:
+[2026-05-01] Resolution note for Epic 68 finding above:
 The lint errors in App.svelte, TabNav.svelte, ToastStack.svelte were fully resolved during the Epic 67/68 implementation session. `npm run lint` (ESLint + svelte-check) now exits 0 with 0 errors and 0 warnings. `npm test` passes 359/359. The [2026-04-22] finding above is superseded by this resolution.
+---
+[2026-05-01] Epic: Epic 70 — Preferred Expansion Priority
+File: documentation/planning/epic/ready-for-dev/epic-70.md, documentation/planning/epic/ready-for-dev/epic-70-task-list.md
+Finding: Epic 70 has been fully implemented (all story tasks marked [x] in the task list) but the epic spec and task-list files remain in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete tool available), so the relocation is logged here.
+Suggested action: Move `epic-70.md` and `epic-70-task-list.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior epics.
 ---

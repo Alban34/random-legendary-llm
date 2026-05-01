@@ -250,6 +250,9 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
   │   [ ⚡ Generate Setup ]  [ ✅ Accept & Log ]    │
   │                                                 │
   │  ▶ Forced Picks  (disclosure, collapsed)        │
+  │    ↳ Preferred expansion: [select or active+clear]│
+  │    ↳ Scheme / Mastermind / Heroes / Villains /   │
+  │      Henchmen forced-pick rows                   │
   │                                                 │
   │  ── Active Expansions ─────────────────────────  │
   │  ☑ Dark City      ☑ Fantastic Four              │
@@ -301,6 +304,7 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 - A single primary button handles both first generation and all subsequent rerolls. Its label is context-sensitive: "Generate Setup" before any result is present, "New Setup" once a setup is already displayed
 - The primary action button appears directly below the setup-requirements summary, before optional content, so users can act without scrolling past forced picks
 - Forced picks are presented in a native `<details>` disclosure element below the primary action row; users who need forced picks can expand the disclosure without it adding visual weight for users who do not
+- Inside the Forced Picks disclosure, a **Preferred Expansion** sub-section appears first: a `<select>` populated with the player's owned expansions lets them designate one expansion whose cards the generator prefers within each play-count tier for unclaimed slots; when an expansion is active it is shown with its name and a one-tap clear button; the sub-section is hidden and replaced with an unavailable message when the player owns fewer than two expansions
 - Forced picks are one-shot setup constraints that remain active across all rerolls, then clear after a successful Accept & Log or reload
 - An "Active Expansions" panel appears below the Forced Picks disclosure on the New Game tab; it lists every owned expansion as a toggleable checkbox item; toggling an item adds or removes its ID from `activeSetIds`; "Use all expansions" sets `activeSetIds` to `null` (restoring the all-owned fallback); "Clear selection" sets `activeSetIds` to `[]`, deselecting every expansion checkbox; the panel shows a summary line reading "Using X of Y expansions" when a non-empty filter is active, or "All X expansions" when `activeSetIds` is `null`
 - Before the Generate button is enabled, `validateSetupLegality` is evaluated against the resolved active pool for the current player count and play mode; if the result is not `ok`, the Generate button is disabled and the legality reasons are displayed inline beneath the selector; re-evaluation happens whenever the active pool, player count, or play mode changes

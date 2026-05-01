@@ -45,6 +45,7 @@
       setActiveSetIds: (ids: string[]) => void;
       clearActiveSetIds: () => void;
       deactivateAllSets: () => void;
+      setPreferredExpansion: (id: string | null) => void;
     };
   } = $props();
 
@@ -90,6 +91,12 @@
       henchmanGroupIds: [...pools.henchmanGroups].sort((a, b) => a.name.localeCompare(b.name))
     };
   });
+
+  let ownedExpansions: Array<{ id: string; name: string }> = $derived(
+    bundle.runtime.sets
+      .filter((set) => appState.collection.ownedSetIds.includes(set.id))
+      .sort((a, b) => a.name.localeCompare(b.name))
+  );
 
   let modeIneligibleSchemeIds: Set<string> = $derived.by(() => {
     if (selectedPlayMode !== 'standard' || selectedPlayerCount !== 1) return new Set<string>();
@@ -333,6 +340,36 @@
               </div>
             {/each}
           </div>
+          {#if ownedExpansions.length >= 2}
+            <div class="stack gap-sm" data-preferred-expansion-section>
+              <label for="preferred-expansion-select"><strong>{locale.t('newGame.forcedPicks.preferredExpansion.label')}</strong></label>
+              <select
+                id="preferred-expansion-select"
+                data-preferred-expansion-select
+                value={forcedPicks.preferredExpansionId ?? ''}
+                onchange={(e) => gameActions.setPreferredExpansion((e.target as HTMLSelectElement).value || null)}
+              >
+                <option value="">{locale.t('newGame.forcedPicks.preferredExpansion.placeholder')}</option>
+                {#each ownedExpansions as set (set.id)}
+                  <option value={set.id}>{set.name}</option>
+                {/each}
+              </select>
+              {#if forcedPicks.preferredExpansionId}
+                {@const preferredSet = bundle.runtime.indexes.setsById[forcedPicks.preferredExpansionId]}
+                <div class="row gap-sm align-center wrap" data-preferred-expansion-active>
+                  <span>{locale.t('newGame.forcedPicks.preferredExpansion.active', { name: preferredSet?.name ?? forcedPicks.preferredExpansionId })}</span>
+                  <button
+                    type="button"
+                    class="button button-secondary"
+                    data-action="clear-preferred-expansion"
+                    onclick={() => gameActions.setPreferredExpansion(null)}
+                  >{locale.t('newGame.forcedPicks.preferredExpansion.clear')}</button>
+                </div>
+              {/if}
+            </div>
+          {:else}
+            <p class="muted" data-preferred-expansion-unavailable>{locale.t('newGame.forcedPicks.preferredExpansion.unavailable')}</p>
+          {/if}
           {#if modeIneligibleSchemeIds.size > 0}
             <p class="muted" data-scheme-mode-ineligibility-notice>
               {locale.t('newGame.forcedPicks.schemesModeIneligible', {

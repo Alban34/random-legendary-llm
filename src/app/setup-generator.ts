@@ -180,7 +180,8 @@ function getFreshnessKey(usageBucket: UsageCategoryMap | undefined, entity: { id
 export function rankItemsByFreshness<T extends { id: string }>(
   items: T[],
   usageBucket: UsageCategoryMap | undefined,
-  random: () => number = Math.random
+  random: () => number = Math.random,
+  preferredExpansionId: string | null = null
 ): T[] {
   const grouped = new Map<string, { key: [number, number, number]; list: T[] }>();
 
@@ -198,7 +199,14 @@ export function rankItemsByFreshness<T extends { id: string }>(
       if (left.key[0] !== right.key[0]) return left.key[0] - right.key[0];
       return left.key[1] - right.key[1];
     })
-    .flatMap(({ list }) => shuffle(list, random));
+    .flatMap(({ list }) => {
+      if (preferredExpansionId) {
+        const preferred = shuffle(list.filter((item) => (item as unknown as { setId?: string }).setId === preferredExpansionId), random);
+        const others = shuffle(list.filter((item) => (item as unknown as { setId?: string }).setId !== preferredExpansionId), random);
+        return [...preferred, ...others];
+      }
+      return shuffle(list, random);
+    });
 }
 
 function summarizeFallback<T extends { id: string }>(
@@ -217,9 +225,10 @@ function selectFreshItems<T extends { id: string }>(
   count: number,
   usageBucket: UsageCategoryMap | undefined,
   random: () => number = Math.random,
-  excludeIds: Set<string> = new Set()
+  excludeIds: Set<string> = new Set(),
+  preferredExpansionId: string | null = null
 ): SelectionResult<T> {
-  const ranked = rankItemsByFreshness(items.filter((entity) => !excludeIds.has(entity.id)), usageBucket, random);
+  const ranked = rankItemsByFreshness(items.filter((entity) => !excludeIds.has(entity.id)), usageBucket, random, preferredExpansionId);
   const selected = ranked.slice(0, count);
   return {
     selected,
@@ -554,7 +563,8 @@ function selectHeroes(
   requirements: SchemeRequirements,
   usageBucket: UsageCategoryMap | undefined,
   random: () => number,
-  forcedHeroIds: string[] = []
+  forcedHeroIds: string[] = [],
+  preferredExpansionId: string | null = null
 ): HeroSelectionResult {
   const heroMap = Object.fromEntries(heroes.map((hero) => [hero.id, hero]));
   const forcedHeroes = forcedHeroIds.map((id) => heroMap[id]).filter(Boolean);
@@ -575,7 +585,7 @@ function selectHeroes(
   const selectedIds = new Set(selected.map((hero) => hero.id));
 
   if (!requirements.heroNameRequirements.length) {
-    const filler = selectFreshItems(heroes, requirements.heroCount - forcedHeroes.length, usageBucket, random, selectedIds);
+    const filler = selectFreshItems(heroes, requirements.heroCount - forcedHeroes.length, usageBucket, random, selectedIds, preferredExpansionId);
     if (filler.selected.length !== requirements.heroCount - forcedHeroes.length) {
       return { selected: [], usedFallback: false, fallbackItems: [], reason: 'Not enough remaining Heroes are available after applying the forced picks.' };
     }
@@ -629,7 +639,7 @@ function selectHeroes(
     }
     return ![...restrictedPatterns].some((pattern) => new RegExp(pattern, 'i').test(hero.name));
   });
-  const filler = selectFreshItems(generalPool, remainingHeroCount, usageBucket, random);
+  const filler = selectFreshItems(generalPool, remainingHeroCount, usageBucket, random, new Set(), preferredExpansionId);
   if (filler.selected.length < remainingHeroCount) {
     return { selected: [], usedFallback: false, fallbackItems: [], reason: 'Not enough remaining Heroes are available after applying the forced picks.' };
   }
@@ -675,7 +685,8 @@ function buildCategorySelection(
   usageBucket: UsageState,
   random: () => number,
   forcedPicks: ForcedPicks,
-  template: SetupTemplate
+  template: SetupTemplate,
+  preferredExpansionId: string | null = null
 ): CategorySelectionResult {
   const forced = resolveForcedCollections(scheme, mastermind, pools, forcedPicks, template);
   if (!forced.allAvailable) {
@@ -704,7 +715,8 @@ function buildCategorySelection(
     requirements.villainGroupCount - forcedVillains.length,
     usageBucket.villainGroups,
     random,
-    new Set(forcedVillains.map((entity) => entity.id))
+    new Set(forcedVillains.map((entity) => entity.id)),
+    preferredExpansionId
   );
   if (extraVillains.selected.length !== requirements.villainGroupCount - forcedVillains.length) {
     return { selection: null, reason: 'Not enough remaining Villain Groups are available after applying the forced picks.' };
@@ -715,7 +727,8 @@ function buildCategorySelection(
     requirements.henchmanGroupCount - forcedHenchmen.length,
     usageBucket.henchmanGroups,
     random,
-    new Set(forcedHenchmen.map((entity) => entity.id))
+    new Set(forcedHenchmen.map((entity) => entity.id)),
+    preferredExpansionId
   );
   if (extraHenchmen.selected.length !== requirements.henchmanGroupCount - forcedHenchmen.length) {
     return { selection: null, reason: 'Not enough remaining Henchman Groups are available after applying the forced picks.' };
@@ -821,24 +834,26 @@ function selectScheme(
   eligibleSchemes: SchemeRuntime[],
   normalizedForcedPicks: ForcedPicks,
   usageSchemes: UsageCategoryMap | undefined,
-  random: () => number
+  random: () => number,
+  preferredExpansionId: string | null = null
 ): SelectionResult<SchemeRuntime> {
   if (normalizedForcedPicks.schemeId) {
     return { selected: eligibleSchemes.filter((scheme) => scheme.id === normalizedForcedPicks.schemeId), fallbackItems: [], usedFallback: false };
   }
-  return selectFreshItems(eligibleSchemes, eligibleSchemes.length, usageSchemes, random);
+  return selectFreshItems(eligibleSchemes, eligibleSchemes.length, usageSchemes, random, new Set(), preferredExpansionId);
 }
 
 function selectMastermind(
   pools: GamePool,
   normalizedForcedPicks: ForcedPicks,
   usageMasterminds: UsageCategoryMap | undefined,
-  random: () => number
+  random: () => number,
+  preferredExpansionId: string | null = null
 ): SelectionResult<MastermindRuntime> {
   if (normalizedForcedPicks.mastermindId) {
     return { selected: pools.masterminds.filter((mastermind) => mastermind.id === normalizedForcedPicks.mastermindId), fallbackItems: [], usedFallback: false };
   }
-  return selectFreshItems(pools.masterminds, pools.masterminds.length, usageMasterminds, random);
+  return selectFreshItems(pools.masterminds, pools.masterminds.length, usageMasterminds, random, new Set(), preferredExpansionId);
 }
 
 function resolveLeadEntity(
@@ -859,7 +874,7 @@ function resolveLeadEntity(
 
 function tryMastermindForScheme(mastermind: MastermindRuntime, context: TryMastermindContext): GeneratedSetup | null {
   const { mastermindRanking, scheme, schemeSelection, pools, effectiveRequirements, normalizedForcedPicks, state, runtime, random, constraintFailureReasons, eligibleSchemes, template } = context;
-  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks, template);
+  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks, template, normalizedForcedPicks.preferredExpansionId);
   if (!categorySelection.selection) {
     if (categorySelection.reason) {
       constraintFailureReasons.add(categorySelection.reason);
@@ -867,7 +882,7 @@ function tryMastermindForScheme(mastermind: MastermindRuntime, context: TryMaste
     return null;
   }
 
-  const heroSelection = selectHeroes(pools.heroes, effectiveRequirements, state.usage.heroes, random, normalizedForcedPicks.heroIds);
+  const heroSelection = selectHeroes(pools.heroes, effectiveRequirements, state.usage.heroes, random, normalizedForcedPicks.heroIds, normalizedForcedPicks.preferredExpansionId);
   if (heroSelection.selected.length !== effectiveRequirements.heroCount) {
     if (heroSelection.reason) {
       constraintFailureReasons.add(heroSelection.reason);
@@ -928,7 +943,7 @@ function trySchemeForSetup(scheme: SchemeRuntime, context: TrySchemeContext): Ge
     return null;
   }
 
-  const mastermindRanking = selectMastermind(pools, normalizedForcedPicks, state.usage.masterminds, random);
+  const mastermindRanking = selectMastermind(pools, normalizedForcedPicks, state.usage.masterminds, random, normalizedForcedPicks.preferredExpansionId);
   for (const mastermind of mastermindRanking.selected) {
     const result = tryMastermindForScheme(mastermind, { mastermindRanking, scheme, schemeSelection, pools, effectiveRequirements, normalizedForcedPicks, state, runtime, random, constraintFailureReasons, eligibleSchemes, template });
     if (result) {
@@ -947,7 +962,7 @@ export function generateSetup({ runtime, state, playerCount, advancedSolo = fals
   const { template, pools, eligibleSchemes, forcedPicks: normalizedForcedPicks } = legality;
   const hasConstraintSelections = hasForcedPicks(normalizedForcedPicks);
   const constraintFailureReasons = new Set<string>();
-  const schemeSelection = selectScheme(eligibleSchemes!, normalizedForcedPicks!, state.usage.schemes, random);
+  const schemeSelection = selectScheme(eligibleSchemes!, normalizedForcedPicks!, state.usage.schemes, random, normalizedForcedPicks!.preferredExpansionId);
 
   for (const scheme of schemeSelection.selected) {
     const result = trySchemeForSetup(scheme, { schemeSelection, pools: pools!, template: template!, normalizedForcedPicks: normalizedForcedPicks!, state, runtime, random, hasConstraintSelections, constraintFailureReasons, eligibleSchemes: eligibleSchemes! });

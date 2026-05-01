@@ -137,9 +137,11 @@ Recommended runtime shape:
 Once legality is established, each category uses the following selection priority:
 
 1. items never used in an accepted game
-2. items with the lowest `plays`
+2. items with the lowest `plays`; within this tier, cards from the preferred expansion (if one is set) are drawn before cards from other expansions
 3. items with the oldest `lastPlayedAt`
 4. random tie-break between remaining equals
+
+The preferred expansion acts as a **tiebreaker within each play-count tier**, not as an override of the fairness system. A card from the preferred expansion that has a higher play count than cards from other expansions is never drawn ahead of those lower-play-count cards.
 
 This priority applies independently to:
 - Heroes
@@ -195,6 +197,7 @@ Supported categories:
 - zero or more forced Heroes
 - zero or more forced Villain Groups
 - zero or more forced Henchman Groups
+- one preferred expansion (tiebreaker; Epic 70)
 
 Behavior:
 - forced picks are applied before random slot-filling begins
@@ -202,5 +205,6 @@ Behavior:
 - if forced picks plus mandatory groups exceed the available slots, generation must fail with a specific reason
 - forced picks are a one-shot UI constraint: they stay active for Generate and Regenerate, then clear after a successful Accept & Log or a reload
 - forced picks are not written into accepted history snapshots
+- the preferred expansion applies only to slots not already claimed by an individually forced card; within each play-count tier for those unclaimed slots, cards from the preferred expansion are drawn before cards from other expansions; the preferred expansion never causes a card with a higher play count to be drawn ahead of a card with a lower play count; if the preferred expansion has no owned cards of the required type in the current tier, the generator falls back silently to the full tier pool
 
 ---

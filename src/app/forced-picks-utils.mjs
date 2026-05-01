@@ -14,7 +14,8 @@ export function createEmptyForcedPicks() {
     mastermindId: null,
     heroIds: [],
     villainGroupIds: [],
-    henchmanGroupIds: []
+    henchmanGroupIds: [],
+    preferredExpansionId: null
   };
 }
 
@@ -28,7 +29,8 @@ export function normalizeForcedPicks(candidateForcedPicks) {
     mastermindId: typeof candidate.mastermindId === 'string' && candidate.mastermindId ? candidate.mastermindId : null,
     heroIds: [...new Set(Array.isArray(candidate.heroIds) ? candidate.heroIds.filter((id) => typeof id === 'string' && id) : [])],
     villainGroupIds: [...new Set(Array.isArray(candidate.villainGroupIds) ? candidate.villainGroupIds.filter((id) => typeof id === 'string' && id) : [])],
-    henchmanGroupIds: [...new Set(Array.isArray(candidate.henchmanGroupIds) ? candidate.henchmanGroupIds.filter((id) => typeof id === 'string' && id) : [])]
+    henchmanGroupIds: [...new Set(Array.isArray(candidate.henchmanGroupIds) ? candidate.henchmanGroupIds.filter((id) => typeof id === 'string' && id) : [])],
+    preferredExpansionId: typeof candidate.preferredExpansionId === 'string' && candidate.preferredExpansionId ? candidate.preferredExpansionId : null
   };
 }
 
@@ -40,6 +42,7 @@ export function hasForcedPicks(forcedPicks) {
     || normalized.heroIds.length
     || normalized.villainGroupIds.length
     || normalized.henchmanGroupIds.length
+    || normalized.preferredExpansionId
   );
 }
 
