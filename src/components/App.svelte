@@ -8,7 +8,7 @@
   import { createEpic1Bundle } from '../app/game-data-pipeline.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
   import { APP_TABS, DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from '../app/app-tabs.ts';
-  import { toast, Toaster } from 'svelte-sonner';
+  import { Toaster, toast } from 'svelte-sonner';
   import { addForcedPick, hasForcedPicks, removeForcedPick } from '../app/forced-picks-utils.ts';
   import { DEFAULT_HISTORY_GROUPING_MODE, HISTORY_GROUPING_MODES } from '../app/history-utils.ts';
   import { createLocaleTools, getSelectableLocales, normalizeLocaleId } from '../app/localization-utils.ts';
@@ -167,6 +167,46 @@
   $effect(() => {
     if (!isLoaded) return;
     syncGlobals();
+  });
+
+  // Toast cap: dismiss the oldest when more than 4 are active
+  $effect(() => {
+    const active = toast.getActiveToasts();
+    if (active.length > 4) {
+      toast.dismiss(active[active.length - 1].id);
+    }
+  });
+
+  // Focus management: when a keyboard Enter/Space press dismisses a toast, move focus to the
+  // next remaining close button. Uses keydown (capture) so both buttons are still in the DOM
+  // when we record the candidate — more reliable than querying after the DOM mutation.
+  $effect(() => {
+    function handleKeydown(e: Event) {
+      const ke = e as KeyboardEvent;
+      if (ke.key !== 'Enter' && ke.key !== ' ') return;
+      const target = ke.target as HTMLElement | null;
+      if (!target?.hasAttribute('data-close-button')) return;
+
+      const toaster = document.querySelector<HTMLElement>('[data-sonner-toaster]');
+      if (!toaster) return;
+
+      const buttons = Array.from(toaster.querySelectorAll<HTMLElement>('[data-close-button]'));
+      const idx = buttons.indexOf(target);
+      const candidate = buttons[idx + 1] ?? buttons[idx - 1];
+
+      if (candidate) {
+        setTimeout(() => {
+          if (document.contains(candidate)) {
+            candidate.focus();
+          } else {
+            const fallback = toaster.querySelector<HTMLElement>('[data-close-button]');
+            if (fallback) fallback.focus();
+          }
+        }, 50);
+      }
+    }
+    document.addEventListener('keydown', handleKeydown, true);
+    return () => document.removeEventListener('keydown', handleKeydown, true);
   });
 
   // ---------------------------------------------------------------------------
@@ -1283,7 +1323,6 @@
     </div>
   </header>
   <main class="app-main">
-    <section id="toast-region" aria-live="polite" aria-atomic="false"></section>
     <section class="stack gap-md" id="diagnostics-shell">
       <section class="panel">
         <h2>Initialization status</h2>
@@ -1374,6 +1413,7 @@
       offset="calc(80px + env(safe-area-inset-bottom))"
       expand={true}
       richColors={true}
+      closeButton={true}
       duration={4000}
       theme={activeThemeId as 'dark' | 'light'}
     />
@@ -1520,7 +1560,6 @@
     </div>
   </header>
   <main class="app-main">
-    <section id="toast-region" aria-live="polite" aria-atomic="false"></section>
     <section class="stack gap-md" id="diagnostics-shell" hidden></section>
     <div class="tab-panel-shell">
       {#each APP_TABS as tab (tab.id)}

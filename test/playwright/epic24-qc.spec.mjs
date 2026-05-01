@@ -14,9 +14,8 @@ test.describe('Epic 24 — Toast Behavior and Feedback Channel Cleanup', () => {
     await selectTheme(page, 'light');
 
     // Toast region may exist in the DOM but no toast item should appear
-    const toastRegion = page.locator('#toast-region');
-    // Either the region is absent (no toasts) or it contains no .toast elements
-    const toastCount = await page.locator('#toast-region .toast').count();
+    // Either the region is absent (no toasts) or it contains no [data-sonner-toast] elements
+    const toastCount = await page.locator('[data-sonner-toaster] [data-sonner-toast]').count();
     expect(toastCount).toBe(0);
   });
 
@@ -35,12 +34,12 @@ test.describe('Epic 24 — Toast Behavior and Feedback Channel Cleanup', () => {
     // Locale switch still emits a toast
     await selectLocale(page, 'fr-FR');
 
-    const toast = page.locator('#toast-region .toast').first();
+    const toast = page.locator('[data-sonner-toaster] [data-sonner-toast]').first();
     await expect(toast).toBeVisible({ timeout: 5000 });
 
     // Confirm the toast is positioned in the lower half of the viewport
     const { toastBottom, viewportHeight } = await page.evaluate(() => {
-      const el = document.querySelector('#toast-region .toast');
+      const el = document.querySelector('[data-sonner-toast]');
       if (!el) {
         return { toastBottom: 0, viewportHeight: window.innerHeight };
       }
@@ -60,10 +59,10 @@ test.describe('Epic 24 — Toast Behavior and Feedback Channel Cleanup', () => {
 
     // Force a toast so the region is rendered in the DOM
     await selectLocale(page, 'fr-FR');
-    await expect(page.locator('#toast-region .toast').first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-sonner-toaster] [data-sonner-toast]').first()).toBeVisible({ timeout: 5000 });
 
     const regionStyles = await page.evaluate(() => {
-      const el = document.querySelector('#toast-region');
+      const el = document.querySelector('[data-sonner-toaster]');
       if (!el) {
         return null;
       }

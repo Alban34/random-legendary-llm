@@ -126,7 +126,7 @@ test.describe('Epic 18 automated QC', () => {
     await expect(page.locator('[data-action="set-theme"][data-theme-id="light"]')).toHaveAttribute('aria-pressed', 'true');
 
     await selectLocale(page, 'fr-FR');
-    await expect(page.locator('#toast-region')).toContainText('Français');
+    await expect(page.locator('[data-sonner-toaster]')).toContainText('Français');
   });
 
   test('keeps primary screens legible across both supported themes on desktop and mobile', async ({ page }) => {

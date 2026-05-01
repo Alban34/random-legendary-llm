@@ -61,7 +61,7 @@ test.describe('Epic 16 automated QC', () => {
     await page.locator('[data-action="generate-setup"]').click();
 
     await expect(page.locator('#panel-new-game')).toContainText('Least-played fallback used for Hero selection');
-    await expect(page.locator('#toast-region .toast').filter({ hasText: 'Least-played fallback used for Hero selection' })).toHaveCount(0);
+    await expect(page.locator('[data-sonner-toaster] [data-sonner-toast]').filter({ hasText: 'Least-played fallback used for Hero selection' })).toHaveCount(0);
   });
 
   test('keeps critical setup errors visible until acknowledged while transient notices still auto-dismiss', async ({ page }) => {
@@ -69,18 +69,17 @@ test.describe('Epic 16 automated QC', () => {
     await selectTab(page, 'new-game');
 
     await page.locator('[data-action="clear-setup-controls"]').click();
-    await expect(page.locator('#toast-region .toast-info')).toHaveCount(1);
+    await expect(page.locator('[data-sonner-toast][data-type="info"]')).toHaveCount(1);
 
     await page.locator('[data-action="generate-setup"]').click();
 
-    const criticalToast = page.locator('#toast-region .toast-error').filter({ hasText: 'No owned sets are currently selected.' }).first();
-    await expect(criticalToast).toBeVisible();
-    await expect(criticalToast).toContainText('Persistent alert');
-
-    await expect.poll(async () => page.locator('#toast-region .toast-info').count(), { timeout: 6_000 }).toBe(0);
+    const criticalToast = page.locator('[data-sonner-toast][data-type="error"]').filter({ hasText: 'No owned sets are currently selected.' }).first();
     await expect(criticalToast).toBeVisible();
 
-    await criticalToast.locator('[data-action="dismiss-toast"]').click();
+    await expect.poll(async () => page.locator('[data-sonner-toast][data-type="info"]').count(), { timeout: 6_000 }).toBe(0);
+    await expect(criticalToast).toBeVisible();
+
+    await criticalToast.locator('[data-close-button]').click();
     await expect(criticalToast).toHaveCount(0);
   });
 
@@ -90,7 +89,7 @@ test.describe('Epic 16 automated QC', () => {
 
     await page.locator('[data-action="clear-setup-controls"]').click();
 
-    const transientToast = page.locator('#toast-region .toast-info').filter({ hasText: 'Reset the current setup controls to their default values.' }).first();
+    const transientToast = page.locator('[data-sonner-toast][data-type="info"]').filter({ hasText: 'Reset the current setup controls to their default values.' }).first();
     await expect(transientToast).toBeVisible();
 
     await transientToast.hover();
@@ -108,13 +107,13 @@ test.describe('Epic 16 automated QC', () => {
     await page.locator('[data-action="clear-setup-controls"]').click();
     await page.locator('[data-action="clear-setup-controls"]').click();
 
-    const dismissButtons = page.locator('#toast-region [data-action="dismiss-toast"]');
+    const dismissButtons = page.locator('[data-sonner-toaster] [data-close-button]');
     await expect(dismissButtons).toHaveCount(2);
 
     await dismissButtons.first().focus();
     await page.keyboard.press('Enter');
 
     await expect(dismissButtons).toHaveCount(1);
-    await expect.poll(() => page.evaluate(() => document.activeElement?.dataset?.toastId || null)).toBe('toast-2');
+    await expect.poll(() => page.evaluate(() => document.activeElement?.hasAttribute('data-close-button') ?? false)).toBe(true);
   });
 });

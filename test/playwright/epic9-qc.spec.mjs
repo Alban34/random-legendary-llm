@@ -15,20 +15,29 @@ test.describe('Epic 9 automated QC', () => {
     await seedAllOwnedState(page);
     await selectTab(page, 'new-game');
 
+    // Use programmatic DOM clicks throughout so the Playwright mouse never enters the
+    // toaster area. This keeps svelte-sonner's hover-pause (expanded=false) inactive,
+    // letting each toast's auto-dismiss timer run naturally from the moment it is created.
     for (let index = 0; index < 5; index += 1) {
-      await page.locator('[data-action="clear-setup-controls"]').click();
+      await page.evaluate(() => {
+        document.querySelector('[data-action="clear-setup-controls"]')?.click();
+      });
     }
 
-    const toasts = page.locator('#toast-region .toast');
+    const toasts = page.locator('[data-sonner-toaster] [data-sonner-toast]');
     await expect(toasts).toHaveCount(4);
-    await expect(page.locator('#toast-region')).toBeVisible();
+    await expect(toasts.first()).toBeVisible();
 
-    await toasts.first().locator('[data-action="dismiss-toast"]').click();
+    // Programmatic dismiss — verifies the close button works without moving the mouse
+    // into the toaster (which would pause all remaining timers via hover-expansion).
+    await page.evaluate(() => {
+      document.querySelector('[data-sonner-toaster] [data-close-button]')?.click();
+    });
     await expect(toasts).toHaveCount(3);
 
-    await page.evaluate(() => document.activeElement?.blur());
-    await page.locator('#app-title').hover();
-    await expect.poll(async () => toasts.count(), { timeout: 6_000 }).toBe(0);
+    // Timers have been running since toast creation (expanded=false throughout).
+    // The remaining 3 toasts auto-dismiss after their duration (4000ms) elapses.
+    await expect.poll(async () => toasts.count(), { timeout: 8_000 }).toBe(0);
   });
 
   test('shows clear error and info notifications for invalid setup requests and least-played fallback usage', async ({ page }) => {
@@ -36,7 +45,7 @@ test.describe('Epic 9 automated QC', () => {
     await selectTab(page, 'new-game');
 
     await page.locator('[data-action="generate-setup"]').click();
-    await expect(page.locator('#toast-region .toast-error').filter({ hasText: 'No owned sets are currently selected.' })).toHaveCount(1);
+    await expect(page.locator('[data-sonner-toast][data-type="error"]').filter({ hasText: 'No owned sets are currently selected.' })).toHaveCount(1);
     await expect(page.locator('#panel-new-game .notice.warning')).toContainText('No owned sets are currently selected.');
 
     await seedAllOwnedState(page);
@@ -87,7 +96,7 @@ test.describe('Epic 9 automated QC', () => {
     await page.locator('[data-action="generate-setup"]').click();
 
     await expect(page.locator('#panel-new-game')).toContainText('Least-played fallback used for Hero selection');
-    await expect(page.locator('#toast-region .toast-info').filter({ hasText: 'Least-played fallback used for Hero selection' })).toHaveCount(0);
+    await expect(page.locator('[data-sonner-toast][data-type="info"]').filter({ hasText: 'Least-played fallback used for Hero selection' })).toHaveCount(0);
     await page.waitForFunction(() => Boolean(window.__CURRENT_SETUP__));
   });
 
@@ -118,8 +127,7 @@ test.describe('Epic 9 automated QC', () => {
     await expect(page.locator('#panel-collection')).toContainText('Browser storage is unavailable');
 
     await page.locator('#tab-desktop-history').click();
-    await expect(page.locator('#toast-region .toast-warning').filter({ hasText: 'Browser storage is unavailable' }).first()).toContainText('Browser storage is unavailable');
-    await expect(page.locator('#toast-region .toast-warning').filter({ hasText: 'Browser storage is unavailable' }).first()).toContainText('Persistent alert');
+    await expect(page.locator('[data-sonner-toast][data-type="warning"]').filter({ hasText: 'Browser storage is unavailable' }).first()).toContainText('Browser storage is unavailable');
     await expect(page.locator('#panel-history')).toBeVisible();
   });
 
@@ -128,7 +136,7 @@ test.describe('Epic 9 automated QC', () => {
 
     await expect(page.locator('#desktop-tabs')).toHaveAttribute('role', 'tablist');
     await expect(page.locator('#panel-browse')).toHaveAttribute('role', 'tabpanel');
-    await expect(page.locator('#toast-region')).toHaveAttribute('aria-live', 'polite');
+    await expect(page.locator('section[aria-live="polite"][aria-relevant="additions text"]')).toBeAttached();
 
     await page.locator('#tab-desktop-browse').focus();
     await page.keyboard.press('ArrowRight');
