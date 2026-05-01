@@ -404,7 +404,7 @@ function validateForcedPickAvailability(
   const mastermindLeadIsVillain = forcedMastermind?.lead?.category === 'villains';
   const mastermindLeadVillainAlreadyForced =
     mastermindLeadIsVillain && forcedPicks.villainGroupIds.includes(forcedMastermind!.lead!.id);
-  const mastermindLeadVillainGroupCount = mastermindLeadIsVillain && !mastermindLeadVillainAlreadyForced ? 1 : 0;
+  const mastermindLeadVillainGroupCount = mastermindLeadIsVillain && !mastermindLeadVillainAlreadyForced && !isSoloMode(template) ? 1 : 0;
   const effectiveForcedVillainCount = forcedPicks.villainGroupIds.length + mastermindLeadVillainGroupCount;
 
   if (effectiveForcedVillainCount > template.villainGroupCount) {
@@ -414,7 +414,7 @@ function validateForcedPickAvailability(
   const mastermindLeadIsHenchman = forcedMastermind?.lead?.category === 'henchmen';
   const mastermindLeadHenchmanAlreadyForced =
     mastermindLeadIsHenchman && forcedPicks.henchmanGroupIds.includes(forcedMastermind!.lead!.id);
-  const mastermindLeadHenchmanGroupCount = mastermindLeadIsHenchman && !mastermindLeadHenchmanAlreadyForced ? 1 : 0;
+  const mastermindLeadHenchmanGroupCount = mastermindLeadIsHenchman && !mastermindLeadHenchmanAlreadyForced && !isSoloMode(template) ? 1 : 0;
   const effectiveForcedHenchmanCount = forcedPicks.henchmanGroupIds.length + mastermindLeadHenchmanGroupCount;
 
   if (effectiveForcedHenchmanCount > template.henchmanGroupCount) {
@@ -425,6 +425,10 @@ function validateForcedPickAvailability(
 }
 
 const SOLO_PLAY_MODES = new Set(['advanced-solo', 'two-handed-solo', 'standard-solo-v2']);
+
+function isSoloMode(template: SetupTemplate): boolean {
+  return SOLO_PLAY_MODES.has(template.playMode) || (template.playMode === 'standard' && template.playerCount === 1);
+}
 
 function resolveForcedCollections(
   scheme: SchemeRuntime,
@@ -451,7 +455,7 @@ function resolveForcedCollections(
     appendForcedReason(source, group.id, 'scheme');
   }
 
-  if (mastermind.lead && !SOLO_PLAY_MODES.has(template.playMode)) {
+  if (mastermind.lead && !isSoloMode(template)) {
     const source = mastermind.lead.category === 'villains' ? villainMap : henchmanMap;
     appendForcedReason(source, mastermind.lead.id, 'mastermind');
   }
@@ -565,7 +569,8 @@ function selectHeroes(
   usageBucket: UsageCategoryMap | undefined,
   random: () => number,
   forcedHeroIds: string[] = [],
-  preferredExpansionId: string | null = null
+  preferredExpansionId: string | null = null,
+  forcedTeam: string | null = null
 ): HeroSelectionResult {
   const heroMap = Object.fromEntries(heroes.map((hero) => [hero.id, hero]));
   const forcedHeroes = forcedHeroIds.map((id) => heroMap[id]).filter(Boolean);
@@ -584,6 +589,29 @@ function selectHeroes(
 
   let selected = [...forcedHeroes];
   const selectedIds = new Set(selected.map((hero) => hero.id));
+
+  if (forcedTeam) {
+    const remainingSlots = requirements.heroCount - selected.length;
+    const teamPool = heroes.filter((hero) => !selectedIds.has(hero.id) && hero.teams.includes(forcedTeam));
+    const generalPool = heroes.filter((hero) => !selectedIds.has(hero.id) && !hero.teams.includes(forcedTeam));
+
+    const teamFiller = selectFreshItems(teamPool, Math.min(teamPool.length, remainingSlots), usageBucket, random);
+    teamFiller.selected.forEach((hero) => selectedIds.add(hero.id));
+    selected.push(...teamFiller.selected);
+
+    const leftoverSlots = requirements.heroCount - selected.length;
+    const generalFiller = selectFreshItems(generalPool, leftoverSlots, usageBucket, random, selectedIds, preferredExpansionId);
+    if (generalFiller.selected.length < leftoverSlots) {
+      return { selected: [], usedFallback: false, fallbackItems: [], reason: 'Not enough remaining Heroes are available after applying the forced picks.' };
+    }
+
+    return {
+      selected: [...selected, ...generalFiller.selected],
+      usedFallback: teamFiller.usedFallback || generalFiller.usedFallback,
+      fallbackItems: [...teamFiller.fallbackItems, ...generalFiller.fallbackItems],
+      reason: null
+    };
+  }
 
   if (!requirements.heroNameRequirements.length) {
     const filler = selectFreshItems(heroes, requirements.heroCount - forcedHeroes.length, usageBucket, random, selectedIds, preferredExpansionId);
@@ -883,7 +911,7 @@ function tryMastermindForScheme(mastermind: MastermindRuntime, context: TryMaste
     return null;
   }
 
-  const heroSelection = selectHeroes(pools.heroes, effectiveRequirements, state.usage.heroes, random, normalizedForcedPicks.heroIds, normalizedForcedPicks.preferredExpansionId);
+  const heroSelection = selectHeroes(pools.heroes, effectiveRequirements, state.usage.heroes, random, normalizedForcedPicks.heroIds, normalizedForcedPicks.preferredExpansionId, normalizedForcedPicks.forcedTeam);
   if (heroSelection.selected.length !== effectiveRequirements.heroCount) {
     if (heroSelection.reason) {
       constraintFailureReasons.add(heroSelection.reason);
@@ -891,7 +919,7 @@ function tryMastermindForScheme(mastermind: MastermindRuntime, context: TryMaste
     return null;
   }
 
-  const leadEntity = resolveLeadEntity(mastermind, runtime);
+  const leadEntity = isSoloMode(template) ? null : resolveLeadEntity(mastermind, runtime);
   const notices = createGeneratorNotices({
     forcedConstraintSummary: buildForcedConstraintSummary(normalizedForcedPicks, {
       scheme,

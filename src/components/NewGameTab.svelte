@@ -47,6 +47,7 @@
       clearActiveSetIds: () => void;
       deactivateAllSets: () => void;
       setPreferredExpansion: (id: string | null) => void;
+      setForcedTeam: (team: string | null) => void;
       setEpicMastermind: (enabled: boolean) => void;
     };
   } = $props();
@@ -152,6 +153,20 @@
     const sel = document.querySelector(`[data-forced-pick-select="${field}"]`);
     gameActions.addForcedPick(field, (sel as HTMLSelectElement | null)?.value || '');
   }
+
+  let activeHeroTeamNames: string[] = $derived.by(() => {
+    const effectiveSetIds = appState.collection.activeSetIds ?? appState.collection.ownedSetIds;
+    const pools = buildOwnedPools(bundle.runtime, effectiveSetIds);
+    const teamSet = new Set<string>();
+    for (const hero of pools.heroes) {
+      for (const team of hero.teams) {
+        if (team) teamSet.add(team);
+      }
+    }
+    return [...teamSet].sort((a, b) => a.localeCompare(b));
+  });
+
+  let activeExpansionsPanelOpen = $state(false);
 </script>
 
 <section class={"two-col shell-two-col page-flow" + (compactViewport ? ' page-flow-compact-mobile' : '')}>
@@ -163,8 +178,8 @@
 
       {#if appState.collection.ownedSetIds.length > 0}
         <!-- Active expansion filter panel -->
-        <details class="panel" data-active-filter-panel open>
-          <summary>
+        <div class="panel" data-active-filter-panel>
+          <div>
             {locale.t('newGame.activeFilter.title')}
             <span class="muted">
               — {#if appState.collection.activeSetIds === null}
@@ -173,7 +188,15 @@
                 {locale.t('newGame.activeFilter.summaryFiltered', { active: appState.collection.activeSetIds.length, total: appState.collection.ownedSetIds.length })}
               {/if}
             </span>
-          </summary>
+            <button
+              type="button"
+              data-action="toggle-active-filter-panel"
+              aria-expanded={activeExpansionsPanelOpen}
+              aria-label={locale.t('newGame.activeFilter.title')}
+              onclick={() => (activeExpansionsPanelOpen = !activeExpansionsPanelOpen)}
+            >▼</button>
+          </div>
+          {#if activeExpansionsPanelOpen}
           <section class="result-card" style="margin-top: var(--space-sm)">
             <div class="stack gap-sm">
               {#each appState.collection.ownedSetIds as setId (setId)}
@@ -220,7 +243,8 @@
               >{locale.t('newGame.activeFilter.clearAll')}</button>
             </div>
           </section>
-        </details>
+          {/if}
+        </div>
         {#if appState.collection.activeSetIds !== null && !filterFeasibility.ok}
           <div class="notice warning" data-active-filter-warning>
             <ul>
@@ -392,6 +416,35 @@
           {:else}
             <p class="muted" data-preferred-expansion-unavailable>{locale.t('newGame.forcedPicks.preferredExpansion.unavailable')}</p>
           {/if}
+          {#if activeHeroTeamNames.length > 0}
+            <div class="stack gap-sm" data-forced-team-section>
+              <label for="forced-team-select"><strong>{locale.t('newGame.forcedPicks.forcedTeam.label')}</strong></label>
+              <select
+                id="forced-team-select"
+                data-forced-team-select
+                value={forcedPicks.forcedTeam ?? ''}
+                onchange={(e) => gameActions.setForcedTeam((e.target as HTMLSelectElement).value || null)}
+              >
+                <option value="">{locale.t('newGame.forcedPicks.forcedTeam.placeholder')}</option>
+                {#each activeHeroTeamNames as team (team)}
+                  <option value={team}>{team}</option>
+                {/each}
+              </select>
+              {#if forcedPicks.forcedTeam}
+                <div class="row gap-sm align-center wrap" data-forced-team-active>
+                  <span>{locale.t('newGame.forcedPicks.forcedTeam.active', { name: forcedPicks.forcedTeam })}</span>
+                  <button
+                    type="button"
+                    class="button button-secondary"
+                    data-action="clear-forced-team"
+                    onclick={() => gameActions.setForcedTeam(null)}
+                  >{locale.t('newGame.forcedPicks.forcedTeam.clear')}</button>
+                </div>
+              {/if}
+            </div>
+          {:else}
+            <p class="muted" data-forced-team-unavailable>{locale.t('newGame.forcedPicks.forcedTeam.unavailable')}</p>
+          {/if}
           {#if modeIneligibleSchemeIds.size > 0}
             <p class="muted" data-scheme-mode-ineligibility-notice>
               {locale.t('newGame.forcedPicks.schemesModeIneligible', {
@@ -496,6 +549,9 @@
 
         <div class="result-card" data-result-section="heroes">
           <h3>{locale.t('newGame.result.heroes')}</h3>
+          {#if currentSetup.forcedPicks.forcedTeam}
+            <div class="pill" data-forced-team-badge>{locale.t('newGame.forcedPicks.forcedTeam.active', { name: currentSetup.forcedPicks.forcedTeam })}</div>
+          {/if}
           <div class="new-game-hero-grid">
             {#each currentSetup.heroes as hero (hero.id)}
               <article class="result-card hero-result-card" data-hero-id={hero.id}>

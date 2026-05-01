@@ -83,10 +83,11 @@ lead: {
 ```
 
 ### Behavior
-- the lead is mandatory and cannot be skipped
+- the lead is mandatory and cannot be skipped in multiplayer and Two-Handed Solo modes
 - if the lead is a Villain Group, it consumes one villain-group slot
 - if the lead is a Henchman Group, it consumes one henchman slot
 - the lead is still tracked in usage stats when the setup is accepted
+- **Solo mode exception (Epic 73):** in Standard Solo, Advanced Solo, and Standard Solo v2, the generator suppresses the lead assignment entirely; the villain or henchman group slot fills from the normal random pool; `leadEntity` is set to `null` so the result view does not display an "Always leads" label; the `lead` attribute is retained in mastermind data and continues to apply for all non-solo modes
 
 ### Examples from the approved source data
 - `Red Skull` → `HYDRA` (`villains`)
@@ -198,6 +199,7 @@ Supported categories:
 - zero or more forced Villain Groups
 - zero or more forced Henchman Groups
 - one preferred expansion (tiebreaker; Epic 70)
+- one forced team name (hero affiliation; Epic 74)
 
 Behavior:
 - forced picks are applied before random slot-filling begins
@@ -206,5 +208,6 @@ Behavior:
 - forced picks are a one-shot UI constraint: they stay active for Generate and Regenerate, then clear after a successful Accept & Log or a reload
 - forced picks are not written into accepted history snapshots
 - the preferred expansion applies only to slots not already claimed by an individually forced card; within each play-count tier for those unclaimed slots, cards from the preferred expansion are drawn before cards from other expansions; the preferred expansion never causes a card with a higher play count to be drawn ahead of a card with a lower play count; if the preferred expansion has no owned cards of the required type in the current tier, the generator falls back silently to the full tier pool
+- when a forced team is set, heroes whose `teams` array includes the forced team name are always selected before any hero from other teams, without regard to freshness tiers; freshness ordering applies within the forced-team pool and within the general fill pool; if the forced-team pool is smaller than the required `heroCount`, remaining slots fill from the general pool using normal freshness ordering; individually forced `heroIds` take priority and are not subject to team forcing
 
 ---

@@ -458,18 +458,15 @@ export const EN_MESSAGES: Record<string, string> = {
   'newGame.soloRules.standard.villainDeck': 'Villain Deck: 1 Villain Group · 3 Henchman cards (same group) · 1 Bystander · 1 Master Strike · normal Scheme Twists',
   'newGame.soloRules.standard.schemeTwist': 'Scheme Twist: KO a Hero from the HQ that costs 6 or less.',
   'newGame.soloRules.standard.eachOtherPlayer': '"Each other player" instructions do not apply — ignore them.',
-  'newGame.soloRules.standard.alwaysLeads': 'Ignore the Mastermind\'s "Always Leads" ability.',
   'newGame.soloRules.advancedSolo.villainDeck': 'Villain Deck: 1 Villain Group · 3 Henchman cards (same group) · 1 Bystander · 5 Master Strikes · normal Scheme Twists',
   'newGame.soloRules.advancedSolo.masterStrike': 'Master Strike: when one fires, immediately play another card from the Villain Deck.',
   'newGame.soloRules.advancedSolo.schemeTwist': 'Scheme Twist: tuck a Hero costing 6 or less from the HQ to the bottom of the Hero Deck.',
   'newGame.soloRules.advancedSolo.eachOtherPlayer': '"Each other player" Villain or Mastermind instructions apply to you.',
-  'newGame.soloRules.advancedSolo.alwaysLeads': 'Ignore the Mastermind\'s "Always Leads" ability.',
   'newGame.soloRules.standardV2.villainDeck': 'Villain Deck: 1 Villain Group · 2 Henchman cards (in deck) + 2 set aside · 1 Bystander · 5 Master Strikes · normal Scheme Twists',
   'newGame.soloRules.standardV2.firstTurnHenchmen': 'First turn: the 2 set-aside Henchmen enter the city one at a time before your normal Villain Deck card.',
   'newGame.soloRules.standardV2.schemeTwist': 'Scheme Twist: tuck one Hero costing 6 or less to the bottom of the Hero Deck. Only one tuck per turn, no matter how many Twists fire.',
   'newGame.soloRules.standardV2.eachOtherPlayer': '"Each other player" Villain, Mastermind, or Tactic instructions apply to you. Does not apply to Hero cards.',
-  'newGame.soloRules.standardV2.mastermindAbility': 'Mastermind abilities tied to their normal Villain Group transfer to whichever Villain or Henchman Group you are actually using.',
-  'newGame.soloRules.standardV2.alwaysLeads': 'Ignore the Mastermind\'s "Always Leads" ability.'
+  'newGame.soloRules.standardV2.mastermindAbility': 'Mastermind abilities tied to their normal Villain Group transfer to whichever Villain or Henchman Group you are actually using.'
 };
 
 export type MessageKey = keyof typeof EN_MESSAGES;

@@ -446,17 +446,14 @@ export const KO_MESSAGES: Record<string, string> = {
   'newGame.soloRules.standard.villainDeck': '빌런 덱: 빌런 그룹 1개 · 핸치맨 카드 3장 (동일 그룹) · 바이스탠더 1개 · 마스터 스트라이크 1장 · 일반 스킴 트위스트',
   'newGame.soloRules.standard.schemeTwist': '스킴 트위스트: 본부에서 비용이 6 이하인 영웅을 KO합니다.',
   'newGame.soloRules.standard.eachOtherPlayer': '"다른 각 플레이어" 지침은 적용되지 않습니다 — 무시하세요.',
-  'newGame.soloRules.standard.alwaysLeads': '마스터마인드의 "항상 리드" 능력을 무시하세요.',
   'newGame.soloRules.advancedSolo.villainDeck': '빌런 덱: 빌런 그룹 1개 · 핸치맨 카드 3장 (동일 그룹) · 바이스탠더 1개 · 마스터 스트라이크 5장 · 일반 스킴 트위스트',
   'newGame.soloRules.advancedSolo.masterStrike': '마스터 스트라이크: 하나가 발동되면 즉시 빌런 덱에서 카드를 한 장 더 공개합니다.',
   'newGame.soloRules.advancedSolo.schemeTwist': '스킴 트위스트: 본부에서 비용이 6 이하인 영웅을 영웅 덱 맨 아래에 끼워 넣습니다.',
   'newGame.soloRules.advancedSolo.eachOtherPlayer': '"다른 각 플레이어"에 관한 빌런 또는 마스터마인드 지침이 당신에게 적용됩니다.',
-  'newGame.soloRules.advancedSolo.alwaysLeads': '마스터마인드의 "항상 리드" 능력을 무시하세요.',
   'newGame.soloRules.standardV2.villainDeck': '빌런 덱: 빌런 그룹 1개 · 핸치맨 카드 2장 (덱에 포함) + 2장 따로 보관 · 바이스탠더 1개 · 마스터 스트라이크 5장 · 일반 스킴 트위스트',
   'newGame.soloRules.standardV2.firstTurnHenchmen': '첫 번째 턴: 따로 보관한 부하 2명이 일반 빌런 덱 카드 공개 전에 한 명씩 도시에 진입합니다.',
   'newGame.soloRules.standardV2.schemeTwist': '스킴 트위스트: 비용이 6 이하인 영웅 한 명을 영웅 덱 맨 아래에 끼워 넣습니다. 같은 턴에 트위스트가 여러 번 발동되더라도 한 번만 끼워 넣습니다.',
   'newGame.soloRules.standardV2.eachOtherPlayer': '"다른 각 플레이어"에 관한 빌런, 마스터마인드 또는 전술 지침이 당신에게 적용됩니다. 영웅 카드에는 적용되지 않습니다.',
   'newGame.soloRules.standardV2.mastermindAbility': '마스터마인드의 일반 빌런 그룹과 연결된 능력은 실제로 사용 중인 빌런 또는 핸치맨 그룹에 전환됩니다.',
-  'newGame.soloRules.standardV2.alwaysLeads': '마스터마인드의 "항상 리드" 능력을 무시하세요.'
 };
 

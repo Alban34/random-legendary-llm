@@ -251,15 +251,12 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
   │                                                 │
   │  ▶ Forced Picks  (disclosure, collapsed)        │
   │    ↳ Preferred expansion: [select or active+clear]│
+  │    ↳ Forced team: [select or active+clear]       │
   │    ↳ Scheme / Mastermind / Heroes / Villains /   │
   │      Henchmen forced-pick rows                   │
   │                                                 │
-  │  ── Active Expansions ─────────────────────────  │
-  │  ☑ Dark City      ☑ Fantastic Four              │
-  │  ☐ Secret Wars    ☑ Paint the Town Red          │
-  │  ...                                            │
-  │  [Use all expansions]  [Clear selection]        │
-  │  Using 3 of 4 expansions                        │
+  │  ▶ Active Expansions  [toggle]                  │
+  │    (collapsed by default; click to expand)       │
   │                                                 │
   │  ⚠ Not enough cards for a legal setup           │
   │    (shown only when filter is infeasible)        │
@@ -304,16 +301,16 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 - A single primary button handles both first generation and all subsequent rerolls. Its label is context-sensitive: "Generate Setup" before any result is present, "New Setup" once a setup is already displayed
 - The primary action button appears directly below the setup-requirements summary, before optional content, so users can act without scrolling past forced picks
 - Forced picks are presented in a native `<details>` disclosure element below the primary action row; users who need forced picks can expand the disclosure without it adding visual weight for users who do not
-- Inside the Forced Picks disclosure, a **Preferred Expansion** sub-section appears first: a `<select>` populated with the player's owned expansions lets them designate one expansion whose cards the generator prefers within each play-count tier for unclaimed slots; when an expansion is active it is shown with its name and a one-tap clear button; the sub-section is hidden and replaced with an unavailable message when the player owns fewer than two expansions
+- Inside the Forced Picks disclosure, a **Preferred Expansion** sub-section appears first: a `<select>` populated with the player's owned expansions lets them designate one expansion whose cards the generator prefers within each play-count tier for unclaimed slots; when an expansion is active it is shown with its name and a one-tap clear button; the sub-section is hidden and replaced with an unavailable message when the player owns fewer than two expansions; a **Forced Team** sub-section follows: a `<select>` populated with the distinct sorted team names present in the active hero pool lets users designate one hero affiliation whose members the generator always selects first; when a forced team is active it is shown with its name and a one-tap clear button; the sub-section is hidden and replaced with an unavailable notice when no heroes in the active collection carry a team affiliation (Epic 74)
 - Forced picks are one-shot setup constraints that remain active across all rerolls, then clear after a successful Accept & Log or reload
-- An "Active Expansions" panel appears below the Forced Picks disclosure on the New Game tab; it lists every owned expansion as a toggleable checkbox item; toggling an item adds or removes its ID from `activeSetIds`; "Use all expansions" sets `activeSetIds` to `null` (restoring the all-owned fallback); "Clear selection" sets `activeSetIds` to `[]`, deselecting every expansion checkbox; the panel shows a summary line reading "Using X of Y expansions" when a non-empty filter is active, or "All X expansions" when `activeSetIds` is `null`
+- An "Active Expansions" panel appears below the Forced Picks disclosure on the New Game tab; the panel is collapsed by default on every page load and can be expanded via a toggle button in the section header; the toggle button carries `aria-expanded` and hides or shows the panel content via an `{#if}` block; the expanded/collapsed state persists for the current session (tab navigation does not reset it) but resets to collapsed on page reload; once expanded, the panel lists every owned expansion as a toggleable checkbox item; toggling an item adds or removes its ID from `activeSetIds`; "Use all expansions" sets `activeSetIds` to `null` (restoring the all-owned fallback); "Clear selection" sets `activeSetIds` to `[]`, deselecting every expansion checkbox; the panel shows a summary line reading "Using X of Y expansions" when a non-empty filter is active, or "All X expansions" when `activeSetIds` is `null` (Epic 72)
 - An **Epic Mastermind** toggle appears in the setup view when at least one expansion in `EPIC_MASTERMIND_SUPPORTED_SETS` (currently `"X-Men"`) is in the player's collection; when the condition is not met the control is fully absent from the DOM; enabling the toggle restricts the mastermind draw to the Epic Mastermind card pool from supported expansions; the toggle state persists across page reloads via `lastEpicMastermind` in `Preferences`
 - Before the Generate button is enabled, `validateSetupLegality` is evaluated against the resolved active pool for the current player count and play mode; if the result is not `ok`, the Generate button is disabled and the legality reasons are displayed inline beneath the selector; re-evaluation happens whenever the active pool, player count, or play mode changes
 - "Generate Setup" / "New Setup" validates collection size before randomizing
 - "Accept & Log Game" saves the setup to history, opens immediate result entry in History, and marks the setup as used; it is disabled until a setup is present
 - Result entry supports pending-result flows, later correction from History, focus moves into the editor on open, and invalid saves announce recoverable errors before returning focus to the correct field
 - ★ marks the forced Mastermind villain group
-- When a setup is generated and the active play mode is Standard Solo, Advanced Solo, or Standard Solo v2, a "Rules for this mode" collapsible panel (`<details open data-result-section="solo-rules">`) appears in the result area below the picked cards; the panel defaults to open (expanded) and lists mode-specific rule items as an ordered `<ul>`; the panel is absent when the play mode is Two-Handed Solo or any multiplayer mode, and is absent before a setup is generated (Epic 57)
+- When a setup is generated and the active play mode is Standard Solo, Advanced Solo, or Standard Solo v2, a "Rules for this mode" collapsible panel (`<details open data-result-section="solo-rules">`) appears in the result area below the picked cards; the panel defaults to open (expanded) and lists mode-specific rule items as an ordered `<ul>`; the panel is absent when the play mode is Two-Handed Solo or any multiplayer mode, and is absent before a setup is generated (Epic 57); the "Ignore Always Leads" reminder is not listed in any mode's rule items because the generator suppresses the mastermind lead constraint automatically in all solo modes — the villain group is always drawn randomly (Epic 73)
 
 > **Design rationale (Epic 25):** Generate and Regenerate were merged into one context-sensitive action because they produce identical outcomes — both randomize a new setup from the current constraints. A dedicated "Regenerate" label implied a behaviorally distinct path when none exists. Forced picks moved below the primary action so the button is reached without scrolling through optional configuration. Both changes reduce action-density confusion and bring the mandatory step earlier in the visual flow.
 

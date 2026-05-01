@@ -329,7 +329,7 @@ Hydration rules:
 - any recovery notice shown to the user should be treated as ephemeral UI state, not as persisted root-state data
 - if browser storage is unavailable entirely, the app should keep running in-memory for the current session and surface a degraded-mode warning
 
-Forced-pick selections (introduced in Epic 15, extended in Epic 70) are also ephemeral UI-only state. They intentionally do not persist in browser storage and do not appear in accepted `GameRecord` snapshots.
+Forced-pick selections (introduced in Epic 15, extended in Epics 70 and 74) are also ephemeral UI-only state. They intentionally do not persist in browser storage and do not appear in accepted `GameRecord` snapshots.
 
 ### `ForcedPicks`
 
@@ -340,13 +340,16 @@ Forced-pick selections (introduced in Epic 15, extended in Epic 70) are also eph
   heroIds: string[],
   villainGroupIds: string[],
   henchmanGroupIds: string[],
-  preferredExpansionId: string | null   // Epic 70: preferred expansion tiebreaker
+  preferredExpansionId: string | null,  // Epic 70: preferred expansion tiebreaker
+  forcedTeam: string | null             // Epic 74: hero team selected first
 }
 ```
 
-`createEmptyForcedPicks()` initialises all singular fields to `null` and all array fields to `[]`. `normalizeForcedPicks(raw)` coerces every field from untrusted input: each singular string field passes through as-is when it is a non-empty string, and falls back to `null` for any other value (null, undefined, missing, empty string, non-string); each array field is rebuilt as a filtered array of non-empty strings. `hasForcedPicks(fp)` returns `true` when any singular field is non-null or any array field is non-empty, including when `preferredExpansionId` is non-null.
+`createEmptyForcedPicks()` initialises all singular fields to `null` and all array fields to `[]`. `normalizeForcedPicks(raw)` coerces every field from untrusted input: each singular string field passes through as-is when it is a non-empty string, and falls back to `null` for any other value (null, undefined, missing, empty string, non-string); each array field is rebuilt as a filtered array of non-empty strings. `hasForcedPicks(fp)` returns `true` when any singular field is non-null or any array field is non-empty, including when `preferredExpansionId` or `forcedTeam` is non-null.
 
 `preferredExpansionId` names one owned expansion whose cards the generator should prefer within each play-count tier for all unclaimed slots. It is a tiebreaker below the play-count fairness system, not an override of it; see `documentation/architecture/setup-rules.md` for the full priority order.
+
+`forcedTeam` names one hero team affiliation whose members the generator always selects before heroes from other teams; see `documentation/architecture/setup-rules.md` for the full forced-team selection logic. (Epic 74)
 
 The active theme is persisted, but the startup script in `index.html` applies it before the main app boot completes so first paint stays aligned with the stored preference.
 

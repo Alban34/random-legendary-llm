@@ -518,6 +518,7 @@
     addForcedPick: (field: string, value: string) => void;
     removeForcedPick: (field: string, value: string) => void;
     setPreferredExpansion: (id: string | null) => void;
+    setForcedTeam: (team: string | null) => void;
     clearToDefaults: () => void;
     dismissMyludoSummary: () => void;
     dismissBggSummary: () => void;
@@ -908,6 +909,11 @@
       ui.lastActionNotice = locale!.t('actions.updatedForcedPicks');
     },
 
+    setForcedTeam(team) {
+      setForcedPicks({ ...getForcedPicks(), forcedTeam: team });
+      clearGeneratedSetup();
+    },
+
     generateSetup() {
       try {
         const setup = generateSetup({
@@ -1227,6 +1233,7 @@
     removeForcedPick: actions.removeForcedPick,
     clearForcedPicks: actions.clearForcedPicks,
     setPreferredExpansion: actions.setPreferredExpansion,
+    setForcedTeam: actions.setForcedTeam,
     clearToDefaults: actions.clearToDefaults,
     setActiveSetIds: actions.setActiveSetIds,
     clearActiveSetIds: actions.clearActiveSetIds,

@@ -127,13 +127,13 @@ test('Applies scheme constraints, forced groups, and modifiers to generated setu
 test('Mastermind leads consume the correct villain or henchman slot', () => {
 
   const redSkullState = makeTargetedState({ mastermindName: 'Red Skull' });
-  const redSkullSetup = generateSetup({ runtime: bundle.runtime, state: redSkullState, playerCount: 1, advancedSolo: false, random: () => 0 });
+  const redSkullSetup = generateSetup({ runtime: bundle.runtime, state: redSkullState, playerCount: 2, advancedSolo: false, random: () => 0 });
   assert.equal(redSkullSetup.mastermind.name, 'Red Skull');
   assert.equal(redSkullSetup.villainGroups.length, redSkullSetup.requirements.villainGroupCount);
   assert.ok(redSkullSetup.villainGroups.some((group) => group.name === 'HYDRA' && group.forced));
 
   const drDoomState = makeTargetedState({ mastermindName: 'Dr. Doom' });
-  const drDoomSetup = generateSetup({ runtime: bundle.runtime, state: drDoomState, playerCount: 1, advancedSolo: false, random: () => 0 });
+  const drDoomSetup = generateSetup({ runtime: bundle.runtime, state: drDoomState, playerCount: 2, advancedSolo: false, random: () => 0 });
   assert.equal(drDoomSetup.mastermind.name, 'Dr. Doom');
   assert.equal(drDoomSetup.henchmanGroups.length, drDoomSetup.requirements.henchmanGroupCount);
   assert.ok(drDoomSetup.henchmanGroups.some((group) => group.name === 'Doombot Legion' && group.forced));

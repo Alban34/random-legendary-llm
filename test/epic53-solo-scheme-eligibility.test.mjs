@@ -145,7 +145,7 @@ test('Advanced-solo with forced core-set-negative-zone-prison-breakout returns o
   assert.equal(legality.ok, true);
 });
 
-test('Mastermind villain lead + 1 forced villain group exceeds 1 slot in standard solo (ok false)', () => {
+test('Mastermind villain lead + 1 forced villain group exceeds 1 slot in standard solo (ok true)', () => {
 
   const state = createAllOwnedState();
   const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'villains');
@@ -162,11 +162,7 @@ test('Mastermind villain lead + 1 forced villain group exceeds 1 slot in standar
       villainGroupIds: [otherVillainGroup.id]
     }
   });
-  assert.equal(legality.ok, false);
-  assert.ok(
-    legality.reasons.some((r) => r.includes('exceed the base Villain Group slots')),
-    `Expected reason about Villain Group slots, got: ${JSON.stringify(legality.reasons)}`
-  );
+  assert.equal(legality.ok, true);
 });
 
 test('Mastermind villain lead + 1 forced villain group fits in 2-player standard (ok true)', () => {
@@ -206,7 +202,7 @@ test('Mastermind villain lead alone is valid in standard solo (ok true)', () => 
   assert.equal(legality.ok, true);
 });
 
-test('Mastermind henchman lead + 1 forced henchman group exceeds 1 slot in standard solo (ok false)', () => {
+test('Mastermind henchman lead + 1 forced henchman group exceeds 1 slot in standard solo (ok true)', () => {
 
   const state = createAllOwnedState();
   const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'henchmen');
@@ -223,11 +219,7 @@ test('Mastermind henchman lead + 1 forced henchman group exceeds 1 slot in stand
       henchmanGroupIds: [otherHenchmanGroup.id]
     }
   });
-  assert.equal(legality.ok, false);
-  assert.ok(
-    legality.reasons.some((r) => r.includes('Henchman Group slots')),
-    `Expected reason about Henchman Group slots, got: ${JSON.stringify(legality.reasons)}`
-  );
+  assert.equal(legality.ok, true);
 });
 
 test('Mastermind henchman lead + 1 forced henchman group fits in 4-player standard (ok true)', () => {

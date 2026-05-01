@@ -446,17 +446,14 @@ export const DE_MESSAGES: Record<string, string> = {
   'newGame.soloRules.standard.villainDeck': 'Villain Deck: 1 Villain Group · 3 Henchman-Karten (gleiche Gruppe) · 1 Bystander · 1 Master Strike · normale Scheme Twists',
   'newGame.soloRules.standard.schemeTwist': 'Scheme Twist: Schicke einen Helden aus dem HQ, der 6 oder weniger kostet, in den KO-Stapel.',
   'newGame.soloRules.standard.eachOtherPlayer': '„Jeder andere Spieler"-Anweisungen gelten nicht – ignoriere sie.',
-  'newGame.soloRules.standard.alwaysLeads': 'Ignoriere die „Always Leads"-Fähigkeit des Masterminds.',
   'newGame.soloRules.advancedSolo.villainDeck': 'Villain Deck: 1 Villain Group · 3 Henchman-Karten (gleiche Gruppe) · 1 Bystander · 5 Master Strikes · normale Scheme Twists',
   'newGame.soloRules.advancedSolo.masterStrike': 'Master Strike: Wenn einer ausgelöst wird, spiele sofort eine weitere Karte vom Villain Deck.',
   'newGame.soloRules.advancedSolo.schemeTwist': 'Scheme Twist: Schiebe einen Helden aus dem HQ, der 6 oder weniger kostet, unter den Hero Deck.',
   'newGame.soloRules.advancedSolo.eachOtherPlayer': '„Jeder andere Spieler"-Anweisungen von Villain oder Mastermind gelten für dich.',
-  'newGame.soloRules.advancedSolo.alwaysLeads': 'Ignoriere die „Always Leads"-Fähigkeit des Masterminds.',
   'newGame.soloRules.standardV2.villainDeck': 'Villain Deck: 1 Villain Group · 2 Henchman-Karten (im Stapel) + 2 beiseitegelegt · 1 Bystander · 5 Master Strikes · normale Scheme Twists',
   'newGame.soloRules.standardV2.firstTurnHenchmen': 'Erster Zug: Die 2 beiseitegelegten Henchmen betreten die Stadt nacheinander, bevor deine normale Villain-Deck-Karte gespielt wird.',
   'newGame.soloRules.standardV2.schemeTwist': 'Scheme Twist: Schiebe einen Helden, der 6 oder weniger kostet, unter den Hero Deck. Maximal einmal pro Zug, unabhängig von der Anzahl ausgelöster Twists.',
   'newGame.soloRules.standardV2.eachOtherPlayer': '„Jeder andere Spieler"-Anweisungen von Villain, Mastermind oder Taktik gelten für dich. Gilt nicht für Heldenkarten.',
-  'newGame.soloRules.standardV2.mastermindAbility': 'Mastermind-Fähigkeiten, die mit ihrer normalen Villain Group verknüpft sind, übertragen sich auf die Villain- oder Henchman Group, die du tatsächlich verwendest.',
-  'newGame.soloRules.standardV2.alwaysLeads': 'Ignoriere die „Always Leads"-Fähigkeit des Masterminds.'
+  'newGame.soloRules.standardV2.mastermindAbility': 'Mastermind-Fähigkeiten, die mit ihrer normalen Villain Group verknüpft sind, übertragen sich auf die Villain- oder Henchman Group, die du tatsächlich verwendest.'
 };
 

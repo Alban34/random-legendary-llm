@@ -12,16 +12,14 @@ export function getSoloRulesItems(playMode: PlayMode): string[] | null {
       return [
         'newGame.soloRules.standard.villainDeck',
         'newGame.soloRules.standard.schemeTwist',
-        'newGame.soloRules.standard.eachOtherPlayer',
-        'newGame.soloRules.standard.alwaysLeads'
+        'newGame.soloRules.standard.eachOtherPlayer'
       ];
     case 'advanced-solo':
       return [
         'newGame.soloRules.advancedSolo.villainDeck',
         'newGame.soloRules.advancedSolo.masterStrike',
         'newGame.soloRules.advancedSolo.schemeTwist',
-        'newGame.soloRules.advancedSolo.eachOtherPlayer',
-        'newGame.soloRules.advancedSolo.alwaysLeads'
+        'newGame.soloRules.advancedSolo.eachOtherPlayer'
       ];
     case 'standard-solo-v2':
       return [
@@ -29,8 +27,7 @@ export function getSoloRulesItems(playMode: PlayMode): string[] | null {
         'newGame.soloRules.standardV2.firstTurnHenchmen',
         'newGame.soloRules.standardV2.schemeTwist',
         'newGame.soloRules.standardV2.eachOtherPlayer',
-        'newGame.soloRules.standardV2.mastermindAbility',
-        'newGame.soloRules.standardV2.alwaysLeads'
+        'newGame.soloRules.standardV2.mastermindAbility'
       ];
     default:
       return null;

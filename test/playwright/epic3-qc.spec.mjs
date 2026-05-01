@@ -157,18 +157,21 @@ test.describe('Epic 3 automated QC', () => {
     const extraLeadMastermind = snapshot.runtime.indexes.allMasterminds.find((entity) => entity.lead && !['Red Skull', 'Dr. Doom'].includes(entity.name));
 
     await prepareTargetedState(page, { mastermindNames: ['Red Skull'] });
+    await setPlayerMode(page, 2, false);
     let result = await generateSetup(page);
     expect(result.setup.mastermind.name).toBe('Red Skull');
     expect(result.setup.mastermind.leadCategory).toBe('villains');
     expect(result.setup.villainGroups.some((group) => group.id === result.setup.mastermind.leadEntityId && group.forced)).toBeTruthy();
 
     await prepareTargetedState(page, { mastermindNames: ['Dr. Doom'] });
+    await setPlayerMode(page, 2, false);
     result = await generateSetup(page);
     expect(result.setup.mastermind.name).toBe('Dr. Doom');
     expect(result.setup.mastermind.leadCategory).toBe('henchmen');
     expect(result.setup.henchmanGroups.some((group) => group.id === result.setup.mastermind.leadEntityId && group.forced)).toBeTruthy();
 
     await prepareTargetedState(page, { mastermindNames: [extraLeadMastermind.name] });
+    await setPlayerMode(page, 2, false);
     result = await generateSetup(page);
     expect(result.setup.mastermind.name).toBe(extraLeadMastermind.name);
     expect(result.setup.mastermind.leadCategory).toBeTruthy();

@@ -10,7 +10,7 @@ test('getSoloRulesItems returns exactly 4 keys for standard mode', () => {
 
   const items = getSoloRulesItems('standard');
   assert.equal(Array.isArray(items), true);
-  assert.equal(items.length, 4);
+  assert.equal(items.length, 3);
   assert.ok(items.every((key) => key.startsWith('newGame.soloRules.standard.')));
 });
 
@@ -18,7 +18,7 @@ test('getSoloRulesItems returns exactly 5 keys for advanced-solo mode', () => {
 
   const items = getSoloRulesItems('advanced-solo');
   assert.equal(Array.isArray(items), true);
-  assert.equal(items.length, 5);
+  assert.equal(items.length, 4);
   assert.ok(items.every((key) => key.startsWith('newGame.soloRules.advancedSolo.')));
 });
 
@@ -26,7 +26,7 @@ test('getSoloRulesItems returns exactly 6 keys for standard-solo-v2 mode', () =>
 
   const items = getSoloRulesItems('standard-solo-v2');
   assert.equal(Array.isArray(items), true);
-  assert.equal(items.length, 6);
+  assert.equal(items.length, 5);
   assert.ok(items.every((key) => key.startsWith('newGame.soloRules.standardV2.')));
 });
 
@@ -63,7 +63,6 @@ test('getSoloRulesItems key order matches specification for standard', () => {
   assert.equal(items[0], 'newGame.soloRules.standard.villainDeck');
   assert.equal(items[1], 'newGame.soloRules.standard.schemeTwist');
   assert.equal(items[2], 'newGame.soloRules.standard.eachOtherPlayer');
-  assert.equal(items[3], 'newGame.soloRules.standard.alwaysLeads');
 });
 
 test('getSoloRulesItems key order matches specification for advanced-solo', () => {
@@ -73,7 +72,6 @@ test('getSoloRulesItems key order matches specification for advanced-solo', () =
   assert.equal(items[1], 'newGame.soloRules.advancedSolo.masterStrike');
   assert.equal(items[2], 'newGame.soloRules.advancedSolo.schemeTwist');
   assert.equal(items[3], 'newGame.soloRules.advancedSolo.eachOtherPlayer');
-  assert.equal(items[4], 'newGame.soloRules.advancedSolo.alwaysLeads');
 });
 
 test('getSoloRulesItems key order matches specification for standard-solo-v2', () => {
@@ -84,7 +82,6 @@ test('getSoloRulesItems key order matches specification for standard-solo-v2', (
   assert.equal(items[2], 'newGame.soloRules.standardV2.schemeTwist');
   assert.equal(items[3], 'newGame.soloRules.standardV2.eachOtherPlayer');
   assert.equal(items[4], 'newGame.soloRules.standardV2.mastermindAbility');
-  assert.equal(items[5], 'newGame.soloRules.standardV2.alwaysLeads');
 });
 
 // ── Story 2: Reactive panel logic (simulated $derived computation) ────────────
@@ -106,7 +103,7 @@ test('soloRulesItems is non-null after generating with 1P Standard Solo', () => 
   const fakeSetup = { template: { playMode: 'standard' } };
   const result = computeSoloRulesItems(fakeSetup, 1, 'standard');
   assert.notEqual(result, null);
-  assert.equal(result.length, 4);
+  assert.equal(result.length, 3);
 });
 
 test('soloRulesItems is non-null after generating with 1P Advanced Solo', () => {
@@ -114,7 +111,7 @@ test('soloRulesItems is non-null after generating with 1P Advanced Solo', () => 
   const fakeSetup = { template: { playMode: 'advanced-solo' } };
   const result = computeSoloRulesItems(fakeSetup, 1, 'advanced-solo');
   assert.notEqual(result, null);
-  assert.equal(result.length, 5);
+  assert.equal(result.length, 4);
 });
 
 test('soloRulesItems is non-null after generating with 1P Standard v2', () => {
@@ -122,7 +119,7 @@ test('soloRulesItems is non-null after generating with 1P Standard v2', () => {
   const fakeSetup = { template: { playMode: 'standard-solo-v2' } };
   const result = computeSoloRulesItems(fakeSetup, 1, 'standard-solo-v2');
   assert.notEqual(result, null);
-  assert.equal(result.length, 6);
+  assert.equal(result.length, 5);
 });
 
 test('soloRulesItems is null for two-handed-solo (panel absent)', () => {
@@ -165,25 +162,22 @@ test('Advanced Solo locale includes Master Strike cascade rule text', () => {
 
 // ── Story 3b: EN_MESSAGES locale key presence ────────────────────────────────
 
-test('EN_MESSAGES contains all 17 solo rules locale keys', () => {
+test('EN_MESSAGES contains all 14 solo rules locale keys', () => {
 
   const expectedKeys = [
     'newGame.soloRules.sectionTitle',
     'newGame.soloRules.standard.villainDeck',
     'newGame.soloRules.standard.schemeTwist',
     'newGame.soloRules.standard.eachOtherPlayer',
-    'newGame.soloRules.standard.alwaysLeads',
     'newGame.soloRules.advancedSolo.villainDeck',
     'newGame.soloRules.advancedSolo.masterStrike',
     'newGame.soloRules.advancedSolo.schemeTwist',
     'newGame.soloRules.advancedSolo.eachOtherPlayer',
-    'newGame.soloRules.advancedSolo.alwaysLeads',
     'newGame.soloRules.standardV2.villainDeck',
     'newGame.soloRules.standardV2.firstTurnHenchmen',
     'newGame.soloRules.standardV2.schemeTwist',
     'newGame.soloRules.standardV2.eachOtherPlayer',
-    'newGame.soloRules.standardV2.mastermindAbility',
-    'newGame.soloRules.standardV2.alwaysLeads'
+    'newGame.soloRules.standardV2.mastermindAbility'
   ];
   for (const key of expectedKeys) {
     assert.ok(

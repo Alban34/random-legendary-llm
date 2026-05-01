@@ -292,6 +292,7 @@ export interface GeneratedSetup {
     heroIds: string[];
     villainGroupIds: string[];
     henchmanGroupIds: string[];
+    forcedTeam: string | null;
   };
   notices: string[];
   fallbackUsed: boolean;
