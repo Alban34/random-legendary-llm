@@ -1,3 +1,8 @@
+# UX Review — Legendary: Marvel Randomizer
+**Review date:** 2026-04-10  
+**Reviewer:** UX Manager (synthesized from delegated expert reviews)  
+**Prior review:** none
+
 ## 1. Executive summary
 
 The application already has strong product breadth, a coherent visual identity, and a capable core flow from collection management through setup generation, acceptance, history, and backup. Desktop is broadly usable and the New Game result presentation is especially clear once the user is inside the workflow. Theme switching, localization, grouped history, result logging, and backup portability all feel like real product features rather than placeholder scaffolding.
