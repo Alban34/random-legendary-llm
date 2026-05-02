@@ -1,11 +1,11 @@
 // src/app/state-store.svelte.js
 // Svelte 5 reactive wrapper around the plain state-store module.
 // This file is for use by Svelte components ONLY (.svelte files or .svelte.js modules).
-// Node unit tests must import from state-store.mjs directly — they do not go through this file.
+// Node unit tests must import from state-store.ts directly — they do not go through this file.
 
-export * from './state-store.mjs';
+export * from './state-store.ts';
 
-import { createDefaultState } from './state-store.mjs';
+import { createDefaultState } from './state-store.ts';
 
 // ---------------------------------------------------------------------------
 // Reactive application state
@@ -13,7 +13,7 @@ import { createDefaultState } from './state-store.mjs';
 // _appState is the single source of truth for the in-memory application state
 // when running inside the Svelte component tree. It is initialised with the
 // plain default shape; callers should call setAppState() immediately after
-// hydrating from localStorage (via hydrateState / loadState from state-store.mjs).
+// hydrating from localStorage (via hydrateState / loadState from state-store.ts).
 //
 // Rules:
 //  - Read  : call getAppState() inside a $derived or reactive expression
@@ -36,7 +36,7 @@ export function getAppState() {
  * Replaces the reactive application state in-place so that all Svelte
  * subscriptions see the update without recreating the proxy.
  *
- * @param {ReturnType<import('./state-store.mjs').createDefaultState>} newState
+ * @param {ReturnType<import('./state-store.ts').createDefaultState>} newState
  */
 export function setAppState(newState) {
   Object.assign(_appState, newState);

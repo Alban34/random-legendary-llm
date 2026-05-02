@@ -5,99 +5,32 @@
   import NewGameTab from './NewGameTab.svelte';
   import HistoryTab from './HistoryTab.svelte';
   import BackupTab from './BackupTab.svelte';
-  import { createEpic1Bundle } from '../app/game-data-pipeline.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
-  import { APP_TABS, DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from '../app/app-tabs.ts';
+  import { APP_TABS, DEFAULT_TAB_ID, normalizeSelectedTab } from '../app/app-tabs.ts';
   import { Toaster, toast } from 'svelte-sonner';
-  import { addForcedPick, hasForcedPicks, removeForcedPick } from '../app/forced-picks-utils.ts';
-  import { DEFAULT_HISTORY_GROUPING_MODE, HISTORY_GROUPING_MODES } from '../app/history-utils.ts';
-  import { createLocaleTools, getSelectableLocales, normalizeLocaleId } from '../app/localization-utils.ts';
-  import { normalizeGameResultDraft, validateGameResultDraft, isCompletedGameResult } from '../app/result-utils.ts';
+  import { HISTORY_GROUPING_MODES } from '../app/history-utils.ts';
+  import { createLocaleTools, getSelectableLocales, getLocaleFlag } from '../app/localization-utils.ts';
   import OnboardingShell from './OnboardingShell.svelte';
-  import { buildHistoryReadySetupSnapshot, generateSetup } from '../app/setup-generator.ts';
   import { resolvePlayMode } from '../app/setup-rules.ts';
-  import { getThemeDefinition, normalizeThemeId, THEME_OPTIONS } from '../app/theme-utils.ts';
-  import type { AppState, LocaleTools, StorageAdapter, AppPersistenceState, ModalConfig, AppTab } from '../app/types.ts';
+  import { getThemeDefinition, normalizeThemeId, THEME_OPTIONS, getThemeIcon } from '../app/theme-utils.ts';
+  import type { AppState, LocaleTools, StorageAdapter, AppPersistenceState, AppTab } from '../app/types.ts';
+  import { STORAGE_KEY, updateState } from '../app/state-store.ts';
+  import { browseVm, createBrowseActions } from '../app/browse-vm.svelte.ts';
+  import { newGameVm, resetForcedPicks, createNewGameActions } from '../app/new-game-vm.svelte.ts';
   import {
-    STORAGE_KEY,
-    acceptGameSetup,
-    createStorageAdapter,
-    createGameRecordId,
-    createDefaultState,
-    hydrateState,
-    resetAllState as resetAllStateStore,
-    resetOwnedCollection,
-    resetUsageCategory as resetUsageCategoryStore,
-    toggleOwnedSet as toggleOwnedSetStore,
-    setActiveSetIds as setActiveSetIdsStore,
-    clearActiveSetIds as clearActiveSetIdsStore,
-    deactivateAllSets as deactivateAllSetsStore,
-    updateGameResult,
-    updateState
-  } from '../app/state-store.ts';
-  import {
-    buildBackupFilename,
-    createBackupPayload,
-    mergeImportedState,
-    parseBackupText,
-    summarizeBackupState
-  } from '../app/backup-utils.ts';
-  import { mergeOwnedSets } from '../app/collection-utils.ts';
-  import { parseMyludoFile, matchMyludoNamesToSets } from '../app/myludo-import-utils.ts';
-  import { fetchBggCollection, matchBggNamesToSets } from '../app/bgg-import-utils.ts';
-  import {
-    getBrowseSearchTerm, setBrowseSearchTerm,
-    getBrowseTypeFilter, setBrowseTypeFilter,
-    getExpandedBrowseSetId, setExpandedBrowseSetId
-  } from '../app/browse-vm.svelte.ts';
-  import {
-    getCurrentSetup, setCurrentSetup,
-    getGeneratorError, setGeneratorError,
-    getGeneratorNotices, setGeneratorNotices,
-    getSelectedPlayerCount, setSelectedPlayerCount,
-    getSelectedPlayMode, setSelectedPlayMode,
-    getAdvancedSolo, setAdvancedSolo,
-    getForcedPicks, setForcedPicks, resetForcedPicks
-  } from '../app/new-game-vm.svelte.ts';
-  import {
-    getHistoryExpandedRecordId, setHistoryExpandedRecordId,
-    getHistoryInsightsExpanded, setHistoryInsightsExpanded, toggleHistoryInsights,
-    getHistoryGroupingMode, setHistoryGroupingMode, resetHistoryGroupingMode,
-    getResultEditorRecordId, setResultEditorRecordId,
-    getResultEditorReturnFocusSelector, setResultEditorReturnFocusSelector,
-    getResultDraft, setResultDraft, resetResultDraft,
-    resetResultDraftForPlayerCount,
-    getResultFormError, setResultFormError,
-    getResultInvalidFields, setResultInvalidFields,
-    setResultPlayerScore, setResultPlayerName
+    historyVm, resetHistoryGroupingMode,
+    openResultEditor, closeResultEditor, createHistoryActions
   } from '../app/history-vm.svelte.ts';
-  import {
-    getBackupImportError, setBackupImportError,
-    getStagedBackup, setStagedBackup,
-    getConfirmBackupRestoreMode, setConfirmBackupRestoreMode,
-    getLastBackupExportFileName, setLastBackupExportFileName
-  } from '../app/backup-vm.svelte.ts';
-  import {
-    getMyludoImportStatus, setMyludoImportStatus,
-    getMyludoImportError, setMyludoImportError,
-    getMyludoImportSummary, setMyludoImportSummary,
-    getBggImportStatus, setBggImportStatus,
-    getBggImportError, setBggImportError,
-    getBggImportSummary, setBggImportSummary
-  } from '../app/import-vm.svelte.ts';
+  import { backupVm, createBackupActions } from '../app/backup-vm.svelte.ts';
+  import { importVm, createImportActions } from '../app/import-vm.svelte.ts';
   import { focusActionButton, focusSelector, focusModalCancelButton } from '../app/focus-utils.ts';
   import ModalRoot from './ModalRoot.svelte';
+  import { computeModalConfig } from '../app/modal-utils.ts';
+  import { initApp } from '../app/app-init.ts';
+  import { createCollectionActions } from '../app/collection-actions.ts';
+  import { createPreferencesActions } from '../app/preferences-actions.ts';
 
   /* global __APP_VERSION__ */
-
-  async function loadSeed(): Promise<unknown> {
-    const seedUrl = new URL('../data/canonical-game-data.json', import.meta.url);
-    const response = await fetch(seedUrl);
-    if (!response.ok) {
-      throw new Error(`Unable to load canonical game data (${response.status} ${response.statusText})`);
-    }
-    return response.json();
-  }
 
   // ---------------------------------------------------------------------------
   // Reactive State
@@ -141,6 +74,8 @@
   // Non-reactive helpers
   let storageAdapter: StorageAdapter | null = null;
 
+  const TOAST_DISMISS_FOCUS_DELAY_MS = 50;
+
   // ---------------------------------------------------------------------------
   // Derived
   // ---------------------------------------------------------------------------
@@ -151,7 +86,25 @@
   let activeLocaleId = $derived(appState?.preferences?.localeId ?? 'en-US');
 
 
-  let modalConfig = $derived(isLoaded ? computeModalConfig() : null);
+  let modalConfig = $derived(
+    isLoaded
+      ? computeModalConfig({
+          locale: locale!,
+          appState: appState!,
+          confirmResetOwnedCollection: ui.confirmResetOwnedCollection,
+          confirmResetAllState: ui.confirmResetAllState,
+          confirmBackupRestoreMode: backupVm.confirmRestoreMode,
+          stagedBackup: backupVm.stagedBackup,
+          onCancelResetOwnedCollection: () => actions.cancelResetOwnedCollection(),
+          onConfirmResetOwnedCollection: () => actions.confirmResetOwnedCollection(),
+          onCancelResetAllState: () => actions.cancelResetAllState(),
+          onResetAllState: () => actions.resetAllState(),
+          onCancelBackupRestore: () => actions.cancelBackupRestore(),
+          onConfirmMergeBackup: () => actions.confirmMergeBackup(),
+          onConfirmReplaceBackup: () => actions.confirmReplaceBackup()
+        })
+      : null
+  );
 
   // ---------------------------------------------------------------------------
   // Effects
@@ -202,7 +155,7 @@
             const fallback = toaster.querySelector<HTMLElement>('[data-close-button]');
             if (fallback) fallback.focus();
           }
-        }, 50);
+        }, TOAST_DISMISS_FOCUS_DELAY_MS);
       }
     }
     document.addEventListener('keydown', handleKeydown, true);
@@ -210,7 +163,7 @@
   });
 
   // ---------------------------------------------------------------------------
-  // Debug globals (mirrors syncDebugGlobals from browser-entry.mjs)
+  // Debug globals (mirrors syncDebugGlobals from browser-entry.ts)
   // ---------------------------------------------------------------------------
   function syncGlobals() {
     if (!import.meta.env.DEV) return;
@@ -218,23 +171,23 @@
     (globalThis as Record<string, unknown>).__EPIC1 = bundle;
     (globalThis as Record<string, unknown>).__APP_STATE__ = appState;
     (globalThis as Record<string, unknown>).__APP_PERSISTENCE__ = persistence;
-    (globalThis as Record<string, unknown>).__CURRENT_SETUP__ = getCurrentSetup();
+    (globalThis as Record<string, unknown>).__CURRENT_SETUP__ = newGameVm.currentSetup;
     (globalThis as Record<string, unknown>).__ACTIVE_TAB__ = ui.selectedTab;
     (globalThis as Record<string, unknown>).__BROWSE_UI__ = {
-      searchTerm: getBrowseSearchTerm(),
-      typeFilter: getBrowseTypeFilter(),
-      expandedSetId: getExpandedBrowseSetId()
+      searchTerm: browseVm.searchTerm,
+      typeFilter: browseVm.typeFilter,
+      expandedSetId: browseVm.expandedSetId
     };
     (globalThis as Record<string, unknown>).__COLLECTION_UI__ = { confirmResetOwnedCollection: ui.confirmResetOwnedCollection };
     (globalThis as Record<string, unknown>).__HISTORY_UI__ = {
-      groupingMode: getHistoryGroupingMode(),
+      groupingMode: historyVm.groupingMode,
       supportedGroupingModes: HISTORY_GROUPING_MODES,
       confirmResetAllState: ui.confirmResetAllState,
-      resultEditorRecordId: getResultEditorRecordId(),
-      resultDraft: getResultDraft(),
-      resultFormError: getResultFormError(),
-      resultInvalidFields: getResultInvalidFields(),
-      historyInsightsExpanded: getHistoryInsightsExpanded()
+      resultEditorRecordId: historyVm.resultEditorRecordId,
+      resultDraft: historyVm.resultDraft,
+      resultFormError: historyVm.resultFormError,
+      resultInvalidFields: historyVm.resultInvalidFields,
+      historyInsightsExpanded: historyVm.insightsExpanded
     };
     (globalThis as Record<string, unknown>).__ONBOARDING_UI__ = {
       visible: ui.onboardingVisible,
@@ -244,9 +197,9 @@
       mobilePreferencesOpen: ui.mobilePreferencesOpen
     };
     (globalThis as Record<string, unknown>).__PLAY_MODE_UI__ = {
-      playerCount: getSelectedPlayerCount(),
-      playMode: getSelectedPlayMode(),
-      advancedSolo: getAdvancedSolo()
+      playerCount: newGameVm.selectedPlayerCount,
+      playMode: newGameVm.selectedPlayMode,
+      advancedSolo: newGameVm.advancedSolo
     };
     (globalThis as Record<string, unknown>).__THEME_UI__ = {
       activeThemeId: appState.preferences.themeId,
@@ -260,70 +213,12 @@
       supportedLocales: getSelectableLocales()
     };
     (globalThis as Record<string, unknown>).__BACKUP_UI__ = {
-      importError: getBackupImportError(),
-      stagedBackupSummary: getStagedBackup()?.summary || null,
-      confirmRestoreMode: getConfirmBackupRestoreMode(),
-      lastExportFileName: getLastBackupExportFileName() || null
+      importError: backupVm.importError,
+      stagedBackupSummary: backupVm.stagedBackup?.summary || null,
+      confirmRestoreMode: backupVm.confirmRestoreMode,
+      lastExportFileName: backupVm.lastExportFileName || null
     };
-    (globalThis as Record<string, unknown>).__FORCED_PICKS_UI__ = getForcedPicks();
-  }
-
-  // ---------------------------------------------------------------------------
-  // Modal config
-  // ---------------------------------------------------------------------------
-  function computeModalConfig(): ModalConfig | null {
-    if (!locale || !appState) return null;
-    if (ui.confirmResetOwnedCollection) {
-      return {
-        title: locale!.t('modal.reset.title'),
-        description: locale!.t('modal.resetCollection.description'),
-        cancelAction: 'cancel-reset-owned-collection',
-        confirmAction: 'confirm-reset-owned-collection',
-        confirmLabel: locale!.t('modal.resetCollection.confirm'),
-        onCancel: () => actions.cancelResetOwnedCollection(),
-        onConfirm: () => actions.confirmResetOwnedCollection()
-      };
-    }
-    if (ui.confirmResetAllState) {
-      return {
-        title: locale!.t('modal.reset.title'),
-        description: locale!.t('modal.resetAll.description'),
-        cancelAction: 'cancel-reset-all-state',
-        confirmAction: 'confirm-reset-all-state',
-        confirmLabel: locale!.t('modal.resetAll.confirm'),
-        onCancel: () => actions.cancelResetAllState(),
-        onConfirm: () => actions.resetAllState()
-      };
-    }
-    if (getConfirmBackupRestoreMode() && getStagedBackup()) {
-      const { summary } = getStagedBackup()!;
-      if (getConfirmBackupRestoreMode() === 'merge') {
-        return {
-          title: locale!.t('modal.merge.title'),
-          description: locale!.t('modal.merge.description', {
-            ownedSetCount: locale!.formatNumber(summary.ownedSetCount),
-            historyCount: locale!.formatNumber(summary.historyCount)
-          }),
-          cancelAction: 'cancel-backup-restore',
-          confirmAction: 'confirm-merge-backup',
-          confirmLabel: locale!.t('modal.merge.confirm'),
-          onCancel: () => actions.cancelBackupRestore(),
-          onConfirm: () => actions.confirmMergeBackup()
-        };
-      }
-      return {
-        title: locale!.t('modal.replace.title'),
-        description: locale!.t('modal.replace.description', {
-          historyCount: locale!.formatNumber(summary.historyCount)
-        }),
-        cancelAction: 'cancel-backup-restore',
-        confirmAction: 'confirm-replace-backup',
-        confirmLabel: locale!.t('modal.replace.confirm'),
-        onCancel: () => actions.cancelBackupRestore(),
-        onConfirm: () => actions.confirmReplaceBackup()
-      };
-    }
-    return null;
+    (globalThis as Record<string, unknown>).__FORCED_PICKS_UI__ = newGameVm.forcedPicks;
   }
 
   // ---------------------------------------------------------------------------
@@ -338,9 +233,9 @@
   }
 
   function clearGeneratedSetup() {
-    setCurrentSetup(null);
-    setGeneratorError(null);
-    setGeneratorNotices([]);
+    newGameVm.currentSetup = null;
+    newGameVm.generatorError = null;
+    newGameVm.generatorNotices = [];
   }
 
   function clearForcedPicksState() {
@@ -348,71 +243,21 @@
   }
 
   function clearBackupDraft() {
-    setBackupImportError(null);
-    setStagedBackup(null);
-    setConfirmBackupRestoreMode(null);
-  }
-
-  function getLocaleFlag(localeId: string) {
-    const flags = {
-      'en-US': '🇺🇸',
-      'fr-FR': '🇫🇷',
-      'de-DE': '🇩🇪',
-      'ja-JP': '🇯🇵',
-      'ko-KR': '🇰🇷',
-      'es-ES': '🇪🇸'
-    };
-    return (flags as Record<string, string>)[localeId] ?? '🌐';
-  }
-
-  function getThemeIcon(themeId: string) {
-    const icons = { dark: '🌙', light: '☀️' };
-    return (icons as Record<string, string>)[themeId] ?? '🎨';
-  }
-
-  function closeResultEditor() {
-    const returnFocusSelector = getResultEditorReturnFocusSelector();
-    setResultEditorRecordId(null);
-    setResultEditorReturnFocusSelector(null);
-    resetResultDraft();
-    setResultFormError(null);
-    setResultInvalidFields([]);
-    return returnFocusSelector;
-  }
-
-  function openResultEditor(recordId: string, options: { returnFocusSelector?: string } = {}) {
-    const record = appState!.history.find((entry) => entry.id === recordId);
-    if (!record) return false;
-    setResultEditorRecordId(recordId);
-    setResultEditorReturnFocusSelector(
-      options.returnFocusSelector ??
-      `[data-action="edit-game-result"][data-record-id="${recordId}"]`
-    );
-    if (record.playerCount >= 2) {
-      if (isCompletedGameResult(record.result)) {
-        setResultDraft(normalizeGameResultDraft(record.result, record.playerCount));
-      } else {
-        resetResultDraftForPlayerCount(record.playerCount);
-      }
-    } else {
-      setResultDraft(normalizeGameResultDraft(record.result));
-    }
-    setResultFormError(null);
-    setResultInvalidFields([]);
-    setHistoryExpandedRecordId(recordId);
-    return true;
+    backupVm.importError = null;
+    backupVm.stagedBackup = null;
+    backupVm.confirmRestoreMode = null;
   }
 
   function syncUiFromPersistedState(nextState: AppState) {
     appState = nextState;
     refreshLocaleState();
     ui.selectedTab = normalizeSelectedTab(nextState.preferences.selectedTab) ?? DEFAULT_TAB_ID;
-    setSelectedPlayerCount(nextState.preferences.lastPlayerCount);
-    setSelectedPlayMode(resolvePlayMode(nextState.preferences.lastPlayerCount, {
+    newGameVm.selectedPlayerCount = nextState.preferences.lastPlayerCount;
+    newGameVm.selectedPlayMode = resolvePlayMode(nextState.preferences.lastPlayerCount, {
       advancedSolo: nextState.preferences.lastAdvancedSolo,
       playMode: nextState.preferences.lastPlayMode
-    }));
-    setAdvancedSolo(nextState.preferences.lastAdvancedSolo);
+    });
+    newGameVm.advancedSolo = nextState.preferences.lastAdvancedSolo;
     ui.onboardingVisible = !nextState.preferences.onboardingCompleted;
     ui.onboardingStep = 0;
     ui.aboutPanelOpen = false;
@@ -421,8 +266,8 @@
     closeResultEditor();
     clearGeneratedSetup();
     clearBackupDraft();
-    setHistoryExpandedRecordId(null);
-    setHistoryInsightsExpanded(false);
+    historyVm.expandedRecordId = null;
+    historyVm.insightsExpanded = false;
     resetHistoryGroupingMode();
   }
 
@@ -452,39 +297,71 @@
     return result;
   }
 
-  function persistPreferences(playerCount: number, playMode: string, actionNotice: string) {
-    const normalizedPlayMode = resolvePlayMode(playerCount, { playMode });
-    const advancedSolo = normalizedPlayMode === 'advanced-solo';
-    setSelectedPlayerCount(playerCount);
-    setSelectedPlayMode(normalizedPlayMode);
-    setAdvancedSolo(advancedSolo);
-    clearGeneratedSetup();
-    applyStateUpdate((currentState: AppState) => {
-      currentState.preferences.lastPlayerCount = playerCount;
-      currentState.preferences.lastAdvancedSolo = advancedSolo;
-      currentState.preferences.lastPlayMode = normalizedPlayMode;
-      return currentState;
-    }, actionNotice);
-  }
+  // ---------------------------------------------------------------------------
+  // Factory instances
+  // ---------------------------------------------------------------------------
+  const browseActionsImpl = createBrowseActions();
 
-  function persistSelectedTab(tabId: string | null, actionNotice: string) {
-    const normalizedTabId = normalizeSelectedTab(tabId);
-    ui.selectedTab = normalizedTabId ?? DEFAULT_TAB_ID;
-    applyStateUpdate((currentState: AppState) => {
-      currentState.preferences.selectedTab = normalizedTabId;
-      return currentState;
-    }, actionNotice);
-  }
+  const newGameActionsImpl = createNewGameActions({
+    getLocale: () => locale!,
+    getBundle: () => bundle!,
+    getAppState: () => appState!,
+    applyStateUpdate,
+    clearGeneratedSetup,
+    clearForcedPicksState,
+    closeResultEditor,
+    focusSelector,
+    openResultEditor: (id, opts) => openResultEditor(appState!, id, opts ?? {}),
+    ui
+  });
 
-  function completeOnboardingFlow(actionNotice: string) {
-    ui.onboardingVisible = false;
-    ui.onboardingStep = 0;
-    applyStateUpdate((currentState: AppState) => {
-      currentState.preferences.onboardingCompleted = true;
-      return currentState;
-    }, actionNotice);
-    focusSelector('[data-browse-primary-cta], [data-action="select-tab"][aria-selected="true"]');
-  }
+  const historyActionsImpl = createHistoryActions({
+    getLocale: () => locale!,
+    getAppState: () => appState!,
+    applyStateUpdate,
+    openResultEditor: (id, opts) => openResultEditor(appState!, id, opts ?? {}),
+    closeResultEditor,
+    focusSelector,
+    ui
+  });
+
+  const backupActionsImpl = createBackupActions({
+    getLocale: () => locale!,
+    getAppState: () => appState!,
+    getBundle: () => bundle!,
+    applyStateUpdate,
+    syncUiFromPersistedState,
+    ui,
+    focusActionButton,
+    focusModalCancelButton
+  });
+
+  const importActionsImpl = createImportActions({
+    getLocale: () => locale!,
+    getBundle: () => bundle!,
+    applyStateUpdate
+  });
+
+  const collectionActionsImpl = createCollectionActions({
+    getLocale: () => locale!,
+    getStorageAdapter: () => storageAdapter,
+    applyStateUpdate,
+    syncUiFromPersistedState,
+    clearGeneratedSetup,
+    clearForcedPicksState,
+    focusActionButton,
+    focusModalCancelButton,
+    ui,
+    persistence
+  });
+
+  const preferencesActionsImpl = createPreferencesActions({
+    getLocale: () => locale!,
+    getAppState: () => appState!,
+    applyStateUpdate,
+    focusSelector,
+    ui
+  });
 
   // ---------------------------------------------------------------------------
   // Actions
@@ -555,559 +432,13 @@
     injectInvalidOwnedSet?: () => void;
   };
   const actions = {
-    selectTab(tabId) {
-      persistSelectedTab(
-        tabId,
-        locale!.t('actions.switchedTab', { tab: locale!.getTabLabel(normalizeSelectedTab(tabId) ?? '') })
-      );
-      focusSelector(
-        `[data-action="select-tab"][data-tab-id="${normalizeSelectedTab(tabId)}"][aria-selected="true"]`
-      );
-    },
-
-    handleTabKeydown(tabId, key) {
-      const normalizedTabId = normalizeSelectedTab(tabId) ?? DEFAULT_TAB_ID;
-      if (key === 'ArrowRight' || key === 'ArrowDown') {
-        const nextId = getAdjacentTabId(normalizedTabId, 'next') ?? DEFAULT_TAB_ID;
-        persistSelectedTab(nextId, locale!.t('actions.keyboardTabs'));
-        focusSelector(`[data-action="select-tab"][data-tab-id="${nextId}"][aria-selected="true"]`);
-        return;
-      }
-      if (key === 'ArrowLeft' || key === 'ArrowUp') {
-        const prevId = getAdjacentTabId(normalizedTabId, 'previous') ?? DEFAULT_TAB_ID;
-        persistSelectedTab(prevId, locale!.t('actions.keyboardTabs'));
-        focusSelector(`[data-action="select-tab"][data-tab-id="${prevId}"][aria-selected="true"]`);
-        return;
-      }
-      if (key === 'Home') {
-        const firstId = getAdjacentTabId(normalizedTabId, 'first') ?? DEFAULT_TAB_ID;
-        persistSelectedTab(firstId, locale!.t('actions.keyboardFirstTab'));
-        focusSelector(`[data-action="select-tab"][data-tab-id="${firstId}"][aria-selected="true"]`);
-        return;
-      }
-      if (key === 'End') {
-        const lastId = getAdjacentTabId(normalizedTabId, 'last') ?? DEFAULT_TAB_ID;
-        persistSelectedTab(lastId, locale!.t('actions.keyboardLastTab'));
-        focusSelector(`[data-action="select-tab"][data-tab-id="${lastId}"][aria-selected="true"]`);
-      }
-    },
-
-    setHistoryGrouping(mode) {
-      setHistoryGroupingMode((HISTORY_GROUPING_MODES.some((entry) => entry.id === mode)
-        ? mode
-        : DEFAULT_HISTORY_GROUPING_MODE) as Parameters<typeof setHistoryGroupingMode>[0]);
-      ui.lastActionNotice = locale!.t('actions.updatedHistoryGrouping', {
-        mode: locale!.getHistoryGroupingLabel(getHistoryGroupingMode())
-      });
-      focusSelector(
-        `[data-action="set-history-grouping"][data-history-grouping-mode="${getHistoryGroupingMode()}"]`
-      );
-    },
-
-    toggleOwnedSet(setId) {
-      clearGeneratedSetup();
-      ui.confirmResetOwnedCollection = false;
-      ui.confirmResetAllState = false;
-      applyStateUpdate(
-        (currentState: AppState) => toggleOwnedSetStore(currentState, setId),
-        locale!.t('actions.updatedOwnedCollection')
-      );
-    },
-
-    setActiveSetIds(ids) {
-      applyStateUpdate(
-        (currentState: AppState) => setActiveSetIdsStore(currentState, ids),
-        locale!.t('actions.updatedActiveFilter')
-      );
-    },
-
-    clearActiveSetIds() {
-      applyStateUpdate(
-        (currentState: AppState) => clearActiveSetIdsStore(currentState),
-        locale!.t('actions.clearedActiveFilter')
-      );
-    },
-
-    deactivateAllSets() {
-      applyStateUpdate(
-        (currentState: AppState) => deactivateAllSetsStore(currentState),
-        locale!.t('actions.clearedActiveFilter')
-      );
-    },
-
-    setBrowseSearchTerm(searchTerm) { setBrowseSearchTerm(searchTerm); },
-
-    setBrowseTypeFilter(typeFilter) { setBrowseTypeFilter(typeFilter as Parameters<typeof setBrowseTypeFilter>[0]); },
-
-    toggleAboutPanel() {
-      ui.aboutPanelOpen = !ui.aboutPanelOpen;
-      ui.lastActionNotice = ui.aboutPanelOpen
-        ? locale!.t('actions.openedAbout')
-        : locale!.t('actions.closedAbout');
-    },
-
-    startOnboarding() {
-      ui.onboardingVisible = true;
-      ui.onboardingStep = 0;
-      ui.aboutPanelOpen = false;
-      ui.lastActionNotice = locale!.t('actions.openedWalkthrough');
-      if (ui.selectedTab !== 'browse') {
-        persistSelectedTab('browse', locale!.t('actions.replayWalkthrough'));
-        focusSelector('#onboarding-step-heading');
-        return;
-      }
-      focusSelector('#onboarding-step-heading');
-    },
-
-    previousOnboardingStep() {
-      ui.onboardingStep = Math.max(0, ui.onboardingStep - 1);
-      ui.lastActionNotice = locale!.t('actions.previousWalkthrough');
-      focusSelector('#onboarding-step-heading');
-    },
-
-    nextOnboardingStep() {
-      ui.onboardingStep = Math.min(4, ui.onboardingStep + 1);
-      ui.lastActionNotice = locale!.t('actions.nextWalkthrough');
-      focusSelector('#onboarding-step-heading');
-    },
-
-    openOnboardingTab(tabId) {
-      persistSelectedTab(
-        tabId,
-        locale!.t('actions.openedWalkthroughTab', {
-          tab: locale!.getTabLabel(normalizeSelectedTab(tabId) ?? '')
-        })
-      );
-    },
-
-    skipOnboarding() { completeOnboardingFlow(locale!.t('actions.skippedWalkthrough')); },
-    completeOnboarding() { completeOnboardingFlow(locale!.t('actions.completedWalkthrough')); },
-
-    toggleBrowseSetExpanded(setId) {
-      setExpandedBrowseSetId(getExpandedBrowseSetId() === setId ? null : setId);
-    },
-
-    requestResetOwnedCollection() {
-      ui.confirmResetOwnedCollection = true;
-      ui.modalReturnFocusAction = 'request-reset-owned-collection';
-      ui.lastActionNotice = locale!.t('actions.confirmResetCollection');
-      focusModalCancelButton();
-    },
-
-    cancelResetOwnedCollection() {
-      ui.confirmResetOwnedCollection = false;
-      ui.lastActionNotice = locale!.t('actions.keptCollection');
-      focusActionButton(ui.modalReturnFocusAction ?? '');
-    },
-
-    confirmResetOwnedCollection() {
-      ui.confirmResetOwnedCollection = false;
-      clearForcedPicksState();
-      clearGeneratedSetup();
-      applyStateUpdate(
-        (currentState: AppState) => resetOwnedCollection(currentState),
-        locale!.t('actions.clearedCollection')
-      );
-      toast.success(locale!.t('actions.clearedCollection'));
-    },
-
-    requestResetAllState() {
-      ui.confirmResetAllState = true;
-      ui.modalReturnFocusAction = 'request-reset-all-state';
-      ui.lastActionNotice = locale!.t('actions.confirmResetAll');
-      focusModalCancelButton();
-    },
-
-    cancelResetAllState() {
-      ui.confirmResetAllState = false;
-      ui.lastActionNotice = locale!.t('actions.keptState');
-      focusActionButton(ui.modalReturnFocusAction ?? '');
-    },
-
-    setPlayerCount(playerCount) {
-      const playMode = playerCount === 1 ? getSelectedPlayMode() : 'standard';
-      persistPreferences(
-        playerCount,
-        playMode,
-        locale!.t('actions.selectedPlayerMode', {
-          count: locale!.formatNumber(playerCount),
-          playerWord: playerCount === 1 ? 'player' : 'players'
-        })
-      );
-    },
-
-    setPlayMode(playMode) {
-      if (getSelectedPlayerCount() !== 1 && playMode !== 'standard') {
-        ui.lastActionNotice = locale!.t('actions.invalidSoloMode');
-        toast.warning(locale!.t('actions.invalidSoloMode'));
-        return;
-      }
-      persistPreferences(
-        getSelectedPlayerCount(),
-        playMode,
-        locale!.t('actions.selectedPlayMode', {
-          mode: locale!.getPlayModeLabel(playMode, getSelectedPlayerCount())
-        })
-      );
-    },
-
-    setEpicMastermind(enabled) {
-      applyStateUpdate((currentState: AppState) => {
-        currentState.preferences.lastEpicMastermind = enabled;
-        return currentState;
-      }, locale!.t('newGame.epicMastermind'));
-    },
-
-    setTheme(themeId) {
-      const normalizedThemeId = normalizeThemeId(themeId);
-      if (appState!.preferences.themeId === normalizedThemeId) return;
-      applyStateUpdate((currentState: AppState) => {
-        currentState.preferences.themeId = normalizedThemeId;
-        return currentState;
-      }, locale!.t('actions.appliedTheme', { theme: locale!.getThemeLabel(normalizedThemeId) }));
-      focusSelector(`[data-action="set-theme"][data-theme-id="${normalizedThemeId}"]`);
-    },
-
-    setLocale(localeId) {
-      const normalizedLocaleId = normalizeLocaleId(localeId);
-      if (appState!.preferences.localeId === normalizedLocaleId) return;
-      const newLocaleTools = createLocaleTools(normalizedLocaleId);
-      applyStateUpdate((currentState: AppState) => {
-        currentState.preferences.localeId = normalizedLocaleId;
-        return currentState;
-      }, locale!.t('actions.appliedLocale', { locale: newLocaleTools.localeLabel }));
-      toast.success(locale!.t('actions.appliedLocale', { locale: newLocaleTools.localeLabel }));
-      focusSelector('#header-locale-select');
-    },
-
-    exportBackup() {
-      const payload = createBackupPayload($state.snapshot(appState!));
-      const fileName = buildBackupFilename(payload.exportedAt);
-      const backupBlob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const downloadUrl = URL.createObjectURL(backupBlob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = fileName;
-      document.body.append(link);
-      link.click();
-      link.remove();
-      queueMicrotask(() => URL.revokeObjectURL(downloadUrl));
-      setLastBackupExportFileName(fileName);
-      ui.lastActionNotice = locale!.t('actions.exportedBackup', { fileName });
-      toast.success(locale!.t('actions.exportedBackupToast', { fileName }));
-    },
-
-    openImportBackup() {
-      document.getElementById('backup-import-input')?.click();
-    },
-
-    async importBackupFile(file) {
-      if (!file) return;
-      const importedText = await file.text();
-      const parsedBackup = parseBackupText(importedText, { indexes: bundle!.runtime.indexes });
-      if (!parsedBackup.ok) {
-        setStagedBackup(null);
-        setConfirmBackupRestoreMode(null);
-        setBackupImportError(parsedBackup.error);
-        ui.lastActionNotice = locale!.t('actions.backupImportFailed');
-        toast.error(parsedBackup.error, { duration: Infinity });
-        return;
-      }
-      setBackupImportError(null);
-      setConfirmBackupRestoreMode(null);
-      setStagedBackup({
-        fileName: file.name || buildBackupFilename(parsedBackup.payload.exportedAt),
-        payload: parsedBackup.payload,
-        importedState: parsedBackup.importedState,
-        summary: summarizeBackupState(parsedBackup.importedState)
-      });
-      ui.lastActionNotice = locale!.t('actions.loadedBackupPreview');
-    },
-
-    cancelBackupPreview() {
-      clearBackupDraft();
-      ui.lastActionNotice = locale!.t('actions.discardedBackupPreview');
-    },
-
-    requestMergeBackup() {
-      if (!getStagedBackup()) return;
-      setConfirmBackupRestoreMode('merge');
-      ui.modalReturnFocusAction = 'request-merge-backup';
-      ui.lastActionNotice = locale!.t('actions.reviewMerge');
-      focusModalCancelButton();
-    },
-
-    requestReplaceBackup() {
-      if (!getStagedBackup()) return;
-      setConfirmBackupRestoreMode('replace');
-      ui.modalReturnFocusAction = 'request-replace-backup';
-      ui.lastActionNotice = locale!.t('actions.reviewReplace');
-      focusModalCancelButton();
-    },
-
-    cancelBackupRestore() {
-      setConfirmBackupRestoreMode(null);
-      ui.lastActionNotice = locale!.t('actions.keptBackupPreview');
-      focusActionButton(ui.modalReturnFocusAction ?? '');
-    },
-
-    confirmMergeBackup() {
-      if (!getStagedBackup()) return;
-      setConfirmBackupRestoreMode(null);
-      const nextState = mergeImportedState($state.snapshot(appState!), $state.snapshot(getStagedBackup()!.importedState));
-      const result = applyStateUpdate(() => nextState, locale!.t('actions.mergedBackup'));
-      syncUiFromPersistedState(result.state);
-      toast.success(locale!.t('actions.mergedBackup'));
-    },
-
-    confirmReplaceBackup() {
-      if (!getStagedBackup()) return;
-      setConfirmBackupRestoreMode(null);
-      const result = applyStateUpdate(
-        () => getStagedBackup()!.importedState,
-        locale!.t('actions.replacedBackup')
-      );
-      syncUiFromPersistedState(result.state);
-      toast.warning(locale!.t('actions.replacedBackup'));
-    },
-
-    addForcedPick(field, value) {
-      if (!value) {
-        ui.lastActionNotice = locale!.t('actions.chooseForcedPick');
-        return;
-      }
-      const nextForcedPicks = addForcedPick(getForcedPicks(), field, value);
-      const prev = getForcedPicks();
-      const changed =
-        nextForcedPicks.schemeId !== prev.schemeId ||
-        nextForcedPicks.mastermindId !== prev.mastermindId ||
-        nextForcedPicks.heroIds.join() !== prev.heroIds.join() ||
-        nextForcedPicks.villainGroupIds.join() !== prev.villainGroupIds.join() ||
-        nextForcedPicks.henchmanGroupIds.join() !== prev.henchmanGroupIds.join();
-      setForcedPicks(nextForcedPicks);
-      clearGeneratedSetup();
-      ui.lastActionNotice = changed
-        ? locale!.t('actions.updatedForcedPicks')
-        : locale!.t('actions.duplicateForcedPick');
-    },
-
-    removeForcedPick(field, value) {
-      setForcedPicks(removeForcedPick(getForcedPicks(), field, value));
-      clearGeneratedSetup();
-      ui.lastActionNotice = locale!.t('actions.removedForcedPick');
-    },
-
-    clearForcedPicks() {
-      clearForcedPicksState();
-      clearGeneratedSetup();
-      ui.lastActionNotice = locale!.t('actions.clearedForcedPicks');
-    },
-
-    setPreferredExpansion(id) {
-      setForcedPicks({ ...getForcedPicks(), preferredExpansionId: id });
-      clearGeneratedSetup();
-      ui.lastActionNotice = locale!.t('actions.updatedForcedPicks');
-    },
-
-    setForcedTeam(team) {
-      setForcedPicks({ ...getForcedPicks(), forcedTeam: team });
-      clearGeneratedSetup();
-    },
-
-    generateSetup() {
-      try {
-        const setup = generateSetup({
-          runtime: bundle!.runtime,
-          state: appState!,
-          playerCount: getSelectedPlayerCount(),
-          advancedSolo: getAdvancedSolo(),
-          playMode: getSelectedPlayMode(),
-          forcedPicks: getForcedPicks(),
-          epicMastermind: appState!.preferences.lastEpicMastermind ?? false
-        });
-        setCurrentSetup(setup);
-        setGeneratorError(null);
-        setGeneratorNotices(setup.notices);
-        ui.lastActionNotice = locale!.t('actions.generatedSetup');
-      } catch (error: any) {
-        setCurrentSetup(null);
-        setGeneratorNotices([]);
-        setGeneratorError(error.message);
-        ui.lastActionNotice = locale!.t('actions.failedSetup');
-        toast.error(error.message, { duration: Infinity });
-      }
-    },
-
-    acceptCurrentSetup() {
-      if (!getCurrentSetup()) {
-        ui.lastActionNotice = locale!.t('actions.acceptBeforeLog');
-        toast.warning(locale!.t('actions.acceptBeforeLog'));
-        return;
-      }
-      const acceptedRecordId = createGameRecordId();
-      const acceptedAt = new Date().toISOString();
-      applyStateUpdate((currentState: AppState) => {
-        const nextState = acceptGameSetup(currentState, {
-          id: acceptedRecordId,
-          createdAt: acceptedAt,
-          playerCount: getSelectedPlayerCount(),
-          advancedSolo: getAdvancedSolo(),
-          playMode: getSelectedPlayMode(),
-          epicMastermind: appState!.preferences.lastEpicMastermind ?? false,
-          setupSnapshot: buildHistoryReadySetupSnapshot($state.snapshot(getCurrentSetup()!))
-        });
-        nextState.preferences.selectedTab = 'history';
-        return nextState;
-      }, hasForcedPicks(getForcedPicks())
-        ? locale!.t('actions.acceptedLoggedForced')
-        : locale!.t('actions.acceptedLogged'));
-      ui.selectedTab = 'history';
-      openResultEditor(acceptedRecordId, {
-        returnFocusSelector: `[data-action="edit-game-result"][data-record-id="${acceptedRecordId}"]`
-      });
-      clearForcedPicksState();
-      clearGeneratedSetup();
-      focusSelector('[data-result-field="outcome"]');
-      toast.success(locale!.t('actions.acceptedToast'));
-    },
-
-    editGameResult(recordId) {
-      if (
-        !openResultEditor(recordId, {
-          returnFocusSelector: `[data-action="edit-game-result"][data-record-id="${recordId}"]`
-        })
-      )
-        return;
-      ui.lastActionNotice = locale!.t('actions.openedResultEditor');
-      focusSelector('[data-result-field="outcome"]');
-    },
-
-    setResultOutcome(outcome) {
-      setResultDraft({ ...getResultDraft(), outcome });
-      const hadValidationState = getResultFormError() || getResultInvalidFields().length;
-      setResultFormError(null);
-      setResultInvalidFields([]);
-      if (hadValidationState) focusSelector('[data-result-field="outcome"]');
-    },
-
-    setResultScore(score) {
-      setResultDraft({ ...getResultDraft(), score });
-      setResultFormError(null);
-      setResultInvalidFields([]);
-      focusSelector('[data-result-field="score"]');
-    },
-
-    setResultNotes(notes) {
-      setResultDraft({ ...getResultDraft(), notes });
-      const hadValidationState = getResultFormError() || getResultInvalidFields().length;
-      setResultFormError(null);
-      setResultInvalidFields([]);
-      if (hadValidationState) focusSelector('[data-result-field="notes"]');
-    },
-
-    setResultPlayerScore(index, value) {
-      setResultPlayerScore(index, value);
-      setResultFormError(null);
-      setResultInvalidFields([]);
-    },
-
-    setResultPlayerName(index, value) {
-      setResultPlayerName(index, value);
-    },
-
-    skipGameResultEntry() {
-      const returnFocusSelector = closeResultEditor();
-      ui.lastActionNotice = locale!.t('actions.pendingResult');
-      focusSelector(returnFocusSelector ?? '');
-      toast.info(locale!.t('actions.pendingResultToast'));
-    },
-
-    cancelResultEntry() {
-      const returnFocusSelector = closeResultEditor();
-      ui.lastActionNotice = locale!.t('actions.closedResultEditor');
-      focusSelector(returnFocusSelector ?? '');
-    },
-
-    saveGameResult() {
-      if (!getResultEditorRecordId()) return;
-      const activeRecordId = getResultEditorRecordId();
-      const record = appState!.history.find((r) => r.id === activeRecordId);
-      const playerCount = record?.playerCount ?? 1;
-      const validation = validateGameResultDraft(getResultDraft(), playerCount);
-      if (!validation.ok) {
-        setResultFormError(validation.errors
-          .map((message) => locale!.localizeValidationMessage(message))
-          .join(' '));
-        setResultInvalidFields(validation.errors.flatMap((message) => {
-          if (message.includes('Win or Loss')) return ['outcome'];
-          if (playerCount >= 2 && message.toLowerCase().includes('score')) {
-            return Array.from({ length: playerCount }, (_, i) => `player-score-${i}`);
-          }
-          if (message.toLowerCase().includes('score')) return ['score'];
-          return [];
-        }));
-        ui.lastActionNotice = locale!.t('actions.finishResultFields');
-        focusSelector('[data-result-form-error]');
-        return;
-      }
-      const returnFocusSelector = getResultEditorReturnFocusSelector() ?? '';
-      const wasPending =
-        appState!.history.find((r) => r.id === activeRecordId)?.result?.status !== 'completed';
-      applyStateUpdate(
-        (currentState) =>
-          updateGameResult(currentState, {
-            recordId: activeRecordId!,
-            outcome: validation.result.outcome!,
-            score: validation.result.score,
-            notes: validation.result.notes !== null ? validation.result.notes : undefined,
-            updatedAt: validation.result.updatedAt ?? new Date().toISOString()
-          }),
-        wasPending
-          ? locale!.t('actions.savedResult')
-          : locale!.t('actions.savedCorrectedResult')
-      );
-      closeResultEditor();
-      focusSelector(returnFocusSelector);
-      toast.success(wasPending
-        ? locale!.t('actions.savedResultToast')
-        : locale!.t('actions.savedCorrectedResultToast'));
-    },
-
-    toggleHistoryInsights() {
-      toggleHistoryInsights();
-      focusSelector('[data-action="toggle-history-insights"]');
-    },
-
-    resetUsageCategory(category) {
-      ui.confirmResetAllState = false;
-      closeResultEditor();
-      const label = locale!.getUsageLabel(category);
-      applyStateUpdate(
-        (currentState: AppState) => resetUsageCategoryStore(currentState, category),
-        locale!.t('actions.resetUsageStats', { label })
-      );
-      toast.info(locale!.t('actions.resetUsageStats', { label }));
-    },
-
-    resetAllState() {
-      ui.confirmResetAllState = false;
-      const result = resetAllStateStore({ storageAdapter: storageAdapter! });
-      appState = result.state;
-      persistence.updateNotices = result.notices;
-      persistence.lastSaveMessage = result.save.message;
-      persistence.lastSaveOk = result.save.ok;
-      syncUiFromPersistedState(result.state);
-      ui.selectedTab = DEFAULT_TAB_ID;
-      ui.lastActionNotice = locale!.t('actions.resetAllDefaults');
-      if (result.save.ok) {
-        toast.warning(locale!.t('actions.resetAllDefaults'));
-      } else if (result.save.storageAvailable === false) {
-        toast.warning(result.save.message, { duration: Infinity });
-      } else {
-        toast.error(result.save.message, { duration: Infinity });
-      }
-    },
-
+    ...browseActionsImpl,
+    ...newGameActionsImpl,
+    ...historyActionsImpl,
+    ...backupActionsImpl,
+    ...importActionsImpl,
+    ...collectionActionsImpl,
+    ...preferencesActionsImpl,
     ...(import.meta.env.DEV ? {
       corruptSavedState() {
         const save = storageAdapter!.setItem(STORAGE_KEY, '{ this-is-not-valid-json');
@@ -1140,75 +471,7 @@
           toast.error(ui.lastActionNotice!, { duration: Infinity });
         }
       },
-    } : {}),
-
-    clearToDefaults() {
-      const defaultState = createDefaultState();
-      setSelectedPlayerCount(defaultState.preferences.lastPlayerCount);
-      setSelectedPlayMode(defaultState.preferences.lastPlayMode);
-      setAdvancedSolo(defaultState.preferences.lastAdvancedSolo);
-      clearForcedPicksState();
-      closeResultEditor();
-      clearGeneratedSetup();
-      ui.lastActionNotice = locale!.t('actions.clearDefaults');
-      toast.info(locale!.t('actions.clearDefaults'));
-    },
-
-    async importMyludoFile(file) {
-      if (!file) return;
-      setMyludoImportStatus('loading');
-      setMyludoImportError('');
-      setMyludoImportSummary(null);
-      const result = await parseMyludoFile(file);
-      if (!result.ok) {
-        setMyludoImportStatus('error');
-        setMyludoImportError(result.error);
-        toast.error(result.error, { duration: Infinity });
-        return;
-      }
-      const { matched, unmatched } = matchMyludoNamesToSets(result.gameNames, bundle!.runtime.sets);
-      const matchedSetIds = matched.map((m) => m.setId);
-      applyStateUpdate(
-        (currentState: AppState) => mergeOwnedSets(currentState, matchedSetIds),
-        locale!.t('actions.importedMyludoCollection')
-      );
-      setMyludoImportSummary({ matched, unmatched });
-      setMyludoImportStatus('idle');
-    },
-
-    dismissMyludoSummary() {
-      setMyludoImportSummary(null);
-      setMyludoImportError('');
-      setMyludoImportStatus('idle');
-    },
-
-    async importBggCollection(username) {
-      if (!username) return;
-      setBggImportStatus('loading');
-      setBggImportError('');
-      setBggImportSummary(null);
-      const result = await fetchBggCollection(username);
-      if (!result.ok) {
-        setBggImportStatus('error');
-        setBggImportError(result.error);
-        toast.error(result.error, { duration: Infinity });
-        return;
-      }
-      const { matched, unmatched } = matchBggNamesToSets(result.gameNames, bundle!.runtime.sets);
-      const matchedSetIds = matched.map((m) => m.setId);
-      applyStateUpdate(
-        (currentState: AppState) => mergeOwnedSets(currentState, matchedSetIds),
-        locale!.t('actions.importedBggCollection')
-      );
-      setBggImportSummary({ matched, unmatched });
-      setBggImportStatus('idle');
-    },
-
-    dismissBggSummary() {
-      setBggImportSummary(null);
-      setBggImportError('');
-      setBggImportStatus('idle');
-    }
+    } : {})
   } satisfies Partial<ActionsShape>;
 
   // ---------------------------------------------------------------------------
@@ -1286,35 +549,30 @@
     async function init() {
       if (destroyed) return;
       try {
-        const seed = await loadSeed();
+        const result = await initApp();
         if (destroyed) return;
-        const loadedBundle = createEpic1Bundle(seed as Parameters<typeof createEpic1Bundle>[0]);
-        storageAdapter = createStorageAdapter(globalThis.localStorage);
-        const hydration = hydrateState({ storageAdapter, indexes: loadedBundle.runtime.indexes });
+        storageAdapter = result.storageAdapter;
+        bundle = result.bundle;
+        appState = result.hydratedState;
+        locale = createLocaleTools(result.hydratedState.preferences.localeId);
+        persistence.storageAvailable = result.storageAvailable;
+        persistence.hydratedFromStorage = result.hydratedFromStorage;
+        persistence.recoveredOnLoad = result.recovered;
+        persistence.hydrateNotices = result.hydrateNotices;
+        persistence.updateNotices = [];
+        persistence.lastSaveMessage = null;
+        persistence.lastSaveOk = null;
+        ui.onboardingVisible = !result.hydratedState.preferences.onboardingCompleted;
+        ui.selectedTab = normalizeSelectedTab(result.hydratedState.preferences.selectedTab) ?? DEFAULT_TAB_ID;
+        newGameVm.selectedPlayerCount = result.hydratedState.preferences.lastPlayerCount;
+        newGameVm.selectedPlayMode = resolvePlayMode(result.hydratedState.preferences.lastPlayerCount, {
+          advancedSolo: result.hydratedState.preferences.lastAdvancedSolo,
+          playMode: result.hydratedState.preferences.lastPlayMode
+        });
+        newGameVm.advancedSolo = result.hydratedState.preferences.lastAdvancedSolo;
 
-        bundle = loadedBundle;
-        appState = hydration.state;
-        locale = createLocaleTools(hydration.state.preferences.localeId);
-        persistence = {
-          storageAvailable: hydration.storageAvailable,
-          hydratedFromStorage: hydration.hydratedFromStorage,
-          recoveredOnLoad: hydration.recovered,
-          hydrateNotices: hydration.notices,
-          updateNotices: [],
-          lastSaveMessage: null,
-          lastSaveOk: null
-        };
-        ui.onboardingVisible = !hydration.state.preferences.onboardingCompleted;
-        ui.selectedTab = normalizeSelectedTab(hydration.state.preferences.selectedTab) ?? DEFAULT_TAB_ID;
-        setSelectedPlayerCount(hydration.state.preferences.lastPlayerCount);
-        setSelectedPlayMode(resolvePlayMode(hydration.state.preferences.lastPlayerCount, {
-          advancedSolo: hydration.state.preferences.lastAdvancedSolo,
-          playMode: hydration.state.preferences.lastPlayMode
-        }));
-        setAdvancedSolo(hydration.state.preferences.lastAdvancedSolo);
-
-        if (hydration.notices.length) {
-          hydration.notices.forEach((notice) =>
+        if (result.hydrateNotices.length) {
+          result.hydrateNotices.forEach((notice) =>
             toast.warning(localizeNotice(notice), { duration: Infinity })
           );
         }
@@ -1475,13 +733,13 @@
                 appState={appState!}
                 locale={locale!}
                 {persistence}
-                browseSearchTerm={getBrowseSearchTerm()}
-                browseTypeFilter={getBrowseTypeFilter()}
-                expandedBrowseSetId={getExpandedBrowseSetId()}
+                browseSearchTerm={browseVm.searchTerm}
+                browseTypeFilter={browseVm.typeFilter}
+                expandedBrowseSetId={browseVm.expandedSetId}
                 {compactViewport}
                 aboutPanelOpen={ui.aboutPanelOpen}
                 onboardingVisible={ui.onboardingVisible}
-                currentSetup={getCurrentSetup()}
+                currentSetup={newGameVm.currentSetup}
                 selectedTab={ui.selectedTab}
                 onToggleOwnedSet={actions.toggleOwnedSet}
                 onSetSearchTerm={actions.setBrowseSearchTerm}
@@ -1499,25 +757,25 @@
                 {persistence}
                 lastActionNotice={ui.lastActionNotice}
                 {collectionActions}
-                myludoImportStatus={getMyludoImportStatus()}
-                myludoImportError={getMyludoImportError()}
-                myludoImportSummary={getMyludoImportSummary()}
-                bggImportStatus={getBggImportStatus()}
-                bggImportError={getBggImportError()}
-                bggImportSummary={getBggImportSummary()}
+                myludoImportStatus={importVm.myludoStatus}
+                myludoImportError={importVm.myludoError}
+                myludoImportSummary={importVm.myludoSummary}
+                bggImportStatus={importVm.bggStatus}
+                bggImportError={importVm.bggError}
+                bggImportSummary={importVm.bggSummary}
               />
             {:else if tab.id === 'new-game'}
               <NewGameTab
                 bundle={bundle!}
                 appState={appState!}
                 locale={locale!}
-                selectedPlayerCount={getSelectedPlayerCount()}
-                selectedPlayMode={getSelectedPlayMode()}
-                advancedSolo={getAdvancedSolo()}
-                currentSetup={getCurrentSetup()}
-                generatorError={getGeneratorError()}
-                generatorNotices={getGeneratorNotices()}
-                forcedPicks={getForcedPicks()}
+                selectedPlayerCount={newGameVm.selectedPlayerCount}
+                selectedPlayMode={newGameVm.selectedPlayMode}
+                advancedSolo={newGameVm.advancedSolo}
+                currentSetup={newGameVm.currentSetup}
+                generatorError={newGameVm.generatorError}
+                generatorNotices={newGameVm.generatorNotices}
+                forcedPicks={newGameVm.forcedPicks}
                 {compactViewport}
                 {gameActions}
               />
@@ -1527,13 +785,13 @@
                 appState={appState!}
                 locale={locale!}
                 {compactViewport}
-                historyGroupingMode={getHistoryGroupingMode()}
-                historyInsightsExpanded={getHistoryInsightsExpanded()}
-                historyExpandedRecordId={getHistoryExpandedRecordId()}
-                resultEditorRecordId={getResultEditorRecordId()}
-                resultDraft={getResultDraft()}
-                resultFormError={getResultFormError()}
-                resultInvalidFields={getResultInvalidFields()}
+                historyGroupingMode={historyVm.groupingMode}
+                historyInsightsExpanded={historyVm.insightsExpanded}
+                historyExpandedRecordId={historyVm.expandedRecordId}
+                resultEditorRecordId={historyVm.resultEditorRecordId}
+                resultDraft={historyVm.resultDraft}
+                resultFormError={historyVm.resultFormError}
+                resultInvalidFields={historyVm.resultInvalidFields}
                 {historyActions}
               />
             {:else if tab.id === 'backup'}
@@ -1542,8 +800,8 @@
                 appState={appState!}
                 locale={locale!}
                 {compactViewport}
-                backupImportError={getBackupImportError()}
-                stagedBackup={getStagedBackup()}
+                backupImportError={backupVm.importError}
+                stagedBackup={backupVm.stagedBackup}
                 {backupActions}
               />
             {/if}

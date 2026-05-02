@@ -1,26 +1,97 @@
 // src/app/import-vm.svelte.ts
 // Svelte 5 reactive view-model for the Import tab (BGG and MyLudo imports).
 
-import type { BggMatchResult, MyludoMatchResult } from './types.ts';
+import { toast } from 'svelte-sonner';
+import { parseMyludoFile, matchMyludoNamesToSets } from './myludo-import-utils.ts';
+import { fetchBggCollection, matchBggNamesToSets } from './bgg-import-utils.ts';
+import { mergeOwnedSets } from './collection-utils.ts';
+import type { AppState, LocaleTools, BggMatchResult, MyludoMatchResult } from './types.ts';
+import type { Epic1Bundle } from './game-data-pipeline.ts';
 
 export type ImportStatus = 'idle' | 'loading' | 'success' | 'error';
 
-let myludoImportStatus: ImportStatus = $state<ImportStatus>('idle');
-let myludoImportError: string = $state<string>('');
-let myludoImportSummary: MyludoMatchResult | null = $state<MyludoMatchResult | null>(null);
-let bggImportStatus: ImportStatus = $state<ImportStatus>('idle');
-let bggImportError: string = $state<string>('');
-let bggImportSummary: BggMatchResult | null = $state<BggMatchResult | null>(null);
+export const importVm = $state<{
+  myludoStatus: ImportStatus;
+  myludoError: string;
+  myludoSummary: MyludoMatchResult | null;
+  bggStatus: ImportStatus;
+  bggError: string;
+  bggSummary: BggMatchResult | null;
+}>({
+  myludoStatus: 'idle',
+  myludoError: '',
+  myludoSummary: null,
+  bggStatus: 'idle',
+  bggError: '',
+  bggSummary: null
+});
 
-export function getMyludoImportStatus(): ImportStatus { return myludoImportStatus; }
-export function setMyludoImportStatus(v: ImportStatus): void { myludoImportStatus = v; }
-export function getMyludoImportError(): string { return myludoImportError; }
-export function setMyludoImportError(v: string): void { myludoImportError = v; }
-export function getMyludoImportSummary(): MyludoMatchResult | null { return myludoImportSummary; }
-export function setMyludoImportSummary(v: MyludoMatchResult | null): void { myludoImportSummary = v; }
-export function getBggImportStatus(): ImportStatus { return bggImportStatus; }
-export function setBggImportStatus(v: ImportStatus): void { bggImportStatus = v; }
-export function getBggImportError(): string { return bggImportError; }
-export function setBggImportError(v: string): void { bggImportError = v; }
-export function getBggImportSummary(): BggMatchResult | null { return bggImportSummary; }
-export function setBggImportSummary(v: BggMatchResult | null): void { bggImportSummary = v; }
+// ---------------------------------------------------------------------------
+// Action factory
+// ---------------------------------------------------------------------------
+
+interface ImportActionDeps {
+  getLocale: () => LocaleTools;
+  getBundle: () => Epic1Bundle;
+  applyStateUpdate: (updater: (s: AppState) => AppState, notice: string) => void;
+}
+
+export function createImportActions(deps: ImportActionDeps) {
+  return {
+    async importMyludoFile(file: File) {
+      if (!file) return;
+      importVm.myludoStatus = 'loading';
+      importVm.myludoError = '';
+      importVm.myludoSummary = null;
+      const result = await parseMyludoFile(file);
+      if (!result.ok) {
+        importVm.myludoStatus = 'error';
+        importVm.myludoError = result.error;
+        toast.error(result.error, { duration: Infinity });
+        return;
+      }
+      const { matched, unmatched } = matchMyludoNamesToSets(result.gameNames, deps.getBundle().runtime.sets);
+      const matchedSetIds = matched.map((m) => m.setId);
+      deps.applyStateUpdate(
+        (currentState: AppState) => mergeOwnedSets(currentState, matchedSetIds),
+        deps.getLocale().t('actions.importedMyludoCollection')
+      );
+      importVm.myludoSummary = { matched, unmatched };
+      importVm.myludoStatus = 'idle';
+    },
+
+    dismissMyludoSummary() {
+      importVm.myludoSummary = null;
+      importVm.myludoError = '';
+      importVm.myludoStatus = 'idle';
+    },
+
+    async importBggCollection(username: string) {
+      if (!username) return;
+      importVm.bggStatus = 'loading';
+      importVm.bggError = '';
+      importVm.bggSummary = null;
+      const result = await fetchBggCollection(username);
+      if (!result.ok) {
+        importVm.bggStatus = 'error';
+        importVm.bggError = result.error;
+        toast.error(result.error, { duration: Infinity });
+        return;
+      }
+      const { matched, unmatched } = matchBggNamesToSets(result.gameNames, deps.getBundle().runtime.sets);
+      const matchedSetIds = matched.map((m) => m.setId);
+      deps.applyStateUpdate(
+        (currentState: AppState) => mergeOwnedSets(currentState, matchedSetIds),
+        deps.getLocale().t('actions.importedBggCollection')
+      );
+      importVm.bggSummary = { matched, unmatched };
+      importVm.bggStatus = 'idle';
+    },
+
+    dismissBggSummary() {
+      importVm.bggSummary = null;
+      importVm.bggError = '';
+      importVm.bggStatus = 'idle';
+    }
+  };
+}

@@ -71,6 +71,18 @@ function titleCaseWords(value: string): string {
     .join(' ');
 }
 
+export function getLocaleFlag(localeId: string): string {
+  const flags: Record<string, string> = {
+    'en-US': '🇺🇸',
+    'fr-FR': '🇫🇷',
+    'de-DE': '🇩🇪',
+    'ja-JP': '🇯🇵',
+    'ko-KR': '🇰🇷',
+    'es-ES': '🇪🇸'
+  };
+  return flags[localeId] ?? '🌐';
+}
+
 export function createLocaleTools(localeId: LocaleId): LocaleTools {
   const normalizedLocaleId = normalizeLocaleId(localeId);
   const messages = getMessagesForLocale(normalizedLocaleId);

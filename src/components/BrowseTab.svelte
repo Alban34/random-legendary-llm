@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BROWSE_TYPE_OPTIONS, BROWSE_SORT_OPTIONS, filterBrowseSets, summarizeBrowseSet } from '../app/browse-utils.ts';
-  import { getBrowseSortKey, setBrowseSortKey } from '../app/browse-vm.svelte.ts';
+  import { browseVm } from '../app/browse-vm.svelte.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
   import type { AppState, LocaleTools, AppPersistenceState, GeneratedSetup, GameSet, MastermindCard, MastermindRuntime, HeroRuntime } from '../app/types.ts';
 
@@ -52,7 +52,7 @@
     filterBrowseSets(bundle.runtime.sets, {
       searchTerm: browseSearchTerm,
       typeFilter: browseTypeFilter,
-      sortKey: getBrowseSortKey(),
+      sortKey: browseVm.sortKey,
       ownedSetIds
     })
   );
@@ -195,11 +195,11 @@
           {#each BROWSE_SORT_OPTIONS as option (option.id)}
             <button
               type="button"
-              class={"button " + (getBrowseSortKey() === option.id ? 'button-primary' : 'button-secondary') + " browse-sort-button"}
+              class={"button " + (browseVm.sortKey === option.id ? 'button-primary' : 'button-secondary') + " browse-sort-button"}
               data-action="set-browse-sort-key"
               data-sort-key={option.id}
-              aria-pressed={getBrowseSortKey() === option.id}
-              onclick={() => setBrowseSortKey(option.id as import('../app/browse-vm.svelte.ts').BrowseSortKey)}
+              aria-pressed={browseVm.sortKey === option.id}
+              onclick={() => { browseVm.sortKey = option.id as typeof browseVm.sortKey; }}
             >{locale.getBrowseSortLabel(option.id)}</button>
           {/each}
         </div>

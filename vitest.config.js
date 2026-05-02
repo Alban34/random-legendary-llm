@@ -4,7 +4,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 export default defineConfig({
   plugins: [svelte({ hot: false })],
   test: {
-    include: ['test/**/*.test.mjs'],
+    include: ['test/**/*.test.ts'],
     environment: 'node',
     globals: false,
     coverage: {

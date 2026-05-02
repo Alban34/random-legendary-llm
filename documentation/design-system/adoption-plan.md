@@ -98,8 +98,8 @@ Primary contracts:
 
 ## Regression guardrails
 
-- `test/design-system-rollout.test.mjs` protects the CSS/documentation contract for typography roles, tokenized primitives, reduced motion, and rollout documentation
-- `test/playwright/epic18-qc.spec.mjs` protects cross-theme legibility, focus recovery, component consistency, reduced motion, and enlarged-text resilience across the main tabs
+- `test/design-system-rollout.test.ts` protects the CSS/documentation contract for typography roles, tokenized primitives, reduced motion, and rollout documentation
+- `test/playwright/epic18-qc.spec.ts` protects cross-theme legibility, focus recovery, component consistency, reduced motion, and enlarged-text resilience across the main tabs
 
 ## Manual review still required
 

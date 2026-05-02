@@ -1,9 +1,11 @@
 // src/app/history-vm.svelte.ts
 // Svelte 5 reactive view-model for the History tab.
 
-import { DEFAULT_HISTORY_GROUPING_MODE } from './history-utils.ts';
-import { createPerPlayerScoreArray } from './result-utils.ts';
-import type { GameOutcome } from './types.ts';
+import { toast } from 'svelte-sonner';
+import { DEFAULT_HISTORY_GROUPING_MODE, HISTORY_GROUPING_MODES } from './history-utils.ts';
+import { createPerPlayerScoreArray, validateGameResultDraft, isCompletedGameResult, normalizeGameResultDraft } from './result-utils.ts';
+import { resetUsageCategory as resetUsageCategoryStore, updateGameResult } from './state-store.ts';
+import type { AppState, LocaleTools, GameOutcome } from './types.ts';
 
 export type HistoryGroupingMode = 'mastermind' | 'scheme' | 'heroes' | 'villains' | 'play-mode';
 
@@ -19,72 +21,256 @@ export interface ResultDraft {
   playerScores?: PerPlayerScoreEntry[];
 }
 
-let _historyExpandedRecordId: string | null = $state<string | null>(null);
-let _historyInsightsExpanded: boolean = $state<boolean>(false);
-let _historyGroupingMode: HistoryGroupingMode = $state<HistoryGroupingMode>(DEFAULT_HISTORY_GROUPING_MODE as HistoryGroupingMode);
-let _resultEditorRecordId: string | null = $state<string | null>(null);
-let _resultEditorReturnFocusSelector: string | null = $state<string | null>(null);
-let _resultDraft: ResultDraft = $state<ResultDraft>({ outcome: '', score: '', notes: '' });
-let _resultFormError: string | null = $state<string | null>(null);
-let _resultInvalidFields: string[] = $state<string[]>([]);
+export const historyVm = $state<{
+  expandedRecordId: string | null;
+  insightsExpanded: boolean;
+  groupingMode: HistoryGroupingMode;
+  outcomeFilter: GameOutcome | 'all';
+  resultEditorRecordId: string | null;
+  resultEditorReturnFocusSelector: string | null;
+  resultDraft: ResultDraft;
+  resultFormError: string | null;
+  resultInvalidFields: string[];
+}>({
+  expandedRecordId: null,
+  insightsExpanded: false,
+  groupingMode: DEFAULT_HISTORY_GROUPING_MODE as HistoryGroupingMode,
+  outcomeFilter: 'all',
+  resultEditorRecordId: null,
+  resultEditorReturnFocusSelector: null,
+  resultDraft: { outcome: '', score: '', notes: '' },
+  resultFormError: null,
+  resultInvalidFields: []
+});
 
-export function getHistoryExpandedRecordId(): string | null { return _historyExpandedRecordId; }
-export function setHistoryExpandedRecordId(v: string | null): void { _historyExpandedRecordId = v; }
+export function toggleHistoryInsights(): void {
+  historyVm.insightsExpanded = !historyVm.insightsExpanded;
+}
 
-export function getHistoryInsightsExpanded(): boolean { return _historyInsightsExpanded; }
-export function setHistoryInsightsExpanded(v: boolean): void { _historyInsightsExpanded = v; }
-export function toggleHistoryInsights(): void { _historyInsightsExpanded = !_historyInsightsExpanded; }
+export function resetHistoryGroupingMode(): void {
+  historyVm.groupingMode = DEFAULT_HISTORY_GROUPING_MODE as HistoryGroupingMode;
+}
 
-export function getHistoryGroupingMode(): HistoryGroupingMode { return _historyGroupingMode; }
-export function setHistoryGroupingMode(v: HistoryGroupingMode): void { _historyGroupingMode = v; }
-export function resetHistoryGroupingMode(): void { _historyGroupingMode = DEFAULT_HISTORY_GROUPING_MODE as HistoryGroupingMode; }
+export function resetHistoryOutcomeFilter(): void {
+  historyVm.outcomeFilter = 'all';
+}
 
-let _historyOutcomeFilter: GameOutcome | 'all' = $state<GameOutcome | 'all'>('all');
-
-export function getHistoryOutcomeFilter(): GameOutcome | 'all' { return _historyOutcomeFilter; }
-export function setHistoryOutcomeFilter(v: GameOutcome | 'all'): void { _historyOutcomeFilter = v; }
-export function resetHistoryOutcomeFilter(): void { _historyOutcomeFilter = 'all'; }
-
-export function getResultEditorRecordId(): string | null { return _resultEditorRecordId; }
-export function setResultEditorRecordId(v: string | null): void { _resultEditorRecordId = v; }
-
-export function getResultEditorReturnFocusSelector(): string | null { return _resultEditorReturnFocusSelector; }
-export function setResultEditorReturnFocusSelector(v: string | null): void { _resultEditorReturnFocusSelector = v; }
-
-export function getResultDraft(): ResultDraft { return _resultDraft; }
-export function setResultDraft(v: ResultDraft): void { _resultDraft = v; }
-export function resetResultDraft(): void { _resultDraft = { outcome: '', score: '', notes: '' }; }
+export function resetResultDraft(): void {
+  historyVm.resultDraft = { outcome: '', score: '', notes: '' };
+}
 
 export function resetResultDraftForPlayerCount(playerCount: number): void {
   if (playerCount >= 2) {
-    _resultDraft = {
+    historyVm.resultDraft = {
       outcome: '',
       playerScores: createPerPlayerScoreArray(playerCount).map(() => ({ playerName: '', score: '' })),
       notes: ''
     };
   } else {
-    _resultDraft = { outcome: '', score: '', notes: '' };
+    historyVm.resultDraft = { outcome: '', score: '', notes: '' };
   }
 }
 
 export function setResultPlayerScore(index: number, value: string): void {
-  if (!Array.isArray(_resultDraft.playerScores) || index < 0 || index >= _resultDraft.playerScores.length) return;
-  const updated = _resultDraft.playerScores.map((entry, i) =>
-    i === index ? { ...entry, score: value } : entry
-  );
-  _resultDraft = { ..._resultDraft, playerScores: updated };
+  if (!Array.isArray(historyVm.resultDraft.playerScores) || index < 0 || index >= historyVm.resultDraft.playerScores.length) return;
+  historyVm.resultDraft = {
+    ...historyVm.resultDraft,
+    playerScores: historyVm.resultDraft.playerScores.map((entry, i) =>
+      i === index ? { ...entry, score: value } : entry
+    )
+  };
 }
 
 export function setResultPlayerName(index: number, value: string): void {
-  if (!Array.isArray(_resultDraft.playerScores) || index < 0 || index >= _resultDraft.playerScores.length) return;
-  const updated = _resultDraft.playerScores.map((entry, i) =>
-    i === index ? { ...entry, playerName: typeof value === 'string' ? value.trim() : '' } : entry
-  );
-  _resultDraft = { ..._resultDraft, playerScores: updated };
+  if (!Array.isArray(historyVm.resultDraft.playerScores) || index < 0 || index >= historyVm.resultDraft.playerScores.length) return;
+  historyVm.resultDraft = {
+    ...historyVm.resultDraft,
+    playerScores: historyVm.resultDraft.playerScores.map((entry, i) =>
+      i === index ? { ...entry, playerName: typeof value === 'string' ? value.trim() : '' } : entry
+    )
+  };
 }
 
-export function getResultFormError(): string | null { return _resultFormError; }
-export function setResultFormError(v: string | null): void { _resultFormError = v; }
+// ---------------------------------------------------------------------------
+// Standalone result editor helpers (also used by syncUiFromPersistedState)
+// ---------------------------------------------------------------------------
 
-export function getResultInvalidFields(): string[] { return _resultInvalidFields; }
-export function setResultInvalidFields(v: string[]): void { _resultInvalidFields = v; }
+export function openResultEditor(appState: AppState, recordId: string, options: { returnFocusSelector?: string } = {}): boolean {
+  const record = appState.history.find((entry) => entry.id === recordId);
+  if (!record) return false;
+  historyVm.resultEditorRecordId = recordId;
+  historyVm.resultEditorReturnFocusSelector =
+    options.returnFocusSelector ??
+    `[data-action="edit-game-result"][data-record-id="${recordId}"]`;
+  if (record.playerCount >= 2) {
+    if (isCompletedGameResult(record.result)) {
+      historyVm.resultDraft = normalizeGameResultDraft(record.result, record.playerCount);
+    } else {
+      resetResultDraftForPlayerCount(record.playerCount);
+    }
+  } else {
+    historyVm.resultDraft = normalizeGameResultDraft(record.result);
+  }
+  historyVm.resultFormError = null;
+  historyVm.resultInvalidFields = [];
+  historyVm.expandedRecordId = recordId;
+  return true;
+}
+
+export function closeResultEditor(): string | null {
+  const returnFocusSelector = historyVm.resultEditorReturnFocusSelector;
+  historyVm.resultEditorRecordId = null;
+  historyVm.resultEditorReturnFocusSelector = null;
+  resetResultDraft();
+  historyVm.resultFormError = null;
+  historyVm.resultInvalidFields = [];
+  return returnFocusSelector;
+}
+
+// ---------------------------------------------------------------------------
+// Action factory
+// ---------------------------------------------------------------------------
+
+interface HistoryActionDeps {
+  getLocale: () => LocaleTools;
+  getAppState: () => AppState;
+  applyStateUpdate: (updater: (s: AppState) => AppState, notice: string) => void;
+  openResultEditor: (id: string, opts?: { returnFocusSelector?: string }) => boolean;
+  closeResultEditor: () => string | null;
+  focusSelector: (sel: string) => void;
+  ui: { lastActionNotice: string | null; confirmResetAllState: boolean };
+}
+
+export function createHistoryActions(deps: HistoryActionDeps) {
+  return {
+    setHistoryGrouping(mode: string) {
+      historyVm.groupingMode = (HISTORY_GROUPING_MODES.some((entry) => entry.id === mode)
+        ? mode
+        : DEFAULT_HISTORY_GROUPING_MODE) as typeof historyVm.groupingMode;
+      deps.ui.lastActionNotice = deps.getLocale().t('actions.updatedHistoryGrouping', {
+        mode: deps.getLocale().getHistoryGroupingLabel(historyVm.groupingMode)
+      });
+      deps.focusSelector(
+        `[data-action="set-history-grouping"][data-history-grouping-mode="${historyVm.groupingMode}"]`
+      );
+    },
+
+    editGameResult(recordId: string) {
+      if (
+        !deps.openResultEditor(recordId, {
+          returnFocusSelector: `[data-action="edit-game-result"][data-record-id="${recordId}"]`
+        })
+      )
+        return;
+      deps.ui.lastActionNotice = deps.getLocale().t('actions.openedResultEditor');
+      deps.focusSelector('[data-result-field="outcome"]');
+    },
+
+    setResultOutcome(outcome: string) {
+      historyVm.resultDraft = { ...historyVm.resultDraft, outcome };
+      const hadValidationState = historyVm.resultFormError || historyVm.resultInvalidFields.length;
+      historyVm.resultFormError = null;
+      historyVm.resultInvalidFields = [];
+      if (hadValidationState) deps.focusSelector('[data-result-field="outcome"]');
+    },
+
+    setResultScore(score: string) {
+      historyVm.resultDraft = { ...historyVm.resultDraft, score };
+      historyVm.resultFormError = null;
+      historyVm.resultInvalidFields = [];
+      deps.focusSelector('[data-result-field="score"]');
+    },
+
+    setResultNotes(notes: string) {
+      historyVm.resultDraft = { ...historyVm.resultDraft, notes };
+      const hadValidationState = historyVm.resultFormError || historyVm.resultInvalidFields.length;
+      historyVm.resultFormError = null;
+      historyVm.resultInvalidFields = [];
+      if (hadValidationState) deps.focusSelector('[data-result-field="notes"]');
+    },
+
+    setResultPlayerScore(index: number, value: string) {
+      setResultPlayerScore(index, value);
+      historyVm.resultFormError = null;
+      historyVm.resultInvalidFields = [];
+    },
+
+    setResultPlayerName(index: number, value: string) {
+      setResultPlayerName(index, value);
+    },
+
+    skipGameResultEntry() {
+      const returnFocusSelector = deps.closeResultEditor();
+      deps.ui.lastActionNotice = deps.getLocale().t('actions.pendingResult');
+      deps.focusSelector(returnFocusSelector ?? '');
+      toast.info(deps.getLocale().t('actions.pendingResultToast'));
+    },
+
+    cancelResultEntry() {
+      const returnFocusSelector = deps.closeResultEditor();
+      deps.ui.lastActionNotice = deps.getLocale().t('actions.closedResultEditor');
+      deps.focusSelector(returnFocusSelector ?? '');
+    },
+
+    saveGameResult() {
+      if (!historyVm.resultEditorRecordId) return;
+      const activeRecordId = historyVm.resultEditorRecordId;
+      const record = deps.getAppState().history.find((r) => r.id === activeRecordId);
+      const playerCount = record?.playerCount ?? 1;
+      const validation = validateGameResultDraft(historyVm.resultDraft, playerCount);
+      if (!validation.ok) {
+        historyVm.resultFormError = validation.errors
+          .map((message) => deps.getLocale().localizeValidationMessage(message))
+          .join(' ');
+        historyVm.resultInvalidFields = validation.errors.flatMap((message) => {
+          if (message.includes('Win or Loss')) return ['outcome'];
+          if (playerCount >= 2 && message.toLowerCase().includes('score')) {
+            return Array.from({ length: playerCount }, (_, i) => `player-score-${i}`);
+          }
+          if (message.toLowerCase().includes('score')) return ['score'];
+          return [];
+        });
+        deps.ui.lastActionNotice = deps.getLocale().t('actions.finishResultFields');
+        deps.focusSelector('[data-result-form-error]');
+        return;
+      }
+      const returnFocusSelector = historyVm.resultEditorReturnFocusSelector ?? '';
+      const wasPending =
+        deps.getAppState().history.find((r) => r.id === activeRecordId)?.result?.status !== 'completed';
+      deps.applyStateUpdate(
+        (currentState) =>
+          updateGameResult(currentState, {
+            recordId: activeRecordId!,
+            outcome: validation.result.outcome!,
+            score: validation.result.score,
+            notes: validation.result.notes !== null ? validation.result.notes : undefined,
+            updatedAt: validation.result.updatedAt ?? new Date().toISOString()
+          }),
+        wasPending
+          ? deps.getLocale().t('actions.savedResult')
+          : deps.getLocale().t('actions.savedCorrectedResult')
+      );
+      deps.closeResultEditor();
+      deps.focusSelector(returnFocusSelector);
+      toast.success(wasPending
+        ? deps.getLocale().t('actions.savedResultToast')
+        : deps.getLocale().t('actions.savedCorrectedResultToast'));
+    },
+
+    toggleHistoryInsights() {
+      toggleHistoryInsights();
+      deps.focusSelector('[data-action="toggle-history-insights"]');
+    },
+
+    resetUsageCategory(category: string) {
+      deps.ui.confirmResetAllState = false;
+      deps.closeResultEditor();
+      const label = deps.getLocale().getUsageLabel(category);
+      deps.applyStateUpdate(
+        (currentState: AppState) => resetUsageCategoryStore(currentState, category),
+        deps.getLocale().t('actions.resetUsageStats', { label })
+      );
+      toast.info(deps.getLocale().t('actions.resetUsageStats', { label }));
+    }
+  };
+}

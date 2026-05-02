@@ -103,25 +103,23 @@ When the epic containing that story changes files under `/src`, the epic is not 
 
 ## Design System Epic DS1 — Design Token Foundation and Theme Contract
 
-Automated verification: `test/design-system-epic1-foundation.test.mjs`
+Automated verification: `test/design-system-epic1-foundation.test.ts`
 
-Browser QC: `test/playwright/epic18-qc.spec.mjs`
+Browser QC: `test/playwright/epic18-qc.spec.ts`
 
 ---
 
 ## Design System Epic DS2 — Typography, Layout, and Shell Rhythm
 
-Automated verification: `test/design-system-rollout.test.mjs`
+Automated verification: `test/design-system-rollout.test.ts`
 
-Browser QC: `test/playwright/epic18-qc.spec.mjs`
+Browser QC: `test/playwright/epic18-qc.spec.ts`
 
 ---
 
 ## Epic 10 — Final Documentation and Release Readiness
 
-Automated verification: `test/epic10-documentation-release-readiness.test.mjs`
-
-Browser QC: `test/playwright/epic10-qc.spec.mjs`
+Browser QC: `test/playwright/epic10-qc.spec.ts`
 
 Current automated browser QC command for Epic 1–10:
 
@@ -133,13 +131,13 @@ npm run check:qc:epic10
 
 ## Epic 43 — Expansion Attribution in History
 
-Automated verification: `test/epic43-expansion-attribution.test.mjs`
+Automated verification: `test/epic43-expansion-attribution.test.ts`
 
 ---
 
 ## Epic 45 — MyLudo Collection Import
 
-Automated verification: `test/epic45-myludo-import.test.mjs`
+Automated verification: `test/epic45-myludo-import.test.ts`
 
 Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, `mergeOwnedSets` (via `collection-utils.ts`), CollectionTab import panel rendering, post-import summary, and dismiss flow. All 23 tests pass.
 
@@ -147,9 +145,9 @@ Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, `mergeOwnedSets` (via `coll
 
 ## Epic 44 — Card Browser by Category or Expansion in Collection
 
-Automated verification: `test/epic44-card-browser.test.mjs`
+Automated verification: `test/epic44-card-browser.test.ts`
 
-Browser QC: `test/playwright/epic44-card-browser.spec.mjs`
+Browser QC: `test/playwright/epic44-card-browser.spec.ts`
 
 Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion` (via `collection-utils.ts`), `CardBrowserByCategory.svelte`, `CardBrowserByExpansion.svelte`, the "Sets" / "Browse Cards" view toggle in `CollectionTab.svelte`, the "By Category" / "By Expansion" grouping selector, session-scoped grouping persistence, and `aria-pressed` state on all toggle controls.
 
@@ -157,14 +155,14 @@ Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion` (via `col
 
 ## Epic 49 — Clear Selection Regression Fix & E2E Guard
 
-Browser QC: `test/playwright/epic49-clear-selection.spec.mjs`
+Browser QC: `test/playwright/epic49-clear-selection.spec.ts`
 
-Covers: 4 Playwright tests guarding the "Clear selection" button behaviour in the Active Expansions panel on the New Game tab. Verifies that clicking "Clear selection" sets `activeSetIds` to `[]` in persisted state (not `null`) and that all expansion checkboxes render as unchecked; also verifies that "Use all expansions" restores the `null` state with all checkboxes checked. The existing `test/playwright/epic46-active-filter.spec.mjs` was also updated to align with the corrected `deactivateAllSets` action.
+Covers: 4 Playwright tests guarding the "Clear selection" button behaviour in the Active Expansions panel on the New Game tab. Verifies that clicking "Clear selection" sets `activeSetIds` to `[]` in persisted state (not `null`) and that all expansion checkboxes render as unchecked; also verifies that "Use all expansions" restores the `null` state with all checkboxes checked. The existing `test/playwright/epic46-active-filter.spec.ts` was also updated to align with the corrected `deactivateAllSets` action.
 
 ---
 
 ## Epic 75 — Locale File Sync and Accessibility Defect Fixes
 
-Automated verification: `test/epic75-locale-sync-a11y.test.mjs`
+Automated verification: `test/epic75-locale-sync-a11y.test.ts`
 
-Covers: cross-format key-parity check — verifies that every locale's `.mjs` and `.ts` catalog files expose an identical set of keys; fails if any key is present in one format but absent in the other for any of the six supported locales (`en`, `fr`, `de`, `ja`, `ko`, `es`).
+Covers: cross-locale key-parity check — verifies that every locale's `.ts` catalog file exposes an identical set of keys to the canonical `en.ts`; fails if any key is present in `en.ts` but missing from another locale file, or vice versa, for any of the five non-English locales (`fr`, `de`, `ja`, `ko`, `es`).

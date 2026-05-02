@@ -1,42 +1,226 @@
 // src/app/new-game-vm.svelte.ts
 // Svelte 5 reactive view-model for the New Game tab.
 
-import { createEmptyForcedPicks } from './forced-picks-utils.ts';
+import { toast } from 'svelte-sonner';
+import { createEmptyForcedPicks, hasForcedPicks, addForcedPick as addForcedPickUtil, removeForcedPick as removeForcedPickUtil } from './forced-picks-utils.ts';
 import type { ForcedPicks } from './forced-picks-utils.ts';
-import type { PlayMode, GeneratedSetup } from './types.ts';
+import { buildHistoryReadySetupSnapshot, generateSetup as generateSetupFn } from './setup-generator.ts';
+import { resolvePlayMode } from './setup-rules.ts';
+import { acceptGameSetup, createGameRecordId, createDefaultState } from './state-store.ts';
+import type { PlayMode, GeneratedSetup, AppState, LocaleTools } from './types.ts';
+import type { Epic1Bundle } from './game-data-pipeline.ts';
 
-let _currentSetup: GeneratedSetup | null = $state<GeneratedSetup | null>(null);
-let _generatorError: string | null = $state<string | null>(null);
-let _generatorNotices: string[] = $state<string[]>([]);
-let _selectedPlayerCount: number = $state<number>(1);
-let _selectedPlayMode: PlayMode = $state<PlayMode>('standard');
-let _advancedSolo: boolean = $state<boolean>(false);
-let _forcedPicks: ForcedPicks = $state<ForcedPicks>(createEmptyForcedPicks());
+export const newGameVm = $state<{
+  currentSetup: GeneratedSetup | null;
+  generatorError: string | null;
+  generatorNotices: string[];
+  selectedPlayerCount: number;
+  selectedPlayMode: PlayMode;
+  advancedSolo: boolean;
+  forcedPicks: ForcedPicks;
+}>({
+  currentSetup: null,
+  generatorError: null,
+  generatorNotices: [],
+  selectedPlayerCount: 1,
+  selectedPlayMode: 'standard',
+  advancedSolo: false,
+  forcedPicks: createEmptyForcedPicks()
+});
 
-export function getCurrentSetup(): GeneratedSetup | null { return _currentSetup; }
-export function setCurrentSetup(v: GeneratedSetup | null): void { _currentSetup = v; }
-
-export function getGeneratorError(): string | null { return _generatorError; }
-export function setGeneratorError(v: string | null): void { _generatorError = v; }
-
-export function getGeneratorNotices(): string[] { return _generatorNotices; }
-export function setGeneratorNotices(v: string[]): void { _generatorNotices = v; }
-
-export function getSelectedPlayerCount(): number { return _selectedPlayerCount; }
-export function setSelectedPlayerCount(v: number): void { _selectedPlayerCount = v; }
-
-export function getSelectedPlayMode(): PlayMode { return _selectedPlayMode; }
-export function setSelectedPlayMode(v: PlayMode): void { _selectedPlayMode = v; }
-
-export function getAdvancedSolo(): boolean { return _advancedSolo; }
-export function setAdvancedSolo(v: boolean): void { _advancedSolo = v; }
-
-export function getForcedPicks(): ForcedPicks { return _forcedPicks; }
-export function setForcedPicks(v: ForcedPicks): void { _forcedPicks = v; }
-export function resetForcedPicks(): void { _forcedPicks = createEmptyForcedPicks(); }
+export function resetForcedPicks(): void {
+  newGameVm.forcedPicks = createEmptyForcedPicks();
+}
 
 export function resetNewGame(): void {
-  _generatorError = null;
-  _generatorNotices = [];
-  _currentSetup = null;
+  newGameVm.generatorError = null;
+  newGameVm.generatorNotices = [];
+  newGameVm.currentSetup = null;
+}
+
+// ---------------------------------------------------------------------------
+// Action factory
+// ---------------------------------------------------------------------------
+
+interface NewGameActionDeps {
+  getLocale: () => LocaleTools;
+  getBundle: () => Epic1Bundle;
+  getAppState: () => AppState;
+  applyStateUpdate: (updater: (s: AppState) => AppState, notice: string) => void;
+  clearGeneratedSetup: () => void;
+  clearForcedPicksState: () => void;
+  closeResultEditor: () => string | null;
+  focusSelector: (sel: string) => void;
+  openResultEditor: (id: string, opts?: { returnFocusSelector?: string }) => boolean;
+  ui: { selectedTab: string; lastActionNotice: string | null };
+}
+
+export function createNewGameActions(deps: NewGameActionDeps) {
+  function localPersistPreferences(playerCount: number, playMode: string, actionNotice: string) {
+    const normalizedPlayMode = resolvePlayMode(playerCount, { playMode });
+    const advancedSolo = normalizedPlayMode === 'advanced-solo';
+    newGameVm.selectedPlayerCount = playerCount;
+    newGameVm.selectedPlayMode = normalizedPlayMode;
+    newGameVm.advancedSolo = advancedSolo;
+    deps.clearGeneratedSetup();
+    deps.applyStateUpdate((s: AppState) => ({
+      ...s,
+      preferences: {
+        ...s.preferences,
+        lastPlayerCount: playerCount,
+        lastAdvancedSolo: advancedSolo,
+        lastPlayMode: normalizedPlayMode
+      }
+    }), actionNotice);
+  }
+
+  return {
+    setPlayerCount(playerCount: number) {
+      const playMode = playerCount === 1 ? newGameVm.selectedPlayMode : 'standard';
+      localPersistPreferences(
+        playerCount,
+        playMode,
+        deps.getLocale().t('actions.selectedPlayerMode', {
+          count: deps.getLocale().formatNumber(playerCount),
+          playerWord: playerCount === 1 ? 'player' : 'players'
+        })
+      );
+    },
+
+    setPlayMode(playMode: string) {
+      if (newGameVm.selectedPlayerCount !== 1 && playMode !== 'standard') {
+        deps.ui.lastActionNotice = deps.getLocale().t('actions.invalidSoloMode');
+        toast.warning(deps.getLocale().t('actions.invalidSoloMode'));
+        return;
+      }
+      localPersistPreferences(
+        newGameVm.selectedPlayerCount,
+        playMode,
+        deps.getLocale().t('actions.selectedPlayMode', {
+          mode: deps.getLocale().getPlayModeLabel(playMode, newGameVm.selectedPlayerCount)
+        })
+      );
+    },
+
+    setEpicMastermind(enabled: boolean) {
+      deps.applyStateUpdate((s: AppState) => ({
+        ...s,
+        preferences: { ...s.preferences, lastEpicMastermind: enabled }
+      }), deps.getLocale().t('newGame.epicMastermind'));
+    },
+
+    generateSetup() {
+      try {
+        const setup = generateSetupFn({
+          runtime: deps.getBundle().runtime,
+          state: deps.getAppState(),
+          playerCount: newGameVm.selectedPlayerCount,
+          advancedSolo: newGameVm.advancedSolo,
+          playMode: newGameVm.selectedPlayMode,
+          forcedPicks: newGameVm.forcedPicks,
+          epicMastermind: deps.getAppState().preferences.lastEpicMastermind ?? false
+        });
+        newGameVm.currentSetup = setup;
+        newGameVm.generatorError = null;
+        newGameVm.generatorNotices = setup.notices;
+        deps.ui.lastActionNotice = deps.getLocale().t('actions.generatedSetup');
+      } catch (error: unknown) {
+        newGameVm.currentSetup = null;
+        newGameVm.generatorNotices = [];
+        newGameVm.generatorError = (error as Error).message;
+        deps.ui.lastActionNotice = deps.getLocale().t('actions.failedSetup');
+        toast.error(error instanceof Error ? error.message : String(error), { duration: Infinity });
+      }
+    },
+
+    acceptCurrentSetup() {
+      if (!newGameVm.currentSetup) {
+        deps.ui.lastActionNotice = deps.getLocale().t('actions.acceptBeforeLog');
+        toast.warning(deps.getLocale().t('actions.acceptBeforeLog'));
+        return;
+      }
+      const acceptedRecordId = createGameRecordId();
+      const acceptedAt = new Date().toISOString();
+      deps.applyStateUpdate((s: AppState) => {
+        const nextState = acceptGameSetup(s, {
+          id: acceptedRecordId,
+          createdAt: acceptedAt,
+          playerCount: newGameVm.selectedPlayerCount,
+          advancedSolo: newGameVm.advancedSolo,
+          playMode: newGameVm.selectedPlayMode,
+          epicMastermind: deps.getAppState().preferences.lastEpicMastermind ?? false,
+          setupSnapshot: buildHistoryReadySetupSnapshot($state.snapshot(newGameVm.currentSetup!))
+        });
+        return {
+          ...nextState,
+          preferences: { ...nextState.preferences, selectedTab: 'history' }
+        };
+      }, hasForcedPicks(newGameVm.forcedPicks)
+        ? deps.getLocale().t('actions.acceptedLoggedForced')
+        : deps.getLocale().t('actions.acceptedLogged'));
+      deps.ui.selectedTab = 'history';
+      deps.openResultEditor(acceptedRecordId, {
+        returnFocusSelector: `[data-action="edit-game-result"][data-record-id="${acceptedRecordId}"]`
+      });
+      deps.clearForcedPicksState();
+      deps.clearGeneratedSetup();
+      deps.focusSelector('[data-result-field="outcome"]');
+      toast.success(deps.getLocale().t('actions.acceptedToast'));
+    },
+
+    addForcedPick(field: string, value: string) {
+      if (!value) {
+        deps.ui.lastActionNotice = deps.getLocale().t('actions.chooseForcedPick');
+        return;
+      }
+      const nextForcedPicks = addForcedPickUtil(newGameVm.forcedPicks, field, value);
+      const prev = newGameVm.forcedPicks;
+      const changed =
+        nextForcedPicks.schemeId !== prev.schemeId ||
+        nextForcedPicks.mastermindId !== prev.mastermindId ||
+        nextForcedPicks.heroIds.join() !== prev.heroIds.join() ||
+        nextForcedPicks.villainGroupIds.join() !== prev.villainGroupIds.join() ||
+        nextForcedPicks.henchmanGroupIds.join() !== prev.henchmanGroupIds.join();
+      newGameVm.forcedPicks = nextForcedPicks;
+      deps.clearGeneratedSetup();
+      deps.ui.lastActionNotice = changed
+        ? deps.getLocale().t('actions.updatedForcedPicks')
+        : deps.getLocale().t('actions.duplicateForcedPick');
+    },
+
+    removeForcedPick(field: string, value: string) {
+      newGameVm.forcedPicks = removeForcedPickUtil(newGameVm.forcedPicks, field, value);
+      deps.clearGeneratedSetup();
+      deps.ui.lastActionNotice = deps.getLocale().t('actions.removedForcedPick');
+    },
+
+    setPreferredExpansion(id: string | null) {
+      newGameVm.forcedPicks = { ...newGameVm.forcedPicks, preferredExpansionId: id };
+      deps.clearGeneratedSetup();
+      deps.ui.lastActionNotice = deps.getLocale().t('actions.updatedForcedPicks');
+    },
+
+    setForcedTeam(team: string | null) {
+      newGameVm.forcedPicks = { ...newGameVm.forcedPicks, forcedTeam: team };
+      deps.clearGeneratedSetup();
+    },
+
+    clearForcedPicks() {
+      deps.clearForcedPicksState();
+      deps.clearGeneratedSetup();
+      deps.ui.lastActionNotice = deps.getLocale().t('actions.clearedForcedPicks');
+    },
+
+    clearToDefaults() {
+      const defaultState = createDefaultState();
+      newGameVm.selectedPlayerCount = defaultState.preferences.lastPlayerCount;
+      newGameVm.selectedPlayMode = defaultState.preferences.lastPlayMode;
+      newGameVm.advancedSolo = defaultState.preferences.lastAdvancedSolo;
+      deps.clearForcedPicksState();
+      deps.closeResultEditor();
+      deps.clearGeneratedSetup();
+      deps.ui.lastActionNotice = deps.getLocale().t('actions.clearDefaults');
+      toast.info(deps.getLocale().t('actions.clearDefaults'));
+    }
+  };
 }

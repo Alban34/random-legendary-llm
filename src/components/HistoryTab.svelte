@@ -10,7 +10,7 @@
   import type { MessageKey } from '../app/locales/en.ts';
   import { buildInsightsDashboard, RECENT_SCORE_WINDOW } from '../app/stats-utils.ts';
   import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from '../app/result-utils.ts';
-  import { getHistoryOutcomeFilter, setHistoryOutcomeFilter } from '../app/history-vm.svelte.ts';
+  import { historyVm } from '../app/history-vm.svelte.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
   import type { AppState, LocaleTools } from '../app/types.ts';
 
@@ -87,7 +87,7 @@
   } = $props();
 
   let activeGroupingMode: string = $derived(historyGroupingMode || DEFAULT_HISTORY_GROUPING_MODE);
-  let filteredHistory: HistoryRecord[] = $derived(filterHistoryByOutcome(appState.history, getHistoryOutcomeFilter()));
+  let filteredHistory: HistoryRecord[] = $derived(filterHistoryByOutcome(appState.history, historyVm.outcomeFilter));
   let groups: HistoryGroup[] = $derived(
     buildHistoryGroups(filteredHistory, bundle.runtime.indexes, { mode: activeGroupingMode })
   );
@@ -162,26 +162,26 @@
         ] as opt (opt.value)}
           <button
             type="button"
-            class={"button " + (getHistoryOutcomeFilter() === opt.value ? 'button-primary' : 'button-secondary')}
-            aria-pressed={getHistoryOutcomeFilter() === opt.value}
+            class={"button " + (historyVm.outcomeFilter === opt.value ? 'button-primary' : 'button-secondary')}
+            aria-pressed={historyVm.outcomeFilter === opt.value}
             data-outcome-filter={opt.value}
-            onclick={() => setHistoryOutcomeFilter(opt.value as Parameters<typeof setHistoryOutcomeFilter>[0])}
+            onclick={() => { historyVm.outcomeFilter = opt.value as typeof historyVm.outcomeFilter; }}
           >{opt.label}</button>
         {/each}
       </div>
       {/if}
     </div>
-    {#if getHistoryOutcomeFilter() !== 'all' && appState.history.length > 0}
+    {#if historyVm.outcomeFilter !== 'all' && appState.history.length > 0}
       <p class="muted" data-outcome-filter-count>{locale.formatGameCount(filteredCount)}</p>
     {/if}
 
     <!-- History records -->
     {#if !appState.history.length}
       <p class="muted empty-state">{locale.t('history.empty')}</p>
-    {:else if filteredHistory.length === 0 && getHistoryOutcomeFilter() !== 'all'}
+    {:else if filteredHistory.length === 0 && historyVm.outcomeFilter !== 'all'}
       <p class="muted empty-state" data-outcome-filter-empty>
-        {#if getHistoryOutcomeFilter() === 'win'}No won games yet
-        {:else if getHistoryOutcomeFilter() === 'loss'}No lost games yet
+        {#if historyVm.outcomeFilter === 'win'}No won games yet
+        {:else if historyVm.outcomeFilter === 'loss'}No lost games yet
         {:else}No pending games yet{/if}
       </p>
     {:else}

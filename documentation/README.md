@@ -2,12 +2,12 @@
 
 ## Stack
 
-The v2.0.0 baseline uses TypeScript for all runtime source modules (`src/app/*.ts`). The migration from plain JavaScript (`.mjs`) to TypeScript was completed across Epics 61–68. All test files import from `.ts` source paths and run via Vitest (`vitest run`); coverage is produced by `@vitest/coverage-v8` in lcov format. `svelte-check` is integrated as a type-coverage gate in `npm run lint`.
+The v2.0.0 baseline uses TypeScript for all runtime source modules (`src/app/*.ts`). The migration from plain JavaScript (`.mjs`) to TypeScript was completed across Epics 61–68; Epic 79 completed the final elimination of all remaining `.mjs` files (compiled outputs, test files, config files, and tool scripts). All test files are TypeScript (`.test.ts` / `.spec.ts`) and run via Vitest (`vitest run`); coverage is produced by `@vitest/coverage-v8` in lcov format. `svelte-check` is integrated as a type-coverage gate in `npm run lint`.
 
 ## Architecture
 - [Overview](architecture/overview.md) — Runtime stack, layers, entry points, shipped tab IDs
 - [Setup Rules](architecture/setup-rules.md) — Player-count table, 10-step sequence, legality-first policy
-- [Locale Authoring Convention](architecture/localization.md) — Runtime locale source (`.ts`), translator working copies (`.mjs`), key-addition workflow, and divergence constraint
+- [Locale Authoring Convention](architecture/localization.md) — Runtime locale source (`.ts`), key-addition workflow, and cross-locale key-parity constraint
 
 ## Data
 - [Data Model](data/data-model.md) — Canonical data structures and persisted browser state shape

@@ -35,3 +35,8 @@ export function getThemeDefinition(themeId: ThemeId): ThemeDefinition {
   const normalizedThemeId = normalizeThemeId(themeId);
   return THEME_OPTIONS.find((theme) => theme.id === normalizedThemeId) || THEME_OPTIONS[0];
 }
+
+export function getThemeIcon(themeId: string): string {
+  const icons: Record<string, string> = { dark: '🌙', light: '☀️' };
+  return icons[themeId] ?? '🎨';
+}
