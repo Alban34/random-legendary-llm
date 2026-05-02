@@ -9,10 +9,10 @@ import {
 } from './helpers/app-fixture.ts';
 
 async function openActiveFilterPanel(page) {
-  const toggleBtn = page.locator('[data-action="toggle-active-filter-panel"]');
-  const isExpanded = await toggleBtn.evaluate((el) => el.getAttribute('aria-expanded') === 'true');
-  if (!isExpanded) {
-    await toggleBtn.click();
+  const details = page.locator('[data-active-filter-panel]');
+  const isOpen = await details.evaluate((el) => (el as HTMLDetailsElement).open);
+  if (!isOpen) {
+    await page.locator('[data-active-filter-panel] summary').click();
   }
 }
 

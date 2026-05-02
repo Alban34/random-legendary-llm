@@ -15,7 +15,7 @@ test.describe('Epic 46 Story 46.3: expansion subset selector panel', () => {
     await gotoApp(page);
     await seedAllOwnedState(page);
     await selectTab(page, 'new-game');
-    await page.locator('[data-action="toggle-active-filter-panel"]').click();
+    await page.locator('[data-active-filter-panel] summary').click();
   });
 
   test('selector panel is visible when expansions are owned', async ({ page }) => {
@@ -124,7 +124,7 @@ test.describe('Epic 46 Story 46.4: feasibility warning and Generate button gatin
     await selectTab(page, 'new-game');
 
     // Restore all-owned fallback via the "Use all expansions" button
-    await page.locator('[data-action="toggle-active-filter-panel"]').click();
+    await page.locator('[data-active-filter-panel] summary').click();
     await page.locator('[data-action="active-filter-select-all"]').click();
 
     await expect(page.locator('[data-action="generate-setup"]')).toBeEnabled();

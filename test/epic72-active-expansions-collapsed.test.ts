@@ -1,4 +1,4 @@
-import { test, beforeAll } from 'vitest';
+import { test, it, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -28,115 +28,11 @@ test('Active Expansions panel retains data-active-filter-panel attribute', () =>
   );
 });
 
-test('Active Expansions section no longer uses a <details> element', () => {
-  assert.doesNotMatch(
+test('Active Expansions section uses a <details data-active-filter-panel> element', () => {
+  assert.match(
     newGameTabSource,
     /<details[^>]*data-active-filter-panel/,
-    'data-active-filter-panel must no longer be a <details> element'
-  );
-});
-
-test('Active Expansions header contains a toggle button with data-action="toggle-active-filter-panel"', () => {
-  assert.match(
-    newGameTabSource,
-    /data-action="toggle-active-filter-panel"/,
-    'toggle button must carry data-action="toggle-active-filter-panel"'
-  );
-});
-
-test('Toggle button carries aria-expanded bound to activeExpansionsPanelOpen', () => {
-  assert.match(
-    newGameTabSource,
-    /aria-expanded=\{activeExpansionsPanelOpen\}/,
-    'toggle button must carry aria-expanded={activeExpansionsPanelOpen}'
-  );
-});
-
-test('Toggle button carries an aria-label using the newGame.activeFilter.title locale key', () => {
-  assert.match(
-    newGameTabSource,
-    /aria-label=\{locale\.t\('newGame\.activeFilter\.title'\)\}/,
-    "toggle button must carry aria-label={locale.t('newGame.activeFilter.title')}"
-  );
-});
-
-test('Toggle button onclick flips activeExpansionsPanelOpen', () => {
-  assert.match(
-    newGameTabSource,
-    /activeExpansionsPanelOpen\s*=\s*!activeExpansionsPanelOpen/,
-    'toggle button onclick must flip activeExpansionsPanelOpen'
-  );
-});
-
-test('Toggle button is a native <button> element (keyboard-operable by default)', () => {
-  // Check button element appears with the toggle action — no tabindex suppression
-  assert.match(
-    newGameTabSource,
-    /type="button"[^>]*data-action="toggle-active-filter-panel"|data-action="toggle-active-filter-panel"[^>]*type="button"/,
-    'toggle button must be a native <button type="button"> element'
-  );
-  assert.doesNotMatch(
-    newGameTabSource,
-    /data-action="toggle-active-filter-panel"[^>]*tabindex="-1"/,
-    'toggle button must not suppress keyboard focus with tabindex="-1"'
-  );
-});
-
-// ── Story 72.2 — Default collapsed on page load ─────────────────────────────
-
-test('activeExpansionsPanelOpen is declared as a let variable initialised to false', () => {
-  assert.match(
-    newGameTabSource,
-    /let\s+activeExpansionsPanelOpen\s*=\s*\$state\(false\)/,
-    'activeExpansionsPanelOpen must be a plain let binding initialised to $state(false)'
-  );
-});
-
-test('{#if activeExpansionsPanelOpen} guard block exists in template', () => {
-  assert.match(
-    newGameTabSource,
-    /\{#if activeExpansionsPanelOpen\}/,
-    '{#if activeExpansionsPanelOpen} block must exist in the template'
-  );
-});
-
-test('Expansion checkboxes are inside the {#if activeExpansionsPanelOpen} guard', () => {
-  const ifBlockIdx = newGameTabSource.indexOf('{#if activeExpansionsPanelOpen}');
-  assert.ok(ifBlockIdx !== -1, '{#if activeExpansionsPanelOpen} must exist');
-
-  // Find the matching {/if}: because there are no nested {#if} blocks inside
-  // the activeExpansionsPanelOpen guard (only {#each}), the first {/if} after
-  // the guard opening is the matching close.
-  const endIfIdx = newGameTabSource.indexOf('{/if}', ifBlockIdx);
-  assert.ok(endIfIdx !== -1, '{/if} closing the activeExpansionsPanelOpen block must exist');
-
-  const ifBlock = newGameTabSource.slice(ifBlockIdx, endIfIdx);
-  assert.match(
-    ifBlock,
-    /data-active-filter-checkbox/,
-    'expansion checkboxes must be inside the {#if activeExpansionsPanelOpen} block'
-  );
-});
-
-test('"Use all" button is inside the {#if activeExpansionsPanelOpen} guard', () => {
-  const ifBlockIdx = newGameTabSource.indexOf('{#if activeExpansionsPanelOpen}');
-  const endIfIdx = newGameTabSource.indexOf('{/if}', ifBlockIdx);
-  const ifBlock = newGameTabSource.slice(ifBlockIdx, endIfIdx);
-  assert.match(
-    ifBlock,
-    /data-action="active-filter-select-all"/,
-    '"Use all" button must be inside the {#if activeExpansionsPanelOpen} block'
-  );
-});
-
-test('"Clear selection" button is inside the {#if activeExpansionsPanelOpen} guard', () => {
-  const ifBlockIdx = newGameTabSource.indexOf('{#if activeExpansionsPanelOpen}');
-  const endIfIdx = newGameTabSource.indexOf('{/if}', ifBlockIdx);
-  const ifBlock = newGameTabSource.slice(ifBlockIdx, endIfIdx);
-  assert.match(
-    ifBlock,
-    /data-action="active-filter-clear-all"/,
-    '"Clear selection" button must be inside the {#if activeExpansionsPanelOpen} block'
+    'data-active-filter-panel must be a <details> element'
   );
 });
 
@@ -160,15 +56,15 @@ test('NewGameTab appears inside the {#each APP_TABS} loop in App.svelte', () => 
   );
 });
 
-test('activeExpansionsPanelOpen is a plain let (not $derived), so it survives tab switches', () => {
-  assert.doesNotMatch(
-    newGameTabSource,
-    /\$derived[^;]*activeExpansionsPanelOpen/,
-    'activeExpansionsPanelOpen must not be a $derived expression'
-  );
+it('Active Expansions uses <details> whose open state is preserved natively through tab switches (no JS variable needed)', () => {
   assert.match(
     newGameTabSource,
+    /<details[^>]*data-active-filter-panel/,
+    'Active Expansions must use a native <details> element; the browser preserves its open state across tab switches without a JS variable'
+  );
+  assert.doesNotMatch(
+    newGameTabSource,
     /let\s+activeExpansionsPanelOpen\s*=\s*\$state/,
-    'activeExpansionsPanelOpen must be a plain let $state variable'
+    'activeExpansionsPanelOpen $state variable must not exist; <details> handles state natively'
   );
 });

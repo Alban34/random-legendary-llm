@@ -51,7 +51,7 @@ The `test/playwright/` subtree (E2E specs) is **out of scope** for this epic.
 | `test/epic57-solo-rules-panel.test.ts` | `src/app/solo-rules.ts` | `getSoloRulesItems`, `SOLO_RULES_PANEL_MODES` | `src/app/solo-rules.test.ts` |
 | `test/epic56-standard-v2-solo.test.ts` | `src/app/setup-rules.ts` | `resolvePlayMode`, `resolveSetupTemplate` (standard-solo-v2) | `src/app/setup-rules.test.ts` |
 | `test/epic70-preferred-expansion.test.ts` | `src/app/forced-picks-utils.ts` | `createEmptyForcedPicks`, `hasForcedPicks`, `normalizeForcedPicks` (preferredExpansionId) | `src/app/forced-picks-utils.test.ts` |
-| `test/epic72-active-expansions-collapsed.test.ts` | `src/components/NewGameTab.svelte` | `data-active-filter-panel`, `toggle-active-filter-panel` button structure | `src/components/NewGameTab.test.ts` |
+| `test/epic72-active-expansions-collapsed.test.ts` | `src/components/NewGameTab.svelte` | `data-active-filter-panel`, `<details>` / `<summary>` structure (Epic 80 updated this file; the bespoke toggle button tests were removed) | `src/components/NewGameTab.test.ts` |
 | `test/epic75-locale-sync-a11y.test.ts` | `src/app/locales/` (all locale files) | Key-parity of FR/DE/JA/KO/ES against EN | `src/app/locales/locales.test.ts` |
 | `test/epic23-stats-simplification.test.ts` | `src/components/HistoryTab.svelte` | `stats-category-panel` `<details>`/`<summary>` structure, `data-stats-category` attribute | `src/components/HistoryTab.test.ts` |
 

@@ -15,15 +15,15 @@ aligns Active Expansions to this same pattern and moves it below Forced Picks in
 
 ### Story 80.1 — Apply the Forced Picks collapsible pattern to Active Expansions
 
-- [ ] **Remove the `activeExpansionsPanelOpen` reactive state variable** from
+- [x] **Remove the `activeExpansionsPanelOpen` reactive state variable** from
   `src/components/NewGameTab.svelte` (line 169):
   delete the line `let activeExpansionsPanelOpen = $state(false);`.
 
-- [ ] **Replace the outer `<div class="panel" data-active-filter-panel>` with `<details
+- [x] **Replace the outer `<div class="panel" data-active-filter-panel>` with `<details
   data-active-filter-panel>`** (line 181). Keep `data-active-filter-panel` on the outer element
   so existing Playwright locators (`[data-active-filter-panel]`) continue to match.
 
-- [ ] **Replace the `<div>` header block (lines 182–197) with a `<summary>` element.** The
+- [x] **Replace the `<div>` header block (lines 182–197) with a `<summary>` element.** The
   `<summary>` must keep:
   - the title text: `{locale.t('newGame.activeFilter.title')}`
   - the muted summary `<span class="muted">` with the `{#if activeSetIds === null} … {:else} …
@@ -33,17 +33,17 @@ aligns Active Expansions to this same pattern and moves it below Forced Picks in
   - the outer `<div>` wrapper tag
   - the entire `<button type="button" data-action="toggle-active-filter-panel" …>▼</button>` element
 
-- [ ] **Remove the `{#if activeExpansionsPanelOpen}` / `{/if}` wrapper** around the inner content
+- [x] **Remove the `{#if activeExpansionsPanelOpen}` / `{/if}` wrapper** around the inner content
   section. The `<details>` native element handles visibility; the inner content must always be
   rendered inside the `<details>` (not guarded by an `{#if}`).
 
-- [ ] **Replace `<section class="result-card" style="margin-top: var(--space-sm)">` with
+- [x] **Replace `<section class="result-card" style="margin-top: var(--space-sm)">` with
   `<section class="result-card">`** (drop the bespoke inline `margin-top` style, matching the
   Forced Picks inner section which carries no inline style).
 
-- [ ] **Replace the closing `</div>` of the former outer wrapper with `</details>`.**
+- [x] **Replace the closing `</div>` of the former outer wrapper with `</details>`.**
 
-- [ ] **Update `test/epic72-active-expansions-collapsed.test.ts` — Story 72.1 block:** the
+- [x] **Update `test/epic72-active-expansions-collapsed.test.ts` — Story 72.1 block:** the
   following tests now assert the *opposite* of the new implementation and must be updated:
   - Replace `'Active Expansions section no longer uses a <details> element'` (which uses
     `assert.doesNotMatch` on `/<details[^>]*data-active-filter-panel/`) with
@@ -57,7 +57,7 @@ aligns Active Expansions to this same pattern and moves it below Forced Picks in
   - Delete the test `'Toggle button onclick flips activeExpansionsPanelOpen'`.
   - Delete the test `'Toggle button is a native <button> element (keyboard-operable by default)'`.
 
-- [ ] **Update `test/epic72-active-expansions-collapsed.test.ts` — Story 72.2 block:** all five
+- [x] **Update `test/epic72-active-expansions-collapsed.test.ts` — Story 72.2 block:** all five
   tests in this block rely on `activeExpansionsPanelOpen` and the `{#if}` guard and must be
   deleted:
   - `'activeExpansionsPanelOpen is declared as a let variable initialised to false'`
@@ -69,7 +69,7 @@ aligns Active Expansions to this same pattern and moves it below Forced Picks in
   *(Story 72.3 tests — about `hidden={activeTabId !== tab.id}` in App.svelte — are unrelated to
   the collapsible mechanism and must not be touched.)*
 
-- [ ] **Update `test/playwright/epic46-active-filter.spec.ts`** — replace both occurrences of the
+- [x] **Update `test/playwright/epic46-active-filter.spec.ts`** — replace both occurrences of the
   bespoke toggle button locator with the native `<summary>` click:
   - Line 18 (inside `beforeEach` of `'Epic 46 Story 46.3'`): replace
     `await page.locator('[data-action="toggle-active-filter-panel"]').click();`
@@ -80,7 +80,7 @@ aligns Active Expansions to this same pattern and moves it below Forced Picks in
     with
     `await page.locator('[data-active-filter-panel] summary').click();`
 
-- [ ] **Update `test/playwright/epic49-clear-selection.spec.ts`** — the `openActiveFilterPanel`
+- [x] **Update `test/playwright/epic49-clear-selection.spec.ts`** — the `openActiveFilterPanel`
   helper (lines 11–17) uses `[data-action="toggle-active-filter-panel"]` and its `aria-expanded`
   attribute to decide whether to click. Replace the entire helper body with the `<details>`-based
   equivalent:
@@ -94,7 +94,7 @@ aligns Active Expansions to this same pattern and moves it below Forced Picks in
   }
   ```
 
-- [ ] **Test:** Create `test/epic80-active-expansions-layout-alignment.test.ts` with a Story 80.1
+- [x] **Test:** Create `test/epic80-active-expansions-layout-alignment.test.ts` with a Story 80.1
   section containing:
   - A test asserting `newGameTabSource` matches `/<details[^>]*data-active-filter-panel/` (the
     outer element is now a `<details>`).
@@ -105,7 +105,7 @@ aligns Active Expansions to this same pattern and moves it below Forced Picks in
   - A test asserting `newGameTabSource` does NOT match `/{#if activeExpansionsPanelOpen}/` (the
     `{#if}` guard is gone).
 
-- [ ] **QC (Automated):** Run `npm run lint`, then `npm test -- epic80` and
+- [x] **QC (Automated):** Run `npm run lint`, then `npm test -- epic80` and
   `npm test -- epic72` to confirm all story 80.1 tests pass and no remaining epic72 tests
   reference removed symbols. Then run
   `npx playwright test test/playwright/epic46-active-filter.spec.ts test/playwright/epic49-clear-selection.spec.ts`
@@ -115,7 +115,7 @@ aligns Active Expansions to this same pattern and moves it below Forced Picks in
 
 ### Story 80.2 — Reorder Active Expansions below Forced Picks
 
-- [ ] **Move the entire Active Expansions conditional block in `src/components/NewGameTab.svelte`**
+- [x] **Move the entire Active Expansions conditional block in `src/components/NewGameTab.svelte`**
   from its current position at the top of the `.stack.gap-md` div to immediately after the
   `</details>` closing tag of the Forced Picks panel (the `</details>` currently at line 485).
 
@@ -143,13 +143,13 @@ aligns Active Expansions to this same pattern and moves it below Forced Picks in
   11. Forced Picks `<details>` panel
   12. **Active Expansions `{#if …}` block** ← moved here
 
-- [ ] **Test:** Add a Story 80.2 section to `test/epic80-active-expansions-layout-alignment.test.ts`
+- [x] **Test:** Add a Story 80.2 section to `test/epic80-active-expansions-layout-alignment.test.ts`
   containing:
   - A test asserting that `newGameTabSource.indexOf('data-active-filter-panel')` is greater than
     `newGameTabSource.indexOf('data-forced-picks-panel')` (Active Expansions appears after Forced
     Picks in DOM/source order).
 
-- [ ] **QC (Automated):** Run `npm run lint`, then `npm test -- epic80` to confirm the Story 80.2
+- [x] **QC (Automated):** Run `npm run lint`, then `npm test -- epic80` to confirm the Story 80.2
   ordering assertion passes. Then run
   `npx playwright test test/playwright/epic46-active-filter.spec.ts` to confirm the full
   active-filter flow is intact at the new DOM position. Include in the epic-end full regression
