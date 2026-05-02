@@ -160,3 +160,11 @@ Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion` (via `col
 Browser QC: `test/playwright/epic49-clear-selection.spec.mjs`
 
 Covers: 4 Playwright tests guarding the "Clear selection" button behaviour in the Active Expansions panel on the New Game tab. Verifies that clicking "Clear selection" sets `activeSetIds` to `[]` in persisted state (not `null`) and that all expansion checkboxes render as unchecked; also verifies that "Use all expansions" restores the `null` state with all checkboxes checked. The existing `test/playwright/epic46-active-filter.spec.mjs` was also updated to align with the corrected `deactivateAllSets` action.
+
+---
+
+## Epic 75 — Locale File Sync and Accessibility Defect Fixes
+
+Automated verification: `test/epic75-locale-sync-a11y.test.mjs`
+
+Covers: cross-format key-parity check — verifies that every locale's `.mjs` and `.ts` catalog files expose an identical set of keys; fails if any key is present in one format but absent in the other for any of the six supported locales (`en`, `fr`, `de`, `ja`, `ko`, `es`).

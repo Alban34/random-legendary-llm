@@ -1,3 +1,7 @@
+// ⚠ MIRROR FILE — do not edit in isolation.
+// The canonical source is ko.ts. This .mjs file mirrors it for the Node test environment
+// (localization-utils.mjs → state-store.mjs → vitest tests).
+// When adding or removing keys in ko.ts, make the identical change here.
 // Canonical key schema — all other locale files must mirror this structure.
 export const KO_MESSAGES = {
   'app.title': 'Legendary: Marvel 랜덤라이저',
@@ -31,6 +35,7 @@ export const KO_MESSAGES = {
   'collection.title': '내 컬렉션',
   'collection.description': '여기서 둘러보기와 세팅 생성에 쓰이는 동일한 저장 상태로 보유 세트를 관리합니다.',
   'collection.resetSelections': '모든 선택 초기화',
+  'collection.resetSelections.consequence': '이렇게 하면 소유한 세트 선택이 모두 지워집니다 — 복원하려면 먼저 백업을 내보내세요.',
   'newGame.playerCount': '플레이어 수',
   'newGame.playMode': '플레이 모드',
   'newGame.generate': '세팅 생성',
@@ -106,6 +111,7 @@ export const KO_MESSAGES = {
   'header.locale.fallbackNotice': '이 언어 팩이 아직 완성되지 않아 일부 텍스트가 영어로 표시됩니다.',
   'header.theme.caption': '브라우저 환경설정에 저장됨',
   'header.theme.groupLabel': '테마 선택',
+  'header.skipToMain': '본문으로 이동',
   'tabs.browse.shortLabel': '둘러보기',
   'tabs.collection.shortLabel': '컬렉션',
   'tabs.new-game.shortLabel': '새 게임',

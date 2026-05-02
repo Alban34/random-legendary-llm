@@ -40,9 +40,9 @@ test('Test:qc:epic10 Playwright script is still present', () => {
 
 // ── Story 37.4 — Version bumped to 1.0.2 ──────────────────────────────────
 
-test('Package.json version is 2.0.0', () => {
+test('Package.json version is 2.1.0', () => {
 
-  assert.equal(pkgJson.version, '2.0.0', 'package.json version must be 2.0.0');
+  assert.equal(pkgJson.version, '2.1.0', 'package.json version must be 2.1.0');
 });
 
 // ── Story 37.1 — Locale coverage ──────────────────────────────────────────

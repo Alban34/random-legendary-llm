@@ -32,3 +32,18 @@ File: documentation/planning/epic/ready-for-dev/epic-70.md, documentation/planni
 Finding: Epic 70 has been fully implemented (all story tasks marked [x] in the task list) but the epic spec and task-list files remain in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete tool available), so the relocation is logged here.
 Suggested action: Move `epic-70.md` and `epic-70-task-list.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior epics.
 ---
+[2026-05-02] Epic: Epic 75 — Locale File Sync and Accessibility Defect Fixes
+File: documentation/planning/epic/ready-for-dev/epic-75.md, documentation/planning/epic/ready-for-dev/epic-75-task-list.md
+Finding: Epic 75 has been fully implemented (all story tasks marked [x] in the task list) but the epic spec and task-list files remain in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete tool available), so the relocation is logged here.
+Suggested action: Move `epic-75.md` and `epic-75-task-list.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior completed epics.
+---
+[2026-05-02] Epic: Epic 76 — Forced Picks Panel Cognitive Load Reduction
+File: test/playwright/epic15-qc.spec.mjs
+Finding: Story 4 moved the `[data-active-constraints]` block from inside the Forced Picks `<details>` accordion body to a persistent position above the Generate Setup button. The implementation summary states that selectors in `test/playwright/epic15-qc.spec.mjs` were updated accordingly. This file lives outside `/documentation` and cannot be verified or edited by the tech-writer agent.
+Suggested action: Confirm that all `[data-active-constraints]` selectors in `test/playwright/epic15-qc.spec.mjs` now target the element in its new persistent position (outside the accordion, above the Generate Setup button) and that no selectors still assume the element is inside the `<details>` accordion body. Re-run the Playwright QC suite to verify no regressions.
+---
+[2026-05-02] Epic: Epic 76 — Forced Picks Panel Cognitive Load Reduction
+File: documentation/planning/epic/ready-for-dev/epic-76.md
+Finding: Epic 76 has been fully implemented but the epic spec file remains in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete tool available), so the relocation is logged here.
+Suggested action: Move `epic-76.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior completed epics.
+---

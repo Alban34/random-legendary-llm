@@ -7,6 +7,7 @@ The v2.0.0 baseline uses TypeScript for all runtime source modules (`src/app/*.t
 ## Architecture
 - [Overview](architecture/overview.md) — Runtime stack, layers, entry points, shipped tab IDs
 - [Setup Rules](architecture/setup-rules.md) — Player-count table, 10-step sequence, legality-first policy
+- [Locale Authoring Convention](architecture/localization.md) — Runtime locale source (`.ts`), translator working copies (`.mjs`), key-addition workflow, and divergence constraint
 
 ## Data
 - [Data Model](data/data-model.md) — Canonical data structures and persisted browser state shape

@@ -63,13 +63,6 @@
         <h2>{locale.t('collection.title')}</h2>
         <p class="muted">{locale.t('collection.description')}</p>
       </div>
-      <div class="button-row">
-        <button
-          class="button button-secondary"
-          data-action="request-reset-owned-collection"
-          onclick={collectionActions.requestResetOwnedCollection}
-        >{locale.t('collection.resetSelections')}</button>
-      </div>
     </div>
     <div class="button-row" data-view-toggle>
       <button
@@ -341,6 +334,16 @@
       </div>
     </section>
   {/each}
+  <section class="panel collection-reset-section" data-collection-reset-section>
+    <p class="muted">{locale.t('collection.resetSelections.consequence')}</p>
+    <div class="button-row">
+      <button
+        class="button button-secondary"
+        data-action="request-reset-owned-collection"
+        onclick={collectionActions.requestResetOwnedCollection}
+      >{locale.t('collection.resetSelections')}</button>
+    </div>
+  </section>
   {/if}
 
   {#if collectionView === 'cards'}

@@ -988,6 +988,64 @@ details summary {
   min-width: 0;
 }
 
+.button-row-scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px; /* clearance for scrollbar on Windows */
+}
+
+.button-row-scroll > * {
+  flex-shrink: 0;
+}
+
+.browse-footer {
+  padding: var(--space-3) 0 var(--space-2);
+  text-align: center;
+}
+
+.button-link {
+  appearance: none;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--type-body-sm-size);
+  padding: 0;
+  text-decoration: underline;
+}
+
+.button-link:hover,
+.button-link:focus-visible {
+  color: var(--text-default);
+}
+
+.forced-pick-picker-row > select {
+  flex: 1 1 auto;
+  min-width: 10rem;
+}
+.forced-pick-picker-row > button {
+  flex-shrink: 0;
+}
+
+.forced-picks-section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: var(--space-3) 0;
+}
+
+.forced-picks-pickers-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 480px) {
+  .forced-picks-pickers-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .button {
   appearance: none;
   border: 1px solid var(--border);
@@ -1800,6 +1858,28 @@ details[open] .stats-category-summary::after {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: 0;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-sm, 4px);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+  left: 0.5rem;
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 @media (min-width: 768px) {

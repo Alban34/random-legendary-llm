@@ -1,3 +1,7 @@
+// ⚠ MIRROR FILE — do not edit in isolation.
+// The canonical source is de.ts. This .mjs file mirrors it for the Node test environment
+// (localization-utils.mjs → state-store.mjs → vitest tests).
+// When adding or removing keys in de.ts, make the identical change here.
 // Canonical key schema — all other locale files must mirror this structure.
 export const DE_MESSAGES = {
   'app.title': 'Legendary: Marvel Zufallsgenerator',
@@ -8,6 +12,7 @@ export const DE_MESSAGES = {
   'header.theme.label': 'Thema',
   'header.theme.caption': 'In den Browser-Einstellungen gespeichert',
   'header.theme.groupLabel': 'Thema auswählen',
+  'header.skipToMain': 'Zum Hauptinhalt springen',
   'tabs.browse.label': 'Stöbern',
   'tabs.collection.label': 'Sammlung',
   'tabs.new-game.label': 'Neues Spiel',
@@ -59,6 +64,7 @@ export const DE_MESSAGES = {
   'collection.title': 'Meine Sammlung',
   'collection.description': 'Verwalte hier besessene Sets mit demselben gespeicherten Besitzstatus, den Stöbern und Generierung verwenden.',
   'collection.resetSelections': 'Alle Auswahlen zurücksetzen',
+  'collection.resetSelections.consequence': 'Dadurch werden alle ausgewählten Sets gelöscht — exportieren Sie zuerst eine Sicherung, wenn Sie sie wiederherstellen möchten.',
   'newGame.playerCount': 'Spieleranzahl',
   'newGame.playMode': 'Spielmodus',
   'newGame.generate': 'Aufstellung generieren',

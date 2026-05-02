@@ -139,7 +139,7 @@
 
     <!-- Grouping controls -->
     <div class="row space-between wrap gap-sm align-center" data-history-grouping-controls>
-      <div class="button-row wrap">
+      <div class="button-row button-row-scroll" role="group" aria-label={locale.t('history.groupBy')}>
         {#each HISTORY_GROUPING_MODES as mode (mode.id)}
           <button
             type="button"
@@ -153,7 +153,7 @@
         {/each}
       </div>
       {#if appState.history.length > 0}
-      <div class="button-row wrap" data-outcome-filter-row>
+      <div data-outcome-filter-row class="button-row wrap">
         {#each [
           { value: 'all', label: locale.t('history.filter.all') },
           { value: 'win', label: locale.t('history.filter.win') },

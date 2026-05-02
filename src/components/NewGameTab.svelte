@@ -308,19 +308,12 @@
 
       <div class="muted new-game-mode-help">{locale.getPlayModeHelpText(selectedPlayerCount, selectedPlayMode)}</div>
 
-      <div class="summary-grid">
-        <div class="summary-card">
-          <div class="muted">{locale.t('newGame.selectedMode')}</div>
-          <div class="metric-sm">{availablePlayModes.some((m) => m.id === selectedPlayMode) ? locale.getPlayModeLabel(selectedPlayMode, selectedPlayerCount) : locale.getPlayModeLabel('standard', selectedPlayerCount)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="muted">{locale.t('newGame.ownedSets')}</div>
-          <div class="metric-sm">{appState.collection.ownedSetIds.length}</div>
-        </div>
-        <div class="summary-card">
-          <div class="muted">{locale.t('newGame.lastPersistedMode')}</div>
-          <div class="metric-sm">{locale.formatPersistedPlayMode(appState.preferences.lastPlayerCount, appState.preferences.lastPlayMode)}</div>
-        </div>
+      <div class="summary-card new-game-status-summary" data-new-game-status-summary>
+        <span class="muted" data-status-field="selected-mode">{locale.t('newGame.selectedMode')}: <strong>{availablePlayModes.some((m) => m.id === selectedPlayMode) ? locale.getPlayModeLabel(selectedPlayMode, selectedPlayerCount) : locale.getPlayModeLabel('standard', selectedPlayerCount)}</strong></span>
+        <span aria-hidden="true" class="muted"> · </span>
+        <span class="muted" data-status-field="owned-sets">{locale.t('newGame.ownedSets')}: <strong>{appState.collection.ownedSetIds.length}</strong></span>
+        <span aria-hidden="true" class="muted"> · </span>
+        <span class="muted" data-status-field="last-persisted">{locale.t('newGame.lastPersistedMode')}: <strong>{locale.formatPersistedPlayMode(appState.preferences.lastPlayerCount, appState.preferences.lastPlayMode)}</strong></span>
       </div>
 
       <div class="result-card current-requirements-card" id="setup-requirements-card">
@@ -331,6 +324,41 @@
         {/if}
       </div>
 
+      <div class="stack gap-sm" data-active-constraints>
+        <div class="row space-between wrap gap-sm align-center">
+          <strong>{locale.t('newGame.forcedPicks.activeConstraints')}</strong>
+          <button
+            type="button"
+            class="button button-secondary"
+            data-action="clear-forced-picks"
+            disabled={!hasActiveForcedPicks}
+            onclick={gameActions.clearForcedPicks}
+          >{locale.t('newGame.forcedPicks.clearAll')}</button>
+        </div>
+        {#if hasActiveForcedPicks}
+          <ul class="clean result-list">
+            {#each FORCED_PICK_FIELD_CONFIGS as config (config.field)}
+              {#each getActiveIds(config) as id (id)}
+                {@const entity = entityIndexes[config.field][id]}
+                {@const label = entity ? entity.name : `${id} (not currently owned)`}
+                <li class="result-list-item" data-forced-pick-field={config.field} data-forced-pick-id={id}>
+                  <span><strong>{locale.t(`newGame.forcedPicks.field.${config.field}`)}:</strong> {label}</span>
+                  <button
+                    type="button"
+                    class="button button-secondary"
+                    data-action="remove-forced-pick"
+                    data-field={config.field}
+                    data-entity-id={id}
+                    onclick={() => gameActions.removeForcedPick(config.field, id)}
+                  >{locale.t('newGame.forcedPicks.remove')}</button>
+                </li>
+              {/each}
+            {/each}
+          </ul>
+        {:else}
+          <p class="muted empty-state">{locale.t('newGame.forcedPicks.none')}</p>
+        {/if}
+      </div>
       <div class="button-row">
         <button
           class="button button-primary"
@@ -354,14 +382,13 @@
       <details>
         <summary>{locale.t('newGame.forcedPicks.title')}</summary>
         <section class="result-card" data-forced-picks-panel>
-          <h3>{locale.t('newGame.forcedPicks.title')}</h3>
           <div class="muted">{locale.t('newGame.forcedPicks.description')}</div>
-          <div class="stack gap-md">
+          <div class="forced-picks-pickers-grid">
             {#each FORCED_PICK_FIELD_CONFIGS as config (config.field)}
               {@const availableOptions = getAvailableOptions(config)}
               <div class="stack gap-sm">
                 <label for={"forced-pick-" + config.field}><strong>{locale.t(`newGame.forcedPicks.field.${config.field}`)}</strong></label>
-                <div class="button-row wrap">
+                <div class="button-row wrap forced-pick-picker-row">
                   <select
                     id={"forced-pick-" + config.field}
                     data-forced-pick-select={config.field}
@@ -386,6 +413,7 @@
               </div>
             {/each}
           </div>
+          <hr class="forced-picks-section-divider" aria-hidden="true">
           {#if ownedExpansions.length >= 2}
             <div class="stack gap-sm" data-preferred-expansion-section>
               <label for="preferred-expansion-select"><strong>{locale.t('newGame.forcedPicks.preferredExpansion.label')}</strong></label>
@@ -453,41 +481,6 @@
               })}
             </p>
           {/if}
-          <div class="stack gap-sm">
-            <div class="row space-between wrap gap-sm align-center">
-              <strong>{locale.t('newGame.forcedPicks.activeConstraints')}</strong>
-              <button
-                type="button"
-                class="button button-secondary"
-                data-action="clear-forced-picks"
-                disabled={!hasActiveForcedPicks}
-                onclick={gameActions.clearForcedPicks}
-              >{locale.t('newGame.forcedPicks.clearAll')}</button>
-            </div>
-            {#if hasActiveForcedPicks}
-              <ul class="clean result-list">
-                {#each FORCED_PICK_FIELD_CONFIGS as config (config.field)}
-                  {#each getActiveIds(config) as id (id)}
-                    {@const entity = entityIndexes[config.field][id]}
-                    {@const label = entity ? entity.name : `${id} (not currently owned)`}
-                    <li class="result-list-item" data-forced-pick-field={config.field} data-forced-pick-id={id}>
-                      <span><strong>{locale.t(`newGame.forcedPicks.field.${config.field}`)}:</strong> {label}</span>
-                      <button
-                        type="button"
-                        class="button button-secondary"
-                        data-action="remove-forced-pick"
-                        data-field={config.field}
-                        data-entity-id={id}
-                        onclick={() => gameActions.removeForcedPick(config.field, id)}
-                      >{locale.t('newGame.forcedPicks.remove')}</button>
-                    </li>
-                  {/each}
-                {/each}
-              </ul>
-            {:else}
-              <p class="muted empty-state">{locale.t('newGame.forcedPicks.none')}</p>
-            {/if}
-          </div>
         </section>
       </details>
 

@@ -106,19 +106,6 @@
             data-tab-id={firstRun ? 'new-game' : 'collection'}
             onclick={() => onJumpTab(firstRun ? 'new-game' : 'collection')}
           >{firstRun ? locale.t('browse.hero.generateGame') : locale.t('browse.hero.manageCollection')}</button>
-          <button
-            type="button"
-            class="button button-secondary"
-            data-action="start-onboarding"
-            onclick={onStartOnboarding}
-          >{locale.t('browse.hero.replayWalkthrough')}</button>
-          <button
-            type="button"
-            class="button button-secondary"
-            data-action="toggle-about-panel"
-            aria-expanded={aboutPanelOpen}
-            onclick={onToggleAboutPanel}
-          >{locale.t('browse.hero.aboutProject')}</button>
         </div>
       </div>
       <div class="summary-card browse-results-summary browse-hero-summary">
@@ -148,6 +135,14 @@
         <strong>{locale.t('browse.startHere.step3Title')}</strong>
         <div class="muted">{locale.t('browse.startHere.step3Body')}</div>
       </article>
+      <div class="button-row" data-help-walkthrough-action>
+        <button
+          type="button"
+          class="button button-secondary"
+          data-action="start-onboarding"
+          onclick={onStartOnboarding}
+        >{locale.t('browse.hero.replayWalkthrough')}</button>
+      </div>
     </div>
   </details>
 
@@ -412,5 +407,15 @@
       </section>
     </section>
   {/if}
+
+  <footer class="browse-footer" data-browse-footer>
+    <button
+      type="button"
+      class="button-link"
+      data-action="toggle-about-panel"
+      aria-expanded={aboutPanelOpen}
+      onclick={onToggleAboutPanel}
+    >{locale.t('browse.hero.aboutProject')}</button>
+  </footer>
 
 </section>

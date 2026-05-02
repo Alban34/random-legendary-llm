@@ -1,3 +1,7 @@
+// ⚠ MIRROR FILE — do not edit in isolation.
+// The canonical source is ja.ts. This .mjs file mirrors it for the Node test environment
+// (localization-utils.mjs → state-store.mjs → vitest tests).
+// When adding or removing keys in ja.ts, make the identical change here.
 // Canonical key schema — all other locale files must mirror this structure.
 export const JA_MESSAGES = {
   'app.title': 'Legendary: Marvel ランダマイザー',
@@ -32,6 +36,7 @@ export const JA_MESSAGES = {
   'collection.title': 'マイコレクション',
   'collection.description': 'ここでは閲覧タブやセットアップ生成と同じ保存済みコレクション状態を管理します。',
   'collection.resetSelections': 'すべての選択をリセット',
+  'collection.resetSelections.consequence': 'これにより、所有しているセットの選択がすべてクリアされます — 復元したい場合は、先にバックアップをエクスポートしてください。',
   'newGame.playerCount': 'プレイヤー数',
   'newGame.playMode': 'プレイモード',
   'newGame.generate': 'セットアップを生成',
@@ -107,6 +112,7 @@ export const JA_MESSAGES = {
   'header.locale.fallbackNotice': 'このロケールパックはまだ未完成のため、一部のテキストは英語のフォールバックを使用しています。',
   'header.theme.caption': 'ブラウザー設定に保存',
   'header.theme.groupLabel': 'テーマを選択',
+  'header.skipToMain': 'メインコンテンツへスキップ',
   'tabs.browse.shortLabel': '閲覧',
   'tabs.collection.shortLabel': 'コレクション',
   'tabs.history.shortLabel': '履歴',

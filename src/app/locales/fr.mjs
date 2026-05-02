@@ -1,3 +1,7 @@
+// ⚠ MIRROR FILE — do not edit in isolation.
+// The canonical source is fr.ts. This .mjs file mirrors it for the Node test environment
+// (localization-utils.mjs → state-store.mjs → vitest tests).
+// When adding or removing keys in fr.ts, make the identical change here.
 // Canonical key schema — all other locale files must mirror this structure.
 export const FR_MESSAGES = {
   'app.title': 'Randomiseur Legendary: Marvel',
@@ -12,6 +16,7 @@ export const FR_MESSAGES = {
   'header.theme.label': 'Thème',
   'header.theme.caption': 'Enregistré dans les préférences du navigateur',
   'header.theme.groupLabel': 'Choisir le thème',
+  'header.skipToMain': 'Aller au contenu principal',
   'tabs.browse.label': 'Parcourir',
   'tabs.collection.label': 'Collection',
   'tabs.new-game.label': 'Nouvelle partie',
@@ -85,6 +90,7 @@ export const FR_MESSAGES = {
   'collection.title': 'Ma collection',
   'collection.description': 'Gérez ici les extensions possédées avec le même état persistant utilisé par Parcourir et la génération.',
   'collection.resetSelections': 'Réinitialiser toutes les sélections',
+  'collection.resetSelections.consequence': 'Cela effacera toutes les sélections de sets possédés — exportez une sauvegarde d\'abord si vous souhaitez les restaurer.',
   'collection.ownedSets': 'Extensions possédées',
   'collection.storage': 'Stockage',
   'collection.storage.available': 'Disponible',

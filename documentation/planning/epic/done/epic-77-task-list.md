@@ -2,7 +2,7 @@
 
 ## Story 1 — Update README.md to describe the five game-facing features added in Epics 70–74
 
-- [ ] In `README.md`, immediately after the `### Your history, your insights` sub-section and before the `### All play modes covered` sub-section, insert the following three new `###` sub-sections (preserving one blank line between each):
+- [x] In `README.md`, immediately after the `### Your history, your insights` sub-section and before the `### All play modes covered` sub-section, insert the following three new `###` sub-sections (preserving one blank line between each):
 
   ```markdown
   ### Fine-tune your active pool
@@ -15,33 +15,33 @@
   Lock in a **hero team affiliation** before rolling and the generator always picks from that team first. In all solo modes the app automatically drops the mastermind "Always Leads" constraint, so villain groups are always drawn randomly — no house-rule needed.
   ```
 
-- [ ] In `README.md` `### All play modes covered` sub-section, add the following sentence as a new paragraph immediately after the last existing bullet (`- **Two-Handed Solo** — 1 player playing both sides`):
+- [x] In `README.md` `### All play modes covered` sub-section, add the following sentence as a new paragraph immediately after the last existing bullet (`- **Two-Handed Solo** — 1 player playing both sides`):
 
   ```markdown
   In Standard Solo, Advanced Solo, and Standard Solo v2, the mastermind "Always Leads" villain group constraint is automatically suppressed — the generator draws villain groups randomly in every solo mode.
   ```
 
-- [ ] Test: open `README.md` in a Markdown previewer and verify: (a) all five features are mentioned — Preferred Expansion Priority, Epic Mastermind mode, Active Expansions filter, Solo Always Leads suppression, and Forced Hero Team; (b) the three new `###` sub-sections appear between `### Your history, your insights` and `### All play modes covered`; (c) the `### All play modes covered` sentence appears after the bullet list and references all three solo modes; (d) no existing `###` sub-sections or bullets are removed; (e) the document renders as valid GFM with no broken links.
-- [ ] QC (Automated): run `npm run lint`
+- [x] Test: open `README.md` in a Markdown previewer and verify: (a) all five features are mentioned — Preferred Expansion Priority, Epic Mastermind mode, Active Expansions filter, Solo Always Leads suppression, and Forced Hero Team; (b) the three new `###` sub-sections appear between `### Your history, your insights` and `### All play modes covered`; (c) the `### All play modes covered` sentence appears after the bullet list and references all three solo modes; (d) no existing `###` sub-sections or bullets are removed; (e) the document renders as valid GFM with no broken links.
+- [x] QC (Automated): run `npm run lint`
 
 ---
 
 ## Story 2 — Expand the ui-design.md result-view spec to document solo-mode Always Leads suppression
 
-- [ ] In `documentation/ux/ui-design.md`, Tab 3 — New Game, `**Interactions:**` list: add the following bullet immediately after the `- ★ marks the forced Mastermind villain group` line (currently line 312):
+- [x] In `documentation/ux/ui-design.md`, Tab 3 — New Game, `**Interactions:**` list: add the following bullet immediately after the `- ★ marks the forced Mastermind villain group` line (currently line 312):
 
   ```markdown
   - The ★ villain-group marker and the "Always leads: [name]" sub-line on the mastermind card are rendered **in multiplayer modes only**; in Standard Solo (play mode `standard`, player count 1), Advanced Solo, and Standard Solo v2, neither element is present in the result — the generator does not enforce the mastermind lead constraint in solo modes and the villain group is always drawn randomly (Epic 73)
   ```
 
-- [ ] Test: read the `**Interactions:**` list in `documentation/ux/ui-design.md` and verify: (a) the new bullet is present and immediately follows the `★ marks the forced Mastermind villain group` line; (b) the bullet explicitly names multiplayer as the context where ★ and "Always leads" appear; (c) the bullet explicitly names all three affected solo modes — Standard Solo, Advanced Solo, and Standard Solo v2 — as the contexts where neither element appears; (d) the surrounding bullets are unchanged; (e) the mockup ASCII art above the Interactions list is unchanged.
-- [ ] QC (Automated): run `npm run lint`
+- [x] Test: read the `**Interactions:**` list in `documentation/ux/ui-design.md` and verify: (a) the new bullet is present and immediately follows the `★ marks the forced Mastermind villain group` line; (b) the bullet explicitly names multiplayer as the context where ★ and "Always leads" appear; (c) the bullet explicitly names all three affected solo modes — Standard Solo, Advanced Solo, and Standard Solo v2 — as the contexts where neither element appears; (d) the surrounding bullets are unchanged; (e) the mockup ASCII art above the Interactions list is unchanged.
+- [x] QC (Automated): run `npm run lint`
 
 ---
 
 ## Story 3 — Document the .ts-only runtime locale authoring convention in the architecture documentation
 
-- [ ] Create a new file `documentation/architecture/localization.md` with the following content:
+- [x] Create a new file `documentation/architecture/localization.md` with the following content:
 
   ```markdown
   # Locale Authoring Convention
@@ -81,11 +81,11 @@
   Add new locale keys at the bottom of the relevant message group within `en.ts`, above the closing `}`. Follow the existing grouping conventions (e.g. `newGame.forcedPicks.*`, `history.*`, `backup.*`). After adding to `en.ts`, propagate to the other five `.ts` locale files before committing.
   ```
 
-- [ ] In `documentation/README.md`, under the `## Architecture` section, add the following line after `- [Setup Rules](architecture/setup-rules.md) — Player-count table, 10-step sequence, legality-first policy`:
+- [x] In `documentation/README.md`, under the `## Architecture` section, add the following line after `- [Setup Rules](architecture/setup-rules.md) — Player-count table, 10-step sequence, legality-first policy`:
 
   ```markdown
   - [Locale Authoring Convention](architecture/localization.md) — Runtime locale source (`.ts`), translator working copies (`.mjs`), key-addition workflow, and divergence constraint
   ```
 
-- [ ] Test: verify `documentation/architecture/localization.md` exists and is non-empty; verify `documentation/README.md` contains the new link and the path resolves to the new file; read `localization.md` and confirm it contains all three required elements: (a) explicit statement that `.ts` files are the runtime source imported by `localization-utils.ts`, (b) instruction to add new keys to `.ts` files first, (c) constraint that `.mjs` and `.ts` must never diverge with an explanation of the failure mode.
-- [ ] QC (Automated): run `npm run lint`
+- [x] Test: verify `documentation/architecture/localization.md` exists and is non-empty; verify `documentation/README.md` contains the new link and the path resolves to the new file; read `localization.md` and confirm it contains all three required elements: (a) explicit statement that `.ts` files are the runtime source imported by `localization-utils.ts`, (b) instruction to add new keys to `.ts` files first, (c) constraint that `.mjs` and `.ts` must never diverge with an explanation of the failure mode.
+- [x] QC (Automated): run `npm run lint`

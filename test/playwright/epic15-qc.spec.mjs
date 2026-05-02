@@ -38,7 +38,7 @@ test.describe('Epic 15 automated QC', () => {
     await addForcedPick(page, 'heroIds', hero.id);
 
     await openForcedPicksPanel(page);
-    await expect(page.locator('[data-forced-picks-panel]')).toContainText(mastermind.name);
+    await expect(page.locator('[data-active-constraints]')).toContainText(mastermind.name);
     await expect(page.locator(`[data-forced-pick-field="heroIds"][data-forced-pick-id="${hero.id}"]`)).toContainText(hero.name);
 
     await page.locator(`[data-action="remove-forced-pick"][data-field="heroIds"][data-entity-id="${hero.id}"]`).click();
@@ -47,7 +47,7 @@ test.describe('Epic 15 automated QC', () => {
     await openForcedPicksPanel(page);
     await page.locator('[data-action="clear-forced-picks"]').click();
     await openForcedPicksPanel(page);
-    await expect(page.locator('[data-forced-picks-panel]')).toContainText('No forced picks are active.');
+    await expect(page.locator('[data-active-constraints]')).toContainText('No forced picks are active.');
   });
 
   test('generates a setup that honors legal forced picks and surfaces an applied-constraints notice', async ({ page }) => {
@@ -92,7 +92,7 @@ test.describe('Epic 15 automated QC', () => {
     await page.locator('[data-action="accept-current-setup"]').click();
     await selectTab(page, 'new-game');
     await openForcedPicksPanel(page);
-    await expect(page.locator('[data-forced-picks-panel]')).toContainText('No forced picks are active.');
+    await expect(page.locator('[data-active-constraints]')).toContainText('No forced picks are active.');
 
     const state = await readAppState(page);
     expect(state.history[0].forcedPicks).toBeUndefined();
@@ -102,6 +102,6 @@ test.describe('Epic 15 automated QC', () => {
     await reloadApp(page);
     await selectTab(page, 'new-game');
     await openForcedPicksPanel(page);
-    await expect(page.locator('[data-forced-picks-panel]')).toContainText('No forced picks are active.');
+    await expect(page.locator('[data-active-constraints]')).toContainText('No forced picks are active.');
   });
 });

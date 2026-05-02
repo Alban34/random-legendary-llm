@@ -1,3 +1,7 @@
+// ⚠ MIRROR FILE — do not edit in isolation.
+// The canonical source is es.ts. This .mjs file mirrors it for the Node test environment
+// (localization-utils.mjs → state-store.mjs → vitest tests).
+// When adding or removing keys in es.ts, make the identical change here.
 // Canonical key schema — all other locale files must mirror this structure.
 export const ES_MESSAGES = {
   'app.title': 'Aleatorizador de Legendary: Marvel',
@@ -31,6 +35,7 @@ export const ES_MESSAGES = {
   'collection.title': 'Mi colección',
   'collection.description': 'Gestiona aquí las expansiones que tienes con el mismo estado persistente usado por Explorar y la generación.',
   'collection.resetSelections': 'Restablecer todas las selecciones',
+  'collection.resetSelections.consequence': 'Esto borrará todas las selecciones de sets poseídos — exporta una copia de seguridad primero si deseas restaurarlas.',
   'newGame.playerCount': 'Número de jugadores',
   'newGame.playMode': 'Modo de juego',
   'newGame.generate': 'Generar configuración',
@@ -106,6 +111,7 @@ export const ES_MESSAGES = {
   'header.locale.fallbackNotice': 'Parte del texto usa el inglés como reserva mientras este paquete de idioma está incompleto.',
   'header.theme.caption': 'Guardado en las preferencias del navegador',
   'header.theme.groupLabel': 'Seleccionar tema',
+  'header.skipToMain': 'Saltar al contenido principal',
   'tabs.browse.shortLabel': 'Explorar',
   'tabs.collection.shortLabel': 'Colección',
   'tabs.new-game.shortLabel': 'Nueva partida',

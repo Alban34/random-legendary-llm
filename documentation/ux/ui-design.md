@@ -81,7 +81,7 @@ Typography roles are governed by `design-system/overview.md`.
 - Step progression keeps keyboard focus inside the walkthrough and the current step heading is a valid focus target after each transition
 - Completing or skipping the walkthrough does not automatically re-open it on later launches
 - A full reset clears the onboarding-completed preference and restores the first-run walkthrough
-- About remains hidden by default and is opened intentionally from Browse
+- "About this project" is rendered in a `[data-browse-footer]` area at the bottom of the Browse tab with a `.button-link` style and is always visible
 
 ---
 
@@ -99,8 +99,9 @@ Typography roles are governed by `design-system/overview.md`.
 ## Tab 1 — Browse Extensions
 
 ```
-[Hero with one dominant CTA]
+[Generate a Game]  [Manage Collection]   ← primary and secondary CTAs, always visible
 [Optional "Start here" disclosure]
+  ↳ Replay Walkthrough               ← inside the disclosure (data-help-walkthrough-action)
 [Search / filter bar]                [Type filter: All | Base Game | Large | Small | Standalone]
 [Sort: Name (A–Z) | Release Year | In Collection]
 
@@ -133,8 +134,8 @@ Typography roles are governed by `design-system/overview.md`.
 ```
 
 **Interactions:**
-- First-run Browse keeps one dominant next action and moves secondary orientation into a collapsed help disclosure
-- Returning-user Browse keeps replay/About access but brings filters and the set catalog closer to the top of the page
+- The Browse welcome area always presents exactly two action buttons: a primary **Generate a Game** button and a secondary **Manage Collection** button; this two-button layout is used on all visits regardless of onboarding state
+- "Replay Walkthrough" appears inside the "Start here" help disclosure (`data-help-walkthrough-action`); "About this project" appears in a `[data-browse-footer]` at the bottom of the tab as a `.button-link` styled element and is always visible
 - Click card header → expand/collapse detail panel (accordion)
 - "Add to Collection" toggles ownership directly from Browse and stays synchronized with Collection
 - Type filter pills filter the grid
@@ -184,6 +185,8 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
   ☐ Paint the Town Red (2014)   —  5 heroes, 1 mastermind
   ...
 
+  [data-collection-reset-section]
+  This clears all owned set selections.
   [Reset All Selections]
 
   ── Browse Cards view (active when "Browse Cards" is selected) ──
@@ -226,7 +229,7 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 - The BGG import merges matched expansions into the existing owned set without removing manually selected sets; the import is idempotent (running it twice produces the same result)
 - Checkboxes mirror the "Add to Collection" toggle from Browse tab
 - Capacity indicators show a ✓ or ⚠ per player count
-- "Reset All Selections" clears the collection (with confirmation)
+- "Reset All Selections" appears below all set entries in `[data-collection-reset-section]`; a brief consequence reminder text ("This clears all owned set selections." or equivalent) is rendered adjacent to the button; the existing confirmation dialog is still triggered before any selections are cleared
 - When the Browse Cards view is active, a grouping selector ("By Category" / "By Expansion") appears at the top of the card-browser panel; switching grouping updates the list immediately without a page reload; the active grouping button carries `aria-pressed`; the selected grouping is retained for the browser session but not persisted across page reloads
 - By Category grouping renders five sections in canonical order (Heroes, Masterminds, Villain Groups, Henchman Groups, Schemes); each section heading appears only when the owned-expansion pool contains at least one card of that category; cards are listed A–Z by name within each section
 - By Expansion grouping renders one section per owned expansion sorted A–Z by expansion name; all cards from that expansion regardless of category are listed A–Z by card name within each section
@@ -244,16 +247,21 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
   │  Play Mode                                      │
   │  [Standard Solo] [Standard Solo v2] [Advanced Solo] [Two-Handed]  │
   │                                                 │
+  │  Standard Solo · 5 sets · Last: Standard Solo   │  ← [data-new-game-status-summary] (single line)
+  │                                                 │
   │  Setup: 3 Heroes · 1 Villain Group ·            │
   │         1 Henchman Group · 25 Wounds            │
   │                                                 │
+  │  Active constraints: [summary, persistent]      │
   │   [ ⚡ Generate Setup ]  [ ✅ Accept & Log ]    │
   │                                                 │
   │  ▶ Forced Picks  (disclosure, collapsed)        │
+  │    ↳ Scheme    │ Mastermind  (2-col grid ≥480px) │
+  │    ↳ Heroes    │ Villains                        │
+  │    ↳ Henchmen                                   │
+  │    ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─  │
   │    ↳ Preferred expansion: [select or active+clear]│
   │    ↳ Forced team: [select or active+clear]       │
-  │    ↳ Scheme / Mastermind / Heroes / Villains /   │
-  │      Henchmen forced-pick rows                   │
   │                                                 │
   │  ▶ Active Expansions  [toggle]                  │
   │    (collapsed by default; click to expand)       │
@@ -298,10 +306,12 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 **Interactions:**
 - Player count buttons are mutually exclusive (styled like toggle buttons)
 - 1-player mode exposes Standard Solo, Standard Solo v2, Advanced Solo, and Two-Handed Solo
+- A compact `[data-new-game-status-summary]` inline element appears below the Play Mode selector showing the currently selected mode, owned set count, and last-persisted mode on a single line; it replaces the three separate status cards that previously occupied significantly more vertical space (Epic 78)
 - A single primary button handles both first generation and all subsequent rerolls. Its label is context-sensitive: "Generate Setup" before any result is present, "New Setup" once a setup is already displayed
 - The primary action button appears directly below the setup-requirements summary, before optional content, so users can act without scrolling past forced picks
-- Forced picks are presented in a native `<details>` disclosure element below the primary action row; users who need forced picks can expand the disclosure without it adding visual weight for users who do not
-- Inside the Forced Picks disclosure, a **Preferred Expansion** sub-section appears first: a `<select>` populated with the player's owned expansions lets them designate one expansion whose cards the generator prefers within each play-count tier for unclaimed slots; when an expansion is active it is shown with its name and a one-tap clear button; the sub-section is hidden and replaced with an unavailable message when the player owns fewer than two expansions; a **Forced Team** sub-section follows: a `<select>` populated with the distinct sorted team names present in the active hero pool lets users designate one hero affiliation whose members the generator always selects first; when a forced team is active it is shown with its name and a one-tap clear button; the sub-section is hidden and replaced with an unavailable notice when no heroes in the active collection carry a team affiliation (Epic 74)
+- Forced picks are presented in a native `<details>` disclosure element below the primary action row; users who need forced picks can expand the disclosure without it adding visual weight for users who do not; the accordion toggle label is the only visible heading for the panel — no H3 duplicate appears inside the accordion body (Epic 76)
+- An **Active Constraints** summary block (`[data-active-constraints]`) is rendered persistently outside the accordion, immediately above the Generate Setup button; it is visible whether the accordion is open or collapsed and is unaffected by the accordion toggle (Epic 76)
+- Inside the Forced Picks disclosure, the five **card-type picker rows** (Scheme, Mastermind, Heroes, Villains, Henchmen) appear first as the card-picks group, each using a consistent `.forced-pick-picker-row` layout; on viewports ≥480px the five rows are arranged in a two-column grid via `.forced-picks-pickers-grid`, reducing scroll depth on phone-sized screens; a `.forced-picks-section-divider` `<hr>` separates the card-picks group from the session-settings group below; the **Preferred Expansion** sub-section follows: a `<select>` populated with the player's owned expansions lets them designate one expansion whose cards the generator prefers within each play-count tier for unclaimed slots; when an expansion is active it is shown with its name and a one-tap clear button; the sub-section is hidden and replaced with an unavailable message when the player owns fewer than two expansions; a **Forced Team** sub-section follows: a `<select>` populated with the distinct sorted team names present in the active hero pool lets users designate one hero affiliation whose members the generator always selects first; when a forced team is active it is shown with its name and a one-tap clear button; the sub-section is hidden and replaced with an unavailable notice when no heroes in the active collection carry a team affiliation (Epics 70, 74, 76)
 - Forced picks are one-shot setup constraints that remain active across all rerolls, then clear after a successful Accept & Log or reload
 - An "Active Expansions" panel appears below the Forced Picks disclosure on the New Game tab; the panel is collapsed by default on every page load and can be expanded via a toggle button in the section header; the toggle button carries `aria-expanded` and hides or shows the panel content via an `{#if}` block; the expanded/collapsed state persists for the current session (tab navigation does not reset it) but resets to collapsed on page reload; once expanded, the panel lists every owned expansion as a toggleable checkbox item; toggling an item adds or removes its ID from `activeSetIds`; "Use all expansions" sets `activeSetIds` to `null` (restoring the all-owned fallback); "Clear selection" sets `activeSetIds` to `[]`, deselecting every expansion checkbox; the panel shows a summary line reading "Using X of Y expansions" when a non-empty filter is active, or "All X expansions" when `activeSetIds` is `null` (Epic 72)
 - An **Epic Mastermind** toggle appears in the setup view when at least one expansion in `EPIC_MASTERMIND_SUPPORTED_SETS` (currently `"X-Men"`) is in the player's collection; when the condition is not met the control is fully absent from the DOM; enabling the toggle restricts the mastermind draw to the Epic Mastermind card pool from supported expansions; the toggle state persists across page reloads via `lastEpicMastermind` in `Preferences`
@@ -310,9 +320,14 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 - "Accept & Log Game" saves the setup to history, opens immediate result entry in History, and marks the setup as used; it is disabled until a setup is present
 - Result entry supports pending-result flows, later correction from History, focus moves into the editor on open, and invalid saves announce recoverable errors before returning focus to the correct field
 - ★ marks the forced Mastermind villain group
+- The ★ villain-group marker and the "Always leads: [name]" sub-line on the mastermind card are rendered **in multiplayer modes only**; in Standard Solo (play mode `standard`, player count 1), Advanced Solo, and Standard Solo v2, neither element is present in the result — the generator does not enforce the mastermind lead constraint in solo modes and the villain group is always drawn randomly (Epic 73)
 - When a setup is generated and the active play mode is Standard Solo, Advanced Solo, or Standard Solo v2, a "Rules for this mode" collapsible panel (`<details open data-result-section="solo-rules">`) appears in the result area below the picked cards; the panel defaults to open (expanded) and lists mode-specific rule items as an ordered `<ul>`; the panel is absent when the play mode is Two-Handed Solo or any multiplayer mode, and is absent before a setup is generated (Epic 57); the "Ignore Always Leads" reminder is not listed in any mode's rule items because the generator suppresses the mastermind lead constraint automatically in all solo modes — the villain group is always drawn randomly (Epic 73)
 
 > **Design rationale (Epic 25):** Generate and Regenerate were merged into one context-sensitive action because they produce identical outcomes — both randomize a new setup from the current constraints. A dedicated "Regenerate" label implied a behaviorally distinct path when none exists. Forced picks moved below the primary action so the button is reached without scrolling through optional configuration. Both changes reduce action-density confusion and bring the mandatory step earlier in the visual flow.
+
+**CSS classes introduced by Epic 76:** `.forced-pick-picker-row`, `.forced-picks-pickers-grid`, `.forced-picks-section-divider`
+
+**CSS classes introduced by Epic 78 (New Game tab):** `[data-new-game-status-summary]`
 
 ---
 
@@ -320,6 +335,8 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 
 ```
   Group by: [Mastermind] [Scheme] [Heroes] [Villains] [Player Mode] [Epic Mastermind]
+             ← horizontally-scrollable single-line pill row (.button-row-scroll); all six buttons
+               remain on one line at any viewport width; row scrolls when buttons overflow
 
   Filter: [All] [Won] [Lost] [Pending]
   3 games                                ← count line (hidden when All is active)
@@ -357,6 +374,8 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 - Pending and completed results are both supported, and completed results can be corrected later
 - Opening result entry from History moves focus into the active editor, invalid saves announce errors with field-level invalid state, and save/skip/cancel return focus to the originating record action
 - A row of outcome filter buttons — All, Won, Lost, Pending — appears above the game list whenever at least one history record exists; the active option is visually distinguished; selecting a filter immediately re-renders the list to show only matching records; a count line (e.g. "3 games") appears below the filter row when a non-All filter is active; when the filtered list is empty a contextual message is shown (e.g. "No won games yet") in place of the list; the filter is not persisted across page reloads
+
+**CSS classes introduced by Epic 78 (History tab):** `.button-row-scroll`, `.button-row-scroll > *`
 
 ---
 
@@ -472,7 +491,9 @@ The Backup tab is divided into three clearly separated panels (Epic UX6):
 
 ## Accessibility Notes
 - All interactive elements reachable by keyboard (Tab key)
+- Skip-to-main-content link: a visually-hidden `<a href="#main" class="skip-link">` is the first focusable element in the document; it becomes visible on keyboard focus and moves focus to the `<main id="main">` landmark; the link is not visible to pointer users when unfocused (WCAG SC 2.4.1 Bypass Blocks)
 - Visible focus ring on all focusable elements (`:focus-visible { outline: 2px solid var(--border-focus) }`)
 - ARIA roles: `role="tablist"`, `role="tab"`, `role="tabpanel"`, `role="dialog"` on modal
+- Locale `<select>` aria-label is resolved from the `header.locale.groupLabel` locale key so assistive technology announces a human-readable group label in every supported language (WCAG SC 4.1.2)
 - Color is not the only means of conveying state (always accompanied by icon or text)
 - Sufficient contrast ratios: primary text (#f0f0f0 on #0d0d0d = 18.5:1)

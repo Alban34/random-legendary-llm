@@ -1,3 +1,7 @@
+// ⚠ MIRROR FILE — do not edit in isolation.
+// The canonical source is en.ts. This .mjs file mirrors it for the Node test environment
+// (localization-utils.mjs → state-store.mjs → vitest tests).
+// When adding or removing keys in en.ts, make the identical change here.
 // Canonical key schema — all other locale files must mirror this structure.
 export const EN_MESSAGES = {
   'app.title': 'Legendary: Marvel Randomizer',
@@ -12,6 +16,7 @@ export const EN_MESSAGES = {
   'header.theme.label': 'Theme',
   'header.theme.caption': 'Saved in browser preferences',
   'header.theme.groupLabel': 'Choose theme',
+  'header.skipToMain': 'Skip to main content',
   'tabs.browse.label': 'Browse',
   'tabs.collection.label': 'Collection',
   'tabs.new-game.label': 'New Game',
@@ -85,6 +90,7 @@ export const EN_MESSAGES = {
   'collection.title': 'My Collection',
   'collection.description': 'Manage owned sets here with the same persisted ownership state used by Browse and setup generation.',
   'collection.resetSelections': 'Reset All Selections',
+  'collection.resetSelections.consequence': 'This will clear all owned set selections — export a backup first if you want to restore them.',
   'collection.ownedSets': 'Owned sets',
   'collection.storage': 'Storage',
   'collection.storage.available': 'Available',
@@ -164,6 +170,9 @@ export const EN_MESSAGES = {
   'newGame.activeFilter.summaryFiltered': 'Using {active} of {total} expansions',
   'newGame.activeFilter.selectAll': 'Use all expansions',
   'newGame.activeFilter.clearAll': 'Clear selection',
+  'newGame.epicMastermind': 'Epic Mastermind',
+  'newGame.epicMastermind.help': 'Draw the mastermind exclusively from the harder Epic Mastermind card pool.',
+  'newGame.epicMastermind.noCardsError': 'No Epic Mastermind cards are available in your collection.',
   'history.title': 'Game history',
   'history.description': 'Accepted setups are stored immediately. Each record can stay pending until you log a win/loss and score, then be corrected later if needed.',
   'history.empty': 'No accepted games have been logged yet.',
@@ -173,6 +182,9 @@ export const EN_MESSAGES = {
   'history.group.heroes': 'Heroes',
   'history.group.villains': 'Villains',
   'history.group.play-mode': 'Player Mode',
+  'history.group.epic-mastermind': 'Epic Mastermind',
+  'history.group.epic-mastermind.epicGames': 'Epic Mastermind',
+  'history.group.epic-mastermind.standardGames': 'Standard',
   'history.group.allGames': 'All games',
   'history.acceptedAt': 'Accepted {date} · {mode}',
   'history.result': 'Result:',
@@ -184,6 +196,7 @@ export const EN_MESSAGES = {
   'history.henchmanGroups': 'Henchman Groups:',
   'history.addResult': 'Add result',
   'history.editResult': 'Edit result',
+  'history.epicMastermind.indicator': 'Epic Mastermind',
   'history.filter.all': 'All',
   'history.filter.win': 'Won',
   'history.filter.loss': 'Lost',

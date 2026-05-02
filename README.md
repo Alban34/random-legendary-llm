@@ -30,10 +30,21 @@ Forcing a specific hero, villain group, or scheme before rolling. The generator 
 ### Your history, your insights
 Every accepted game is logged. Track wins, losses, and scores. Regroup your play history by mastermind, scheme, hero, villain group, or play mode. An at-a-glance insights dashboard shows win rate, average score, most-played, and least-played — so you finally know which villain groups you've been avoiding.
 
+### Fine-tune your active pool
+Pick any subset of your shelf as tonight's active pool — the generator draws only from those expansions. Designate one as **preferred** and its cards get drawn first when filling unclaimed slots, without overriding the fairness system or your individual forced picks.
+
+### Go Epic
+Enable **Epic Mastermind** mode to restrict the mastermind draw to the most powerful boss cards from supported expansions (currently X-Men). The rest of the setup is generated normally — only the mastermind slot changes.
+
+### Smarter solo, team control
+Lock in a **hero team affiliation** before rolling and the generator always picks from that team first. In all solo modes the app automatically drops the mastermind "Always Leads" constraint, so villain groups are always drawn randomly — no house-rule needed.
+
 ### All play modes covered
 - **Standard** — 1 to 5 players
 - **Advanced Solo** — 1 player, 3 heroes, 1 villain group (same as Standard Solo, with a larger Master Strike deck)
 - **Two-Handed Solo** — 1 player playing both sides
+
+In Standard Solo, Advanced Solo, and Standard Solo v2, the mastermind "Always Leads" villain group constraint is automatically suppressed — the generator draws villain groups randomly in every solo mode.
 
 ### Your data, your device
 Export a portable backup anytime. Import it on any other device. Merge two devices' histories without losing a single game record. No cloud required.

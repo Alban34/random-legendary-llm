@@ -1367,6 +1367,7 @@
 
 {:else if isLoaded}
   <header class="app-header" data-onboarding-visible={String(ui.onboardingVisible)}>
+    <a href="#main" class="skip-link" data-skip-link>{locale!.t('header.skipToMain')}</a>
     <div class="header-inner">
       <div class="header-top-row">
         <div class="header-copy">
@@ -1382,7 +1383,7 @@
             id="header-locale-select"
             class="locale-select-compact"
             data-action="set-locale-select"
-            aria-label={locale!.t('header.locale!.groupLabel')}
+            aria-label={locale!.t('header.locale.groupLabel')}
             onchange={(e) => actions.setLocale((e.target as HTMLSelectElement).value)}
           >
             {#each getSelectableLocales() as option (option.id)}
@@ -1433,7 +1434,7 @@
     </div>
   </header>
 
-  <main class="app-main">
+  <main id="main" class="app-main">
     <Toaster
       position="bottom-center"
       offset="calc(80px + env(safe-area-inset-bottom))"
