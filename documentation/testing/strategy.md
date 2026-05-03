@@ -105,7 +105,7 @@ When the epic containing that story changes files under `/src`, the epic is not 
 
 Automated verification: `src/app/app-shell.test.ts`, `src/app/theme-utils.test.ts`
 
-Browser QC: `test/playwright/epic18-qc.spec.ts`
+Browser QC: `test/playwright/theme-switching.spec.ts`
 
 ---
 
@@ -113,18 +113,18 @@ Browser QC: `test/playwright/epic18-qc.spec.ts`
 
 Automated verification: `src/app/app-shell.test.ts`, `src/components/HistoryTab.test.ts`, `src/app/focus-utils.test.ts`, `src/app/preferences-actions.test.ts`
 
-Browser QC: `test/playwright/epic18-qc.spec.ts`
+Browser QC: `test/playwright/responsive-shell.spec.ts`
 
 ---
 
 ## Epic 10 — Final Documentation and Release Readiness
 
-Browser QC: `test/playwright/epic10-qc.spec.ts`
+Browser QC: `test/playwright/end-to-end-user-flow.spec.ts`
 
-Current automated browser QC command for Epic 1–10:
+To run all browser QC specs:
 
 ```
-npm run test:qc:epic10
+npm run e2e
 ```
 
 ---
@@ -147,7 +147,7 @@ Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, `mergeOwnedSets` (via `coll
 
 Automated verification: `src/app/collection-utils.test.ts`
 
-Browser QC: `test/playwright/epic44-card-browser.spec.ts`
+Browser QC: `test/playwright/card-browser.spec.ts`
 
 Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion` (via `collection-utils.ts`), `CardBrowserByCategory.svelte`, `CardBrowserByExpansion.svelte`, the "Sets" / "Browse Cards" view toggle in `CollectionTab.svelte`, the "By Category" / "By Expansion" grouping selector, session-scoped grouping persistence, and `aria-pressed` state on all toggle controls.
 
@@ -155,9 +155,9 @@ Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion` (via `col
 
 ## Epic 49 — Clear Selection Regression Fix & E2E Guard
 
-Browser QC: `test/playwright/epic49-clear-selection.spec.ts`
+Browser QC: `test/playwright/expansion-clear-selection.spec.ts`
 
-Covers: 4 Playwright tests guarding the "Clear selection" button behaviour in the Active Expansions panel on the New Game tab. Verifies that clicking "Clear selection" sets `activeSetIds` to `[]` in persisted state (not `null`) and that all expansion checkboxes render as unchecked; also verifies that "Use all expansions" restores the `null` state with all checkboxes checked. The existing `test/playwright/epic46-active-filter.spec.ts` was also updated to align with the corrected `deactivateAllSets` action.
+Covers: 4 Playwright tests guarding the "Clear selection" button behaviour in the Active Expansions panel on the New Game tab. Verifies that clicking "Clear selection" sets `activeSetIds` to `[]` in persisted state (not `null`) and that all expansion checkboxes render as unchecked; also verifies that "Use all expansions" restores the `null` state with all checkboxes checked. The existing `test/playwright/expansion-active-filter.spec.ts` was also updated to align with the corrected `deactivateAllSets` action.
 
 ---
 

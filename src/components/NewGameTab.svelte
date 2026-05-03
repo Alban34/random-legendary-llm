@@ -226,14 +226,6 @@
 
       <div class="muted new-game-mode-help">{locale.getPlayModeHelpText(selectedPlayerCount, selectedPlayMode)}</div>
 
-      <div class="summary-card new-game-status-summary" data-new-game-status-summary>
-        <span class="muted" data-status-field="selected-mode">{locale.t('newGame.selectedMode')}: <strong>{availablePlayModes.some((m) => m.id === selectedPlayMode) ? locale.getPlayModeLabel(selectedPlayMode, selectedPlayerCount) : locale.getPlayModeLabel('standard', selectedPlayerCount)}</strong></span>
-        <span aria-hidden="true" class="muted"> · </span>
-        <span class="muted" data-status-field="owned-sets">{locale.t('newGame.ownedSets')}: <strong>{appState.collection.ownedSetIds.length}</strong></span>
-        <span aria-hidden="true" class="muted"> · </span>
-        <span class="muted" data-status-field="last-persisted">{locale.t('newGame.lastPersistedMode')}: <strong>{locale.formatPersistedPlayMode(appState.preferences.lastPlayerCount, appState.preferences.lastPlayMode)}</strong></span>
-      </div>
-
       <div class="result-card current-requirements-card" id="setup-requirements-card">
         <h3>{locale.t('newGame.setupRequirements')}</h3>
         <div class="muted">{locale.formatEntityCount(displayedRequirements.heroCount, 'common.heroTitle', 'common.heroes')} · {locale.formatEntityCount(displayedRequirements.villainGroupCount, 'common.villainGroupTitle', 'common.villainGroups')} · {locale.formatEntityCount(displayedRequirements.henchmanGroupCount, 'common.henchmanGroupTitle', 'common.henchmanGroups')} · {locale.formatEntityCount(displayedRequirements.wounds, 'common.wound', 'common.wounds')}</div>

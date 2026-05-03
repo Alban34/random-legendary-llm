@@ -72,5 +72,39 @@ test('Adds reduced-motion and focus-restoration guardrails in app-shell.css', ()
 
   assert.match(shellCss, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(shellCss, /\.button:hover,[\s\S]*\.set-card:hover,[\s\S]*\.collection-row:hover\s*\{[\s\S]*transform:\s*none;/);
-  assert.match(shellCss, /\.collection-row:focus-within,[\s\S]*\.history-item:focus-within,[\s\S]*\.history-group:focus-within/);
+  assert.match(shellCss, /\.collection-row:focus-within,[\s\S]*\.history-item:has\(:focus-visible\),[\s\S]*\.history-group:has\(:focus-visible\)/);
+});
+
+// ── Epic 83 — Story 83.1 ──
+
+test('Forced Picks pickers grid class is present in stylesheet', () => {
+  assert.match(shellCss, /\.forced-picks-pickers-grid/);
+});
+
+test('Forced Picks CSS rules contain no hardcoded hex colour values', () => {
+  const forcedPicksBlock = shellCss.match(/\.forced-pick[\s\S]*?(?=\.button\s*\{)/)?.[0] ?? '';
+  assert.doesNotMatch(forcedPicksBlock, /#[0-9a-fA-F]{3,6}/);
+});
+
+test('Layout fix adds [data-forced-picks-panel] rule with min-width: 0 and no hardcoded values', () => {
+  assert.match(shellCss, /\[data-forced-picks-panel\][\s\S]*?\{[\s\S]*?min-width:\s*0/);
+  const panelRule = shellCss.match(/\[data-forced-picks-panel\]\s*\{[^}]*\}/)?.[0] ?? '';
+  assert.doesNotMatch(panelRule, /#[0-9a-fA-F]{3,6}/);
+});
+
+// ── Epic 83 — Story 83.3 ──
+
+test('Forced pick select rule contains token-based visual properties', () => {
+  const selectRule = shellCss.match(/\.forced-pick-picker-row > select\s*\{[^}]*\}/)?.[0] ?? '';
+  assert.ok(selectRule.length > 0, '.forced-pick-picker-row > select rule must exist');
+  assert.match(selectRule, /var\(--[a-zA-Z-]+\)/);
+});
+
+test('Forced pick select rule contains no hardcoded hex colour', () => {
+  const selectRule = shellCss.match(/\.forced-pick-picker-row > select\s*\{[^}]*\}/)?.[0] ?? '';
+  assert.doesNotMatch(selectRule, /#[0-9a-fA-F]{3,6}/);
+});
+
+test('Forced pick select focus-visible rule references var(--border-focus)', () => {
+  assert.match(shellCss, /\.forced-pick-picker-row > select:focus-visible[\s\S]*?var\(--border-focus\)/);
 });

@@ -128,3 +128,46 @@ test('HistoryTab result form uses role="alert" on error element', () => {
   assert.match(historyTabSource, /role="alert"[\s\S]*data-result-form-error/);
 });
 
+// ── Epic 86 — Story 86.1 — .button-row margin-bottom token ──
+
+test('CSS .button-row has token-based margin-bottom', () => {
+  assert.match(
+    cssSource,
+    /\.button-row\s*\{[^}]*margin-bottom\s*:\s*var\(--space-/,
+    '.button-row must have a margin-bottom using a design-system token'
+  );
+});
+
+// ── Epic 86 — Story 86.3 — :has(:focus-visible) for history items ──
+
+test('CSS uses :has(:focus-visible) for .history-item (not :focus-within)', () => {
+  assert.match(
+    cssSource,
+    /\.history-item:has\(:focus-visible\)/,
+    '.history-item must use :has(:focus-visible) for the focus ring'
+  );
+  assert.doesNotMatch(
+    cssSource,
+    /\.history-item:focus-within/,
+    '.history-item must NOT use :focus-within for the focus ring'
+  );
+});
+
+// ── Epic 87 — Story 87.4 — expansion usage percentage integration tests ──
+
+test('HistoryTab.svelte references computeExpansionUsagePercent', () => {
+  assert.match(
+    historyTabSource,
+    /computeExpansionUsagePercent/,
+    'HistoryTab.svelte must reference computeExpansionUsagePercent'
+  );
+});
+
+test('HistoryTab.svelte references locale key history.insights.playCountWithPercent', () => {
+  assert.match(
+    historyTabSource,
+    /history\.insights\.playCountWithPercent/,
+    'HistoryTab.svelte must reference the locale key history.insights.playCountWithPercent'
+  );
+});
+

@@ -56,11 +56,15 @@ test('Test:epic10 script is absent from package.json', () => {
   );
 });
 
-test('Test:qc:epic10 Playwright script is still present', () => {
+test('e2e and e2e:filter Playwright scripts are present', () => {
 
   assert.ok(
-    Object.prototype.hasOwnProperty.call(pkgJson.scripts, 'test:qc:epic10'),
-    'package.json must retain the test:qc:epic10 Playwright script'
+    Object.prototype.hasOwnProperty.call(pkgJson.scripts, 'e2e'),
+    'package.json must contain the e2e Playwright script'
+  );
+  assert.ok(
+    Object.prototype.hasOwnProperty.call(pkgJson.scripts, 'e2e:filter'),
+    'package.json must contain the e2e:filter Playwright script'
   );
 });
 

@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from './game-data-pipeline.ts';
-import { buildInsightsDashboard, buildOutcomeInsights, buildUsageInsights } from './stats-utils.ts';
+import { buildInsightsDashboard, buildOutcomeInsights, buildUsageInsights, computeExpansionUsagePercent } from './stats-utils.ts';
 import { acceptGameSetup, createDefaultState, updateGameResult } from './state-store.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -157,4 +157,22 @@ test('Dashboard reports played percentages for the owned collection, full catalo
   assert.equal(dashboard.collectionCoverage.missingExtensions.total, nonBaseSets.length);
   assert.equal(dashboard.collectionCoverage.missingExtensions.missing, nonBaseSets.length);
   assert.equal(dashboard.collectionCoverage.missingExtensions.missingPercent, 100);
+});
+
+// ── Epic 87 — computeExpansionUsagePercent unit tests ──
+
+test('computeExpansionUsagePercent returns 60 for normal case (12/20)', () => {
+  assert.equal(computeExpansionUsagePercent(12, 20), 60);
+});
+
+test('computeExpansionUsagePercent returns 0 for zero total (not NaN)', () => {
+  assert.equal(computeExpansionUsagePercent(0, 0), 0);
+});
+
+test('computeExpansionUsagePercent returns 100 for full usage (5/5)', () => {
+  assert.equal(computeExpansionUsagePercent(5, 5), 100);
+});
+
+test('computeExpansionUsagePercent rounds fractional results (1/3 → 33)', () => {
+  assert.equal(computeExpansionUsagePercent(1, 3), 33);
 });

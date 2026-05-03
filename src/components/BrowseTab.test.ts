@@ -120,3 +120,13 @@ test('BrowseTab footer contains toggle-about-panel button-link', () => {
   assert.match(footerMatch[0], /data-action="toggle-about-panel"/, 'browse-footer must contain toggle-about-panel action');
   assert.match(footerMatch[0], /button-link/, 'browse-footer button must use button-link class');
 });
+
+// ── Epic 86 — Story 86.4 — .browse-entity-item has no per-item border ──
+
+test('CSS .browse-entity-item does not have a 1px border separator', () => {
+  assert.doesNotMatch(
+    cssSource,
+    /\.browse-entity-item\s*\{[^}]*border\s*:\s*1px/,
+    '.browse-entity-item must not have a border: 1px declaration'
+  );
+});

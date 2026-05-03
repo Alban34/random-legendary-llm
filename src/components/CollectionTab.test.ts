@@ -65,3 +65,58 @@ test('en.ts contains collection.resetSelections.consequence key', () => {
     "en.ts must contain the 'collection.resetSelections.consequence' key"
   );
 });
+
+test('CollectionTab storage-error notice is absent when storageAvailable is true', () => {
+
+  assert.match(
+    collectionTabSource,
+    /\{#if !persistence\.storageAvailable\}/,
+    'CollectionTab must contain a {#if !persistence.storageAvailable} guard for the storage error notice'
+  );
+  const guardMatch = collectionTabSource.match(/\{#if !persistence\.storageAvailable\}([\s\S]*?)\{\/if\}/);
+  assert.ok(guardMatch, '{#if !persistence.storageAvailable} block must be present');
+  const beforeGuard = collectionTabSource.slice(0, collectionTabSource.indexOf('{#if !persistence.storageAvailable}'));
+  assert.doesNotMatch(
+    beforeGuard,
+    /data-storage-error-notice/,
+    'data-storage-error-notice must not appear before the conditional guard'
+  );
+  const afterGuard = collectionTabSource.slice(
+    collectionTabSource.indexOf('{#if !persistence.storageAvailable}') + guardMatch[0].length
+  );
+  assert.doesNotMatch(
+    afterGuard,
+    /data-storage-error-notice/,
+    'data-storage-error-notice must not appear after the conditional guard'
+  );
+});
+
+test('CollectionTab storage-error notice is present when storageAvailable is false', () => {
+
+  const guardMatch = collectionTabSource.match(/\{#if !persistence\.storageAvailable\}([\s\S]*?)\{\/if\}/);
+  assert.ok(guardMatch, '{#if !persistence.storageAvailable} block must be present');
+  assert.match(
+    guardMatch[1],
+    /data-storage-error-notice/,
+    'The {#if !persistence.storageAvailable} block must contain data-storage-error-notice'
+  );
+  assert.match(
+    guardMatch[1],
+    /collection\.storage\.error/,
+    'The {#if !persistence.storageAvailable} block must reference the collection.storage.error locale key'
+  );
+});
+
+test('CollectionTab does not render lastActionNotice element', () => {
+
+  assert.doesNotMatch(
+    collectionTabSource,
+    /lastActionNotice/,
+    'CollectionTab.svelte must not contain any reference to lastActionNotice'
+  );
+  assert.doesNotMatch(
+    collectionTabSource,
+    /collection\.latestAction/,
+    'CollectionTab.svelte must not contain any reference to collection.latestAction'
+  );
+});

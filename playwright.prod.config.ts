@@ -15,7 +15,7 @@ const PORT = process.env.PLAYWRIGHT_PORT || '4173';
  */
 export default defineConfig({
   ...sharedConfig,
-  testMatch: ['**/epic40-production.spec.ts'],
+  testMatch: ['**/pwa-installability-production.spec.ts'],
   use: {
     ...sharedConfig.use,
     baseURL: `http://127.0.0.1:${PORT}/random-legendary-llm/`,

@@ -59,6 +59,10 @@ function percentage(numerator: number, denominator: number): number | null {
   return roundMetric((numerator / denominator) * 100);
 }
 
+export function computeExpansionUsagePercent(count: number, total: number): number {
+  return total === 0 ? 0 : Math.round((count / total) * 100);
+}
+
 function resolveEntityDisplayLabel(entity: { name: string; setId: string }, indexes: AppRuntime['indexes']): string {
   const setName = indexes.setsById[entity.setId]?.name || entity.setId;
   return `${entity.name} · ${setName}`;

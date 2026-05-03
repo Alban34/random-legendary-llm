@@ -5,7 +5,7 @@ const PORT = process.env.PLAYWRIGHT_PORT || '8131';
 
 export default defineConfig({
   ...sharedConfig,
-  testIgnore: ['**/epic40-production.spec.ts'],
+  testIgnore: ['**/pwa-installability-production.spec.ts'],
   use: {
     ...sharedConfig.use,
     baseURL: `http://127.0.0.1:${PORT}`,

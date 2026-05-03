@@ -47,6 +47,7 @@ interface FeasibilityResult {
   template: unknown;
 }
 
+// Grouping key: pool property name (heroes | masterminds | villainGroups | henchmanGroups | schemes)
 export const CARD_CATEGORIES: ReadonlyArray<{ id: string; labelKey: string }> = [
   { id: 'heroes', labelKey: 'common.heroes' },
   { id: 'masterminds', labelKey: 'common.masterminds' },

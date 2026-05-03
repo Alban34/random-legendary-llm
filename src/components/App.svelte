@@ -755,7 +755,6 @@
                 appState={appState!}
                 locale={locale!}
                 {persistence}
-                lastActionNotice={ui.lastActionNotice}
                 {collectionActions}
                 myludoImportStatus={importVm.myludoStatus}
                 myludoImportError={importVm.myludoError}

@@ -8,7 +8,7 @@
   import type { HistoryGroup } from '../app/history-utils.ts';
   import type { HistoryRecord } from '../app/types.ts';
   import type { MessageKey } from '../app/locales/en.ts';
-  import { buildInsightsDashboard, RECENT_SCORE_WINDOW } from '../app/stats-utils.ts';
+  import { buildInsightsDashboard, computeExpansionUsagePercent, RECENT_SCORE_WINDOW } from '../app/stats-utils.ts';
   import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from '../app/result-utils.ts';
   import { historyVm } from '../app/history-vm.svelte.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
@@ -499,7 +499,7 @@
                               <strong>{entry.label}</strong>
                               <span class="muted insight-ranking-meta">{entry.lastPlayedAt ? locale.t('history.insights.lastUsed', { date: locale.formatDate(entry.lastPlayedAt) }) : locale.t('history.insights.noPlayDate')}</span>
                             </span>
-                            <span class="pill">{locale.formatPlayCount(entry.plays)}</span>
+                            <span class="pill">{outcome.totalGames > 0 ? locale.t('history.insights.playCountWithPercent', { count: locale.formatPlayCount(entry.plays), percent: computeExpansionUsagePercent(entry.plays, outcome.totalGames) }) : locale.formatPlayCount(entry.plays)}</span>
                           </li>
                         {/each}
                       </ul>
@@ -517,7 +517,7 @@
                               <strong>{entry.label}</strong>
                               <span class="muted insight-ranking-meta">{entry.lastPlayedAt ? locale.t('history.insights.lastUsed', { date: locale.formatDate(entry.lastPlayedAt) }) : locale.t('history.insights.noPlayDate')}</span>
                             </span>
-                            <span class="pill">{locale.formatPlayCount(entry.plays)}</span>
+                            <span class="pill">{outcome.totalGames > 0 ? locale.t('history.insights.playCountWithPercent', { count: locale.formatPlayCount(entry.plays), percent: computeExpansionUsagePercent(entry.plays, outcome.totalGames) }) : locale.formatPlayCount(entry.plays)}</span>
                           </li>
                         {/each}
                       </ul>

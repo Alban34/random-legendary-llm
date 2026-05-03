@@ -961,6 +961,7 @@ details summary {
 }
 
 .result-card {
+  min-width: 0;
   background: var(--panel-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -982,6 +983,7 @@ details summary {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .button-row > * {
@@ -1021,18 +1023,51 @@ details summary {
   color: var(--text-default);
 }
 
-.forced-pick-picker-row > select {
-  flex: 1 1 auto;
-  min-width: 10rem;
+.forced-pick-picker-row {
+  width: 100%;
+  flex-direction: column;
+}
+
+.forced-pick-picker-row > select,
+[data-preferred-expansion-select],
+[data-forced-team-select] {
+  flex: none;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--type-body-md-size);
+  padding: var(--space-2) var(--space-3);
+}
+.forced-pick-picker-row > select:focus-visible,
+[data-preferred-expansion-select]:focus-visible,
+[data-forced-team-select]:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.forced-pick-picker-row > select:disabled,
+[data-preferred-expansion-select]:disabled,
+[data-forced-team-select]:disabled {
+  color: var(--text-muted);
+  border-color: var(--border);
+  cursor: not-allowed;
 }
 .forced-pick-picker-row > button {
-  flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .forced-picks-section-divider {
   border: none;
   border-top: 1px solid var(--border);
   margin: var(--space-3) 0;
+}
+
+[data-forced-picks-panel] {
+  min-width: 0;
 }
 
 .forced-picks-pickers-grid {
@@ -1042,7 +1077,7 @@ details summary {
 
 @media (min-width: 480px) {
   .forced-picks-pickers-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1118,9 +1153,9 @@ summary:focus-visible,
 }
 
 .collection-row:focus-within,
-.history-item:focus-within,
-.history-group:focus-within,
-.result-card:focus-within,
+.history-item:has(:focus-visible),
+.history-group:has(:focus-visible),
+.result-card:not([data-forced-picks-panel]):focus-within,
 .summary-card:focus-within,
 .modal-dialog:focus-within {
   box-shadow: 0 0 0 2px var(--border-focus), var(--shadow-panel);
@@ -1228,6 +1263,8 @@ pre {
 }
 
 details {
+  outline: none;
+  min-width: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--panel-2);
@@ -1754,9 +1791,7 @@ details[open] .stats-category-summary::after {
 
 .browse-entity-item {
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
   background: var(--surface-soft);
-  border: 1px solid var(--surface-border-soft);
 }
 
 .browse-empty-copy {

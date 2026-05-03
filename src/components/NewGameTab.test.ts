@@ -158,8 +158,44 @@ test('NewGameTab does NOT contain old summary-grid with three separate status ca
   );
 });
 
-test('NewGameTab contains all three data-status-field spans', () => {
-  assert.match(newGameTabSource, /data-status-field="selected-mode"/, 'must have data-status-field="selected-mode"');
+test('NewGameTab contains the two remaining data-status-field spans', () => {
+  assert.doesNotMatch(newGameTabSource, /data-status-field="selected-mode"/, 'must NOT have data-status-field="selected-mode"');
   assert.match(newGameTabSource, /data-status-field="owned-sets"/, 'must have data-status-field="owned-sets"');
   assert.match(newGameTabSource, /data-status-field="last-persisted"/, 'must have data-status-field="last-persisted"');
+});
+
+// ── Epic 86 — Story 86.2 — Selected mode label removed ──
+
+test('NewGameTab does NOT contain data-status-field="selected-mode"', () => {
+  assert.doesNotMatch(
+    newGameTabSource,
+    /data-status-field="selected-mode"/,
+    'selected-mode status field must be absent from the preview pane'
+  );
+});
+
+// ── Epic 83 — Story 83.1 — Forced Picks layout ──
+
+test('NewGameTab still contains data-forced-picks-panel attribute', () => {
+  assert.match(
+    newGameTabSource,
+    /data-forced-picks-panel/,
+    'data-forced-picks-panel attribute must exist in NewGameTab'
+  );
+});
+
+test('Forced Picks <details> wraps a <section class="result-card" data-forced-picks-panel>', () => {
+  assert.match(
+    newGameTabSource,
+    /<section[^>]*class="result-card"[^>]*data-forced-picks-panel/,
+    'The Forced Picks panel must be a <section class="result-card" data-forced-picks-panel>'
+  );
+});
+
+test('<select> elements inside Forced Picks panel carry data-forced-pick-select attributes', () => {
+  assert.match(
+    newGameTabSource,
+    /data-forced-pick-select/,
+    '<select> elements in Forced Picks panel must carry data-forced-pick-select attributes'
+  );
 });

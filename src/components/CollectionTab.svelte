@@ -11,7 +11,6 @@
     appState,
     locale,
     persistence,
-    lastActionNotice,
     collectionActions,
     myludoImportStatus = 'idle',
     myludoImportError = '',
@@ -24,7 +23,6 @@
     appState: AppState;
     locale: LocaleTools;
     persistence: AppPersistenceState;
-    lastActionNotice: string | null;
     collectionActions: {
       toggleOwnedSet: (id: string) => void;
       requestResetOwnedCollection: () => void;
@@ -91,14 +89,11 @@
         <div class="summary-card"><div class="muted">{locale.t('common.henchmanGroups')}</div><div class="metric-sm">{totals.henchmanGroupCount}</div></div>
         <div class="summary-card"><div class="muted">{locale.t('common.schemes')}</div><div class="metric-sm">{totals.schemeCount}</div></div>
       </div>
-      <div class="summary-card">
-        {#if !persistence.storageAvailable}
-          <div><strong>{locale.t('collection.storage')}:</strong> {locale.t('collection.storage.unavailable')}</div>
-        {/if}
-        {#if lastActionNotice}
-          <div class="muted">{locale.t('collection.latestAction')} {lastActionNotice}</div>
-        {/if}
-      </div>
+      {#if !persistence.storageAvailable}
+        <div class="notice warning" data-storage-error-notice>
+          {locale.t('collection.storage.error')}
+        </div>
+      {/if}
       {#if persistenceNotices.length}
         {#each persistenceNotices as notice (notice)}
           <div class="notice warning">{notice}</div>
