@@ -2,7 +2,7 @@
 
 ## Stack
 
-The v2.0.0 baseline uses TypeScript for all runtime source modules (`src/app/*.ts`). The migration from plain JavaScript (`.mjs`) to TypeScript was completed across Epics 61–68; Epic 79 completed the final elimination of all remaining `.mjs` files (compiled outputs, test files, config files, and tool scripts). All test files are TypeScript (`.test.ts` / `.spec.ts`) and run via Vitest (`vitest run`); coverage is produced by `@vitest/coverage-v8` in lcov format. `svelte-check` is integrated as a type-coverage gate in `npm run lint`.
+The v2.0.0 baseline uses TypeScript for all runtime source modules (`src/app/*.ts`). The migration from plain JavaScript (`.mjs`) to TypeScript was completed across Epics 61–68; Epic 79 completed the final elimination of all remaining `.mjs` files (compiled outputs, test files, config files, and tool scripts); Epic 81 eliminated the last `.js` source files — all root toolchain config files (`vite.config.ts`, `vitest.config.ts`, `svelte.config.ts`, `eslint.config.ts`) and the Service Worker source (`src/sw.ts`) are now TypeScript. Epic 82 co-located all unit test files with their source modules under `src/` (e.g. `src/app/history-utils.test.ts`); no test files remain under `test/` except Playwright E2E specs in `test/playwright/`. All test files are TypeScript (`.test.ts` / `.spec.ts`) and run via Vitest (`vitest run`); coverage is produced by `@vitest/coverage-v8` in lcov format. `svelte-check` is integrated as a type-coverage gate in `npm run lint`.
 
 ## Architecture
 - [Overview](architecture/overview.md) — Runtime stack, layers, entry points, shipped tab IDs

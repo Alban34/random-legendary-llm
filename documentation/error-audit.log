@@ -1,3 +1,13 @@
+[2026-05-03] Epic: Epic 81 — Eliminate All .js Source Files
+File: documentation/planning/epic/ready-for-dev/epic-81.md, documentation/planning/epic/ready-for-dev/epic-81-task-list.md
+Finding: Epic 81 has been fully implemented (all implementation tasks marked [x] in the task list) but the epic spec and task-list files remain in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete/move tool available), so the relocation is logged here.
+Suggested action: Move `epic-81.md` and `epic-81-task-list.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior completed epics.
+---
+[2026-05-03] Epic: Epic 82 — Co-locate Unit Tests with Their Source Modules
+File: documentation/planning/epic/ready-for-dev/epic-82.md, documentation/planning/epic/ready-for-dev/epic-82-task-list.md
+Finding: Epic 82 has been fully implemented (all implementation tasks marked [x] in the task list) but the epic spec and task-list files remain in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete/move tool available), so the relocation is logged here.
+Suggested action: Move `epic-82.md` and `epic-82-task-list.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior completed epics.
+---
 [FIXED 2026-04-14] Epic: Epics 29–33 (Svelte 5 Migration)
 File: README.md
 Finding: The root README is stale in four ways after the Svelte 5 migration:
@@ -159,3 +169,13 @@ Resolution: (1) src/app/app-init.ts extracts async initialization (loadSeed, cre
 File: test/playwright/epic17-qc.spec.ts, test/playwright/epic4-qc.spec.ts
 Finding: 3 Playwright tests failing — epic17 (walkthrough on first launch + mobile progression) and epic4 (keyboard focus traversal).
 Resolution: epic4 failure — A skip-link was added to the header in Epic 75 for accessibility. The Tab traversal test now correctly validates the skip-link as the first Tab target (with solid outline). epic17 failure — The "Replay walkthrough" button was inside a closed <details> element; both failing tests now click the <details> summary to open it before clicking [data-action="start-onboarding"]. All 3 previously-failing tests now pass.
+---
+[2026-05-03] Epic: Epic 82 — Co-locate Unit Tests with Their Source Modules
+File: README.md (workspace root, line 85)
+Finding: The "For developers and contributors" section says `Run story-level tests with \`npm run test:epic10\`.` The `test:epic10` script has never existed in `package.json` (confirmed by epic-37 docs). After Epic 82, all `test/epic*.test.ts` files have been deleted and replaced with co-located `src/**/*.test.ts` files; the correct command to run all Vitest unit tests is now `npm test` (mapped to `vitest run` with `include: ['src/**/*.test.ts']`).
+Suggested action: Update the sentence in README.md (root) to replace `npm run test:epic10` with `npm test` (runs all 31 co-located Vitest unit tests). The adjacent `npm run test:qc:epic10` Playwright reference remains valid and does not need changing.
+---
+[2026-05-03] Epic: Epic 82 — Co-locate Unit Tests with Their Source Modules
+File: package.json (scripts section)
+Finding: The `package.json` `scripts` block still contains per-epic Vitest commands (`test:epic1`, `test:epic2`, `test:epic3`, `test:epic4`, `test:epic5`, `test:epic6`, `test:epic7`, `test:epic8`, `test:epic9`, `test:epic12`, `test:epic13`, `test:epic14`, `test:epic18`, `test:epic19`, `test:epic20`) that point to `test/epic*.test.ts` paths. All of these files were deleted by Epic 82 (Stories 82.2 and 82.3). Running any of these scripts will now fail with a Vitest "No test files found" error.
+Suggested action: Remove all `test:epicN` Vitest script entries from `package.json` that reference `test/epic*.test.ts` paths. The `test:qc:epicN` Playwright scripts (which target `test/playwright/*.spec.ts`) are unaffected by Epic 82 and should not be removed.

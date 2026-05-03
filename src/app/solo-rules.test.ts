@@ -1,0 +1,234 @@
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+
+import { getSoloRulesItems, SOLO_RULES_PANEL_MODES } from './solo-rules.ts';
+import { EN_MESSAGES } from './locales/en.ts';
+
+// ── Story 1: Content model ────────────────────────────────────────────────────
+
+test('getSoloRulesItems returns exactly 4 keys for standard mode', () => {
+
+  const items = getSoloRulesItems('standard');
+  assert.equal(Array.isArray(items), true);
+  assert.equal(items.length, 3);
+  assert.ok(items.every((key) => key.startsWith('newGame.soloRules.standard.')));
+});
+
+test('getSoloRulesItems returns exactly 5 keys for advanced-solo mode', () => {
+
+  const items = getSoloRulesItems('advanced-solo');
+  assert.equal(Array.isArray(items), true);
+  assert.equal(items.length, 4);
+  assert.ok(items.every((key) => key.startsWith('newGame.soloRules.advancedSolo.')));
+});
+
+test('getSoloRulesItems returns exactly 6 keys for standard-solo-v2 mode', () => {
+
+  const items = getSoloRulesItems('standard-solo-v2');
+  assert.equal(Array.isArray(items), true);
+  assert.equal(items.length, 5);
+  assert.ok(items.every((key) => key.startsWith('newGame.soloRules.standardV2.')));
+});
+
+test('getSoloRulesItems returns null for two-handed-solo', () => {
+
+  assert.equal(getSoloRulesItems('two-handed-solo'), null);
+});
+
+test('getSoloRulesItems returns null for unknown modes', () => {
+
+  assert.equal(getSoloRulesItems('standard-2p'), null);
+  assert.equal(getSoloRulesItems(''), null);
+  assert.equal(getSoloRulesItems(undefined), null);
+});
+
+test('SOLO_RULES_PANEL_MODES does not include two-handed-solo', () => {
+
+  assert.equal(SOLO_RULES_PANEL_MODES.has('two-handed-solo'), false);
+});
+
+test('SOLO_RULES_PANEL_MODES includes standard', () => {
+
+  assert.equal(SOLO_RULES_PANEL_MODES.has('standard'), true);
+});
+
+test('SOLO_RULES_PANEL_MODES includes standard-solo-v2', () => {
+
+  assert.equal(SOLO_RULES_PANEL_MODES.has('standard-solo-v2'), true);
+});
+
+test('getSoloRulesItems key order matches specification for standard', () => {
+
+  const items = getSoloRulesItems('standard');
+  assert.equal(items[0], 'newGame.soloRules.standard.villainDeck');
+  assert.equal(items[1], 'newGame.soloRules.standard.schemeTwist');
+  assert.equal(items[2], 'newGame.soloRules.standard.eachOtherPlayer');
+});
+
+test('getSoloRulesItems key order matches specification for advanced-solo', () => {
+
+  const items = getSoloRulesItems('advanced-solo');
+  assert.equal(items[0], 'newGame.soloRules.advancedSolo.villainDeck');
+  assert.equal(items[1], 'newGame.soloRules.advancedSolo.masterStrike');
+  assert.equal(items[2], 'newGame.soloRules.advancedSolo.schemeTwist');
+  assert.equal(items[3], 'newGame.soloRules.advancedSolo.eachOtherPlayer');
+});
+
+test('getSoloRulesItems key order matches specification for standard-solo-v2', () => {
+
+  const items = getSoloRulesItems('standard-solo-v2');
+  assert.equal(items[0], 'newGame.soloRules.standardV2.villainDeck');
+  assert.equal(items[1], 'newGame.soloRules.standardV2.firstTurnHenchmen');
+  assert.equal(items[2], 'newGame.soloRules.standardV2.schemeTwist');
+  assert.equal(items[3], 'newGame.soloRules.standardV2.eachOtherPlayer');
+  assert.equal(items[4], 'newGame.soloRules.standardV2.mastermindAbility');
+});
+
+// ── Story 2: Reactive panel logic (simulated $derived computation) ────────────
+
+function computeSoloRulesItems(currentSetup, selectedPlayerCount, selectedPlayMode) {
+  return currentSetup && selectedPlayerCount === 1 && SOLO_RULES_PANEL_MODES.has(selectedPlayMode)
+    ? getSoloRulesItems(selectedPlayMode)
+    : null;
+}
+
+test('soloRulesItems is null when currentSetup is null (panel absent before generate)', () => {
+
+  const result = computeSoloRulesItems(null, 1, 'standard');
+  assert.equal(result, null);
+});
+
+test('soloRulesItems is non-null after generating with 1P Standard Solo', () => {
+
+  const fakeSetup = { template: { playMode: 'standard' } };
+  const result = computeSoloRulesItems(fakeSetup, 1, 'standard');
+  assert.notEqual(result, null);
+  assert.equal(result.length, 3);
+});
+
+test('soloRulesItems is non-null after generating with 1P Advanced Solo', () => {
+
+  const fakeSetup = { template: { playMode: 'advanced-solo' } };
+  const result = computeSoloRulesItems(fakeSetup, 1, 'advanced-solo');
+  assert.notEqual(result, null);
+  assert.equal(result.length, 4);
+});
+
+test('soloRulesItems is non-null after generating with 1P Standard v2', () => {
+
+  const fakeSetup = { template: { playMode: 'standard-solo-v2' } };
+  const result = computeSoloRulesItems(fakeSetup, 1, 'standard-solo-v2');
+  assert.notEqual(result, null);
+  assert.equal(result.length, 5);
+});
+
+test('soloRulesItems is null for two-handed-solo (panel absent)', () => {
+
+  const fakeSetup = { template: { playMode: 'two-handed-solo' } };
+  const result = computeSoloRulesItems(fakeSetup, 1, 'two-handed-solo');
+  assert.equal(result, null);
+});
+
+test('soloRulesItems is null for 2P standard (panel absent for multiplayer mode)', () => {
+
+  const fakeSetup = { template: { playMode: 'standard' } };
+  const result = computeSoloRulesItems(fakeSetup, 2, 'standard');
+  assert.equal(result, null);
+});
+
+// ── Story 2: Locale content verification ─────────────────────────────────────
+
+test('Standard Solo keys do not overlap with Advanced Solo or Standard v2 keys', () => {
+
+  const standardKeys = new Set(getSoloRulesItems('standard'));
+  const advancedKeys = getSoloRulesItems('advanced-solo');
+  const v2Keys = getSoloRulesItems('standard-solo-v2');
+
+  for (const key of advancedKeys) {
+    assert.equal(standardKeys.has(key), false, `Advanced Solo key "${key}" must not appear in Standard keys`);
+  }
+  for (const key of v2Keys) {
+    assert.equal(standardKeys.has(key), false, `Standard v2 key "${key}" must not appear in Standard keys`);
+  }
+});
+
+test('Advanced Solo locale includes Master Strike cascade rule text', () => {
+
+  const masterStrikeText = EN_MESSAGES['newGame.soloRules.advancedSolo.masterStrike'];
+  assert.ok(typeof masterStrikeText === 'string' && masterStrikeText.length > 0);
+  assert.match(masterStrikeText, /Master Strike/i);
+  assert.match(masterStrikeText, /play another card/i);
+});
+
+// ── Story 3b: EN_MESSAGES locale key presence ────────────────────────────────
+
+test('EN_MESSAGES contains all 14 solo rules locale keys', () => {
+
+  const expectedKeys = [
+    'newGame.soloRules.sectionTitle',
+    'newGame.soloRules.standard.villainDeck',
+    'newGame.soloRules.standard.schemeTwist',
+    'newGame.soloRules.standard.eachOtherPlayer',
+    'newGame.soloRules.advancedSolo.villainDeck',
+    'newGame.soloRules.advancedSolo.masterStrike',
+    'newGame.soloRules.advancedSolo.schemeTwist',
+    'newGame.soloRules.advancedSolo.eachOtherPlayer',
+    'newGame.soloRules.standardV2.villainDeck',
+    'newGame.soloRules.standardV2.firstTurnHenchmen',
+    'newGame.soloRules.standardV2.schemeTwist',
+    'newGame.soloRules.standardV2.eachOtherPlayer',
+    'newGame.soloRules.standardV2.mastermindAbility'
+  ];
+  for (const key of expectedKeys) {
+    assert.ok(
+      Object.prototype.hasOwnProperty.call(EN_MESSAGES, key),
+      `Expected EN_MESSAGES to have key: ${key}`
+    );
+    assert.ok(
+      typeof EN_MESSAGES[key] === 'string' && EN_MESSAGES[key].length > 0,
+      `Expected EN_MESSAGES["${key}"] to be a non-empty string`
+    );
+  }
+});
+
+test('Every getSoloRulesItems key for all three modes resolves in EN_MESSAGES', () => {
+
+  for (const mode of ['standard', 'advanced-solo', 'standard-solo-v2']) {
+    const keys = getSoloRulesItems(mode);
+    for (const key of keys) {
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(EN_MESSAGES, key),
+        `Mode "${mode}": key "${key}" is missing from EN_MESSAGES`
+      );
+    }
+  }
+});
+
+// ── From epic73-solo-always-leads (Story 3: alwaysLeads key removed) ─────────
+
+test('Story 3: getSoloRulesItems("standard") does not include the alwaysLeads key', () => {
+  const items = getSoloRulesItems('standard');
+  assert.ok(Array.isArray(items));
+  assert.ok(
+    !items.includes('newGame.soloRules.standard.alwaysLeads'),
+    'alwaysLeads key must not appear in standard solo rules'
+  );
+});
+
+test('Story 3: getSoloRulesItems("advanced-solo") does not include the alwaysLeads key', () => {
+  const items = getSoloRulesItems('advanced-solo');
+  assert.ok(Array.isArray(items));
+  assert.ok(
+    !items.includes('newGame.soloRules.advancedSolo.alwaysLeads'),
+    'alwaysLeads key must not appear in advanced-solo rules'
+  );
+});
+
+test('Story 3: getSoloRulesItems("standard-solo-v2") does not include the alwaysLeads key', () => {
+  const items = getSoloRulesItems('standard-solo-v2');
+  assert.ok(Array.isArray(items));
+  assert.ok(
+    !items.includes('newGame.soloRules.standardV2.alwaysLeads'),
+    'alwaysLeads key must not appear in standard-solo-v2 rules'
+  );
+});

@@ -144,7 +144,7 @@ causing tests to pass against stale logic.
 **Option A — Vitest with native TypeScript** (recommended):  
 Configure Vitest to resolve `.ts` imports directly via its built-in esbuild/Vite transform.
 Test files import from `.ts` sources; `.mjs` files are deleted entirely.  
-Check `vitest.config.js` — if it already uses Vite as the test runner, this may require
+Check `vitest.config.ts` — if it already uses Vite as the test runner, this may require
 only removing the `.mjs` aliases.
 
 **Option B — Generated `.mjs` as a build artefact**:  

@@ -82,7 +82,7 @@ The full architecture, data model, testing strategy, design system, and developm
 
 State is persisted under the `legendary_state_v1` key in browser localStorage. Epic 10 (documentation and release readiness) is complete.
 
-Run story-level tests with `npm run test:epic10`. Run browser QC with `npm run test:qc:epic10`, or run the full browser QC suite with `npm run test:qc`.
+Run the full unit test suite with `npm test`. Run browser QC with `npm run test:qc`.
 
 ---
 

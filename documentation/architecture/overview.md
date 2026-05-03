@@ -47,7 +47,7 @@ The current release keeps the architecture described below and implements it wit
 - `src/components/CardBrowserByExpansion.svelte` — renders the card-browser "by expansion" view inside `CollectionTab`; accepts `pools` and `locale` props; calls `getCardsByExpansion` and renders one `<section>` per owned expansion sorted A–Z by expansion name, with all cards from that expansion listed A–Z; shows the same empty-collection message when no sets are owned (Epic 44)
 - `src/app/locales/en.ts`, `fr.ts`, `de.ts`, `ja.ts`, `ko.ts`, `es.ts` — per-locale message catalog files; each exports its respective `*_MESSAGES` object; imported by `localization-utils.ts` (Epic 41)
 - `public/manifest.webmanifest` — Web App Manifest declaring app identity, display mode, theme colour, and icon references; served at the GitHub Pages base path (Epic 40)
-- `public/sw.js` — cache-first Service Worker template; `%%SW_CACHE_VERSION%%` and `%%SW_PRECACHE_URLS%%` placeholders are injected by the `swInjectPlugin` Vite plugin during `npm run build` (Epic 40)
+- `src/sw.ts` — cache-first Service Worker TypeScript source (migrated from `public/sw.js` in Epic 81); compiled by `swCompilePlugin` to `dist/sw.js` during `npm run build`; `%%SW_CACHE_VERSION%%` and `%%SW_PRECACHE_URLS%%` placeholders are then injected into the compiled output by the `swInjectPlugin` Vite plugin (Epic 40)
 - `public/icons/icon-192.png`, `icon-512.png`, `icon-512-maskable.png` — app icon assets referenced by the Web App Manifest and iOS Safari Add to Home Screen (Epic 40)
 
 The shipped runtime bundle created by `createEpic1Bundle(seed)` exposes project-owned canonical source data, normalized runtime data, summary counts, and validation test results for the browser shell.

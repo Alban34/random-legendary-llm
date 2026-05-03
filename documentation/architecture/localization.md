@@ -26,7 +26,7 @@ Every locale file must carry exactly the same set of keys as `en.ts`. If they di
 - The missing locale renders raw key strings (e.g. `newGame.forcedPicks.label`) instead of translated text.
 - Extra keys added to a non-English locale but absent from `en.ts` are unreachable by the app.
 
-Cross-locale key parity is enforced by `test/epic75-locale-sync-a11y.test.ts`, which verifies that every locale's `.ts` catalog carries an identical set of keys to `en.ts`; any divergence fails the suite.
+Cross-locale key parity is enforced by `src/app/locales/locales.test.ts`, which verifies that every locale's `.ts` catalog carries an identical set of keys to `en.ts`; any divergence fails the suite.
 
 ## Where to add new keys
 

@@ -1,0 +1,212 @@
+import { test, beforeAll } from 'vitest';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { createEpic1Bundle } from './game-data-pipeline.ts';
+import { generateSetup, validateSetupLegality } from './setup-generator.ts';
+import { createDefaultState } from './state-store.ts';
+import { getAvailablePlayModes } from './new-game-utils.ts';
+import { resolvePlayMode, resolveSetupTemplate } from './setup-rules.ts';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const rootDir = path.resolve(__dirname, '../..');
+const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
+
+let bundle;
+
+function createAllOwnedState() {
+  const state = createDefaultState();
+  state.collection.ownedSetIds = bundle.runtime.sets.map((set) => set.id);
+  return state;
+}
+
+beforeAll(async () => {
+  const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
+  bundle = createEpic1Bundle(seed);
+});
+
+test('resolveSetupTemplate returns correct shape for standard-solo-v2', () => {
+
+  const template = resolveSetupTemplate(1, { playMode: 'standard-solo-v2' });
+
+  assert.equal(template.heroCount, 3);
+  assert.equal(template.villainGroupCount, 1);
+  assert.equal(template.henchmanGroupCount, 1);
+  assert.equal(template.wounds, 25);
+  assert.equal(template.playMode, 'standard-solo-v2');
+});
+
+test('resolvePlayMode throws when standard-solo-v2 is used with more than 1 player', () => {
+
+  assert.throws(
+    () => resolvePlayMode(2, { playMode: 'standard-solo-v2' }),
+    /only available for 1 player/
+  );
+});
+
+test('getAvailablePlayModes includes standard-solo-v2 for 1 player but not for 2 players', () => {
+
+  const soloModes = getAvailablePlayModes(1).map((m) => m.id);
+  assert.ok(soloModes.includes('standard-solo-v2'), 'standard-solo-v2 should be in 1-player modes');
+
+  const multiModes = getAvailablePlayModes(2).map((m) => m.id);
+  assert.ok(!multiModes.includes('standard-solo-v2'), 'standard-solo-v2 should not be in 2-player modes');
+});
+
+test('Standard-solo-v2 does not inherit the Epic 53 scheme eligibility restriction', () => {
+
+  const state = createAllOwnedState();
+  const legality = validateSetupLegality({
+    runtime: bundle.runtime,
+    state,
+    playerCount: 1,
+    playMode: 'standard-solo-v2'
+  });
+
+  // core-set-negative-zone-prison-breakout has no minimumPlayerCount constraint, so its
+  // eligibility purely depends on the incompatiblePlayModes restriction from Epic 53 which
+  // must NOT apply to standard-solo-v2.
+  assert.ok(
+    legality.eligibleSchemes.some((s) => s.id === 'core-set-negative-zone-prison-breakout'),
+    'Expected core-set-negative-zone-prison-breakout to be eligible for standard-solo-v2 (not subject to standard-solo restriction)'
+  );
+
+  // core-set-super-hero-civil-war and marvel-studios-phase-1-super-hero-civil-war have a
+  // pre-existing minimumPlayerCount: 2 constraint that makes them ineligible for any
+  // 1-player mode independently of the Epic 53 restriction.
+  const civilWarIds = [
+    'core-set-super-hero-civil-war',
+    'marvel-studios-phase-1-super-hero-civil-war'
+  ];
+  for (const id of civilWarIds) {
+    assert.ok(
+      !legality.eligibleSchemes.some((s) => s.id === id),
+      `Expected ${id} to be ineligible for standard-solo-v2 due to minimumPlayerCount: 2`
+    );
+  }
+});
+
+test('generateSetup with standard-solo-v2 returns setup matching the v2 template', () => {
+
+  const state = createAllOwnedState();
+  const setup = generateSetup({
+    runtime: bundle.runtime,
+    state,
+    playerCount: 1,
+    playMode: 'standard-solo-v2',
+    random: () => 0
+  });
+
+  assert.equal(setup.template.heroCount, 3);
+  assert.equal(setup.template.villainGroupCount, 1);
+  assert.equal(setup.template.playMode, 'standard-solo-v2');
+});
+
+// From epic3 — resolveSetupTemplate base tests
+
+test('Resolves setup templates for all supported player modes including Advanced Solo', () => {
+
+  assert.deepEqual(resolveSetupTemplate(1, false), {
+    key: '1',
+    playerCount: 1,
+    effectivePlayerCount: 1,
+    advancedSolo: false,
+    playMode: 'standard',
+    modeLabel: 'Standard Solo v1',
+    modeDescription: 'Use the standard setup counts for the selected player count.',
+    heroCount: 3,
+    villainGroupCount: 1,
+    henchmanGroupCount: 1,
+    wounds: 25
+  });
+  assert.equal(resolveSetupTemplate(1, true).heroCount, 3);
+  assert.equal(resolveSetupTemplate(5, false).villainGroupCount, 5);
+  assert.throws(() => resolveSetupTemplate(2, true), /Advanced Solo is only available/);
+});
+
+test('Hero counts match official Legendary rules for each player count', () => {
+
+  assert.equal(resolveSetupTemplate(1, false).heroCount, 3, '1-player standard: 3 heroes');
+  assert.equal(resolveSetupTemplate(1, true).heroCount, 3, '1-player advanced solo: 3 heroes (same as standard solo, larger Master Strike deck)');
+  assert.equal(resolveSetupTemplate(2, false).heroCount, 5, '2-player: 5 heroes');
+  assert.equal(resolveSetupTemplate(3, false).heroCount, 5, '3-player: 5 heroes');
+  assert.equal(resolveSetupTemplate(4, false).heroCount, 5, '4-player: 5 heroes (not 6)');
+  assert.equal(resolveSetupTemplate(5, false).heroCount, 6, '5-player: 6 heroes');
+});
+
+// From epic11 — two-handed-solo resolveSetupTemplate
+
+test('Resolves two-handed solo as a solo mode that uses the 2-player setup counts', () => {
+
+  const template = resolveSetupTemplate(1, { playMode: 'two-handed-solo' });
+
+  assert.deepEqual(template, {
+    key: '1-two-handed',
+    playerCount: 1,
+    effectivePlayerCount: 2,
+    advancedSolo: false,
+    playMode: 'two-handed-solo',
+    modeLabel: 'Two-Handed Solo',
+    modeDescription: 'Track the game as solo, but use the standard 2-player setup counts.',
+    heroCount: 5,
+    villainGroupCount: 2,
+    henchmanGroupCount: 1,
+    wounds: 30
+  });
+});
+
+// ── From epic3-setup-generator (resolveSetupTemplate tests) ──────────────────
+
+test('Resolves setup templates for all supported player modes including Advanced Solo', () => {
+
+  assert.deepEqual(resolveSetupTemplate(1, false), {
+    key: '1',
+    playerCount: 1,
+    effectivePlayerCount: 1,
+    advancedSolo: false,
+    playMode: 'standard',
+    modeLabel: 'Standard Solo v1',
+    modeDescription: 'Use the standard setup counts for the selected player count.',
+    heroCount: 3,
+    villainGroupCount: 1,
+    henchmanGroupCount: 1,
+    wounds: 25
+  });
+  assert.equal(resolveSetupTemplate(1, true).heroCount, 3);
+  assert.equal(resolveSetupTemplate(5, false).villainGroupCount, 5);
+  assert.throws(() => resolveSetupTemplate(2, true), /Advanced Solo is only available/);
+});
+
+test('Hero counts match official Legendary rules for each player count', () => {
+
+  assert.equal(resolveSetupTemplate(1, false).heroCount, 3, '1-player standard: 3 heroes');
+  assert.equal(resolveSetupTemplate(1, true).heroCount, 3, '1-player advanced solo: 3 heroes (same as standard solo, larger Master Strike deck)');
+  assert.equal(resolveSetupTemplate(2, false).heroCount, 5, '2-player: 5 heroes');
+  assert.equal(resolveSetupTemplate(3, false).heroCount, 5, '3-player: 5 heroes');
+  assert.equal(resolveSetupTemplate(4, false).heroCount, 5, '4-player: 5 heroes (not 6)');
+  assert.equal(resolveSetupTemplate(5, false).heroCount, 6, '5-player: 6 heroes');
+});
+
+// ── From epic11-play-modes (resolveSetupTemplate test) ───────────────────────
+
+test('Resolves two-handed solo as a solo mode that uses the 2-player setup counts', () => {
+
+  const template = resolveSetupTemplate(1, { playMode: 'two-handed-solo' });
+
+  assert.deepEqual(template, {
+    key: '1-two-handed',
+    playerCount: 1,
+    effectivePlayerCount: 2,
+    advancedSolo: false,
+    playMode: 'two-handed-solo',
+    modeLabel: 'Two-Handed Solo',
+    modeDescription: 'Track the game as solo, but use the standard 2-player setup counts.',
+    heroCount: 5,
+    villainGroupCount: 2,
+    henchmanGroupCount: 1,
+    wounds: 30
+  });
+});

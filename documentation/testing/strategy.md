@@ -103,7 +103,7 @@ When the epic containing that story changes files under `/src`, the epic is not 
 
 ## Design System Epic DS1 — Design Token Foundation and Theme Contract
 
-Automated verification: `test/design-system-epic1-foundation.test.ts`
+Automated verification: `src/app/app-shell.test.ts`, `src/app/theme-utils.test.ts`
 
 Browser QC: `test/playwright/epic18-qc.spec.ts`
 
@@ -111,7 +111,7 @@ Browser QC: `test/playwright/epic18-qc.spec.ts`
 
 ## Design System Epic DS2 — Typography, Layout, and Shell Rhythm
 
-Automated verification: `test/design-system-rollout.test.ts`
+Automated verification: `src/app/app-shell.test.ts`, `src/components/HistoryTab.test.ts`, `src/app/focus-utils.test.ts`, `src/app/preferences-actions.test.ts`
 
 Browser QC: `test/playwright/epic18-qc.spec.ts`
 
@@ -124,20 +124,20 @@ Browser QC: `test/playwright/epic10-qc.spec.ts`
 Current automated browser QC command for Epic 1–10:
 
 ```
-npm run check:qc:epic10
+npm run test:qc:epic10
 ```
 
 ---
 
 ## Epic 43 — Expansion Attribution in History
 
-Automated verification: `test/epic43-expansion-attribution.test.ts`
+Automated verification: `src/app/history-utils.test.ts`
 
 ---
 
 ## Epic 45 — MyLudo Collection Import
 
-Automated verification: `test/epic45-myludo-import.test.ts`
+Automated verification: `src/app/myludo-import-utils.test.ts`
 
 Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, `mergeOwnedSets` (via `collection-utils.ts`), CollectionTab import panel rendering, post-import summary, and dismiss flow. All 23 tests pass.
 
@@ -145,7 +145,7 @@ Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, `mergeOwnedSets` (via `coll
 
 ## Epic 44 — Card Browser by Category or Expansion in Collection
 
-Automated verification: `test/epic44-card-browser.test.ts`
+Automated verification: `src/app/collection-utils.test.ts`
 
 Browser QC: `test/playwright/epic44-card-browser.spec.ts`
 
@@ -163,6 +163,6 @@ Covers: 4 Playwright tests guarding the "Clear selection" button behaviour in th
 
 ## Epic 75 — Locale File Sync and Accessibility Defect Fixes
 
-Automated verification: `test/epic75-locale-sync-a11y.test.ts`
+Automated verification: `src/app/locales/locales.test.ts`
 
 Covers: cross-locale key-parity check — verifies that every locale's `.ts` catalog file exposes an identical set of keys to the canonical `en.ts`; fails if any key is present in `en.ts` but missing from another locale file, or vice versa, for any of the five non-English locales (`fr`, `de`, `ja`, `ko`, `es`).
