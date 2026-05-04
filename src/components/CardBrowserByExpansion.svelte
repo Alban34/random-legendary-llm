@@ -13,14 +13,14 @@
 {:else}
   <div class="stack gap-md">
     {#each expansions as expansion (expansion.setId)}
-      <section data-expansion={expansion.setId}>
-        <h3>{expansion.setName} <span class="muted" style="font-weight: normal; font-size: 0.85em;">({expansion.cards.length})</span></h3>
+      <details class="history-group" data-expansion={expansion.setId} open>
+        <summary><span class="history-group-title">{expansion.setName}</span><span class="pill">({expansion.cards.length})</span></summary>
         <ul class="card-browser-columns">
           {#each expansion.cards as card (card.id)}
             <li>{card.name}</li>
           {/each}
         </ul>
-      </section>
+      </details>
     {/each}
   </div>
 {/if}

@@ -994,6 +994,7 @@ details summary {
   flex-wrap: nowrap;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  padding-top: 4px; /* clearance for hover/focus outline */
   padding-bottom: 2px; /* clearance for scrollbar on Windows */
 }
 

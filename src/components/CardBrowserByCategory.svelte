@@ -12,8 +12,8 @@
   <p class="muted">{locale.t('collection.browser.noOwnedSets')}</p>
 {:else}
   <div class="stack gap-md">
-    {#each categories.filter((c) => c.cards.length > 0) as category, categoryIndex (category.categoryId)}
-      <details class="history-group" data-category={category.categoryId} open={categoryIndex === 0}>
+    {#each categories.filter((c) => c.cards.length > 0) as category, _categoryIndex (category.categoryId)}
+      <details class="history-group" data-category={category.categoryId} open>
         <summary><span class="history-group-title">{locale.t(category.labelKey)}</span><span class="pill">({category.cards.length})</span></summary>
         <ul class="card-browser-columns">
           {#each category.cards as card (card.id)}

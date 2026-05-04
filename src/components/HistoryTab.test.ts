@@ -116,6 +116,7 @@ test('CSS contains .button-row-scroll with flex-wrap: nowrap', () => {
   assert.match(cssSource, /\.button-row-scroll\s*\{/, 'CSS must have .button-row-scroll rule');
   assert.match(cssSource, /\.button-row-scroll[^}]*flex-wrap:\s*nowrap/, '.button-row-scroll must set flex-wrap: nowrap');
   assert.match(cssSource, /\.button-row-scroll[^}]*overflow-x:\s*auto/, '.button-row-scroll must set overflow-x: auto');
+  assert.match(cssSource, /\.button-row-scroll[^}]*padding-top\s*:/, '.button-row-scroll must set padding-top for hover/focus clearance');
 });
 
 test('CSS contains .button-row-scroll > * with flex-shrink: 0', () => {

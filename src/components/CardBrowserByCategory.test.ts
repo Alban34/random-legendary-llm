@@ -39,9 +39,27 @@ test('CardBrowserByCategory category heading references a locale key from CARD_C
 });
 
 test('CardBrowserByCategory first group renders with the open attribute', () => {
+  assert.doesNotMatch(
+    source,
+    /open=\{categoryIndex/,
+    'Template must not use the conditional open={categoryIndex === 0} binding'
+  );
   assert.match(
     source,
-    /open=\{categoryIndex === 0\}/,
-    'First <details> element must carry the open attribute via open={categoryIndex === 0}'
+    /open>/,
+    '<details> element must carry a bare unconditional open attribute'
+  );
+});
+
+test('CardBrowserByCategory all groups render with the open attribute', () => {
+  assert.doesNotMatch(
+    source,
+    /open=\{categoryIndex/,
+    'Template must not contain open={categoryIndex === 0} — all groups should be open unconditionally'
+  );
+  assert.match(
+    source,
+    /open>/,
+    'Template must contain a bare unconditional open attribute on the <details> element'
   );
 });

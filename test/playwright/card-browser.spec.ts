@@ -109,6 +109,21 @@ test.describe('Card browser', () => {
     await expect(heroesSection).toContainText('Black Widow');
   });
 
+  // Story 44.3 — By Category grouping (continued)
+
+  test('By Category: all category groups are open on initial render', async ({ page }) => {
+    await ownSets(page, ['core-set', 'fantastic-four']);
+    await page.locator('[data-action="set-collection-view"][data-view="cards"]').click();
+
+    const browser = page.locator('#panel-collection [data-view="card-browser"]');
+    const groups = browser.locator('details[data-category]');
+    const count = await groups.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i++) {
+      await expect(groups.nth(i)).toHaveAttribute('open', '');
+    }
+  });
+
   // Story 44.4 — By Expansion grouping
 
   test('By Expansion: owned Core Set shows one expansion heading', async ({ page }) => {
@@ -117,7 +132,7 @@ test.describe('Card browser', () => {
     await page.locator('[data-action="set-card-grouping"][data-grouping="expansion"]').click();
 
     const browser = page.locator('#panel-collection [data-view="card-browser"]');
-    await expect(browser.locator('[data-expansion="core-set"] h3')).toContainText('Core Set');
+    await expect(browser.locator('[data-expansion="core-set"] summary')).toContainText('Core Set');
   });
 
   test('By Expansion: two owned expansions show two sections sorted A-Z', async ({ page }) => {
@@ -126,12 +141,35 @@ test.describe('Card browser', () => {
     await page.locator('[data-action="set-card-grouping"][data-grouping="expansion"]').click();
 
     const browser = page.locator('#panel-collection [data-view="card-browser"]');
-    const headings = await browser.locator('section[data-expansion] h3').allTextContents();
+    const headings = await browser.locator('details[data-expansion] summary').allTextContents();
 
     expect(headings.length).toBe(2);
     // Core Set alphabetically before Fantastic Four
     expect(headings[0]).toContain('Core Set');
     expect(headings[1]).toContain('Fantastic Four');
+  });
+
+  test('By Expansion: each expansion group uses details.history-group with a summary', async ({ page }) => {
+    await ownSets(page, ['core-set']);
+    await page.locator('[data-action="set-collection-view"][data-view="cards"]').click();
+    await page.locator('[data-action="set-card-grouping"][data-grouping="expansion"]').click();
+
+    const browser = page.locator('#panel-collection [data-view="card-browser"]');
+    await expect(browser.locator('details.history-group[data-expansion]')).toHaveCount(1);
+    await expect(browser.locator('details[data-expansion="core-set"] summary')).toBeVisible();
+    await expect(browser.locator('details[data-expansion="core-set"] summary')).toContainText('Core Set');
+    await expect(browser.locator('details[data-expansion="core-set"] .pill')).toBeVisible();
+  });
+
+  test('By Expansion: all expansion groups are open on initial render', async ({ page }) => {
+    await ownSets(page, ['core-set', 'fantastic-four']);
+    await page.locator('[data-action="set-collection-view"][data-view="cards"]').click();
+    await page.locator('[data-action="set-card-grouping"][data-grouping="expansion"]').click();
+
+    const browser = page.locator('#panel-collection [data-view="card-browser"]');
+    await expect(browser.locator('details[data-expansion]')).toHaveCount(2);
+    await expect(browser.locator('details[data-expansion="core-set"]')).toHaveAttribute('open', '');
+    await expect(browser.locator('details[data-expansion="fantastic-four"]')).toHaveAttribute('open', '');
   });
 
   test('By Expansion: a known core-set card appears in the Core Set section', async ({ page }) => {

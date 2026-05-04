@@ -16,4 +16,7 @@
 - [x] In history, we lack the percentage of use per expansions: it would be very nice to have this too
 - [x] e2e tests should be named by their feature, not their epic
 - [x] package.json file should not contain that a dedicated script for each e2e test: it should test everything at once and give the possibility to start one specific test if needed
+- [x] Browsing card "by category" should have all categories expended by default
+- [x] Browsing card "by expansion" should have the same visual as the "by category", replacing a category name by an expansion name (e.g.: "Heroes" is displayed the same way as "Ant-Man" expansion)
+- [x] In game history, the filter buttons (mastermind, scheme...) are cut off on top when hovering them (this is not the case for the "All", "Won"... filter).
 

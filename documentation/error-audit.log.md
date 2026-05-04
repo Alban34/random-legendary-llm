@@ -1,3 +1,18 @@
+[F-008] [2026-05-04] Epic: Epic 89 — Browse Card Grouping Consistency and Default Expanded State
+File: documentation/planning/epic/ready-for-dev/epic-89.md, documentation/planning/epic/ready-for-dev/epic-89-task-list.md
+Finding: Epic 89 has been fully implemented but `epic-89.md` and `epic-89-task-list.md` remain in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`.
+Suggested action: Move `epic-89.md` and `epic-89-task-list.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to match the lifecycle convention used by all prior completed epics.
+---
+[F-009] [2026-05-04] Epic: Epic 90 — Fix History Grouping Filter Button Hover Clipping
+File: documentation/planning/epic/ready-for-dev/epic-90.md, documentation/planning/epic/ready-for-dev/epic-90-task-list.md
+Finding: Epic 90 has been fully implemented but `epic-90.md` and `epic-90-task-list.md` remain in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`.
+Suggested action: Move `epic-90.md` and `epic-90-task-list.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to match the lifecycle convention used by all prior completed epics.
+---
+[F-010] [2026-05-04] Epic: Epic 89, Epic 90
+File: documentation/release-notes/ (no file exists for the version containing these epics)
+Finding: No release notes file exists for the version that ships Epics 89 and 90. The latest file is `v2.1.0-release-notes.md`, which covers Epics 75, 76, 78, and 80. The browse card grouping improvements (Epic 89) and the hover-clipping CSS fix (Epic 90) have not been documented in any release notes.
+Suggested action: Create a release notes file for the next version (e.g. `v2.1.1-release-notes.md` or `v2.2.0-release-notes.md`) and add entries for: (1) all Browse Cards groups now expand by default in both "By Category" and "By Expansion" views; (2) By Expansion view now uses collapsible `<details class="history-group">` groups matching the Category view; (3) hover/focus outline clipping on History grouping buttons is fixed by `padding-top: 4px` on `.button-row-scroll`.
+---
 [F-001] [FIXED 2026-05-03] Epic: Epic 81 — Eliminate All .js Source Files
 File: documentation/planning/epic/ready-for-dev/epic-81.md, documentation/planning/epic/ready-for-dev/epic-81-task-list.md
 Finding: Epic 81 has been fully implemented (all implementation tasks marked [x] in the task list) but the epic spec and task-list files remain in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete/move tool available), so the relocation is logged here.

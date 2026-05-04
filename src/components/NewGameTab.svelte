@@ -172,6 +172,10 @@
   <!-- Setup controls panel -->
   <section class="panel">
     <h2>{locale.t('newGame.panel.setupTitle')}</h2>
+    <div data-new-game-status-summary class="muted">
+      <span data-status-field="owned-sets">{appState.collection.ownedSetIds.length}</span>
+      · <span data-status-field="last-persisted">{appState.preferences.lastPlayMode}</span>
+    </div>
     <div class={"stack gap-md" + (compactViewport ? ' page-flow-compact-mobile' : '')}>
 
       <div data-mobile-task-anchor="new-game">

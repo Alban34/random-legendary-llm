@@ -95,13 +95,13 @@ test('Layout fix adds [data-forced-picks-panel] rule with min-width: 0 and no ha
 // ── Epic 83 — Story 83.3 ──
 
 test('Forced pick select rule contains token-based visual properties', () => {
-  const selectRule = shellCss.match(/\.forced-pick-picker-row > select\s*\{[^}]*\}/)?.[0] ?? '';
+  const selectRule = shellCss.match(/\.forced-pick-picker-row > select[^{]*\{[^}]*\}/)?.[0] ?? '';
   assert.ok(selectRule.length > 0, '.forced-pick-picker-row > select rule must exist');
   assert.match(selectRule, /var\(--[a-zA-Z-]+\)/);
 });
 
 test('Forced pick select rule contains no hardcoded hex colour', () => {
-  const selectRule = shellCss.match(/\.forced-pick-picker-row > select\s*\{[^}]*\}/)?.[0] ?? '';
+  const selectRule = shellCss.match(/\.forced-pick-picker-row > select[^{]*\{[^}]*\}/)?.[0] ?? '';
   assert.doesNotMatch(selectRule, /#[0-9a-fA-F]{3,6}/);
 });
 
