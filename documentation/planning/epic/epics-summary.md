@@ -98,3 +98,4 @@ All completed epics from the `done/` folder.
 | UX5 | History as Logbook First, Insights Second | Recenter History on reviewing, editing, and understanding played games before exposing deeper analytics. |
 | UX6 | Backup Safety, Maintenance Clarity, and Danger-Zone Separation | Make Backup calmer and safer by separating routine maintenance from destructive actions and reducing repeated reset density. |
 | 91 | Per-Expansion Usage Breakdown in History Insights | Add a ranked per-expansion usage panel to the History Insights dashboard showing what percentage of games each expansion appeared in. |
+| 92 | Consistent Rotating-Arrow Indicator on All Collapsible Panels | Apply the rotating `›` arrow open/close indicator uniformly to every collapsible panel via a global `details summary` CSS rule, replacing the native browser triangle across the app. |

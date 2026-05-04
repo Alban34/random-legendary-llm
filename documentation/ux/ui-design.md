@@ -480,6 +480,12 @@ The Backup tab is divided into three clearly separated panels (Epic UX6):
 .badge-standalone { background: #1a7a4a; }
 ```
 
+### Collapsible Panel (`<details>` / `<summary>`)
+
+All `<details>` / `<summary>` elements in the app share a global disclosure indicator: the native browser triangle is hidden and a `›` character is injected via `::after` on the `<summary>`. The arrow rotates from 90° (collapsed) to 270° (open); the transition follows `var(--motion-duration)` and `var(--motion-easing)` and is suppressed under `prefers-reduced-motion: reduce`. Both the rotation and the suppression are defined once on the global `details summary` rule in `app-shell.css` (Epic 92).
+
+The `.history-item summary` is the sole exception: individual game-record rows in the History tab suppress the arrow via `.history-item summary::after { content: none }` because their summaries already contain the mastermind name, expansion label, and result pills.
+
 ---
 
 ## Animations & Transitions
@@ -488,6 +494,7 @@ The Backup tab is divided into three clearly separated panels (Epic UX6):
 |---------|-----------|
 | Tab switch | Fade in (150ms ease) |
 | Card expand | max-height slide (200ms ease) |
+| Collapsible panel open/close | `›` arrow rotates from 90° to 270° (`var(--motion-duration)` transition); suppressed when `prefers-reduced-motion` is set (Epic 92) |
 | Toast appear | Spring-animated slide and expand (managed by svelte-sonner); fade only when `prefers-reduced-motion` is set |
 | Toast dismiss | Spring-animated collapse and slide out (managed by svelte-sonner); fade only when `prefers-reduced-motion` is set |
 | Button hover | background lightens (100ms) |

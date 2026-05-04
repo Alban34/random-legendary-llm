@@ -750,33 +750,11 @@ html {
   color: var(--text-primary);
 }
 
-.maintenance-accordion-summary::-webkit-details-marker {
-  display: none;
-}
-
-.maintenance-accordion-summary::after {
-  content: '›';
-  font-size: 1.25rem;
-  transition: transform var(--motion-duration) var(--motion-easing);
-  display: inline-block;
-  transform: rotate(90deg);
-}
-
-details[open].maintenance-accordion .maintenance-accordion-summary::after {
-  transform: rotate(270deg);
-}
-
 .maintenance-accordion-body {
   padding: 0 var(--space-5) var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .maintenance-accordion-summary::after {
-    transition: none;
-  }
 }
 
 .eyebrow {
@@ -1275,6 +1253,35 @@ details {
 details summary {
   cursor: pointer;
   font-weight: 600;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary::after {
+  content: '\203A';
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-left: auto;
+  display: inline-block;
+  transform: rotate(90deg);
+  transition: transform var(--motion-duration) var(--motion-easing);
+}
+
+details[open] summary::after {
+  transform: rotate(270deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  details summary::after {
+    transition: none;
+  }
 }
 
 .pill {
@@ -1469,6 +1476,10 @@ details summary {
   align-items: center;
 }
 
+.history-item summary::after {
+  content: none;
+}
+
 .history-usage-indicators {
   gap: var(--space-3);
 }
@@ -1587,9 +1598,10 @@ details summary {
 
 .stats-category-panel {
   width: 100%;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--surface-panel);
+  background: var(--panel-2);
+  overflow: hidden;
 }
 
 .stats-category-summary {
@@ -1599,25 +1611,8 @@ details summary {
   padding: var(--space-3) var(--space-4);
   cursor: pointer;
   font-weight: 600;
-  font-size: var(--text-md);
   list-style: none;
   user-select: none;
-}
-
-.stats-category-summary::-webkit-details-marker {
-  display: none;
-}
-
-.stats-category-summary::after {
-  content: '+';
-  font-size: var(--text-lg);
-  line-height: 1;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-details[open] .stats-category-summary::after {
-  content: '−';
 }
 
 .stats-category-body {

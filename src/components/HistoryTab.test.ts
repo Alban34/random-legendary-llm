@@ -56,9 +56,9 @@ test('CSS defines .stats-category-body rule', () => {
   assert.match(cssSource, /\.stats-category-body\s*\{/);
 });
 
-test('CSS defines open-state indicator for details[open] .stats-category-summary', () => {
+test('CSS defines global open-state indicator for details[open] summary::after', () => {
 
-  assert.match(cssSource, /details\[open\]\s+\.stats-category-summary/);
+  assert.match(cssSource, /details\[open\]\s+summary::after/);
 });
 
 test('Renderer does NOT contain the groupingNotice technical disclaimer text', () => {

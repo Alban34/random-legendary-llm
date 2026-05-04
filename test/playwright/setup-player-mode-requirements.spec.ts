@@ -178,7 +178,7 @@ test.describe('Setup: player-mode requirement display', () => {
   });
 
   test('inspects a 5-player setup under tight counts and keeps generate/regenerate ephemeral while surfacing fallback messaging', async ({ page }) => {
-    await prepareTargetedState(page, { heroFreshCount: 2 });
+    await prepareTargetedState(page, { heroFreshCount: 2, schemeNames: ['Midtown Bank Robbery'] });
     await setPlayerMode(page, 5, false);
     const stateBefore = JSON.stringify(await readAppState(page));
 
