@@ -172,3 +172,37 @@ test('HistoryTab.svelte references locale key history.insights.playCountWithPerc
   );
 });
 
+// ── Epic 91 — Story 91.3 — expansion usage panel locale key references ──
+
+test('HistoryTab.svelte references locale key history.insights.expansionUsage', () => {
+  assert.match(
+    historyTabSource,
+    /history\.insights\.expansionUsage[^G]/,
+    'HistoryTab.svelte must reference history.insights.expansionUsage'
+  );
+});
+
+test('HistoryTab.svelte references locale key history.insights.expansionUsageSummary', () => {
+  assert.match(
+    historyTabSource,
+    /history\.insights\.expansionUsageSummary/,
+    'HistoryTab.svelte must reference history.insights.expansionUsageSummary'
+  );
+});
+
+test('HistoryTab.svelte references locale key history.insights.expansionUsageGames', () => {
+  assert.match(
+    historyTabSource,
+    /history\.insights\.expansionUsageGames/,
+    'HistoryTab.svelte must reference history.insights.expansionUsageGames'
+  );
+});
+
+test('HistoryTab.svelte references locale key history.insights.noExpansionData', () => {
+  assert.match(
+    historyTabSource,
+    /history\.insights\.noExpansionData/,
+    'HistoryTab.svelte must reference history.insights.noExpansionData'
+  );
+});
+

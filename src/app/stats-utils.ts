@@ -172,8 +172,60 @@ export function buildOutcomeInsights(history: AppState['history']): unknown {
   };
 }
 
+export function buildExpansionUsageInsights(
+  runtime: AppRuntime,
+  history: AppState['history'],
+  totalGames: number
+): { id: string; name: string; games: number; percent: number }[] {
+  if (!history.length || totalGames === 0) {
+    return [];
+  }
+
+  const counts: Record<string, number> = {};
+
+  for (const record of history) {
+    const snapshot = record.setupSnapshot;
+    const setIds = new Set<string>();
+
+    const mastermindSetId = runtime.indexes.mastermindsById[snapshot.mastermindId]?.setId;
+    if (mastermindSetId !== undefined) setIds.add(mastermindSetId);
+
+    const schemeSetId = runtime.indexes.schemesById[snapshot.schemeId]?.setId;
+    if (schemeSetId !== undefined) setIds.add(schemeSetId);
+
+    for (const id of snapshot.heroIds) {
+      const setId = runtime.indexes.heroesById[id]?.setId;
+      if (setId !== undefined) setIds.add(setId);
+    }
+
+    for (const id of snapshot.villainGroupIds) {
+      const setId = runtime.indexes.villainGroupsById[id]?.setId;
+      if (setId !== undefined) setIds.add(setId);
+    }
+
+    for (const id of snapshot.henchmanGroupIds) {
+      const setId = runtime.indexes.henchmanGroupsById[id]?.setId;
+      if (setId !== undefined) setIds.add(setId);
+    }
+
+    for (const setId of setIds) {
+      counts[setId] = (counts[setId] ?? 0) + 1;
+    }
+  }
+
+  return Object.entries(counts)
+    .map(([setId, games]) => ({
+      id: setId,
+      name: runtime.indexes.setsById[setId]?.name ?? setId,
+      games,
+      percent: computeExpansionUsagePercent(games, totalGames)
+    }))
+    .sort((a, b) => b.games - a.games || a.name.localeCompare(b.name));
+}
+
 export function buildInsightsDashboard(runtime: AppRuntime, state: AppState, options: { limit?: number } = {}): unknown {
   const outcome = buildOutcomeInsights(state.history || []);
+  const expansionUsage = buildExpansionUsageInsights(runtime, state.history || [], (outcome as { totalGames: number }).totalGames);
   const usage = buildUsageInsights(runtime, state, options) as Array<{
     category: string;
     label: string;
@@ -216,6 +268,7 @@ export function buildInsightsDashboard(runtime: AppRuntime, state: AppState, opt
   return {
     outcome,
     usage,
+    expansionUsage,
     freshness: {
       totalEntitiesTracked,
       totalNeverPlayed,

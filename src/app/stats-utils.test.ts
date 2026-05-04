@@ -5,8 +5,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from './game-data-pipeline.ts';
-import { buildInsightsDashboard, buildOutcomeInsights, buildUsageInsights, computeExpansionUsagePercent } from './stats-utils.ts';
+import { buildInsightsDashboard, buildOutcomeInsights, buildUsageInsights, buildExpansionUsageInsights, computeExpansionUsagePercent } from './stats-utils.ts';
 import { acceptGameSetup, createDefaultState, updateGameResult } from './state-store.ts';
+import type { HistoryRecord } from './types.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -175,4 +176,48 @@ test('computeExpansionUsagePercent returns 100 for full usage (5/5)', () => {
 
 test('computeExpansionUsagePercent rounds fractional results (1/3 → 33)', () => {
   assert.equal(computeExpansionUsagePercent(1, 3), 33);
+});
+
+// ── Epic 91 — buildExpansionUsageInsights unit tests ──
+
+test('buildExpansionUsageInsights returns [] for empty history', () => {
+  const result = buildExpansionUsageInsights(bundle.runtime, [], 0);
+  assert.deepEqual(result, []);
+});
+
+test('buildExpansionUsageInsights returns entries at 100% for a single record', () => {
+  const fakeRecord = {
+    setupSnapshot: {
+      mastermindId: bundle.runtime.indexes.allMasterminds[0].id,
+      schemeId: bundle.runtime.indexes.allSchemes[0].id,
+      heroIds: [bundle.runtime.indexes.allHeroes[0].id],
+      villainGroupIds: [bundle.runtime.indexes.allVillainGroups[0].id],
+      henchmanGroupIds: [bundle.runtime.indexes.allHenchmanGroups[0].id]
+    }
+  } as unknown as HistoryRecord;
+  const result = buildExpansionUsageInsights(bundle.runtime, [fakeRecord], 1);
+  assert.ok(result.length > 0, 'should have at least one expansion entry');
+  result.forEach(entry => assert.equal(entry.percent, 100));
+});
+
+test('buildExpansionUsageInsights counts shared set as 100% and unique set as 50% across two records', () => {
+  const mastermind = bundle.runtime.indexes.allMasterminds[0];
+  const hero = bundle.runtime.indexes.allHeroes.find((h) => h.setId !== mastermind.setId) || bundle.runtime.indexes.allHeroes[0];
+  const record1 = { setupSnapshot: { mastermindId: mastermind.id, schemeId: bundle.runtime.indexes.allSchemes[0].id, heroIds: [], villainGroupIds: [], henchmanGroupIds: [] } } as unknown as HistoryRecord;
+  const record2 = { setupSnapshot: { mastermindId: mastermind.id, schemeId: bundle.runtime.indexes.allSchemes[0].id, heroIds: [hero.id], villainGroupIds: [], henchmanGroupIds: [] } } as unknown as HistoryRecord;
+  const result = buildExpansionUsageInsights(bundle.runtime, [record1, record2], 2);
+  const mastermindSetEntry = result.find(e => e.id === mastermind.setId);
+  assert.ok(mastermindSetEntry, 'mastermind set should appear');
+  assert.equal(mastermindSetEntry!.games, 2);
+  assert.equal(mastermindSetEntry!.percent, 100);
+});
+
+test('buildExpansionUsageInsights counts same expansion only once per game even if multiple card types belong to it', () => {
+  const mastermind = bundle.runtime.indexes.allMasterminds[0];
+  const heroSameSet = bundle.runtime.indexes.allHeroes.find((h) => h.setId === mastermind.setId) || bundle.runtime.indexes.allHeroes[0];
+  const record = { setupSnapshot: { mastermindId: mastermind.id, schemeId: bundle.runtime.indexes.allSchemes[0].id, heroIds: [heroSameSet.id], villainGroupIds: [], henchmanGroupIds: [] } } as unknown as HistoryRecord;
+  const result = buildExpansionUsageInsights(bundle.runtime, [record], 1);
+  const mastermindSetEntry = result.find(e => e.id === mastermind.setId);
+  assert.ok(mastermindSetEntry, 'mastermind set should appear');
+  assert.equal(mastermindSetEntry!.games, 1, 'same set should only count once per game even if multiple entities belong to it');
 });

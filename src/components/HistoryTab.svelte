@@ -92,7 +92,8 @@
     buildHistoryGroups(filteredHistory, bundle.runtime.indexes, { mode: activeGroupingMode })
   );
   let filteredCount: number = $derived(filteredHistory.length);
-  type DashboardResult = { outcome: OutcomeInsight; usage: UsageCategoryInsight[]; freshness: FreshnessInsight; collectionCoverage: CollectionCoverageInsight } | null;
+  type ExpansionUsageEntry = { id: string; name: string; games: number; percent: number };
+  type DashboardResult = { outcome: OutcomeInsight; usage: UsageCategoryInsight[]; expansionUsage: ExpansionUsageEntry[]; freshness: FreshnessInsight; collectionCoverage: CollectionCoverageInsight } | null;
   let dashboard: DashboardResult = $derived(buildInsightsDashboard(bundle.runtime, appState, { limit: 3 }) as DashboardResult);
   let insightsExpanded: boolean = $derived(compactViewport ? Boolean(historyInsightsExpanded) : true);
 
@@ -382,7 +383,7 @@
 
   <!-- Insights dashboard -->
   {#if dashboard}
-    {@const { outcome, usage, freshness, collectionCoverage } = dashboard}
+    {@const { outcome, usage, expansionUsage, freshness, collectionCoverage } = dashboard}
     {@const helperCopy = getHelperCopy(outcome)}
     {@const toggleButtonLabel = insightsExpanded ? locale.t('browse.set.hideDetails') : locale.t('browse.set.showDetails')}
     <section
@@ -528,6 +529,26 @@
                 </div>
               </details>
             {/each}
+            <details class="stats-category-panel" data-stats-category="expansions">
+              <summary class="stats-category-summary">{locale.t('history.insights.expansionUsage')}</summary>
+              <div class="stats-category-body">
+                {#if outcome.totalGames === 0}
+                  <p class="muted empty-state">{locale.t('history.insights.noExpansionData')}</p>
+                {:else}
+                  <div class="muted">{locale.t('history.insights.expansionUsageSummary', { used: locale.formatNumber(expansionUsage.length), total: locale.formatNumber(bundle.runtime.sets.length) })}</div>
+                  {#if expansionUsage.length > 0}
+                    <ul class="clean result-list insight-ranking-list">
+                      {#each expansionUsage as entry (entry.id)}
+                        <li class="result-list-item insight-ranking-item">
+                          <span><strong>{entry.name}</strong></span>
+                          <span class="pill">{locale.t('history.insights.expansionUsageGames', { games: locale.formatPlayCount(entry.games), percent: entry.percent })}</span>
+                        </li>
+                      {/each}
+                    </ul>
+                  {/if}
+                {/if}
+              </div>
+            </details>
           </div>
         </div>
       {/if}

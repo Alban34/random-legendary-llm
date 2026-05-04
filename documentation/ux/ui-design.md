@@ -360,6 +360,14 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
   panel rendered with native <details>/<summary> elements.
   Summary counts remain visible in the closed state so users
   can scan without opening every section.
+
+  An additional collapsible "Expansion Usage" panel appears after
+  the five card-type panels. It shows a ranked list of all
+  expansions that appeared in at least one logged game, each row
+  showing the expansion name and a pill with the game count and
+  percentage. A summary line ("X of Y expansions appeared in your
+  games") is visible in the closed state. An empty state message
+  is shown when no games have been logged yet. (Epic 91)
 ```
 
 **Interactions:**

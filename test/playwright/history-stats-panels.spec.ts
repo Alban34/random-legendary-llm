@@ -15,7 +15,7 @@ test.describe('History: per-category stats panels', () => {
 
     // Each per-category panel is a <details> with the class
     const panels = page.locator('details.stats-category-panel');
-    await expect(panels).toHaveCount(5); // heroes, masterminds, villainGroups, henchmanGroups, schemes
+    await expect(panels).toHaveCount(6); // heroes, masterminds, villainGroups, henchmanGroups, schemes, expansions
   });
 
   test('per-category stats panels start collapsed by default', async ({ page }) => {
