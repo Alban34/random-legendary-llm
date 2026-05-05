@@ -1,5 +1,6 @@
-import { buildOwnedPools, validateSetupLegality } from './setup-generator.ts';
-import type { GamePool } from './setup-generator.ts';
+import { buildOwnedPools } from './setup-pool-builder.ts';
+import type { GamePool } from './setup-pool-builder.ts';
+import { validateSetupLegality } from './setup-validator.ts';
 import type { AppState, GameSet, PlayMode } from './types.ts';
 
 interface CardEntry {

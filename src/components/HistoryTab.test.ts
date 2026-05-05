@@ -11,34 +11,38 @@ const rootDir = path.resolve(__dirname, '../..');
 let historyTabSource;
 let collectionTabSource;
 let cssSource;
+let historyInsightsDashboardSource;
+let gameResultEditorSource;
 
 beforeAll(async () => {
-  [historyTabSource, collectionTabSource, cssSource] = await Promise.all([
+  [historyTabSource, collectionTabSource, cssSource, historyInsightsDashboardSource, gameResultEditorSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'CollectionTab.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'HistoryInsightsDashboard.svelte'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'GameResultEditor.svelte'), 'utf8')
   ]);
 });
 
 test('Renderer uses <details> element for per-category stats panels', () => {
 
-  assert.match(historyTabSource, /stats-category-panel/);
-  assert.match(historyTabSource, /<details\s[^>]*class="stats-category-panel"/);
+  assert.match(historyInsightsDashboardSource, /stats-category-panel/);
+  assert.match(historyInsightsDashboardSource, /<details\s[^>]*class="stats-category-panel"/);
 });
 
 test('Renderer uses <summary> with stats-category-summary class', () => {
 
-  assert.match(historyTabSource, /<summary\s[^>]*class="stats-category-summary"/);
+  assert.match(historyInsightsDashboardSource, /<summary\s[^>]*class="stats-category-summary"/);
 });
 
 test('Renderer emits data-stats-category attribute on each panel', () => {
 
-  assert.match(historyTabSource, /data-stats-category=\{category\.category\}/);
+  assert.match(historyInsightsDashboardSource, /data-stats-category=\{category\.category\}/);
 });
 
 test('Renderer wraps category body in stats-category-body div', () => {
 
-  assert.match(historyTabSource, /class="stats-category-body"/);
+  assert.match(historyInsightsDashboardSource, /class="stats-category-body"/);
 });
 
 test('CSS defines .stats-category-panel rule', () => {
@@ -126,7 +130,7 @@ test('CSS contains .button-row-scroll > * with flex-shrink: 0', () => {
 // ── From design-system-rollout (HistoryTab design-system adoption assertions) ──
 
 test('HistoryTab result form uses role="alert" on error element', () => {
-  assert.match(historyTabSource, /role="alert"[\s\S]*data-result-form-error/);
+  assert.match(gameResultEditorSource, /role="alert"[\s\S]*data-result-form-error/);
 });
 
 // ── Epic 86 — Story 86.1 — .button-row margin-bottom token ──
@@ -158,7 +162,7 @@ test('CSS uses :has(:focus-visible) for .history-item (not :focus-within)', () =
 
 test('HistoryTab.svelte references computeExpansionUsagePercent', () => {
   assert.match(
-    historyTabSource,
+    historyInsightsDashboardSource,
     /computeExpansionUsagePercent/,
     'HistoryTab.svelte must reference computeExpansionUsagePercent'
   );
@@ -166,7 +170,7 @@ test('HistoryTab.svelte references computeExpansionUsagePercent', () => {
 
 test('HistoryTab.svelte references locale key history.insights.playCountWithPercent', () => {
   assert.match(
-    historyTabSource,
+    historyInsightsDashboardSource,
     /history\.insights\.playCountWithPercent/,
     'HistoryTab.svelte must reference the locale key history.insights.playCountWithPercent'
   );
@@ -176,7 +180,7 @@ test('HistoryTab.svelte references locale key history.insights.playCountWithPerc
 
 test('HistoryTab.svelte references locale key history.insights.expansionUsage', () => {
   assert.match(
-    historyTabSource,
+    historyInsightsDashboardSource,
     /history\.insights\.expansionUsage[^G]/,
     'HistoryTab.svelte must reference history.insights.expansionUsage'
   );
@@ -184,7 +188,7 @@ test('HistoryTab.svelte references locale key history.insights.expansionUsage', 
 
 test('HistoryTab.svelte references locale key history.insights.expansionUsageSummary', () => {
   assert.match(
-    historyTabSource,
+    historyInsightsDashboardSource,
     /history\.insights\.expansionUsageSummary/,
     'HistoryTab.svelte must reference history.insights.expansionUsageSummary'
   );
@@ -192,7 +196,7 @@ test('HistoryTab.svelte references locale key history.insights.expansionUsageSum
 
 test('HistoryTab.svelte references locale key history.insights.expansionUsageGames', () => {
   assert.match(
-    historyTabSource,
+    historyInsightsDashboardSource,
     /history\.insights\.expansionUsageGames/,
     'HistoryTab.svelte must reference history.insights.expansionUsageGames'
   );
@@ -200,7 +204,7 @@ test('HistoryTab.svelte references locale key history.insights.expansionUsageGam
 
 test('HistoryTab.svelte references locale key history.insights.noExpansionData', () => {
   assert.match(
-    historyTabSource,
+    historyInsightsDashboardSource,
     /history\.insights\.noExpansionData/,
     'HistoryTab.svelte must reference history.insights.noExpansionData'
   );

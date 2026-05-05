@@ -10,11 +10,15 @@ const rootDir = path.resolve(__dirname, '../..');
 
 let newGameTabSource;
 let appSvelteSource;
+let activeSetFilterPanelSource;
+let forcedPicksPanelSource;
 
 beforeAll(async () => {
-  [newGameTabSource, appSvelteSource] = await Promise.all([
+  [newGameTabSource, appSvelteSource, activeSetFilterPanelSource, forcedPicksPanelSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'NewGameTab.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'ActiveSetFilterPanel.svelte'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'ForcedPicksPanel.svelte'), 'utf8'),
   ]);
 });
 
@@ -22,7 +26,7 @@ beforeAll(async () => {
 
 test('Active Expansions panel retains data-active-filter-panel attribute', () => {
   assert.match(
-    newGameTabSource,
+    activeSetFilterPanelSource,
     /data-active-filter-panel/,
     'data-active-filter-panel attribute must exist in NewGameTab'
   );
@@ -30,7 +34,7 @@ test('Active Expansions panel retains data-active-filter-panel attribute', () =>
 
 test('Active Expansions section uses a <details data-active-filter-panel> element', () => {
   assert.match(
-    newGameTabSource,
+    activeSetFilterPanelSource,
     /<details[^>]*data-active-filter-panel/,
     'data-active-filter-panel must be a <details> element'
   );
@@ -58,7 +62,7 @@ test('NewGameTab appears inside the {#each APP_TABS} loop in App.svelte', () => 
 
 it('Active Expansions uses <details> whose open state is preserved natively through tab switches (no JS variable needed)', () => {
   assert.match(
-    newGameTabSource,
+    activeSetFilterPanelSource,
     /<details[^>]*data-active-filter-panel/,
     'Active Expansions must use a native <details> element; the browser preserves its open state across tab switches without a JS variable'
   );
@@ -74,7 +78,7 @@ it('Active Expansions uses <details> whose open state is preserved natively thro
 describe('Epic 80 — Active Expansions Layout Alignment', () => {
   describe('Story 80.1 — Apply the Forced Picks collapsible pattern to Active Expansions', () => {
     it('Active Expansions outer element is a <details data-active-filter-panel>', () => {
-      assert.match(newGameTabSource, /<details[^>]*data-active-filter-panel/);
+      assert.match(activeSetFilterPanelSource, /<details[^>]*data-active-filter-panel/);
     });
 
     it('activeExpansionsPanelOpen state variable is removed', () => {
@@ -99,8 +103,8 @@ describe('Epic 80 — Active Expansions Layout Alignment', () => {
   describe('Story 80.2 — Reorder Active Expansions below Forced Picks', () => {
     it('Active Expansions block appears after Forced Picks in source order', () => {
       assert.ok(
-        newGameTabSource.indexOf('data-active-filter-panel') >
-          newGameTabSource.indexOf('data-forced-picks-panel'),
+        newGameTabSource.indexOf('<ActiveSetFilterPanel') >
+          newGameTabSource.indexOf('<ForcedPicksPanel'),
         'data-active-filter-panel must appear after data-forced-picks-panel in NewGameTab.svelte'
       );
     });
@@ -135,7 +139,7 @@ test('Renderer uses a single context-sensitive generate button', () => {
 test('Generate button row appears before forced picks panel in render source', () => {
 
   const generateButtonIdx = newGameTabSource.indexOf('data-action="generate-setup"');
-  const forcedPicksPanelIdx = newGameTabSource.indexOf('data-forced-picks-panel');
+  const forcedPicksPanelIdx = newGameTabSource.indexOf('<ForcedPicksPanel');
   assert.ok(generateButtonIdx !== -1, 'generate-setup button must exist in NewGameTab');
   assert.ok(forcedPicksPanelIdx !== -1, 'data-forced-picks-panel must exist in NewGameTab');
   assert.ok(
@@ -178,7 +182,7 @@ test('NewGameTab does NOT contain data-status-field="selected-mode"', () => {
 
 test('NewGameTab still contains data-forced-picks-panel attribute', () => {
   assert.match(
-    newGameTabSource,
+    forcedPicksPanelSource,
     /data-forced-picks-panel/,
     'data-forced-picks-panel attribute must exist in NewGameTab'
   );
@@ -186,7 +190,7 @@ test('NewGameTab still contains data-forced-picks-panel attribute', () => {
 
 test('Forced Picks <details> wraps a <section class="result-card" data-forced-picks-panel>', () => {
   assert.match(
-    newGameTabSource,
+    forcedPicksPanelSource,
     /<section[^>]*class="result-card"[^>]*data-forced-picks-panel/,
     'The Forced Picks panel must be a <section class="result-card" data-forced-picks-panel>'
   );
@@ -194,7 +198,7 @@ test('Forced Picks <details> wraps a <section class="result-card" data-forced-pi
 
 test('<select> elements inside Forced Picks panel carry data-forced-pick-select attributes', () => {
   assert.match(
-    newGameTabSource,
+    forcedPicksPanelSource,
     /data-forced-pick-select/,
     '<select> elements in Forced Picks panel must carry data-forced-pick-select attributes'
   );

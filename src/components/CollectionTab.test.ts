@@ -10,11 +10,13 @@ const rootDir = path.resolve(__dirname, '../..');
 
 let collectionTabSource;
 let enLocaleSource;
+let collectionSetsViewSource;
 
 beforeAll(async () => {
-  [collectionTabSource, enLocaleSource] = await Promise.all([
+  [collectionTabSource, enLocaleSource, collectionSetsViewSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'CollectionTab.svelte'), 'utf8'),
-    fs.readFile(path.join(rootDir, 'src', 'app', 'locales', 'en.ts'), 'utf8')
+    fs.readFile(path.join(rootDir, 'src', 'app', 'locales', 'en.ts'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'CollectionSetsView.svelte'), 'utf8')
   ]);
 });
 
@@ -31,12 +33,12 @@ test('CollectionTab panel header does NOT contain request-reset-owned-collection
 
 test('CollectionTab contains [data-collection-reset-section]', () => {
 
-  assert.match(collectionTabSource, /data-collection-reset-section/, 'CollectionTab must contain data-collection-reset-section');
+  assert.match(collectionSetsViewSource, /data-collection-reset-section/, 'CollectionTab must contain data-collection-reset-section');
 });
 
 test('CollectionTab reset section contains the consequence locale key', () => {
 
-  const resetSectionMatch = collectionTabSource.match(/data-collection-reset-section[\s\S]{0,400}<\/section>/);
+  const resetSectionMatch = collectionSetsViewSource.match(/data-collection-reset-section[\s\S]{0,400}<\/section>/);
   assert.ok(resetSectionMatch, 'data-collection-reset-section must exist');
   assert.match(
     resetSectionMatch[0],
@@ -47,8 +49,8 @@ test('CollectionTab reset section contains the consequence locale key', () => {
 
 test('CollectionTab reset section appears after collection-group elements', () => {
 
-  const lastGroupIdx = collectionTabSource.lastIndexOf('data-collection-group');
-  const resetSectionIdx = collectionTabSource.indexOf('data-collection-reset-section');
+  const lastGroupIdx = collectionSetsViewSource.lastIndexOf('data-collection-group');
+  const resetSectionIdx = collectionSetsViewSource.indexOf('data-collection-reset-section');
   assert.ok(lastGroupIdx !== -1, 'data-collection-group must exist');
   assert.ok(resetSectionIdx !== -1, 'data-collection-reset-section must exist');
   assert.ok(

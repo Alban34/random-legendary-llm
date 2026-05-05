@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getCardsByCategory } from '../app/collection-utils.ts';
   import type { LocaleTools } from '../app/types.ts';
-  import type { GamePool } from '../app/setup-generator.ts';
+  import type { GamePool } from '../app/setup-pool-builder.ts';
 
   let { pools, locale }: { pools: GamePool; locale: LocaleTools } = $props();
 

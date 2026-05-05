@@ -10,10 +10,7 @@ import { acceptGameSetup, createDefaultState } from './state-store.ts';
 import {
   applySchemeModifiersToTemplate,
   buildHistoryReadySetupSnapshot,
-  buildOwnedPools,
-  generateSetup,
-  rankItemsByFreshness,
-  validateSetupLegality
+  generateSetup
 } from './setup-generator.ts';
 import { resolveSetupTemplate } from './setup-rules.ts';
 
@@ -74,18 +71,6 @@ function markAllMastermindsExceptLead(state, bundle, leadMastermind) {
   });
 }
 
-function computeActiveHeroTeamNames(state, bundle) {
-  const effectiveSetIds = state.collection.activeSetIds ?? state.collection.ownedSetIds;
-  const pools = buildOwnedPools(bundle.runtime, effectiveSetIds);
-  const teamSet = new Set<string>();
-  for (const hero of pools.heroes) {
-    for (const team of hero.teams) {
-      if (team) teamSet.add(team);
-    }
-  }
-  return [...teamSet].sort((a, b) => a.localeCompare(b));
-}
-
 function findSimpleSchemeAndMastermind(bundle) {
   const simpleScheme = bundle.runtime.indexes.allSchemes.find(
     (entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount
@@ -97,20 +82,6 @@ function findSimpleSchemeAndMastermind(bundle) {
 beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
-});
-
-test('Legality validation rejects empty or unsupported collections with clear reasons', () => {
-
-  const emptyState = createDefaultState();
-  const emptyValidation = validateSetupLegality({ runtime: bundle.runtime, state: emptyState, playerCount: 1, advancedSolo: false });
-
-  assert.equal(emptyValidation.ok, false);
-  assert.ok(emptyValidation.reasons.some((reason) => reason.includes('No owned sets')));
-  assert.ok(emptyValidation.reasons.some((reason) => reason.includes('heroes')));
-
-  const invalidAdvancedSolo = validateSetupLegality({ runtime: bundle.runtime, state: createAllOwnedState(), playerCount: 2, advancedSolo: true });
-  assert.equal(invalidAdvancedSolo.ok, false);
-  assert.ok(invalidAdvancedSolo.reasons[0].includes('Advanced Solo'));
 });
 
 test('Applies scheme constraints, forced groups, and modifiers to generated setups', () => {
@@ -142,31 +113,6 @@ test('Mastermind leads consume the correct villain or henchman slot', () => {
   assert.equal(drDoomSetup.mastermind.name, 'Dr. Doom');
   assert.equal(drDoomSetup.henchmanGroups.length, drDoomSetup.requirements.henchmanGroupCount);
   assert.ok(drDoomSetup.henchmanGroups.some((group) => group.name === 'Doombot Legion' && group.forced));
-});
-
-test('Hero freshness ranking prefers never-played first, then least-played, items with equal plays are shuffled together', () => {
-
-  const heroes = bundle.runtime.indexes.allHeroes.slice(0, 6);
-  const usage = {
-    [heroes[2].id]: { plays: 1, lastPlayedAt: '2026-04-03T12:00:00.000Z' },
-    [heroes[3].id]: { plays: 1, lastPlayedAt: '2026-04-05T12:00:00.000Z' },
-    [heroes[4].id]: { plays: 2, lastPlayedAt: '2026-04-01T12:00:00.000Z' },
-    [heroes[5].id]: { plays: 2, lastPlayedAt: '2026-04-02T12:00:00.000Z' }
-  };
-
-  const ranked = rankItemsByFreshness(heroes, usage, () => 0);
-  assert.deepEqual(new Set(ranked.slice(0, 2).map((entity) => entity.id)), new Set([
-    heroes[0].id,
-    heroes[1].id
-  ]));
-  assert.deepEqual(new Set(ranked.slice(2, 4).map((entity) => entity.id)), new Set([
-    heroes[2].id,
-    heroes[3].id
-  ]));
-  assert.deepEqual(new Set(ranked.slice(4, 6).map((entity) => entity.id)), new Set([
-    heroes[4].id,
-    heroes[5].id
-  ]));
 });
 
 test('Least-played fallback is used when fresh heroes are insufficient', () => {
@@ -255,29 +201,6 @@ test('Supports forced picks across setup categories when a legal setup exists', 
   assert.ok(setup.notices.some((notice) => notice.includes('Applied forced picks')));
 });
 
-test('Surfaces actionable legality reasons for unavailable or illegal forced picks', () => {
-
-  const state = createDefaultState();
-  state.collection.ownedSetIds = ['core-set'];
-  const missingScheme = bundle.runtime.indexes.allSchemes.find((entity) => entity.setId !== 'core-set');
-  const missingHero = bundle.runtime.indexes.allHeroes.find((entity) => entity.setId !== 'core-set');
-
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'standard',
-    forcedPicks: {
-      schemeId: missingScheme.id,
-      heroIds: [missingHero.id]
-    }
-  });
-
-  assert.equal(legality.ok, false);
-  assert.ok(legality.reasons.some((reason) => reason.includes('Forced Scheme is not owned')));
-  assert.ok(legality.reasons.some((reason) => reason.includes('Forced Heroes are not owned')));
-});
-
 test('Explains impossible forced-pick collisions with scheme and mastermind requirements', () => {
 
   const state = createAllOwnedState();
@@ -335,68 +258,6 @@ const INELIGIBLE_STANDARD_SOLO_IDS = [
   'core-set-negative-zone-prison-breakout'
 ];
 
-test('Standard solo eligibleSchemes excludes all three ineligible scheme ids', () => {
-
-  const state = createAllOwnedState();
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'standard'
-  });
-  for (const id of INELIGIBLE_STANDARD_SOLO_IDS) {
-    assert.ok(
-      !legality.eligibleSchemes.some((s) => s.id === id),
-      `Expected ${id} to be excluded from standard-solo eligibleSchemes`
-    );
-  }
-});
-
-test('Advanced-solo eligibleSchemes includes core-set-negative-zone-prison-breakout', () => {
-
-  const state = createAllOwnedState();
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'advanced-solo'
-  });
-  assert.ok(
-    legality.eligibleSchemes.some((s) => s.id === 'core-set-negative-zone-prison-breakout'),
-    'Expected core-set-negative-zone-prison-breakout to be eligible in advanced-solo'
-  );
-});
-
-test('Two-handed-solo eligibleSchemes includes core-set-negative-zone-prison-breakout', () => {
-
-  const state = createAllOwnedState();
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'two-handed-solo'
-  });
-  assert.ok(
-    legality.eligibleSchemes.some((s) => s.id === 'core-set-negative-zone-prison-breakout'),
-    'Expected core-set-negative-zone-prison-breakout to be eligible in two-handed-solo'
-  );
-});
-
-test('Standard 2-player eligibleSchemes includes core-set-negative-zone-prison-breakout', () => {
-
-  const state = createAllOwnedState();
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 2,
-    playMode: 'standard'
-  });
-  assert.ok(
-    legality.eligibleSchemes.some((s) => s.id === 'core-set-negative-zone-prison-breakout'),
-    'Expected core-set-negative-zone-prison-breakout to be eligible for 2-player standard'
-  );
-});
-
 test('generateSetup standard solo never returns an ineligible scheme over 50 calls', () => {
 
   const state = createAllOwnedState();
@@ -412,137 +273,6 @@ test('generateSetup standard solo never returns an ineligible scheme over 50 cal
       `Call ${i + 1}: generateSetup returned ineligible scheme ${setup.scheme.id}`
     );
   }
-});
-
-test('Standard solo with forced ineligible scheme returns ok false and correct reason', () => {
-
-  const state = createAllOwnedState();
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'standard',
-    forcedPicks: {
-      schemeId: 'core-set-negative-zone-prison-breakout'
-    }
-  });
-  assert.equal(legality.ok, false);
-  assert.ok(
-    legality.reasons.some((r) => r.includes('not legal for the selected play mode')),
-    `Expected reason about play mode, got: ${JSON.stringify(legality.reasons)}`
-  );
-});
-
-test('Advanced-solo with forced core-set-negative-zone-prison-breakout returns ok true', () => {
-
-  const state = createAllOwnedState();
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'advanced-solo',
-    forcedPicks: {
-      schemeId: 'core-set-negative-zone-prison-breakout'
-    }
-  });
-  assert.equal(legality.ok, true);
-});
-
-test('Mastermind villain lead + 1 forced villain group exceeds 1 slot in standard solo (ok true)', () => {
-
-  const state = createAllOwnedState();
-  const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'villains');
-  assert.ok(mastermind, 'Expected at least one mastermind with a villain lead');
-  const otherVillainGroup = bundle.runtime.indexes.allVillainGroups.find((vg) => vg.id !== mastermind.lead.id);
-  assert.ok(otherVillainGroup, 'Expected at least one villain group other than the mastermind lead');
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'standard',
-    forcedPicks: {
-      mastermindId: mastermind.id,
-      villainGroupIds: [otherVillainGroup.id]
-    }
-  });
-  assert.equal(legality.ok, true);
-});
-
-test('Mastermind villain lead + 1 forced villain group fits in 2-player standard (ok true)', () => {
-
-  const state = createAllOwnedState();
-  const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'villains');
-  assert.ok(mastermind, 'Expected at least one mastermind with a villain lead');
-  const otherVillainGroup = bundle.runtime.indexes.allVillainGroups.find((vg) => vg.id !== mastermind.lead.id);
-  assert.ok(otherVillainGroup, 'Expected at least one villain group other than the mastermind lead');
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 2,
-    playMode: 'standard',
-    forcedPicks: {
-      mastermindId: mastermind.id,
-      villainGroupIds: [otherVillainGroup.id]
-    }
-  });
-  assert.equal(legality.ok, true);
-});
-
-test('Mastermind villain lead alone is valid in standard solo (ok true)', () => {
-
-  const state = createAllOwnedState();
-  const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'villains');
-  assert.ok(mastermind, 'Expected at least one mastermind with a villain lead');
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'standard',
-    forcedPicks: {
-      mastermindId: mastermind.id
-    }
-  });
-  assert.equal(legality.ok, true);
-});
-
-test('Mastermind henchman lead + 1 forced henchman group exceeds 1 slot in standard solo (ok true)', () => {
-
-  const state = createAllOwnedState();
-  const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'henchmen');
-  assert.ok(mastermind, 'Expected at least one mastermind with a henchman lead');
-  const otherHenchmanGroup = bundle.runtime.indexes.allHenchmanGroups.find((hg) => hg.id !== mastermind.lead.id);
-  assert.ok(otherHenchmanGroup, 'Expected at least one henchman group other than the mastermind lead');
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'standard',
-    forcedPicks: {
-      mastermindId: mastermind.id,
-      henchmanGroupIds: [otherHenchmanGroup.id]
-    }
-  });
-  assert.equal(legality.ok, true);
-});
-
-test('Mastermind henchman lead + 1 forced henchman group fits in 4-player standard (ok true)', () => {
-
-  const state = createAllOwnedState();
-  const mastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.lead?.category === 'henchmen');
-  assert.ok(mastermind, 'Expected at least one mastermind with a henchman lead');
-  const otherHenchmanGroup = bundle.runtime.indexes.allHenchmanGroups.find((hg) => hg.id !== mastermind.lead.id);
-  assert.ok(otherHenchmanGroup, 'Expected at least one henchman group other than the mastermind lead');
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 4,
-    playMode: 'standard',
-    forcedPicks: {
-      mastermindId: mastermind.id,
-      henchmanGroupIds: [otherHenchmanGroup.id]
-    }
-  });
-  assert.equal(legality.ok, true);
 });
 
 // ── From epic9-notifications-accessibility (setup-generator parts) ────────────
@@ -898,172 +628,4 @@ test('When forcedTeam is null, hero selection behaves as normal', () => {
 
   assert.equal(setup.heroes.length, 5);
   assert.ok(setup.heroes.length > 0);
-});
-
-test('activeHeroTeamNames contains only team names present on at least one hero in the owned pool', () => {
-  const state = createAllOwnedState();
-  const effectiveSetIds = state.collection.activeSetIds ?? state.collection.ownedSetIds;
-  const pools = buildOwnedPools(bundle.runtime, effectiveSetIds);
-  const activeHeroTeamNames = computeActiveHeroTeamNames(state, bundle);
-
-  assert.ok(activeHeroTeamNames.length > 0, 'Expected at least one team name');
-  for (const team of activeHeroTeamNames) {
-    const found = pools.heroes.some((hero) => hero.teams.includes(team));
-    assert.ok(found, `Team '${team}' should be present on at least one hero`);
-  }
-});
-
-test('activeHeroTeamNames is sorted alphabetically', () => {
-  const state = createAllOwnedState();
-  const activeHeroTeamNames = computeActiveHeroTeamNames(state, bundle);
-
-  for (let i = 1; i < activeHeroTeamNames.length; i++) {
-    assert.ok(
-      activeHeroTeamNames[i - 1].localeCompare(activeHeroTeamNames[i]) <= 0,
-      `Expected sorted order but '${activeHeroTeamNames[i - 1]}' comes before '${activeHeroTeamNames[i]}'`
-    );
-  }
-});
-
-test('activeHeroTeamNames is deduplicated', () => {
-  const state = createAllOwnedState();
-  const activeHeroTeamNames = computeActiveHeroTeamNames(state, bundle);
-
-  const uniqueNames = new Set(activeHeroTeamNames);
-  assert.equal(activeHeroTeamNames.length, uniqueNames.size, 'Expected no duplicate team names');
-});
-
-test('activeHeroTeamNames contains no empty strings', () => {
-  const state = createAllOwnedState();
-  const activeHeroTeamNames = computeActiveHeroTeamNames(state, bundle);
-
-  assert.ok(
-    activeHeroTeamNames.every((name) => typeof name === 'string' && name.length > 0),
-    'Expected no empty strings in activeHeroTeamNames'
-  );
-});
-
-// ── Coverage: applyModifier uncovered switch cases and inner branches ─────────
-
-test('applySchemeModifiersToTemplate covers conditional, require-hero-name-match-count, and default modifier types', () => {
-
-  const template = resolveSetupTemplate(2, {});
-  const craftedScheme = {
-    id: 'coverage-scheme',
-    setId: 'test',
-    name: 'Coverage Scheme',
-    aliases: [],
-    constraints: { minimumPlayerCount: null },
-    forcedGroups: [],
-    notes: [],
-    modifiers: [
-      // conditional-add-villain-group: playerCounts includes playerCount (if true) + truthy amount
-      { type: 'conditional-add-villain-group', playerCounts: [2], amount: 1 },
-      // conditional-add-villain-group: playerCounts doesn't include playerCount (if false)
-      { type: 'conditional-add-villain-group', playerCounts: [3], amount: 1 },
-      // conditional-add-villain-group: no playerCounts property (|| [] falsy side)
-      { type: 'conditional-add-villain-group' },
-      // conditional-add-villain-group: if true, falsy amount (|| 0 falsy side)
-      { type: 'conditional-add-villain-group', playerCounts: [2], amount: 0 },
-      // conditional-set-min-heroes: playerCounts includes playerCount + truthy value
-      { type: 'conditional-set-min-heroes', playerCounts: [2], value: 10 },
-      // conditional-set-min-heroes: playerCounts doesn't include playerCount
-      { type: 'conditional-set-min-heroes', playerCounts: [3], value: 10 },
-      // conditional-set-min-heroes: no playerCounts (|| [] falsy side)
-      { type: 'conditional-set-min-heroes' },
-      // conditional-set-min-heroes: if true, falsy value (|| 0 falsy side)
-      { type: 'conditional-set-min-heroes', playerCounts: [2], value: 0 },
-      // require-hero-name-match-count (switch case 8)
-      { type: 'require-hero-name-match-count', pattern: 'Spider', value: 2 },
-      // unknown modifier type (default case)
-      { type: 'no-op-unknown-type-for-coverage' },
-      // add-hero with falsy amount (|| 0 branch)
-      { type: 'add-hero', amount: 0 },
-      // add-villain-group with falsy amount
-      { type: 'add-villain-group', amount: 0 },
-      // add-henchman-group with falsy amount
-      { type: 'add-henchman-group', amount: 0 },
-      // set-min-heroes with falsy value
-      { type: 'set-min-heroes', value: 0 },
-      // set-bystanders with no value (undefined ?? takes requirements.bystanders)
-      { type: 'set-bystanders' }
-    ]
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const requirements = applySchemeModifiersToTemplate(template, craftedScheme as any);
-  assert.ok(requirements.heroNameRequirements.some((r) => r.pattern === 'Spider'), 'heroNameRequirements should include Spider pattern');
-  assert.ok(requirements.villainGroupCount >= template.villainGroupCount, 'villainGroupCount should be at least the template base');
-
-  // Also covers the scheme.modifiers || [] falsy branch
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const nullModifiersResult = applySchemeModifiersToTemplate(template, { modifiers: null } as any);
-  assert.equal(nullModifiersResult.heroCount, template.heroCount);
-});
-
-// ── Coverage: appendForcedReason existing-entry path ─────────────────────────
-
-test('When the same group appears in both forcedPicks.villainGroupIds and scheme.forcedGroups it carries both reasons', () => {
-
-  const state = createAllOwnedState();
-  const secretInvasion = bundle.runtime.indexes.allSchemes.find((s) => s.name === 'Secret Invasion of the Skrull Shapeshifters');
-  const skrullsId = secretInvasion.forcedGroups[0].id;
-  const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((m) => !m.lead);
-
-  // Forcing skrullsId via villainGroupIds AND having Secret Invasion also force it
-  // causes appendForcedReason to be called for the same id twice with different reasons
-  const setup = generateSetup({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 2,
-    playMode: 'standard',
-    forcedPicks: {
-      schemeId: secretInvasion.id,
-      mastermindId: simpleMastermind.id,
-      villainGroupIds: [skrullsId]
-    },
-    random: () => 0
-  });
-
-  const skrullsGroup = setup.villainGroups.find((g) => g.id === skrullsId);
-  assert.ok(skrullsGroup, 'Skrulls should appear in the setup');
-  assert.equal(skrullsGroup.forced, true, 'Skrulls should be marked as forced');
-  assert.ok(Array.isArray(skrullsGroup.forcedBy), 'forcedBy should be an array when carrying multiple reasons');
-  assert.ok(skrullsGroup.forcedReasons.includes('constraint'), 'Should carry constraint reason from forcedPicks');
-  assert.ok(skrullsGroup.forcedReasons.includes('scheme'), 'Should carry scheme reason from Secret Invasion forced groups');
-});
-
-// ── Coverage: validateSetupLegality missing forced entities and excess heroes ─
-
-test('validateSetupLegality reports missing mastermind, villain group, henchman group, and excess hero forced picks', () => {
-
-  const state = createDefaultState();
-  state.collection.ownedSetIds = ['core-set'];
-
-  const missingMastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.setId !== 'core-set');
-  const missingVG = bundle.runtime.indexes.allVillainGroups.find((vg) => vg.setId !== 'core-set');
-  const missingHG = bundle.runtime.indexes.allHenchmanGroups.find((hg) => hg.setId !== 'core-set');
-  // All core-set heroes are owned but forcing all of them greatly exceeds template.heroCount
-  const ownedHeroIds = bundle.runtime.indexes.allHeroes
-    .filter((h) => h.setId === 'core-set')
-    .map((h) => h.id);
-
-  const legality = validateSetupLegality({
-    runtime: bundle.runtime,
-    state,
-    playerCount: 1,
-    playMode: 'standard',
-    forcedPicks: {
-      mastermindId: missingMastermind.id,
-      villainGroupIds: [missingVG.id],
-      henchmanGroupIds: [missingHG.id],
-      heroIds: ownedHeroIds
-    }
-  });
-
-  assert.equal(legality.ok, false);
-  assert.ok(legality.reasons.some((r) => r.includes('Forced Mastermind is not owned')));
-  assert.ok(legality.reasons.some((r) => r.includes('Forced Villain Groups are not owned')));
-  assert.ok(legality.reasons.some((r) => r.includes('Forced Henchman Groups are not owned')));
-  assert.ok(legality.reasons.some((r) => r.includes('Forced Heroes exceed the base Hero slots')));
 });

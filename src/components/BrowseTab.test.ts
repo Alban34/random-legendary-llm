@@ -9,12 +9,16 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '../..');
 
 let browseTabSource;
+let browseHeroSectionSource;
+let browseHelpDisclosureSource;
 let appSvelteSource;
 let cssSource;
 
 beforeAll(async () => {
-  [browseTabSource, appSvelteSource, cssSource] = await Promise.all([
+  [browseTabSource, browseHeroSectionSource, browseHelpDisclosureSource, appSvelteSource, cssSource] = await Promise.all([
     fs.readFile(path.join(rootDir, 'src', 'components', 'BrowseTab.svelte'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'BrowseHeroSection.svelte'), 'utf8'),
+    fs.readFile(path.join(rootDir, 'src', 'components', 'BrowseHelpDisclosure.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'components', 'App.svelte'), 'utf8'),
     fs.readFile(path.join(rootDir, 'src', 'app', 'app-shell.css'), 'utf8')
   ]);
@@ -22,8 +26,8 @@ beforeAll(async () => {
 
 test('BrowseTab structural panels exist with expected data attributes', () => {
 
-  assert.match(browseTabSource, /data-browse-help-disclosure/);
-  assert.match(browseTabSource, /data-browse-primary-cta/);
+  assert.match(browseHelpDisclosureSource, /data-browse-help-disclosure/);
+  assert.match(browseHeroSectionSource, /data-browse-primary-cta/);
   assert.match(browseTabSource, /data-browse-sets-panel/);
   assert.match(browseTabSource, /browse-panel-full-width/);
 });
@@ -37,7 +41,7 @@ test('Onboarding shell appears above the tab panels and Ready Tabs metric is rem
 
 test('BrowseTab browse-hero-actions contains exactly two buttons', () => {
 
-  const heroActionsMatch = browseTabSource.match(/<div class="button-row browse-hero-actions">([\s\S]*?)<\/div>/);
+  const heroActionsMatch = browseHeroSectionSource.match(/<div class="button-row browse-hero-actions">([\s\S]*?)<\/div>/);
   assert.ok(heroActionsMatch, 'browse-hero-actions div must exist');
   const innerHtml = heroActionsMatch[1];
   const buttonMatches = innerHtml.match(/<button\b/g);
@@ -47,7 +51,7 @@ test('BrowseTab browse-hero-actions contains exactly two buttons', () => {
 
 test('BrowseTab browse-hero-actions does NOT contain start-onboarding or toggle-about-panel', () => {
 
-  const heroActionsMatch = browseTabSource.match(/<div class="button-row browse-hero-actions">([\s\S]*?)<\/div>/);
+  const heroActionsMatch = browseHeroSectionSource.match(/<div class="button-row browse-hero-actions">([\s\S]*?)<\/div>/);
   assert.ok(heroActionsMatch, 'browse-hero-actions div must exist');
   const innerHtml = heroActionsMatch[1];
   assert.doesNotMatch(innerHtml, /start-onboarding/, 'start-onboarding must not be in browse-hero-actions');
@@ -57,7 +61,7 @@ test('BrowseTab browse-hero-actions does NOT contain start-onboarding or toggle-
 test('BrowseTab help-walkthrough-action is inside browse-help-disclosure', () => {
 
   assert.match(
-    browseTabSource,
+    browseHelpDisclosureSource,
     /data-browse-help-disclosure[\s\S]{0,2000}data-help-walkthrough-action/,
     '[data-help-walkthrough-action] must appear inside [data-browse-help-disclosure]'
   );
@@ -65,7 +69,7 @@ test('BrowseTab help-walkthrough-action is inside browse-help-disclosure', () =>
 
 test('BrowseTab help-walkthrough-action contains start-onboarding button', () => {
 
-  const walkthroughMatch = browseTabSource.match(/data-help-walkthrough-action[\s\S]{0,300}<\/div>/);
+  const walkthroughMatch = browseHelpDisclosureSource.match(/data-help-walkthrough-action[\s\S]{0,300}<\/div>/);
   assert.ok(walkthroughMatch, 'data-help-walkthrough-action block must exist');
   assert.match(walkthroughMatch[0], /data-action="start-onboarding"/, 'walkthrough action must trigger start-onboarding');
 });

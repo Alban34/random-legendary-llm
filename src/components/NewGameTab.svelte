@@ -3,11 +3,15 @@
   import type { PlayModeOption } from '../app/new-game-utils.ts';
   import { FORCED_PICK_FIELD_CONFIGS, hasForcedPicks } from '../app/forced-picks-utils.ts';
   import type { ForcedPicks } from '../app/forced-picks-utils.ts';
-  import { buildOwnedPools, validateSetupLegality } from '../app/setup-generator.ts';
+  import { buildOwnedPools } from '../app/setup-pool-builder.ts';
+  import { validateSetupLegality } from '../app/setup-validator.ts';
   import { getSoloRulesItems, SOLO_RULES_PANEL_MODES } from '../app/solo-rules.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
-  import type { AppState, LocaleTools, GeneratedSetup, PlayMode, SchemeRuntime, HeroRuntime, MastermindRuntime, VillainGroupRuntime, HenchmanGroupRuntime } from '../app/types.ts';
+  import type { AppState, LocaleTools, GeneratedSetup, PlayMode } from '../app/types.ts';
   import { EPIC_MASTERMIND_SUPPORTED_SETS } from '../app/types.ts';
+  import ActiveSetFilterPanel from './ActiveSetFilterPanel.svelte';
+  import ForcedPicksPanel from './ForcedPicksPanel.svelte';
+  import SetupResultCard from './SetupResultCard.svelte';
 
   let {
     bundle,
@@ -75,24 +79,16 @@
       : null
   );
 
-  let filterFeasibility: ReturnType<typeof validateSetupLegality> = $derived.by(() => {
-    return validateSetupLegality({
-      runtime: bundle.runtime,
-      state: appState,
-      playerCount: selectedPlayerCount,
-      advancedSolo,
-      playMode: selectedPlayMode,
-      forcedPicks: null
-    });
-  });
+  let filterFeasibility = $derived(validateSetupLegality({
+    runtime: bundle.runtime,
+    state: appState,
+    playerCount: selectedPlayerCount,
+    advancedSolo,
+    playMode: selectedPlayMode,
+    forcedPicks: null
+  }));
 
-  let ownedForcedPickOptions: {
-    schemeId: SchemeRuntime[];
-    mastermindId: MastermindRuntime[];
-    heroIds: HeroRuntime[];
-    villainGroupIds: VillainGroupRuntime[];
-    henchmanGroupIds: HenchmanGroupRuntime[];
-  } = $derived.by(() => {
+  let ownedForcedPickOptions = $derived.by(() => {
     const pools = buildOwnedPools(bundle.runtime, appState.collection.ownedSetIds);
     return {
       schemeId: [...pools.schemes].sort((a, b) => a.name.localeCompare(b.name)),
@@ -111,11 +107,9 @@
 
   let modeIneligibleSchemeIds: Set<string> = $derived.by(() => {
     if (selectedPlayMode !== 'standard' || selectedPlayerCount !== 1) return new Set<string>();
-    return new Set<string>(
-      ownedForcedPickOptions.schemeId
-        .filter((s) => s.constraints?.incompatiblePlayModes?.includes('standard-solo'))
-        .map((s) => s.id)
-    );
+    return new Set(ownedForcedPickOptions.schemeId
+      .filter((s) => s.constraints?.incompatiblePlayModes?.includes('standard-solo'))
+      .map((s) => s.id));
   });
 
   let entityIndexes: Record<string, Record<string, { id: string; name: string }>> = $derived({
@@ -126,32 +120,10 @@
     henchmanGroupIds: bundle.runtime.indexes.henchmanGroupsById
   });
 
-  function formatForcedByLabel(forcedBy: string | string[]): string {
-    const values = Array.isArray(forcedBy) ? forcedBy : [forcedBy];
-    return locale.formatList(values.map((v) => {
-      if (v === 'mastermind') return locale.t('newGame.forcedPicks.reason.mastermind');
-      if (v === 'scheme') return locale.t('newGame.forcedPicks.reason.scheme');
-      return locale.t('newGame.forcedPicks.reason.default');
-    }));
-  }
-
   function getActiveIds(config: { field: string; multi: boolean }): string[] {
     const val = (forcedPicks as unknown as Record<string, string | string[] | null>)[config.field];
     if (config.multi) return (val as string[]) ?? [];
     return val ? [val as string] : [];
-  }
-
-  function getAvailableOptions(config: { field: string; multi: boolean }): Array<{ id: string; name: string; constraints?: { incompatiblePlayModes?: string[] } }> {
-    let opts = (ownedForcedPickOptions as Record<string, Array<{ id: string; name: string; constraints?: { incompatiblePlayModes?: string[] } }>>)[config.field] ?? [];
-    if (config.field === 'schemeId') {
-      opts = opts.filter((e) => !modeIneligibleSchemeIds.has(e.id));
-    }
-    return config.multi ? opts.filter((e) => !getActiveIds(config).includes(e.id)) : opts;
-  }
-
-  function handleAddForcedPick(field: string): void {
-    const sel = document.querySelector(`[data-forced-pick-select="${field}"]`);
-    gameActions.addForcedPick(field, (sel as HTMLSelectElement | null)?.value || '');
   }
 
   let activeHeroTeamNames: string[] = $derived.by(() => {
@@ -292,294 +264,37 @@
         <div class="muted new-game-ephemeral-notice">{locale.t('newGame.ephemeralNotice')}</div>
       {/if}
 
-      <!-- Forced picks panel -->
-      <details>
-        <summary>{locale.t('newGame.forcedPicks.title')}</summary>
-        <section class="result-card" data-forced-picks-panel>
-          <div class="muted">{locale.t('newGame.forcedPicks.description')}</div>
-          <div class="forced-picks-pickers-grid">
-            {#each FORCED_PICK_FIELD_CONFIGS as config (config.field)}
-              {@const availableOptions = getAvailableOptions(config)}
-              <div class="stack gap-sm">
-                <label for={"forced-pick-" + config.field}><strong>{locale.t(`newGame.forcedPicks.field.${config.field}`)}</strong></label>
-                <div class="button-row wrap forced-pick-picker-row">
-                  <select
-                    id={"forced-pick-" + config.field}
-                    data-forced-pick-select={config.field}
-                    disabled={!availableOptions.length}
-                  >
-                    <option value="">{locale.t('newGame.forcedPicks.choose', { label: locale.t(`newGame.forcedPicks.field.${config.field}`).toLowerCase() })}</option>
-                    {#each availableOptions as entity (entity.id)}
-                      <option value={entity.id}>{entity.name}</option>
-                    {/each}
-                  </select>
-                  <button
-                    type="button"
-                    class="button button-secondary"
-                    data-action="add-forced-pick"
-                    data-field={config.field}
-                    disabled={!availableOptions.length}
-                    onclick={() => handleAddForcedPick(config.field)}
-                  >{config.multi
-                    ? locale.t('newGame.forcedPicks.add', { label: locale.t(`newGame.forcedPicks.field.${config.field}`) })
-                    : locale.t('newGame.forcedPicks.set', { label: locale.t(`newGame.forcedPicks.field.${config.field}`) })}</button>
-                </div>
-              </div>
-            {/each}
-          </div>
-          <hr class="forced-picks-section-divider" aria-hidden="true">
-          {#if ownedExpansions.length >= 2}
-            <div class="stack gap-sm" data-preferred-expansion-section>
-              <label for="preferred-expansion-select"><strong>{locale.t('newGame.forcedPicks.preferredExpansion.label')}</strong></label>
-              <select
-                id="preferred-expansion-select"
-                data-preferred-expansion-select
-                value={forcedPicks.preferredExpansionId ?? ''}
-                onchange={(e) => gameActions.setPreferredExpansion((e.target as HTMLSelectElement).value || null)}
-              >
-                <option value="">{locale.t('newGame.forcedPicks.preferredExpansion.placeholder')}</option>
-                {#each ownedExpansions as set (set.id)}
-                  <option value={set.id}>{set.name}</option>
-                {/each}
-              </select>
-              {#if forcedPicks.preferredExpansionId}
-                {@const preferredSet = bundle.runtime.indexes.setsById[forcedPicks.preferredExpansionId]}
-                <div class="row gap-sm align-center wrap" data-preferred-expansion-active>
-                  <span>{locale.t('newGame.forcedPicks.preferredExpansion.active', { name: preferredSet?.name ?? forcedPicks.preferredExpansionId })}</span>
-                  <button
-                    type="button"
-                    class="button button-secondary"
-                    data-action="clear-preferred-expansion"
-                    onclick={() => gameActions.setPreferredExpansion(null)}
-                  >{locale.t('newGame.forcedPicks.preferredExpansion.clear')}</button>
-                </div>
-              {/if}
-            </div>
-          {:else}
-            <p class="muted" data-preferred-expansion-unavailable>{locale.t('newGame.forcedPicks.preferredExpansion.unavailable')}</p>
-          {/if}
-          {#if activeHeroTeamNames.length > 0}
-            <div class="stack gap-sm" data-forced-team-section>
-              <label for="forced-team-select"><strong>{locale.t('newGame.forcedPicks.forcedTeam.label')}</strong></label>
-              <select
-                id="forced-team-select"
-                data-forced-team-select
-                value={forcedPicks.forcedTeam ?? ''}
-                onchange={(e) => gameActions.setForcedTeam((e.target as HTMLSelectElement).value || null)}
-              >
-                <option value="">{locale.t('newGame.forcedPicks.forcedTeam.placeholder')}</option>
-                {#each activeHeroTeamNames as team (team)}
-                  <option value={team}>{team}</option>
-                {/each}
-              </select>
-              {#if forcedPicks.forcedTeam}
-                <div class="row gap-sm align-center wrap" data-forced-team-active>
-                  <span>{locale.t('newGame.forcedPicks.forcedTeam.active', { name: forcedPicks.forcedTeam })}</span>
-                  <button
-                    type="button"
-                    class="button button-secondary"
-                    data-action="clear-forced-team"
-                    onclick={() => gameActions.setForcedTeam(null)}
-                  >{locale.t('newGame.forcedPicks.forcedTeam.clear')}</button>
-                </div>
-              {/if}
-            </div>
-          {:else}
-            <p class="muted" data-forced-team-unavailable>{locale.t('newGame.forcedPicks.forcedTeam.unavailable')}</p>
-          {/if}
-          {#if modeIneligibleSchemeIds.size > 0}
-            <p class="muted" data-scheme-mode-ineligibility-notice>
-              {locale.t('newGame.forcedPicks.schemesModeIneligible', {
-                count: modeIneligibleSchemeIds.size,
-                mode: locale.getPlayModeLabel(selectedPlayMode, selectedPlayerCount)
-              })}
-            </p>
-          {/if}
-        </section>
-      </details>
+      <ForcedPicksPanel
+        {forcedPicks}
+        {ownedForcedPickOptions}
+        {gameActions}
+        {locale}
+        {modeIneligibleSchemeIds}
+        {ownedExpansions}
+        {activeHeroTeamNames}
+        {selectedPlayMode}
+        {selectedPlayerCount}
+        {bundle}
+      />
 
       {#if appState.collection.ownedSetIds.length > 0}
-        <!-- Active expansion filter panel -->
-        <details data-active-filter-panel>
-          <summary>
-            {locale.t('newGame.activeFilter.title')}
-            <span class="muted">
-              — {#if appState.collection.activeSetIds === null}
-                {locale.t('newGame.activeFilter.summaryAll', { count: appState.collection.ownedSetIds.length })}
-              {:else}
-                {locale.t('newGame.activeFilter.summaryFiltered', { active: appState.collection.activeSetIds.length, total: appState.collection.ownedSetIds.length })}
-              {/if}
-            </span>
-          </summary>
-          <section class="result-card">
-            <div class="stack gap-sm">
-              {#each appState.collection.ownedSetIds as setId (setId)}
-                {@const setEntry = bundle.runtime.indexes.setsById[setId]}
-                {@const isChecked = appState.collection.activeSetIds === null || appState.collection.activeSetIds.includes(setId)}
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    data-active-filter-checkbox={setId}
-                    onchange={(e) => {
-                      const nowChecked = (e.target as HTMLInputElement).checked;
-                      const activeIds = appState.collection.activeSetIds;
-                      const ownedIds = appState.collection.ownedSetIds;
-                      if (nowChecked) {
-                        if (activeIds === null) return;
-                        const newIds = [...new Set([...activeIds, setId])];
-                        if (newIds.length === ownedIds.length) {
-                          gameActions.clearActiveSetIds();
-                        } else {
-                          gameActions.setActiveSetIds(newIds);
-                        }
-                      } else {
-                        const currentIds = activeIds === null ? [...ownedIds] : activeIds;
-                        gameActions.setActiveSetIds(currentIds.filter((id) => id !== setId));
-                      }
-                    }}
-                  /> {setEntry ? setEntry.name : setId}
-                </label>
-              {/each}
-            </div>
-            <div class="row wrap gap-sm align-center" style="margin-top: var(--space-sm)">
-              <button
-                type="button"
-                class="button button-secondary"
-                data-action="active-filter-select-all"
-                onclick={gameActions.clearActiveSetIds}
-              >{locale.t('newGame.activeFilter.selectAll')}</button>
-              <button
-                type="button"
-                class="button button-secondary"
-                data-action="active-filter-clear-all"
-                onclick={gameActions.deactivateAllSets}
-              >{locale.t('newGame.activeFilter.clearAll')}</button>
-            </div>
-          </section>
-        </details>
-        {#if appState.collection.activeSetIds !== null && !filterFeasibility.ok}
-          <div class="notice warning" data-active-filter-warning>
-            <ul>
-              {#each filterFeasibility.reasons as reason}
-                <li>{reason}</li>
-              {/each}
-            </ul>
-          </div>
-        {/if}
+        <ActiveSetFilterPanel
+          {appState}
+          {bundle}
+          {gameActions}
+          {locale}
+          {filterFeasibility}
+        />
       {/if}
 
     </div>
   </section>
 
-  <!-- Setup result panel -->
-  <section class="panel">
-    <h2>{locale.t('newGame.panel.resultTitle')}</h2>
-    <div class="stack gap-md">
-      <!-- Generator notices -->
-      {#if generatorError}
-        <div class="notice warning">{generatorError}</div>
-      {:else if !currentSetup}
-        <div class="notice info">{locale.t('newGame.generator.previewNotice')}</div>
-      {:else if !generatorNotices.length}
-        <div class="notice success">{locale.t('newGame.generator.freshNotice')}</div>
-      {:else}
-        {#each generatorNotices as notice (notice)}
-          <div class="notice info">{notice}</div>
-        {/each}
-      {/if}
-
-      {#if !currentSetup}
-        <div class="summary-grid">
-          <div class="summary-card"><div class="muted">{locale.t('common.heroes')}</div><div class="metric-sm">—</div></div>
-          <div class="summary-card"><div class="muted">{locale.t('common.villainGroups')}</div><div class="metric-sm">—</div></div>
-          <div class="summary-card"><div class="muted">{locale.t('common.henchmanGroups')}</div><div class="metric-sm">—</div></div>
-          <div class="summary-card"><div class="muted">{locale.t('common.wounds')}</div><div class="metric-sm">—</div></div>
-        </div>
-      {:else}
-        <div class="summary-grid">
-          <div class="summary-card"><div class="muted">{locale.t('common.heroes')}</div><div class="metric-sm">{currentSetup.requirements.heroCount}</div></div>
-          <div class="summary-card"><div class="muted">{locale.t('common.villainGroups')}</div><div class="metric-sm">{currentSetup.requirements.villainGroupCount}</div></div>
-          <div class="summary-card"><div class="muted">{locale.t('common.henchmanGroups')}</div><div class="metric-sm">{currentSetup.requirements.henchmanGroupCount}</div></div>
-          <div class="summary-card"><div class="muted">{locale.t('common.wounds')}</div><div class="metric-sm">{currentSetup.requirements.wounds}</div></div>
-        </div>
-
-        <div class="result-card" data-result-section="mastermind">
-          <h3>{locale.t('newGame.result.mastermind')}</h3>
-          <div><strong>{currentSetup.mastermind.name}</strong></div>
-          <div class="muted">{currentSetup.mastermind.leadEntity ? locale.t('common.alwaysLeads', { name: currentSetup.mastermind.leadEntity.name }) : locale.t('common.noMandatoryLead')}</div>
-          {#if currentSetup.mastermind.leadEntity}
-            <div class="pill">★ {locale.t('common.mandatoryLead')}</div>
-          {/if}
-          {#if currentSetup.mastermind.notes.length}
-            <div class="muted">{currentSetup.mastermind.notes.join(' ')}</div>
-          {/if}
-        </div>
-
-        <div class="result-card" data-result-section="scheme">
-          <h3>{locale.t('newGame.result.scheme')}</h3>
-          <div><strong>{currentSetup.scheme.name}</strong></div>
-          <div class="muted">{locale.t('newGame.result.modeBystanders', { mode: currentSetup.template.modeLabel, count: locale.formatNumber(currentSetup.requirements.bystanders) })}</div>
-          {#if currentSetup.scheme.notes.length}
-            <div class="notice info">⚠ {locale.t('newGame.result.special', { notes: currentSetup.scheme.notes.join(' ') })}</div>
-          {/if}
-        </div>
-
-        <div class="result-card" data-result-section="heroes">
-          <h3>{locale.t('newGame.result.heroes')}</h3>
-          {#if currentSetup.forcedPicks.forcedTeam}
-            <div class="pill" data-forced-team-badge>{locale.t('newGame.forcedPicks.forcedTeam.active', { name: currentSetup.forcedPicks.forcedTeam })}</div>
-          {/if}
-          <div class="new-game-hero-grid">
-            {#each currentSetup.heroes as hero (hero.id)}
-              <article class="result-card hero-result-card" data-hero-id={hero.id}>
-                <h3>{hero.name}</h3>
-                <div class="muted">{hero.teams?.length ? hero.teams.join(' · ') : locale.t('common.noTeamListed')}</div>
-              </article>
-            {/each}
-          </div>
-        </div>
-
-        <div class="result-card" data-result-section="villain-groups">
-          <h3>{locale.t('newGame.result.villainGroups')}</h3>
-          <ul class="clean result-list">
-            {#each currentSetup.villainGroups as group (group.name)}
-              <li class="result-list-item">
-                <span>{group.name}</span>
-                {#if group.forced}
-                  <span class="pill">{locale.t('newGame.forcedPicks.forcedBy', { value: formatForcedByLabel(group.forcedBy!) })}</span>
-                {/if}
-              </li>
-            {/each}
-          </ul>
-        </div>
-
-        <div class="result-card" data-result-section="henchman-groups">
-          <h3>{locale.t('newGame.result.henchmanGroups')}</h3>
-          <ul class="clean result-list">
-            {#each currentSetup.henchmanGroups as group (group.name)}
-              <li class="result-list-item">
-                <span>{group.name}</span>
-                {#if group.forced}
-                  <span class="pill">{locale.t('newGame.forcedPicks.forcedBy', { value: formatForcedByLabel(group.forcedBy!) })}</span>
-                {/if}
-              </li>
-            {/each}
-          </ul>
-        </div>
-
-        {#if soloRulesItems}
-          <details class="result-card" data-result-section="solo-rules" open>
-            <summary><strong>{locale.t('newGame.soloRules.sectionTitle')}</strong></summary>
-            <ul class="clean result-list" style="margin-top: var(--space-sm)">
-              {#each soloRulesItems as key (key)}
-                <li>{locale.t(key)}</li>
-              {/each}
-            </ul>
-          </details>
-        {/if}
-      {/if}
-    </div>
-  </section>
-
+  <SetupResultCard
+    {currentSetup}
+    {soloRulesItems}
+    {locale}
+    {generatorError}
+    {generatorNotices}
+  />
 </section>

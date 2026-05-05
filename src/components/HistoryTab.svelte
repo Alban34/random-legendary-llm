@@ -8,11 +8,13 @@
   import type { HistoryGroup } from '../app/history-utils.ts';
   import type { HistoryRecord } from '../app/types.ts';
   import type { MessageKey } from '../app/locales/en.ts';
-  import { buildInsightsDashboard, computeExpansionUsagePercent, RECENT_SCORE_WINDOW } from '../app/stats-utils.ts';
-  import { GAME_OUTCOME_OPTIONS, isCompletedGameResult } from '../app/result-utils.ts';
+  import { buildInsightsDashboard } from '../app/stats-utils.ts';
+  import { isCompletedGameResult } from '../app/result-utils.ts';
   import { historyVm } from '../app/history-vm.svelte.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
   import type { AppState, LocaleTools } from '../app/types.ts';
+  import GameResultEditor from './GameResultEditor.svelte';
+  import HistoryInsightsDashboard from './HistoryInsightsDashboard.svelte';
 
   type ResultDraft = { outcome: string; score?: string; playerScores?: { playerName: string; score: string }[]; notes: string };
   type HistoryActions = {
@@ -97,11 +99,6 @@
   let dashboard: DashboardResult = $derived(buildInsightsDashboard(bundle.runtime, appState, { limit: 3 }) as DashboardResult);
   let insightsExpanded: boolean = $derived(compactViewport ? Boolean(historyInsightsExpanded) : true);
 
-  function formatInsightMetric(value: unknown, { suffix = '', fallback = '—' }: { suffix?: string; fallback?: string } = {}): string {
-    if (value === null || value === undefined) return fallback;
-    return `${value}${suffix}`;
-  }
-
   function getLocalizedGroupLabel(group: HistoryGroup): string {
     if (group.mode === 'play-mode') {
       const playMode = group.id.split(':')[1] || 'standard';
@@ -113,18 +110,6 @@
     return group.label;
   }
 
-  function getHelperCopy(outcome: OutcomeInsight): string {
-    const scoredWindow = Math.min(outcome.scoredGames, RECENT_SCORE_WINDOW);
-    if (outcome.totalGames === 0) return locale.t('history.insights.helper.noGames');
-    if (outcome.completedResults === 0) return locale.t('history.insights.helper.pendingOnly');
-    if (outcome.scoredGames === 0) return locale.t('history.insights.helper.noScores');
-    if (outcome.scoredGames === 1) return locale.t('history.insights.helper.oneScore');
-    return locale.t('history.insights.helper.recentAverage', {
-      count: locale.formatNumber(scoredWindow),
-      gameWord: scoredWindow === 1 ? locale.t('common.game') : locale.t('common.games'),
-      score: formatInsightMetric(outcome.recentAverageScore)
-    });
-  }
 </script>
 
 <section class={"page-flow stack gap-md" + (compactViewport ? ' page-flow-compact-mobile' : '')}>
@@ -206,10 +191,6 @@
               {@const playerLabel = locale.formatPlayerLabel(summary.playerCount)}
               {@const modeLabel = locale.getPlayModeLabel(summary.playMode, summary.playerCount)}
               {@const resultLabel = locale.formatResultStatus(summary.result)}
-              {@const errorId = `result-form-error-${summary.id}`}
-              {@const outcomeInvalid = resultInvalidFields.includes('outcome')}
-              {@const scoreInvalid = summary.playerCount === 1 && resultInvalidFields.includes('score')}
-              {@const isPending = !isCompletedGameResult(summary.result)}
               <details
                 class="history-item"
                 data-history-record-id={summary.id}
@@ -252,125 +233,17 @@
                   >{isCompletedGameResult(summary.result) ? locale.t('history.editResult') : locale.t('history.addResult')}</button>
                 </div>
 
-                <!-- Inline result editor -->
                 {#if isEditing}
-                  <section class="result-card history-result-editor" data-result-editor={summary.id}>
-                    <h3 id={"result-editor-heading-" + summary.id} tabindex="-1">{isPending ? locale.t('history.resultEditor.addTitle') : locale.t('history.resultEditor.editTitle')}</h3>
-                    <p class="muted">{isPending ? locale.t('history.resultEditor.pendingDescription') : locale.t('history.resultEditor.editDescription')}</p>
-
-                    {#if resultFormError}
-                      <div
-                        class="notice warning"
-                        id={errorId}
-                        role="alert"
-                        aria-live="assertive"
-                        tabindex="-1"
-                        data-result-form-error
-                      >{resultFormError}</div>
-                    {/if}
-
-                    <div class="stack gap-sm">
-                      <label for={"result-outcome-" + summary.id}><strong>{locale.t('history.resultEditor.outcome')}</strong></label>
-                      <select
-                        id={"result-outcome-" + summary.id}
-                        class="text-input"
-                        data-result-field="outcome"
-                        aria-invalid={outcomeInvalid || undefined}
-                        aria-describedby={outcomeInvalid ? errorId : undefined}
-                        onchange={(e) => historyActions.setResultOutcome((e.target as HTMLSelectElement).value)}
-                      >
-                        <option value="">{locale.t('history.resultEditor.chooseOutcome')}</option>
-                        {#each GAME_OUTCOME_OPTIONS as option (option.id)}
-                          <option value={option.id} selected={resultDraft.outcome === option.id}>{locale.getOutcomeLabel(option.id)}</option>
-                        {/each}
-                      </select>
-                    </div>
-
-                    {#if summary.playerCount === 1}
-                      <div class="stack gap-sm">
-                        <label for={"result-score-" + summary.id}><strong>{locale.t('history.resultEditor.score')}</strong> <span class="muted">{locale.t('history.resultEditor.scoreHint')}</span></label>
-                        <input
-                          id={"result-score-" + summary.id}
-                          class="text-input"
-                          data-result-field="score"
-                          type="number"
-                          min="0"
-                          step="1"
-                          inputmode="numeric"
-                          value={resultDraft.score}
-                          placeholder="0"
-                          aria-invalid={scoreInvalid || undefined}
-                          aria-describedby={scoreInvalid ? errorId : undefined}
-                          oninput={(e) => historyActions.setResultScore((e.target as HTMLInputElement).value)}
-                        />
-                      </div>
-                    {:else}
-                      {#each resultDraft.playerScores ?? [] as entry, i}
-                        {@const playerScoreInvalid = resultInvalidFields.includes(`player-score-${i}`)}
-                        <div class="stack gap-sm">
-                          <label for={`result-player-name-${summary.id}-${i}`}><strong>Player {i + 1}</strong></label>
-                          <input
-                            id={`result-player-name-${summary.id}-${i}`}
-                            type="text"
-                            class="text-input"
-                            data-result-field={`player-name-${i}`}
-                            placeholder={`Player ${i + 1}`}
-                            value={entry.playerName}
-                            oninput={(e) => historyActions.setResultPlayerName(i, (e.target as HTMLInputElement).value)}
-                          />
-                          <input
-                            type="number"
-                            class="text-input"
-                            data-result-field={`player-score-${i}`}
-                            min="0"
-                            step="1"
-                            inputmode="numeric"
-                            value={entry.score}
-                            placeholder="0"
-                            aria-invalid={playerScoreInvalid || undefined}
-                            aria-describedby={playerScoreInvalid ? errorId : undefined}
-                            oninput={(e) => historyActions.setResultPlayerScore(i, (e.target as HTMLInputElement).value)}
-                          />
-                        </div>
-                      {/each}
-                    {/if}
-
-                    <div class="stack gap-sm">
-                      <label for={"result-notes-" + summary.id}><strong>{locale.t('history.resultEditor.notes')}</strong> <span class="muted">{locale.t('history.resultEditor.optional')}</span></label>
-                      <textarea
-                        id={"result-notes-" + summary.id}
-                        class="text-input result-notes-input"
-                        data-result-field="notes"
-                        rows="3"
-                        maxlength="500"
-                        placeholder={locale.t('history.resultEditor.notesPlaceholder')}
-                        oninput={(e) => historyActions.setResultNotes((e.target as HTMLTextAreaElement).value)}
-                      >{resultDraft.notes}</textarea>
-                    </div>
-
-                    <div class="button-row">
-                      <button
-                        type="button"
-                        class="button button-success"
-                        data-action="save-game-result"
-                        onclick={historyActions.saveGameResult}
-                      >{locale.t('history.resultEditor.save')}</button>
-                      {#if isPending}
-                        <button
-                          type="button"
-                          class="button button-secondary"
-                          data-action="skip-game-result"
-                          onclick={historyActions.skipGameResultEntry}
-                        >{locale.t('history.resultEditor.skip')}</button>
-                      {/if}
-                      <button
-                        type="button"
-                        class="button button-secondary"
-                        data-action="cancel-result-entry"
-                        onclick={historyActions.cancelResultEntry}
-                      >{locale.t('history.resultEditor.cancel')}</button>
-                    </div>
-                  </section>
+                  <GameResultEditor
+                    recordId={summary.id}
+                    playerCount={summary.playerCount}
+                    isPending={!isCompletedGameResult(summary.result)}
+                    {resultDraft}
+                    {resultFormError}
+                    {resultInvalidFields}
+                    {historyActions}
+                    {locale}
+                  />
                 {/if}
 
               </details>
@@ -383,176 +256,14 @@
 
   <!-- Insights dashboard -->
   {#if dashboard}
-    {@const { outcome, usage, expansionUsage, freshness, collectionCoverage } = dashboard}
-    {@const helperCopy = getHelperCopy(outcome)}
-    {@const toggleButtonLabel = insightsExpanded ? locale.t('browse.set.hideDetails') : locale.t('browse.set.showDetails')}
-    <section
-      class={"panel history-insights-shell " + (compactViewport ? 'compact' : 'expanded')}
-      data-history-insights
-    >
-      <div class="row space-between wrap gap-md align-center">
-        <div>
-          <h2>{locale.t('history.insights.title')}</h2>
-          <p class="muted">{locale.t('history.insights.description')}</p>
-        </div>
-        <div class="muted insight-outcome-summary">{locale.t('history.insights.summary', { wins: locale.formatNumber(outcome.wins), losses: locale.formatNumber(outcome.losses), pending: locale.formatNumber(outcome.pendingResults), scored: locale.formatNumber(outcome.scoredGames) })}</div>
-      </div>
-      <div class="notice info">{helperCopy}</div>
-      {#if compactViewport}
-        <button
-          type="button"
-          class="button button-secondary history-insights-toggle"
-          data-action="toggle-history-insights"
-          aria-expanded={insightsExpanded}
-          onclick={historyActions.toggleHistoryInsights}
-        >{toggleButtonLabel}</button>
-      {/if}
-      {#if insightsExpanded}
-        <div class="history-insights-content">
-          <div class="summary-grid insight-summary-grid">
-            <article class="summary-card" data-insight-card="games-logged">
-              <div class="muted">{locale.t('history.insights.gamesLogged')}</div>
-              <div class="metric-sm">{outcome.totalGames}</div>
-            </article>
-            <article class="summary-card" data-insight-card="win-rate">
-              <div class="muted">{locale.t('history.insights.winRate')}</div>
-              <div class="metric-sm">{formatInsightMetric(outcome.winRate, { suffix: '%' })}</div>
-            </article>
-            <article class="summary-card" data-insight-card="pending-results">
-              <div class="muted">{locale.t('history.insights.pendingResults')}</div>
-              <div class="metric-sm">{outcome.pendingResults}</div>
-            </article>
-            <article class="summary-card" data-insight-card="average-score">
-              <div class="muted">{locale.t('history.insights.averageScore')}</div>
-              <div class="metric-sm">{formatInsightMetric(outcome.averageScore)}</div>
-            </article>
-            <article class="summary-card" data-insight-card="best-score">
-              <div class="muted">{locale.t('history.insights.bestScore')}</div>
-              <div class="metric-sm">{formatInsightMetric(outcome.bestScore)}</div>
-            </article>
-            <article class="summary-card" data-insight-card="fresh-pool">
-              <div class="muted">{locale.t('history.insights.freshPool')}</div>
-              <div class="metric-sm">{freshness.totalNeverPlayed}/{freshness.totalEntitiesTracked}</div>
-            </article>
-            <article class="summary-card" data-insight-card="user-collection-played">
-              <div class="muted">{locale.t('history.insights.userCollectionPlayed')}</div>
-              <div class="metric-sm">{formatInsightMetric(collectionCoverage.userCollection.playedPercent, { suffix: '%' })}</div>
-              <div class="muted">{collectionCoverage.userCollection.played}/{collectionCoverage.userCollection.total}</div>
-            </article>
-            <article class="summary-card" data-insight-card="overall-collection-played">
-              <div class="muted">{locale.t('history.insights.overallCollectionPlayed')}</div>
-              <div class="metric-sm">{formatInsightMetric(collectionCoverage.overallCollection.playedPercent, { suffix: '%' })}</div>
-              <div class="muted">{collectionCoverage.overallCollection.played}/{collectionCoverage.overallCollection.total}</div>
-            </article>
-            <article class="summary-card" data-insight-card="missing-extensions">
-              <div class="muted">{locale.t('history.insights.missingExtensions')}</div>
-              <div class="metric-sm">{formatInsightMetric(collectionCoverage.missingExtensions.missingPercent, { suffix: '%' })}</div>
-              <div class="muted">{collectionCoverage.missingExtensions.missing}/{collectionCoverage.missingExtensions.total} {locale.t('history.insights.notOwned')}</div>
-            </article>
-          </div>
-
-          <div class="two-col insight-coverage-grid">
-            <article class="result-card insight-ranking-card" data-insight-coverage-group="user-collection">
-              <h3>{locale.t('history.insights.userCoverage')}</h3>
-              <div class="muted">{locale.t('history.insights.userCoverageDescription')}</div>
-              <ul class="clean result-list insight-coverage-list">
-                {#each collectionCoverage.userCollection.byType as entry (entry.category)}
-                  <li class="result-list-item insight-coverage-item" data-insight-coverage-category={entry.category}>
-                    <span>
-                      <strong>{locale.t(entry.label)}</strong>
-                      <span class="muted insight-ranking-meta">{locale.t('history.coverage.playedSummary', { played: locale.formatNumber(entry.played), total: locale.formatNumber(entry.total) })}</span>
-                    </span>
-                    <span class="pill">{formatInsightMetric(entry.playedPercent, { suffix: '%' })}</span>
-                  </li>
-                {/each}
-              </ul>
-            </article>
-            <article class="result-card insight-ranking-card" data-insight-coverage-group="overall-collection">
-              <h3>{locale.t('history.insights.overallCoverage')}</h3>
-              <div class="muted">{locale.t('history.insights.overallCoverageDescription')}</div>
-              <ul class="clean result-list insight-coverage-list">
-                {#each collectionCoverage.overallCollection.byType as entry (entry.category)}
-                  <li class="result-list-item insight-coverage-item" data-insight-coverage-category={entry.category}>
-                    <span>
-                      <strong>{locale.t(entry.label)}</strong>
-                      <span class="muted insight-ranking-meta">{locale.t('history.coverage.playedSummary', { played: locale.formatNumber(entry.played), total: locale.formatNumber(entry.total) })}</span>
-                    </span>
-                    <span class="pill">{formatInsightMetric(entry.playedPercent, { suffix: '%' })}</span>
-                  </li>
-                {/each}
-              </ul>
-            </article>
-          </div>
-
-          <div class="stats-category-panels">
-            {#each usage as category (category.category)}
-              <details class="stats-category-panel" data-stats-category={category.category}>
-                <summary class="stats-category-summary">{locale.t(category.label)}</summary>
-                <div class="stats-category-body">
-                  <div class="muted">{locale.t('history.insights.playedSummary', { used: locale.formatNumber(category.used), total: locale.formatNumber(category.total), neverPlayed: locale.formatNumber(category.neverPlayed) })}</div>
-                  <div class="stack gap-sm insight-ranking-section">
-                    <strong>{locale.t('history.insights.mostPlayed')}</strong>
-                    {#if category.mostPlayed.length}
-                      <ul class="clean result-list insight-ranking-list">
-                        {#each category.mostPlayed as entry (entry.label)}
-                          <li class="result-list-item insight-ranking-item">
-                            <span>
-                              <strong>{entry.label}</strong>
-                              <span class="muted insight-ranking-meta">{entry.lastPlayedAt ? locale.t('history.insights.lastUsed', { date: locale.formatDate(entry.lastPlayedAt) }) : locale.t('history.insights.noPlayDate')}</span>
-                            </span>
-                            <span class="pill">{outcome.totalGames > 0 ? locale.t('history.insights.playCountWithPercent', { count: locale.formatPlayCount(entry.plays), percent: computeExpansionUsagePercent(entry.plays, outcome.totalGames) }) : locale.formatPlayCount(entry.plays)}</span>
-                          </li>
-                        {/each}
-                      </ul>
-                    {:else}
-                      <p class="muted empty-state">{locale.t('history.insights.noneMostPlayed', { label: locale.t(category.label).toLowerCase() })}</p>
-                    {/if}
-                  </div>
-                  <div class="stack gap-sm insight-ranking-section">
-                    <strong>{locale.t('history.insights.leastPlayed')}</strong>
-                    {#if category.leastPlayed.length}
-                      <ul class="clean result-list insight-ranking-list">
-                        {#each category.leastPlayed as entry (entry.label)}
-                          <li class="result-list-item insight-ranking-item">
-                            <span>
-                              <strong>{entry.label}</strong>
-                              <span class="muted insight-ranking-meta">{entry.lastPlayedAt ? locale.t('history.insights.lastUsed', { date: locale.formatDate(entry.lastPlayedAt) }) : locale.t('history.insights.noPlayDate')}</span>
-                            </span>
-                            <span class="pill">{outcome.totalGames > 0 ? locale.t('history.insights.playCountWithPercent', { count: locale.formatPlayCount(entry.plays), percent: computeExpansionUsagePercent(entry.plays, outcome.totalGames) }) : locale.formatPlayCount(entry.plays)}</span>
-                          </li>
-                        {/each}
-                      </ul>
-                    {:else}
-                      <p class="muted empty-state">{locale.t('history.insights.noneLeastPlayed', { label: locale.t(category.label).toLowerCase() })}</p>
-                    {/if}
-                  </div>
-                </div>
-              </details>
-            {/each}
-            <details class="stats-category-panel" data-stats-category="expansions">
-              <summary class="stats-category-summary">{locale.t('history.insights.expansionUsage')}</summary>
-              <div class="stats-category-body">
-                {#if outcome.totalGames === 0}
-                  <p class="muted empty-state">{locale.t('history.insights.noExpansionData')}</p>
-                {:else}
-                  <div class="muted">{locale.t('history.insights.expansionUsageSummary', { used: locale.formatNumber(expansionUsage.length), total: locale.formatNumber(bundle.runtime.sets.length) })}</div>
-                  {#if expansionUsage.length > 0}
-                    <ul class="clean result-list insight-ranking-list">
-                      {#each expansionUsage as entry (entry.id)}
-                        <li class="result-list-item insight-ranking-item">
-                          <span><strong>{entry.name}</strong></span>
-                          <span class="pill">{locale.t('history.insights.expansionUsageGames', { games: locale.formatPlayCount(entry.games), percent: entry.percent })}</span>
-                        </li>
-                      {/each}
-                    </ul>
-                  {/if}
-                {/if}
-              </div>
-            </details>
-          </div>
-        </div>
-      {/if}
-    </section>
+    <HistoryInsightsDashboard
+      {dashboard}
+      {locale}
+      {insightsExpanded}
+      {compactViewport}
+      setsTotal={bundle.runtime.sets.length}
+      onToggleInsights={historyActions.toggleHistoryInsights}
+    />
   {/if}
 
 </section>

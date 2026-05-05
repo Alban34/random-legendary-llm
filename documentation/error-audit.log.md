@@ -223,6 +223,11 @@ File: documentation/planning/epic/ready-for-dev/epic-95.md
 Finding: Epic 95 has been fully implemented (Stories 95.1–95.5 complete, 587 tests in 42 test files, 74.2% stmt / 75.1% branch) but the epic spec file remains in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete/move tool available), so the relocation is logged here.
 Suggested action: Move `epic-95.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior completed epics.
 ---
+[F-037] [2026-05-05] Epic: SRP/File-Size Refactoring (Phase 1 & 2)
+File: documentation/planning/epic/epic-95-coverage-audit.md
+Finding: The coverage audit was generated on 2026-05-04 against the pre-refactoring codebase. After the SRP split, 8 monolithic source files became 22 files. The 14 newly extracted files (`game-data-normalizer.ts`, `game-data-indexes.ts`, `types-game-data.ts`, `types-app-state.ts`, `types-setup.ts`, `types-storage.ts`, `types-locale.ts`, `types-ui.ts`, `state-defaults.ts`, `state-sanitizer.ts`, `state-io.ts`, `storage-adapter.ts`, `setup-pool-builder.ts`, `setup-freshness.ts`, `setup-scheme-modifiers.ts`, `setup-validator.ts`, `setup-hero-selector.ts`, `setup-category-selector.ts`) are absent from the coverage table. The retained files (`setup-generator.ts`, `state-store.ts`, `game-data-pipeline.ts`, `types.ts`) now have smaller line counts and their coverage percentages have changed. The report is therefore an incomplete picture of the current codebase.
+Suggested action: A QC agent should re-run `npm test -- --coverage` after the refactoring and regenerate `documentation/planning/epic/epic-95-coverage-audit.md` to reflect the current split file structure. The regenerated report should add rows for all 14+ new files and update the retained-file rows.
+---
 
 ## Summary Table
 
@@ -264,3 +269,4 @@ Suggested action: Move `epic-95.md` from `documentation/planning/epic/ready-for-
 | F-034 | Epics 83–88 spec files not moved to `done/` | FIXED | 2026-05-03 | 2026-05-03 |
 | F-035 | PWA/SW: Production spec excluded from wrong runner; SW test in wrong spec file | FIXED | 2026-05-03 | 2026-05-03 |
 | F-036 | Epic 95 spec file not moved to `done/` after full implementation | OPEN | 2026-05-04 | — |
+| F-037 | SRP refactoring: coverage audit predates the split; 14 new extracted files absent from report | OPEN | 2026-05-05 | — |

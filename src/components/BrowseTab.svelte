@@ -2,7 +2,11 @@
   import { BROWSE_TYPE_OPTIONS, BROWSE_SORT_OPTIONS, filterBrowseSets, summarizeBrowseSet } from '../app/browse-utils.ts';
   import { browseVm } from '../app/browse-vm.svelte.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
-  import type { AppState, LocaleTools, AppPersistenceState, GeneratedSetup, GameSet, MastermindCard, MastermindRuntime, HeroRuntime } from '../app/types.ts';
+  import type { AppState, LocaleTools, AppPersistenceState, GeneratedSetup, GameSet, MastermindCard, MastermindRuntime } from '../app/types.ts';
+
+  import BrowseHeroSection from './BrowseHeroSection.svelte';
+  import BrowseHelpDisclosure from './BrowseHelpDisclosure.svelte';
+  import AboutPanel from './AboutPanel.svelte';
 
   let {
     bundle,
@@ -66,85 +70,15 @@
     return `${mastermind.name} → ${leadEntity?.name || (mastermind as MastermindRuntime).lead!.id}`;
   }
 
-  const KNOWN_DUPLICATE_ENTITY_NAMES = ['Black Widow', 'Loki', 'Thor', 'Nova', 'Venom'];
-
-  function formatDuplicateEntries(): Array<{ name: string; all: Array<HeroRuntime | MastermindRuntime> }> {
-    return KNOWN_DUPLICATE_ENTITY_NAMES
-      .map((name) => {
-        const heroes = bundle.runtime.indexes.allHeroes.filter((entity) => entity.name === name);
-        const masterminds = bundle.runtime.indexes.allMasterminds.filter((entity) => entity.name === name);
-        return { name, all: [...heroes, ...masterminds] };
-      })
-      .filter((entry) => entry.all.length > 1);
-  }
 </script>
 
 <section class={"page-flow stack gap-md" + (compactViewport ? ' page-flow-compact-mobile' : '')}>
 
   <!-- Hero section -->
-  <section class={"panel browse-hero " + (firstRun ? 'browse-hero-first-run' : 'browse-hero-returning')}>
-    <div class="row space-between wrap gap-md align-center">
-      <div class={"browse-hero-copy panel-copy" + (compactViewport ? ' compact-mobile' : '')}>
-        <div class="eyebrow">{locale.t('browse.hero.eyebrow')}</div>
-        <h2>{locale.t('browse.hero.title')}</h2>
-        {#if !compactViewport || firstRun}
-          <p class="muted browse-hero-description">{locale.t('browse.hero.description')}</p>
-        {/if}
-        <div class="button-row browse-hero-actions">
-          <button
-            type="button"
-            class="button button-primary"
-            data-action="jump-tab"
-            data-tab-id={firstRun ? 'collection' : 'new-game'}
-            data-browse-primary-cta
-            onclick={() => onJumpTab(firstRun ? 'collection' : 'new-game')}
-          >{firstRun ? locale.t('browse.hero.manageCollection') : locale.t('browse.hero.generateGame')}</button>
-          <button
-            type="button"
-            class="button button-secondary"
-            data-action="jump-tab"
-            data-tab-id={firstRun ? 'new-game' : 'collection'}
-            onclick={() => onJumpTab(firstRun ? 'new-game' : 'collection')}
-          >{firstRun ? locale.t('browse.hero.generateGame') : locale.t('browse.hero.manageCollection')}</button>
-        </div>
-      </div>
-      <div class="summary-card browse-results-summary browse-hero-summary">
-        <div class="muted">{locale.t('browse.metrics.includedSets')}</div>
-        <div class="metric-sm">{bundle.counts.sets}</div>
-        <div class="muted">{locale.t('browse.metrics.ownedSets')} {appState.collection.ownedSetIds.length} · {locale.t('browse.metrics.historyRecords')} {appState.history.length}</div>
-      </div>
-    </div>
-  </section>
+  <BrowseHeroSection {firstRun} {compactViewport} {locale} {bundle} {appState} {onJumpTab} />
 
   <!-- Help disclosure -->
-  <details class={"panel browse-help-disclosure" + (compactViewport ? ' compact-mobile' : '')} data-browse-help-disclosure>
-    <summary>{locale.t('browse.startHere.title')}</summary>
-    <div class="stack gap-sm browse-priority-list">
-      {#if !compactViewport || firstRun}
-        <p class="muted browse-help-description">{locale.t('browse.startHere.description')}</p>
-      {/if}
-      <article class="summary-card browse-priority-item">
-        <strong>{locale.t('browse.startHere.step1Title')}</strong>
-        <div class="muted">{locale.t('browse.startHere.step1Body')}</div>
-      </article>
-      <article class="summary-card browse-priority-item">
-        <strong>{locale.t('browse.startHere.step2Title')}</strong>
-        <div class="muted">{locale.t('browse.startHere.step2Body')}</div>
-      </article>
-      <article class="summary-card browse-priority-item">
-        <strong>{locale.t('browse.startHere.step3Title')}</strong>
-        <div class="muted">{locale.t('browse.startHere.step3Body')}</div>
-      </article>
-      <div class="button-row" data-help-walkthrough-action>
-        <button
-          type="button"
-          class="button button-secondary"
-          data-action="start-onboarding"
-          onclick={onStartOnboarding}
-        >{locale.t('browse.hero.replayWalkthrough')}</button>
-      </div>
-    </div>
-  </details>
+  <BrowseHelpDisclosure {firstRun} {compactViewport} {locale} {onStartOnboarding} />
 
   <!-- Sets panel -->
   <section class="panel browse-panel-full-width" data-browse-sets-panel>
@@ -328,84 +262,7 @@
 
   <!-- About panel -->
   {#if aboutPanelOpen}
-    {@const failedTests = bundle.tests.filter((t) => t.status === 'fail')}
-    {@const duplicates = formatDuplicateEntries()}
-    <section class="panel about-panel" id="about-panel">
-      <div class="row space-between wrap gap-md align-center">
-        <div class="panel-copy">
-          <div class="eyebrow">{locale.t('about.eyebrow')}</div>
-          <h2>{locale.t('about.title')}</h2>
-          <p class="muted">{locale.t('about.description')}</p>
-        </div>
-        <div class="button-row">
-          <button
-            type="button"
-            class="button button-secondary"
-            data-action="toggle-about-panel"
-            onclick={onToggleAboutPanel}
-          >{locale.t('about.hide')}</button>
-        </div>
-      </div>
-      <section class="two-col about-layout">
-        <section class="stack gap-md">
-          <details class="about-card">
-            <summary><h3>{locale.t('about.initStatus')}</h3></summary>
-            <div>
-              {#if failedTests.length}
-                <p class="error">{locale.t('about.failedInit', { count: locale.formatNumber(failedTests.length) })}</p>
-              {:else}
-                <p class="status-pass">{locale.t('about.loadedOk')}</p>
-              {/if}
-            </div>
-          </details>
-          <details class="about-card">
-            <summary><h3>{locale.t('about.dataSamples')}</h3></summary>
-            <div class="stack gap-sm">
-              {#each duplicates as entry (entry.name)}
-                <details>
-                  <summary>{entry.name} <span class="pill">{locale.formatNumber(entry.all.length)} {locale.t('about.entries')}</span></summary>
-                  <pre>{entry.all.map((entity) => `${entity.id}  ←  ${entity.setId}`).join('\n')}</pre>
-                </details>
-              {/each}
-            </div>
-          </details>
-          <details class="about-card">
-            <summary><h3>{locale.t('about.testResults')}</h3></summary>
-            <ul class="clean">
-              {#each bundle.tests as test (test.name)}
-                <li class={"test " + test.status}>
-                  <strong class={"status-" + test.status}>{test.status === 'pass' ? 'PASS' : 'FAIL'}</strong>
-                  — {test.name}
-                  {#if test.error}<div class="error">{test.error}</div>{/if}
-                </li>
-              {/each}
-            </ul>
-          </details>
-        </section>
-        <section class="stack gap-md">
-          <details class="about-card">
-            <summary><h3>{locale.t('about.runtimeDiagnostics')}</h3></summary>
-            <pre>{JSON.stringify({
-              sampleLeadResolution: bundle.runtime.indexes.allMasterminds.filter((e) => e.lead).slice(0, 5),
-              sampleForcedSchemes: bundle.runtime.indexes.allSchemes.filter((e) => e.forcedGroups.length || e.modifiers.length).slice(0, 8),
-              storageState: {
-                storageAvailable: persistence.storageAvailable,
-                recoveredOnLoad: persistence.recoveredOnLoad,
-                ownedSetIds: appState.collection.ownedSetIds,
-                historyCount: appState.history.length,
-                selectedTab,
-                onboardingCompleted: appState.preferences.onboardingCompleted
-              },
-              currentSetup: currentSetup ? currentSetup.setupSnapshot : null
-            }, null, 2)}</pre>
-          </details>
-          <details class="about-card">
-            <summary><h3>{locale.t('about.persistedState')}</h3></summary>
-            <pre>{JSON.stringify(appState, null, 2)}</pre>
-          </details>
-        </section>
-      </section>
-    </section>
+    <AboutPanel {bundle} {appState} {locale} {persistence} {currentSetup} {selectedTab} {onToggleAboutPanel} />
   {/if}
 
   <footer class="browse-footer" data-browse-footer>
