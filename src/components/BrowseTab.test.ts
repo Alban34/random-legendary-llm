@@ -94,33 +94,6 @@ test('CSS contains .button-link rule', () => {
   assert.match(cssSource, /\.button-link[^}]*appearance:\s*none/, '.button-link must set appearance: none');
 });
 
-// ── From epic78-ui-layout-polish (BrowseTab parts) ──────────────────────
-
-test('BrowseTab help-walkthrough-action is inside browse-help-disclosure', () => {
-  assert.match(
-    browseTabSource,
-    /data-browse-help-disclosure[\s\S]{0,2000}data-help-walkthrough-action/,
-    '[data-help-walkthrough-action] must appear inside [data-browse-help-disclosure]'
-  );
-});
-
-test('BrowseTab help-walkthrough-action contains start-onboarding button', () => {
-  const walkthroughMatch = browseTabSource.match(/data-help-walkthrough-action[\s\S]{0,300}<\/div>/);
-  assert.ok(walkthroughMatch, 'data-help-walkthrough-action block must exist');
-  assert.match(walkthroughMatch[0], /data-action="start-onboarding"/, 'walkthrough action must trigger start-onboarding');
-});
-
-test('BrowseTab contains [data-browse-footer]', () => {
-  assert.match(browseTabSource, /data-browse-footer/, 'BrowseTab must contain data-browse-footer');
-});
-
-test('BrowseTab footer contains toggle-about-panel button-link', () => {
-  const footerMatch = browseTabSource.match(/data-browse-footer[\s\S]{0,400}<\/footer>/);
-  assert.ok(footerMatch, 'browse-footer element must exist');
-  assert.match(footerMatch[0], /data-action="toggle-about-panel"/, 'browse-footer must contain toggle-about-panel action');
-  assert.match(footerMatch[0], /button-link/, 'browse-footer button must use button-link class');
-});
-
 // ── Epic 86 — Story 86.4 — .browse-entity-item has no per-item border ──
 
 test('CSS .browse-entity-item does not have a 1px border separator', () => {

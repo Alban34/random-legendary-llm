@@ -1,6 +1,6 @@
 import { buildOwnedPools, validateSetupLegality } from './setup-generator.ts';
 import type { GamePool } from './setup-generator.ts';
-import type { AppState, GameSet } from './types.ts';
+import type { AppState, GameSet, PlayMode } from './types.ts';
 
 interface CardEntry {
   id: string;
@@ -41,7 +41,7 @@ interface FeasibilityResult {
   label: string;
   playerCount: number;
   advancedSolo: boolean;
-  playMode: string;
+  playMode: PlayMode;
   ok: boolean;
   reasons: unknown[];
   template: unknown;
@@ -81,7 +81,7 @@ export function getCardsByExpansion(pools: any): ExpansionEntry[] {
   return [...expansionMap.values()]
     .map((expansion) => ({
       ...expansion,
-      cards: expansion.cards.sort((a, b) => a.name.localeCompare(b.name)),
+      cards: expansion.cards.toSorted((a, b) => a.name.localeCompare(b.name)),
     }))
     .sort((a, b) => a.setName.localeCompare(b.setName));
 }
@@ -97,7 +97,7 @@ export const COLLECTION_FEASIBILITY_MODES: ReadonlyArray<{
   label: string;
   playerCount: number;
   advancedSolo: boolean;
-  playMode: string;
+  playMode: PlayMode;
 }> = [
   { id: 'standard-solo', label: 'Standard Solo (1P)', playerCount: 1, advancedSolo: false, playMode: 'standard' },
   { id: 'advanced-solo', label: 'Advanced Solo', playerCount: 1, advancedSolo: true, playMode: 'advanced-solo' },

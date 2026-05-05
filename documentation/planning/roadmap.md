@@ -444,3 +444,11 @@ Localization is broader and more cross-cutting than history grouping. Deferring 
 ### Wave 5 — History refinement and internationalization
 - Epic 20
 - Epic 19
+
+---
+
+## Delivered Clean-Code Releases
+
+### v2.1.1 — Code Quality and Test Coverage (May 2026, Epics 93–95)
+
+All 99 open SonarCloud issues resolved across Critical, Major, and Minor severities (Epic 93): cognitive complexity reductions in `result-utils.ts`, `stats-utils.ts`, and `setup-generator.ts`; non-mutating sort, parameter grouping, and top-level-await corrections; and a language-modernization sweep across the full source tree. Thirteen duplicate test cases were removed by extracting shared test helpers into `src/app/test-utils.ts`, reducing the test count from 480 to 467 (Epic 94). Unit test coverage was raised from 63.3% to 74.2% statement coverage and from 60.0% to 75.1% branch coverage by adding 120 new tests across 9 new test files targeting the most under-covered modules (Epic 95). No user-facing behavior changes were introduced. See [`release-notes/v2.1.1-release-notes.md`](../release-notes/v2.1.1-release-notes.md).

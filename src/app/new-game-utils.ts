@@ -48,8 +48,7 @@ export function getPlayModeHelpText(playerCount: number, playMode: string): stri
 }
 
 export function getDisplayedSetupRequirements({ playerCount, advancedSolo, playMode, currentSetup }: GetDisplayedSetupRequirementsOptions): Omit<SetupRequirements, 'heroNameRequirements'> {
-  type ResolveTemplateFn = (playerCount: number, opts: { advancedSolo?: boolean; playMode?: string }) => { heroCount: number; villainGroupCount: number; henchmanGroupCount: number; wounds: number; playerCount: number; playMode: string };
-  const template = (resolveSetupTemplate as unknown as ResolveTemplateFn)(playerCount, { advancedSolo, playMode });
+  const template = resolveSetupTemplate(playerCount, { advancedSolo, playMode });
 
   if (
     currentSetup?.template.playerCount === template.playerCount

@@ -181,7 +181,7 @@ test('EN_MESSAGES contains all 14 solo rules locale keys', () => {
   ];
   for (const key of expectedKeys) {
     assert.ok(
-      Object.prototype.hasOwnProperty.call(EN_MESSAGES, key),
+      Object.hasOwn(EN_MESSAGES, key),
       `Expected EN_MESSAGES to have key: ${key}`
     );
     assert.ok(
@@ -197,7 +197,7 @@ test('Every getSoloRulesItems key for all three modes resolves in EN_MESSAGES', 
     const keys = getSoloRulesItems(mode);
     for (const key of keys) {
       assert.ok(
-        Object.prototype.hasOwnProperty.call(EN_MESSAGES, key),
+        Object.hasOwn(EN_MESSAGES, key),
         `Mode "${mode}": key "${key}" is missing from EN_MESSAGES`
       );
     }

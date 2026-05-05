@@ -143,7 +143,7 @@ test('Merge semantics union collection, dedupe history, keep stronger usage stat
   currentState.preferences.themeId = 'dark';
   currentState = acceptGameSetup(currentState, createSampleSetup(0));
 
-  const importedState = JSON.parse(JSON.stringify(currentState));
+  const importedState = structuredClone(currentState);
   importedState.collection.ownedSetIds = ['core-set', 'dark-city'];
   importedState.preferences.themeId = 'light';
   importedState.preferences.selectedTab = 'history';
@@ -166,4 +166,80 @@ test('Merge semantics union collection, dedupe history, keep stronger usage stat
   assert.equal(mergedState.preferences.themeId, 'light');
   assert.equal(mergedState.usage.heroes[currentState.history[0].setupSnapshot.heroIds[0]].plays, 4);
   assert.equal(mergedState.usage.heroes[currentState.history[0].setupSnapshot.heroIds[0]].lastPlayedAt, '2026-04-11T09:00:00.000Z');
+});
+
+test('Rejects payloads failing each envelope validation check independently', () => {
+
+  const nonObject = parseBackupPayload(null, { indexes: bundle.runtime.indexes });
+  assert.equal(nonObject.ok, false);
+  assert.match(nonObject.error, /JSON object/i);
+
+  const wrongVersion = parseBackupPayload({
+    schemaId: BACKUP_SCHEMA_ID,
+    version: 999,
+    data: {}
+  }, { indexes: bundle.runtime.indexes });
+  assert.equal(wrongVersion.ok, false);
+  assert.match(wrongVersion.error, /unsupported schema version/i);
+
+  const nonObjectData = parseBackupPayload({
+    schemaId: BACKUP_SCHEMA_ID,
+    version: BACKUP_SCHEMA_VERSION,
+    data: 'not-an-object'
+  }, { indexes: bundle.runtime.indexes });
+  assert.equal(nonObjectData.ok, false);
+  assert.match(nonObjectData.error, /missing its data section/i);
+
+  const nonObjectCollection = parseBackupPayload({
+    schemaId: BACKUP_SCHEMA_ID,
+    version: BACKUP_SCHEMA_VERSION,
+    data: { collection: 'not-an-object', usage: {}, history: [], preferences: {} }
+  }, { indexes: bundle.runtime.indexes });
+  assert.equal(nonObjectCollection.ok, false);
+  assert.match(nonObjectCollection.error, /missing collection data/i);
+
+  const nonArrayHistory = parseBackupPayload({
+    schemaId: BACKUP_SCHEMA_ID,
+    version: BACKUP_SCHEMA_VERSION,
+    data: { collection: {}, usage: {}, history: 'not-an-array', preferences: {} }
+  }, { indexes: bundle.runtime.indexes });
+  assert.equal(nonArrayHistory.ok, false);
+  assert.match(nonArrayHistory.error, /missing history data/i);
+
+  const nonObjectPreferences = parseBackupPayload({
+    schemaId: BACKUP_SCHEMA_ID,
+    version: BACKUP_SCHEMA_VERSION,
+    data: { collection: {}, usage: {}, history: [], preferences: 'not-an-object' }
+  }, { indexes: bundle.runtime.indexes });
+  assert.equal(nonObjectPreferences.ok, false);
+  assert.match(nonObjectPreferences.error, /missing preference data/i);
+});
+
+test('buildBackupFilename falls back to a timestamp when given a non-string exportedAt', () => {
+
+  const filename = buildBackupFilename(null as unknown as string);
+  assert.match(filename, /^legendary-marvel-randomizer-backup-\d{4}-/);
+});
+
+test('mergeUsageBucket handles new entries, null lastPlayedAt on either side, and current-wins ordering', () => {
+
+  const currentState = createDefaultState();
+  currentState.usage.heroes['hero-a'] = { plays: 3, lastPlayedAt: '2026-04-10T12:00:00.000Z' };
+  currentState.usage.heroes['hero-b'] = { plays: 1, lastPlayedAt: null };
+  currentState.usage.heroes['hero-c'] = { plays: 2, lastPlayedAt: '2026-04-10T12:00:00.000Z' };
+
+  const importedState = createDefaultState();
+  importedState.usage.heroes['hero-a'] = { plays: 2, lastPlayedAt: '2026-04-09T10:00:00.000Z' };
+  importedState.usage.heroes['hero-b'] = { plays: 1, lastPlayedAt: '2026-04-10T13:00:00.000Z' };
+  importedState.usage.heroes['hero-c'] = { plays: 5, lastPlayedAt: null };
+  importedState.usage.heroes['hero-d'] = { plays: 4, lastPlayedAt: '2026-04-10T08:00:00.000Z' };
+
+  const merged = mergeImportedState(currentState, importedState);
+
+  assert.equal(merged.usage.heroes['hero-a'].lastPlayedAt, '2026-04-10T12:00:00.000Z');
+  assert.equal(merged.usage.heroes['hero-a'].plays, 3);
+  assert.equal(merged.usage.heroes['hero-b'].lastPlayedAt, '2026-04-10T13:00:00.000Z');
+  assert.equal(merged.usage.heroes['hero-c'].lastPlayedAt, '2026-04-10T12:00:00.000Z');
+  assert.equal(merged.usage.heroes['hero-c'].plays, 5);
+  assert.equal(merged.usage.heroes['hero-d'].plays, 4);
 });

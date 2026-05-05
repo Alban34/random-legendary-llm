@@ -97,8 +97,25 @@ export function formatGameResultStatus(result: GameResult | null | undefined, lo
 
   const { t } = createLocaleTools(normalizeLocaleId(locale));
   const scoreLabel = t('result.scoreLabel');
-  const formattedScore = new Intl.NumberFormat(locale).format(result.score as number);
+  const formattedScore = new Intl.NumberFormat(locale).format(result.score);
   return `${formatGameOutcomeLabel(result.outcome)} \u00b7 ${scoreLabel} ${formattedScore}`;
+}
+
+function createMultiplayerCompletedGameResult(outcome: string, score: unknown, notes: string, updatedAt: string): GameResult {
+  if (!Array.isArray(score)) {
+    throw new TypeError('Per-player score array is required for multiplayer games.');
+  }
+  const normalizedEntries = (score as Partial<PlayerScoreEntry>[]).map((entry) => createPlayerScoreEntry(entry));
+  if (outcome === 'win' && normalizedEntries.every((entry) => entry.score === null)) {
+    throw new Error('Enter a whole-number score that is 0 or greater before saving the game result.');
+  }
+  return {
+    status: GAME_RESULT_STATUS_COMPLETED,
+    outcome: outcome as GameOutcome,
+    score: normalizedEntries,
+    notes: trimNotes(notes),
+    updatedAt: typeof updatedAt === 'string' ? updatedAt : new Date().toISOString()
+  };
 }
 
 export function createCompletedGameResult({ outcome, score, notes = '', updatedAt = new Date().toISOString(), playerCount = 1 }: CreateCompletedGameResultOptions): GameResult {
@@ -107,20 +124,7 @@ export function createCompletedGameResult({ outcome, score, notes = '', updatedA
   }
 
   if (playerCount >= 2) {
-    if (!Array.isArray(score)) {
-      throw new Error('Per-player score array is required for multiplayer games.');
-    }
-    const normalizedEntries = (score as Partial<PlayerScoreEntry>[]).map((entry) => createPlayerScoreEntry(entry));
-    if (outcome === 'win' && normalizedEntries.every((entry) => entry.score === null)) {
-      throw new Error('Enter a whole-number score that is 0 or greater before saving the game result.');
-    }
-    return {
-      status: GAME_RESULT_STATUS_COMPLETED,
-      outcome: outcome as GameOutcome,
-      score: normalizedEntries,
-      notes: trimNotes(notes),
-      updatedAt: typeof updatedAt === 'string' ? updatedAt : new Date().toISOString()
-    };
+    return createMultiplayerCompletedGameResult(outcome, score, notes, updatedAt);
   }
 
   const normalizedScore = normalizeScore(score as number | null | undefined);
@@ -145,6 +149,65 @@ export function createCompletedGameResult({ outcome, score, notes = '', updatedA
   };
 }
 
+function sanitizePendingCandidate(c: Record<string, unknown>, playerCount: number): { result: GameResult; recovered: boolean } {
+  if (playerCount >= 2) {
+    if (c.score !== null && !Array.isArray(c.score)) {
+      return { result: createPendingGameResult(), recovered: true };
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pendingResult = createPendingGameResult() as any;
+    if (Array.isArray(c.score)) {
+      pendingResult.score = (c.score as unknown[]).map((entry) => {
+        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+          return { playerName: '', score: null };
+        }
+        return createPlayerScoreEntry(entry as Partial<PlayerScoreEntry>);
+      });
+    }
+    return { result: pendingResult as GameResult, recovered: false };
+  }
+
+  const notes = trimNotes(c.notes);
+  const updatedAt = c.updatedAt === null || typeof c.updatedAt === 'string'
+    ? c.updatedAt
+    : null;
+  const recovered = c.outcome !== null
+    || c.score !== null
+    || notes !== ''
+    || updatedAt !== null;
+
+  return {
+    result: createPendingGameResult(),
+    recovered: recovered as boolean
+  };
+}
+
+function sanitizeCompletedMultiplayerResult(c: Record<string, unknown>, playerCount: number): { result: GameResult; recovered: boolean } {
+  const sanitizedEntries = (c.score as unknown[]).map((entry) => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      return { playerName: '', score: null };
+    }
+    return createPlayerScoreEntry(entry as Partial<PlayerScoreEntry>);
+  });
+  try {
+    return {
+      result: createCompletedGameResult({
+        outcome: c.outcome as string,
+        score: sanitizedEntries,
+        notes: c.notes as string,
+        updatedAt: c.updatedAt as string,
+        playerCount
+      }),
+      recovered: false
+    };
+  } catch {
+    return {
+      result: createPendingGameResult(),
+      recovered: true
+    };
+  }
+}
+
 export function sanitizeStoredGameResult(candidate: unknown, playerCount = 1): { result: GameResult; recovered: boolean } {
   if (candidate === undefined) {
     return {
@@ -163,36 +226,7 @@ export function sanitizeStoredGameResult(candidate: unknown, playerCount = 1): {
   const c = candidate as Record<string, unknown>;
 
   if (c.status === GAME_RESULT_STATUS_PENDING) {
-    if (playerCount >= 2) {
-      if (c.score !== null && !Array.isArray(c.score)) {
-        return { result: createPendingGameResult(), recovered: true };
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pendingResult = createPendingGameResult() as any;
-      if (Array.isArray(c.score)) {
-        pendingResult.score = (c.score as unknown[]).map((entry) => {
-          if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-            return { playerName: '', score: null };
-          }
-          return createPlayerScoreEntry(entry as Partial<PlayerScoreEntry>);
-        });
-      }
-      return { result: pendingResult as GameResult, recovered: false };
-    }
-
-    const notes = trimNotes(c.notes);
-    const updatedAt = c.updatedAt === null || typeof c.updatedAt === 'string'
-      ? c.updatedAt
-      : null;
-    const recovered = c.outcome !== null
-      || c.score !== null
-      || notes !== ''
-      || updatedAt !== null;
-
-    return {
-      result: createPendingGameResult(),
-      recovered: recovered as boolean
-    };
+    return sanitizePendingCandidate(c, playerCount);
   }
 
   if (c.status !== GAME_RESULT_STATUS_COMPLETED) {
@@ -210,29 +244,7 @@ export function sanitizeStoredGameResult(candidate: unknown, playerCount = 1): {
   }
 
   if (playerCount >= 2 && Array.isArray(c.score)) {
-    const sanitizedEntries = (c.score as unknown[]).map((entry) => {
-      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-        return { playerName: '', score: null };
-      }
-      return createPlayerScoreEntry(entry as Partial<PlayerScoreEntry>);
-    });
-    try {
-      return {
-        result: createCompletedGameResult({
-          outcome: c.outcome as string,
-          score: sanitizedEntries,
-          notes: c.notes as string,
-          updatedAt: c.updatedAt as string,
-          playerCount
-        }),
-        recovered: false
-      };
-    } catch {
-      return {
-        result: createPendingGameResult(),
-        recovered: true
-      };
-    }
+    return sanitizeCompletedMultiplayerResult(c, playerCount);
   }
 
   try {
@@ -271,6 +283,62 @@ export function normalizeGameResultDraft(result: GameResult | null | undefined, 
   };
 }
 
+function validateMultiplayerDraft(
+  outcome: string,
+  notes: string,
+  playerScores: unknown[],
+  playerCount: number,
+  preExistingErrors: string[]
+): ValidationResult {
+  const errors = [...preExistingErrors];
+
+  if (playerScores.length !== playerCount) {
+    errors.push('Player scores are missing or incomplete.');
+  }
+
+  for (const entry of playerScores) {
+    const e = (entry ?? {}) as Record<string, unknown>;
+    const scoreStr = typeof e.score === 'string' ? e.score.trim() : '';
+    if (scoreStr !== '') {
+      const parsed = Number.parseInt(scoreStr, 10);
+      if (!/^\d+$/.test(scoreStr) || !Number.isInteger(parsed) || parsed < 0) {
+        errors.push('Score must be a whole number that is 0 or greater.');
+        break;
+      }
+    }
+  }
+
+  if (outcome === 'win' && !playerScores.some((entry) => {
+    const e = (entry ?? {}) as Record<string, unknown>;
+    const scoreStr = typeof e.score === 'string' ? e.score.trim() : '';
+    return scoreStr !== '';
+  })) {
+    errors.push('Enter a score before saving the result.');
+  }
+
+  if (errors.length) {
+    return { ok: false, errors, result: null };
+  }
+
+  return {
+    ok: true,
+    errors: [],
+    result: createCompletedGameResult({
+      outcome,
+      score: playerScores.map((entry) => {
+        const e = (entry ?? {}) as Record<string, unknown>;
+        const scoreStr = typeof e.score === 'string' ? e.score.trim() : '';
+        return {
+          playerName: typeof e.playerName === 'string' ? e.playerName : '',
+          score: scoreStr === '' ? null : Number.parseInt(scoreStr, 10)
+        };
+      }),
+      notes,
+      playerCount
+    })
+  };
+}
+
 export function validateGameResultDraft(draft: unknown, playerCount = 1): ValidationResult {
   const d = (draft as Record<string, unknown>) ?? {};
   const outcome = typeof d.outcome === 'string' ? d.outcome : '';
@@ -283,52 +351,7 @@ export function validateGameResultDraft(draft: unknown, playerCount = 1): Valida
 
   if (playerCount >= 2) {
     const playerScores = Array.isArray(d.playerScores) ? (d.playerScores as unknown[]) : [];
-
-    if (playerScores.length !== playerCount) {
-      errors.push('Player scores are missing or incomplete.');
-    }
-
-    for (const entry of playerScores) {
-      const e = (entry ?? {}) as Record<string, unknown>;
-      const scoreStr = typeof e.score === 'string' ? e.score.trim() : '';
-      if (scoreStr !== '') {
-        const parsed = Number.parseInt(scoreStr, 10);
-        if (!/^\d+$/.test(scoreStr) || !Number.isInteger(parsed) || parsed < 0) {
-          errors.push('Score must be a whole number that is 0 or greater.');
-          break;
-        }
-      }
-    }
-
-    if (outcome === 'win' && !playerScores.some((entry) => {
-      const e = (entry ?? {}) as Record<string, unknown>;
-      const scoreStr = typeof e.score === 'string' ? e.score.trim() : '';
-      return scoreStr !== '';
-    })) {
-      errors.push('Enter a score before saving the result.');
-    }
-
-    if (errors.length) {
-      return { ok: false, errors, result: null };
-    }
-
-    return {
-      ok: true,
-      errors: [],
-      result: createCompletedGameResult({
-        outcome,
-        score: playerScores.map((entry) => {
-          const e = (entry ?? {}) as Record<string, unknown>;
-          const scoreStr = typeof e.score === 'string' ? e.score.trim() : '';
-          return {
-            playerName: typeof e.playerName === 'string' ? e.playerName : '',
-            score: scoreStr === '' ? null : Number.parseInt(scoreStr, 10)
-          };
-        }),
-        notes,
-        playerCount
-      })
-    };
+    return validateMultiplayerDraft(outcome, notes, playerScores, playerCount, errors);
   }
 
   const scoreValue = typeof d.score === 'string' ? d.score.trim() : '';

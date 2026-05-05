@@ -2,8 +2,7 @@ import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { join } from 'node:path';
+import path, { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from './game-data-pipeline.ts';
@@ -15,6 +14,7 @@ import {
   getCardsByExpansion,
   getCollectionFeasibility,
   groupSetsByType,
+  mergeOwnedSets,
   summarizeOwnedCollection
 } from './collection-utils.ts';
 import { buildOwnedPools } from './setup-generator.ts';
@@ -233,5 +233,87 @@ test('Standalone group is removed from collection-utils', () => {
 
   const collectionUtilsSource = readFileSync(join(process.cwd(), 'src/app/collection-utils.ts'), 'utf8');
   assert.doesNotMatch(collectionUtilsSource, /id:\s*['"](standalone)['"]/);
+});
+
+// ── mergeOwnedSets ──
+
+test('mergeOwnedSets merges new IDs into existing owned set with sorting', () => {
+
+  const state = createDefaultState();
+  state.collection.ownedSetIds = ['core-set'];
+  const result = mergeOwnedSets(state, ['dark-city']);
+  assert.deepEqual(result.collection.ownedSetIds, ['core-set', 'dark-city']);
+});
+
+test('mergeOwnedSets produces no duplicates when merging an already-owned ID', () => {
+
+  const state = createDefaultState();
+  state.collection.ownedSetIds = ['core-set'];
+  const result = mergeOwnedSets(state, ['core-set']);
+  assert.deepEqual(result.collection.ownedSetIds, ['core-set']);
+});
+
+test('mergeOwnedSets is idempotent: calling twice with same input produces the same result', () => {
+
+  const state = createDefaultState();
+  state.collection.ownedSetIds = ['core-set'];
+  const once = mergeOwnedSets(state, ['dark-city']);
+  const twice = mergeOwnedSets(once, ['dark-city']);
+  assert.deepEqual(once.collection.ownedSetIds, twice.collection.ownedSetIds);
+});
+
+test('mergeOwnedSets leaves owned set unchanged when newSetIds is empty', () => {
+
+  const state = createDefaultState();
+  state.collection.ownedSetIds = ['core-set'];
+  const result = mergeOwnedSets(state, []);
+  assert.deepEqual(result.collection.ownedSetIds, ['core-set']);
+});
+
+test('mergeOwnedSets produces a result sorted alphabetically', () => {
+
+  const state = createDefaultState();
+  state.collection.ownedSetIds = ['dark-city'];
+  const result = mergeOwnedSets(state, ['core-set']);
+  assert.deepEqual(result.collection.ownedSetIds, ['core-set', 'dark-city']);
+});
+
+test('mergeOwnedSets does not mutate the original state', () => {
+
+  const state = createDefaultState();
+  state.collection.ownedSetIds = ['core-set'];
+  mergeOwnedSets(state, ['dark-city']);
+  assert.deepEqual(state.collection.ownedSetIds, ['core-set']);
+});
+
+test('getCardsByCategory falls back to an empty array when a pool category key is missing', () => {
+
+  const partialPools = { heroes: [{ id: 'h1', setId: 'core-set', name: 'Hero One' }] };
+  const categories = getCardsByCategory(partialPools);
+  assert.equal(categories.length, 5);
+  const masterminds = categories.find((c) => c.categoryId === 'masterminds');
+  assert.deepEqual(masterminds!.cards, []);
+  const schemes = categories.find((c) => c.categoryId === 'schemes');
+  assert.deepEqual(schemes!.cards, []);
+});
+
+test('getCardsByExpansion silently skips cards whose setId is not in pools.sets', () => {
+
+  const pools = {
+    sets: [{ id: 'core-set', name: 'Core Set' }],
+    heroes: [
+      { id: 'h1', setId: 'core-set', name: 'Hero One' },
+      { id: 'h2', setId: 'orphan-set', name: 'Orphan Hero' }
+    ],
+    masterminds: [],
+    villainGroups: [],
+    henchmanGroups: [],
+    schemes: []
+  };
+  const expansions = getCardsByExpansion(pools);
+  assert.equal(expansions.length, 1);
+  assert.equal(expansions[0].setId, 'core-set');
+  assert.equal(expansions[0].cards.length, 1);
+  assert.equal(expansions[0].cards[0].name, 'Hero One');
 });
 

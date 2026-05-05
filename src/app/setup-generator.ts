@@ -83,7 +83,7 @@ interface ValidateLegalityOptions {
   state: AppState;
   playerCount: number;
   advancedSolo?: boolean;
-  playMode?: PlayMode | string;
+  playMode?: PlayMode;
   forcedPicks?: unknown;
 }
 
@@ -101,7 +101,7 @@ interface GenerateSetupOptions {
   state: AppState;
   playerCount: number;
   advancedSolo?: boolean;
-  playMode?: PlayMode | string;
+  playMode?: PlayMode;
   forcedPicks?: unknown;
   epicMastermind?: boolean;
   random?: () => number;
@@ -355,6 +355,34 @@ function appendForcedReason(map: Map<string, ForcedEntry>, id: string, reason: s
 // Forced pick validation
 // ---------------------------------------------------------------------------
 
+function validateMastermindLeadSlots(
+  forcedPicks: ForcedPicks,
+  mastermindsById: Record<string, MastermindRuntime>,
+  template: SetupTemplate,
+  reasons: string[]
+): void {
+  const forcedMastermind = forcedPicks.mastermindId ? mastermindsById[forcedPicks.mastermindId] : null;
+  const mastermindLeadIsVillain = forcedMastermind?.lead?.category === 'villains';
+  const mastermindLeadVillainAlreadyForced =
+    mastermindLeadIsVillain && forcedPicks.villainGroupIds.includes(forcedMastermind!.lead!.id);
+  const mastermindLeadVillainGroupCount = mastermindLeadIsVillain && !mastermindLeadVillainAlreadyForced && !isSoloMode(template) ? 1 : 0;
+  const effectiveForcedVillainCount = forcedPicks.villainGroupIds.length + mastermindLeadVillainGroupCount;
+
+  if (effectiveForcedVillainCount > template.villainGroupCount) {
+    reasons.push(`Forced Villain Groups (including mastermind lead) exceed the base Villain Group slots for this setup mode (${effectiveForcedVillainCount}/${template.villainGroupCount}).`);
+  }
+
+  const mastermindLeadIsHenchman = forcedMastermind?.lead?.category === 'henchmen';
+  const mastermindLeadHenchmanAlreadyForced =
+    mastermindLeadIsHenchman && forcedPicks.henchmanGroupIds.includes(forcedMastermind!.lead!.id);
+  const mastermindLeadHenchmanGroupCount = mastermindLeadIsHenchman && !mastermindLeadHenchmanAlreadyForced && !isSoloMode(template) ? 1 : 0;
+  const effectiveForcedHenchmanCount = forcedPicks.henchmanGroupIds.length + mastermindLeadHenchmanGroupCount;
+
+  if (effectiveForcedHenchmanCount > template.henchmanGroupCount) {
+    reasons.push(`Forced Henchman Groups (including mastermind lead) exceed the base Henchman Group slots for this setup mode (${effectiveForcedHenchmanCount}/${template.henchmanGroupCount}).`);
+  }
+}
+
 function validateForcedPickAvailability(
   forcedPicks: ForcedPicks,
   pools: GamePool,
@@ -399,27 +427,8 @@ function validateForcedPickAvailability(
     reasons.push(`Forced Heroes exceed the base Hero slots for this setup mode (${forcedPicks.heroIds.length}/${template.heroCount}).`);
   }
 
-  // Count mastermind villain lead toward the villain group slot limit
-  const forcedMastermind = forcedPicks.mastermindId ? mastermindsById[forcedPicks.mastermindId] : null;
-  const mastermindLeadIsVillain = forcedMastermind?.lead?.category === 'villains';
-  const mastermindLeadVillainAlreadyForced =
-    mastermindLeadIsVillain && forcedPicks.villainGroupIds.includes(forcedMastermind!.lead!.id);
-  const mastermindLeadVillainGroupCount = mastermindLeadIsVillain && !mastermindLeadVillainAlreadyForced && !isSoloMode(template) ? 1 : 0;
-  const effectiveForcedVillainCount = forcedPicks.villainGroupIds.length + mastermindLeadVillainGroupCount;
-
-  if (effectiveForcedVillainCount > template.villainGroupCount) {
-    reasons.push(`Forced Villain Groups (including mastermind lead) exceed the base Villain Group slots for this setup mode (${effectiveForcedVillainCount}/${template.villainGroupCount}).`);
-  }
-
-  const mastermindLeadIsHenchman = forcedMastermind?.lead?.category === 'henchmen';
-  const mastermindLeadHenchmanAlreadyForced =
-    mastermindLeadIsHenchman && forcedPicks.henchmanGroupIds.includes(forcedMastermind!.lead!.id);
-  const mastermindLeadHenchmanGroupCount = mastermindLeadIsHenchman && !mastermindLeadHenchmanAlreadyForced && !isSoloMode(template) ? 1 : 0;
-  const effectiveForcedHenchmanCount = forcedPicks.henchmanGroupIds.length + mastermindLeadHenchmanGroupCount;
-
-  if (effectiveForcedHenchmanCount > template.henchmanGroupCount) {
-    reasons.push(`Forced Henchman Groups (including mastermind lead) exceed the base Henchman Group slots for this setup mode (${effectiveForcedHenchmanCount}/${template.henchmanGroupCount}).`);
-  }
+  // Count mastermind villain and henchman lead toward the slot limits
+  validateMastermindLeadSlots(forcedPicks, mastermindsById, template, reasons);
 
   return reasons;
 }
@@ -714,9 +723,9 @@ function buildCategorySelection(
   usageBucket: UsageState,
   random: () => number,
   forcedPicks: ForcedPicks,
-  template: SetupTemplate,
-  preferredExpansionId: string | null = null
+  opts: { template: SetupTemplate; preferredExpansionId?: string | null }
 ): CategorySelectionResult {
+  const { template, preferredExpansionId = null } = opts;
   const forced = resolveForcedCollections(scheme, mastermind, pools, forcedPicks, template);
   if (!forced.allAvailable) {
     return { selection: null, reason: 'One or more forced Villain Group or Henchman Group picks are unavailable in the current owned collection.' };
@@ -903,7 +912,7 @@ function resolveLeadEntity(
 
 function tryMastermindForScheme(mastermind: MastermindRuntime, context: TryMastermindContext): GeneratedSetup | null {
   const { mastermindRanking, scheme, schemeSelection, pools, effectiveRequirements, normalizedForcedPicks, state, runtime, random, constraintFailureReasons, eligibleSchemes, template } = context;
-  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks, template, normalizedForcedPicks.preferredExpansionId);
+  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks, { template, preferredExpansionId: normalizedForcedPicks.preferredExpansionId });
   if (!categorySelection.selection) {
     if (categorySelection.reason) {
       constraintFailureReasons.add(categorySelection.reason);

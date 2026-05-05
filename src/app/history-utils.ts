@@ -129,14 +129,14 @@ export function formatHistorySummary(record: HistoryRecord, indexes: RuntimeInde
     playMode,
     result,
     resultLabel: formatGameResultStatus(result),
-    scoreLabel: isCompletedGameResult(result) && result.score !== null && record.playerCount === 1 ? `Score ${result.score}` : null,
+    scoreLabel: isCompletedGameResult(result) && result.score !== null && record.playerCount === 1 ? `Score ${String(result.score)}` : null,
     perPlayerScoreLabel: (function() {
       if (record.playerCount < 2 || !isCompletedGameResult(result) || !Array.isArray(result.score)) return null;
       const hasAnyScore = result.score.some((entry) => entry.score !== null);
       if (!hasAnyScore) return null;
       return result.score.map((entry, i) => {
         const name = entry.playerName && entry.playerName.trim() !== '' ? entry.playerName : `Player ${i + 1}`;
-        const score = entry.score !== null ? entry.score : '\u2014';
+        const score = entry.score ?? '\u2014';
         return `${name}: ${score}`;
       }).join(' \u00b7 ');
     })(),
@@ -256,6 +256,6 @@ export function buildFullResetPreview(): {
     collection: defaultState.collection,
     usage: defaultState.usage,
     history: defaultState.history,
-    preferences: defaultState.preferences as AppState['preferences']
+    preferences: defaultState.preferences
   };
 }

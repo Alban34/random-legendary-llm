@@ -101,6 +101,28 @@ When the epic containing that story changes files under `/src`, the epic is not 
 
 ---
 
+## Code coverage target
+
+As of Epic 95, the project adopts a formal coverage threshold for all testable utility modules:
+
+**Target: ≥ 80% statement coverage AND ≥ 80% branch coverage per module**
+
+This applies only to files that can run in the Vitest/Node environment. The following categories are **explicitly excluded** because they require a browser context, Svelte reactivity, or a live DOM:
+
+| Category | Examples |
+|----------|----------|
+| Browser / SW entry points | `src/sw.ts`, `src/app/app-init.ts`, `src/app/app-renderer.ts`, `src/app/browser-entry.ts` |
+| DOM-dependent utilities | `src/app/collection-actions.ts`, `src/app/feedback-utils.ts`, `src/app/modal-utils.ts`, `src/app/focus-utils.ts` |
+| Svelte reactive VMs | `src/app/backup-vm.svelte.ts`, `src/app/browse-vm.svelte.ts`, `src/app/history-vm.svelte.ts`, `src/app/import-vm.svelte.ts`, `src/app/new-game-vm.svelte.ts`, `src/app/state-store.svelte.ts` |
+| Type-only / data-only | `src/app/env.d.ts`, `src/app/types.ts`, `src/data/canonical-game-data.json` |
+| Svelte components (not `.ts`) | All `src/components/*.svelte` files — outside the `src/**/*.ts` coverage scope |
+
+Excluded modules should be covered by Playwright E2E tests instead.
+
+Coverage is measured by `@vitest/coverage-v8` against the `src/**/*.ts` include pattern (configured in `vitest.config.ts`). The per-module gap analysis is recorded in [`documentation/planning/epic/epic-95-coverage-audit.md`](../planning/epic/epic-95-coverage-audit.md).
+
+---
+
 ## Design System Epic DS1 — Design Token Foundation and Theme Contract
 
 Automated verification: `src/app/app-shell.test.ts`, `src/app/theme-utils.test.ts`
@@ -139,7 +161,9 @@ Automated verification: `src/app/history-utils.test.ts`
 
 Automated verification: `src/app/myludo-import-utils.test.ts`
 
-Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, `mergeOwnedSets` (via `collection-utils.ts`), CollectionTab import panel rendering, post-import summary, and dismiss flow. All 23 tests pass.
+Covers: `parseMyludoFile`, `matchMyludoNamesToSets`, CollectionTab import panel rendering, post-import summary, and dismiss flow. All 17 tests pass.
+
+Note (Epic 94): `mergeOwnedSets` tests were moved from this file to `collection-utils.test.ts` as part of the Epic 94 cross-file duplication reduction.
 
 ---
 
@@ -149,7 +173,9 @@ Automated verification: `src/app/collection-utils.test.ts`
 
 Browser QC: `test/playwright/card-browser.spec.ts`
 
-Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion` (via `collection-utils.ts`), `CardBrowserByCategory.svelte`, `CardBrowserByExpansion.svelte`, the "Sets" / "Browse Cards" view toggle in `CollectionTab.svelte`, the "By Category" / "By Expansion" grouping selector, session-scoped grouping persistence, and `aria-pressed` state on all toggle controls.
+Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion`, `mergeOwnedSets` (all via `collection-utils.ts`), `CardBrowserByCategory.svelte`, `CardBrowserByExpansion.svelte`, the "Sets" / "Browse Cards" view toggle in `CollectionTab.svelte`, the "By Category" / "By Expansion" grouping selector, session-scoped grouping persistence, and `aria-pressed` state on all toggle controls.
+
+Note (Epic 94): 6 `mergeOwnedSets` tests were consolidated into this file from `myludo-import-utils.test.ts` and `bgg-import-utils.test.ts` as the canonical location for `collection-utils.ts` coverage.
 
 ---
 

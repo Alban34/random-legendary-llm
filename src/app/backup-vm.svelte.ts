@@ -3,8 +3,10 @@
 
 import { toast } from 'svelte-sonner';
 import { buildBackupFilename, createBackupPayload, mergeImportedState, parseBackupText, summarizeBackupState } from './backup-utils.ts';
-import type { AppState, LocaleTools, BackupPayload, StagedBackup } from './types.ts';
+import type { AppState, LocaleTools, StagedBackup } from './types.ts';
 import type { Epic1Bundle } from './game-data-pipeline.ts';
+
+export type { BackupPayload } from './types.ts';
 
 export const backupVm = $state<{
   importError: string | null;
@@ -24,9 +26,6 @@ export function resetBackupDraft(): void {
   backupVm.confirmRestoreMode = null;
   backupVm.lastExportFileName = null;
 }
-
-// Keep BackupPayload re-exported for any consumers that imported it via this module
-export type { BackupPayload };
 
 // ---------------------------------------------------------------------------
 // Action factory

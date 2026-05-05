@@ -240,10 +240,10 @@ export function createHistoryActions(deps: HistoryActionDeps) {
       deps.applyStateUpdate(
         (currentState) =>
           updateGameResult(currentState, {
-            recordId: activeRecordId!,
+            recordId: activeRecordId,
             outcome: validation.result.outcome!,
             score: validation.result.score,
-            notes: validation.result.notes !== null ? validation.result.notes : undefined,
+            notes: validation.result.notes ?? undefined,
             updatedAt: validation.result.updatedAt ?? new Date().toISOString()
           }),
         wasPending

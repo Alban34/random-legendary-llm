@@ -172,6 +172,36 @@ export function buildOutcomeInsights(history: AppState['history']): unknown {
   };
 }
 
+function collectSetIdsForRecord(
+  snapshot: { mastermindId: string; schemeId: string; heroIds: string[]; villainGroupIds: string[]; henchmanGroupIds: string[] },
+  indexes: AppRuntime['indexes']
+): Set<string> {
+  const setIds = new Set<string>();
+
+  const mastermindSetId = indexes.mastermindsById[snapshot.mastermindId]?.setId;
+  if (mastermindSetId !== undefined) setIds.add(mastermindSetId);
+
+  const schemeSetId = indexes.schemesById[snapshot.schemeId]?.setId;
+  if (schemeSetId !== undefined) setIds.add(schemeSetId);
+
+  for (const id of snapshot.heroIds) {
+    const setId = indexes.heroesById[id]?.setId;
+    if (setId !== undefined) setIds.add(setId);
+  }
+
+  for (const id of snapshot.villainGroupIds) {
+    const setId = indexes.villainGroupsById[id]?.setId;
+    if (setId !== undefined) setIds.add(setId);
+  }
+
+  for (const id of snapshot.henchmanGroupIds) {
+    const setId = indexes.henchmanGroupsById[id]?.setId;
+    if (setId !== undefined) setIds.add(setId);
+  }
+
+  return setIds;
+}
+
 export function buildExpansionUsageInsights(
   runtime: AppRuntime,
   history: AppState['history'],
@@ -184,30 +214,7 @@ export function buildExpansionUsageInsights(
   const counts: Record<string, number> = {};
 
   for (const record of history) {
-    const snapshot = record.setupSnapshot;
-    const setIds = new Set<string>();
-
-    const mastermindSetId = runtime.indexes.mastermindsById[snapshot.mastermindId]?.setId;
-    if (mastermindSetId !== undefined) setIds.add(mastermindSetId);
-
-    const schemeSetId = runtime.indexes.schemesById[snapshot.schemeId]?.setId;
-    if (schemeSetId !== undefined) setIds.add(schemeSetId);
-
-    for (const id of snapshot.heroIds) {
-      const setId = runtime.indexes.heroesById[id]?.setId;
-      if (setId !== undefined) setIds.add(setId);
-    }
-
-    for (const id of snapshot.villainGroupIds) {
-      const setId = runtime.indexes.villainGroupsById[id]?.setId;
-      if (setId !== undefined) setIds.add(setId);
-    }
-
-    for (const id of snapshot.henchmanGroupIds) {
-      const setId = runtime.indexes.henchmanGroupsById[id]?.setId;
-      if (setId !== undefined) setIds.add(setId);
-    }
-
+    const setIds = collectSetIdsForRecord(record.setupSnapshot, runtime.indexes);
     for (const setId of setIds) {
       counts[setId] = (counts[setId] ?? 0) + 1;
     }
