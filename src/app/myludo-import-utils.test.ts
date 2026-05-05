@@ -6,8 +6,6 @@ import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from './game-data-pipeline.ts';
 import { parseMyludoFile, matchMyludoNamesToSets } from './myludo-import-utils.ts';
-import { mergeOwnedSets } from './collection-utils.ts';
-import { createDefaultState } from './state-store.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -146,9 +144,9 @@ test('matchMyludoNamesToSets handles mixed matched and unmatched input', () => {
     bundle.runtime.sets
   );
   assert.equal(matched.length, 2);
-  const matchedIds = matched.map((m) => m.setId);
-  assert.ok(matchedIds.includes('core-set'), 'core-set should be matched');
-  assert.ok(matchedIds.includes('dark-city'), 'dark-city should be matched');
+  const matchedIds = new Set(matched.map((m) => m.setId));
+  assert.ok(matchedIds.has('core-set'), 'core-set should be matched');
+  assert.ok(matchedIds.has('dark-city'), 'dark-city should be matched');
   assert.equal(unmatched.length, 1);
   assert.equal(unmatched[0], 'Unknown Title');
 });
@@ -186,57 +184,4 @@ test('matchMyludoNamesToSets preserves original casing in matched.myludoName', (
   assert.equal(matched.length, 1);
   assert.equal(matched[0].myludoName, 'DARK CITY');
   assert.equal(matched[0].setId, 'dark-city');
-});
-
-// ---------------------------------------------------------------------------
-// mergeOwnedSets
-// ---------------------------------------------------------------------------
-
-test('mergeOwnedSets merges new IDs into existing owned set with sorting', () => {
-
-  const state = createDefaultState();
-  state.collection.ownedSetIds = ['core-set'];
-  const result = mergeOwnedSets(state, ['dark-city']);
-  assert.deepEqual(result.collection.ownedSetIds, ['core-set', 'dark-city']);
-});
-
-test('mergeOwnedSets produces no duplicates when merging an already-owned ID', () => {
-
-  const state = createDefaultState();
-  state.collection.ownedSetIds = ['core-set'];
-  const result = mergeOwnedSets(state, ['core-set']);
-  assert.deepEqual(result.collection.ownedSetIds, ['core-set']);
-});
-
-test('mergeOwnedSets is idempotent: calling twice with same input produces the same result', () => {
-
-  const state = createDefaultState();
-  state.collection.ownedSetIds = ['core-set'];
-  const once = mergeOwnedSets(state, ['dark-city']);
-  const twice = mergeOwnedSets(once, ['dark-city']);
-  assert.deepEqual(once.collection.ownedSetIds, twice.collection.ownedSetIds);
-});
-
-test('mergeOwnedSets leaves owned set unchanged when newSetIds is empty', () => {
-
-  const state = createDefaultState();
-  state.collection.ownedSetIds = ['core-set'];
-  const result = mergeOwnedSets(state, []);
-  assert.deepEqual(result.collection.ownedSetIds, ['core-set']);
-});
-
-test('mergeOwnedSets produces a result sorted alphabetically', () => {
-
-  const state = createDefaultState();
-  state.collection.ownedSetIds = ['dark-city'];
-  const result = mergeOwnedSets(state, ['core-set']);
-  assert.deepEqual(result.collection.ownedSetIds, ['core-set', 'dark-city']);
-});
-
-test('mergeOwnedSets does not mutate the original state', () => {
-
-  const state = createDefaultState();
-  state.collection.ownedSetIds = ['core-set'];
-  mergeOwnedSets(state, ['dark-city']);
-  assert.deepEqual(state.collection.ownedSetIds, ['core-set']);
 });

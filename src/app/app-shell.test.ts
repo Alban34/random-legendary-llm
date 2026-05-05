@@ -37,7 +37,7 @@ test('Defines governed semantic token families in the stylesheet', () => {
     '--shadow-panel:',
     '--motion-base:'
   ]) {
-    assert.match(shellCss, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+    assert.match(shellCss, new RegExp(token.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)));
   }
 
   assert.match(shellCss, /--bg:\s*var\(--color-background\);/);
@@ -57,7 +57,7 @@ test('index.html uses legacyThemeIdAliases and supportedThemeIds for theme initi
 test('Ships governed typography roles and tokenized shell primitives', () => {
 
   for (const selector of ['.display-lg', '.display-md', '.heading-lg', '.heading-md', '.body-lg', '.body-md', '.body-sm', '.label']) {
-    assert.match(shellCss, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+    assert.match(shellCss, new RegExp(selector.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)));
   }
 
   assert.match(shellCss, /\.app-header h1\s*\{[\s\S]*font-family:\s*var\(--font-heading\);/);

@@ -129,3 +129,36 @@ test('Bundle summary remains internally green', () => {
   assert.equal(bundle.tests.filter((entry) => entry.status === 'fail').length, 0);
 });
 
+test('buildCanonicalSourceData falls back to [] and default numeric values when optional fields are absent', () => {
+
+  const minimalSeed = {
+    setCatalog: [{ name: 'Minimal Set', year: 2020, type: 'base' }],
+    rawCardData: {
+      heroes: [{ setName: 'Minimal Set', name: 'Hero Alpha' }],
+      masterminds: [{ setName: 'Minimal Set', name: 'Villain Prime' }],
+      villainGroups: [{ setName: 'Minimal Set', name: 'Bad Guys' }],
+      henchmanGroups: [{ setName: 'Minimal Set', name: 'Henchmen' }],
+      schemes: [{ setName: 'Minimal Set', name: 'Evil Plan' }]
+    }
+  };
+
+  const result = buildCanonicalSourceData(minimalSeed as unknown as Parameters<typeof buildCanonicalSourceData>[0]);
+  const set = result.sets[0];
+
+  assert.deepEqual(set.aliases, [], 'Set aliases should default to []');
+  assert.deepEqual(set.heroes[0].aliases, [], 'Hero aliases should default to []');
+  assert.deepEqual(set.heroes[0].teams, [], 'Hero teams should default to []');
+  assert.equal(set.heroes[0].cardCount, 14, 'Hero cardCount should default to 14');
+  assert.deepEqual(set.masterminds[0].aliases, [], 'Mastermind aliases should default to []');
+  assert.deepEqual(set.masterminds[0].notes, [], 'Mastermind notes should default to []');
+  assert.deepEqual(set.villainGroups[0].aliases, [], 'Villain group aliases should default to []');
+  assert.equal(set.villainGroups[0].cardCount, 8, 'Villain group cardCount should default to 8');
+  assert.deepEqual(set.henchmanGroups[0].aliases, [], 'Henchman group aliases should default to []');
+  assert.equal(set.henchmanGroups[0].cardCount, 10, 'Henchman group cardCount should default to 10');
+  assert.deepEqual(set.schemes[0].aliases, [], 'Scheme aliases should default to []');
+  assert.deepEqual(set.schemes[0].constraints, { minimumPlayerCount: null }, 'Scheme constraints should default');
+  assert.deepEqual(set.schemes[0].forcedGroups, [], 'Scheme forcedGroups should default to []');
+  assert.deepEqual(set.schemes[0].modifiers, [], 'Scheme modifiers should default to []');
+  assert.deepEqual(set.schemes[0].notes, [], 'Scheme notes should default to []');
+});
+

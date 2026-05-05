@@ -2,8 +2,7 @@ import { test, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { join } from 'node:path';
+import path, { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from './game-data-pipeline.ts';
@@ -61,6 +60,38 @@ function makeTargetedState({ schemeName, mastermindName, heroUsageOverride } = {
   }
 
   return state;
+}
+
+function markAllMastermindsExceptLead(state, bundle, leadMastermind) {
+  const allMasterminds = bundle.runtime.indexes.allMasterminds;
+  allMasterminds.forEach((m, index) => {
+    if (m.id !== leadMastermind.id) {
+      state.usage.masterminds[m.id] = {
+        plays: 1,
+        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
+      };
+    }
+  });
+}
+
+function computeActiveHeroTeamNames(state, bundle) {
+  const effectiveSetIds = state.collection.activeSetIds ?? state.collection.ownedSetIds;
+  const pools = buildOwnedPools(bundle.runtime, effectiveSetIds);
+  const teamSet = new Set<string>();
+  for (const hero of pools.heroes) {
+    for (const team of hero.teams) {
+      if (team) teamSet.add(team);
+    }
+  }
+  return [...teamSet].sort((a, b) => a.localeCompare(b));
+}
+
+function findSimpleSchemeAndMastermind(bundle) {
+  const simpleScheme = bundle.runtime.indexes.allSchemes.find(
+    (entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount
+  );
+  const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((entity) => !entity.lead);
+  return { simpleScheme, simpleMastermind };
 }
 
 beforeAll(async () => {
@@ -167,7 +198,7 @@ test('Least-played fallback is used when fresh heroes are insufficient', () => {
 test('Generate/Regenerate remain ephemeral and do not mutate persisted state inputs', () => {
 
   const state = makeTargetedState();
-  const before = JSON.parse(JSON.stringify(state));
+  const before = structuredClone(state);
 
   generateSetup({ runtime: bundle.runtime, state, playerCount: 1, advancedSolo: false, random: () => 0 });
   generateSetup({ runtime: bundle.runtime, state, playerCount: 1, advancedSolo: false, random: () => 0.75 });
@@ -636,15 +667,7 @@ test('Story 1: standard solo (playerCount=1) does not force the mastermind lead'
 
 test('Story 1: advanced-solo does not force the mastermind lead', () => {
   const state = createAllOwnedState();
-  const allMasterminds = bundle.runtime.indexes.allMasterminds;
-  allMasterminds.forEach((m, index) => {
-    if (m.id !== leadMastermind.id) {
-      state.usage.masterminds[m.id] = {
-        plays: 1,
-        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
-      };
-    }
-  });
+  markAllMastermindsExceptLead(state, bundle, leadMastermind);
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 1, playMode: 'advanced-solo', random: () => 0 });
   const leadId = leadMastermind.lead.id;
   const category = leadMastermind.lead.category;
@@ -658,15 +681,7 @@ test('Story 1: advanced-solo does not force the mastermind lead', () => {
 
 test('Story 1: two-handed-solo does not force the mastermind lead', () => {
   const state = createAllOwnedState();
-  const allMasterminds = bundle.runtime.indexes.allMasterminds;
-  allMasterminds.forEach((m, index) => {
-    if (m.id !== leadMastermind.id) {
-      state.usage.masterminds[m.id] = {
-        plays: 1,
-        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
-      };
-    }
-  });
+  markAllMastermindsExceptLead(state, bundle, leadMastermind);
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 1, playMode: 'two-handed-solo', random: () => 0 });
   const leadId = leadMastermind.lead.id;
   const category = leadMastermind.lead.category;
@@ -680,15 +695,7 @@ test('Story 1: two-handed-solo does not force the mastermind lead', () => {
 
 test('Story 1: standard-solo-v2 does not force the mastermind lead', () => {
   const state = createAllOwnedState();
-  const allMasterminds = bundle.runtime.indexes.allMasterminds;
-  allMasterminds.forEach((m, index) => {
-    if (m.id !== leadMastermind.id) {
-      state.usage.masterminds[m.id] = {
-        plays: 1,
-        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
-      };
-    }
-  });
+  markAllMastermindsExceptLead(state, bundle, leadMastermind);
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 1, playMode: 'standard-solo-v2', random: () => 0 });
   const leadId = leadMastermind.lead.id;
   const category = leadMastermind.lead.category;
@@ -702,15 +709,7 @@ test('Story 1: standard-solo-v2 does not force the mastermind lead', () => {
 
 test('Story 1 regression: non-solo (playerCount=2) DOES force the mastermind lead', () => {
   const state = createAllOwnedState();
-  const allMasterminds = bundle.runtime.indexes.allMasterminds;
-  allMasterminds.forEach((m, index) => {
-    if (m.id !== leadMastermind.id) {
-      state.usage.masterminds[m.id] = {
-        plays: 1,
-        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
-      };
-    }
-  });
+  markAllMastermindsExceptLead(state, bundle, leadMastermind);
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 2, playMode: 'standard', random: () => 0 });
   const leadId = leadMastermind.lead.id;
   const category = leadMastermind.lead.category;
@@ -724,15 +723,7 @@ test('Story 1 regression: non-solo (playerCount=2) DOES force the mastermind lea
 
 test('Story 2: standard solo (playerCount=1) sets leadEntity to null', () => {
   const state = createAllOwnedState();
-  const allMasterminds = bundle.runtime.indexes.allMasterminds;
-  allMasterminds.forEach((m, index) => {
-    if (m.id !== leadMastermind.id) {
-      state.usage.masterminds[m.id] = {
-        plays: 1,
-        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
-      };
-    }
-  });
+  markAllMastermindsExceptLead(state, bundle, leadMastermind);
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 1, playMode: 'standard', random: () => 0 });
   assert.equal(setup.mastermind.id, leadMastermind.id);
   assert.equal(setup.mastermind.leadEntity, null);
@@ -740,15 +731,7 @@ test('Story 2: standard solo (playerCount=1) sets leadEntity to null', () => {
 
 test('Story 2: advanced-solo sets leadEntity to null', () => {
   const state = createAllOwnedState();
-  const allMasterminds = bundle.runtime.indexes.allMasterminds;
-  allMasterminds.forEach((m, index) => {
-    if (m.id !== leadMastermind.id) {
-      state.usage.masterminds[m.id] = {
-        plays: 1,
-        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
-      };
-    }
-  });
+  markAllMastermindsExceptLead(state, bundle, leadMastermind);
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 1, playMode: 'advanced-solo', random: () => 0 });
   assert.equal(setup.mastermind.id, leadMastermind.id);
   assert.equal(setup.mastermind.leadEntity, null);
@@ -756,15 +739,7 @@ test('Story 2: advanced-solo sets leadEntity to null', () => {
 
 test('Story 2: two-handed-solo sets leadEntity to null', () => {
   const state = createAllOwnedState();
-  const allMasterminds = bundle.runtime.indexes.allMasterminds;
-  allMasterminds.forEach((m, index) => {
-    if (m.id !== leadMastermind.id) {
-      state.usage.masterminds[m.id] = {
-        plays: 1,
-        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
-      };
-    }
-  });
+  markAllMastermindsExceptLead(state, bundle, leadMastermind);
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 1, playMode: 'two-handed-solo', random: () => 0 });
   assert.equal(setup.mastermind.id, leadMastermind.id);
   assert.equal(setup.mastermind.leadEntity, null);
@@ -772,15 +747,7 @@ test('Story 2: two-handed-solo sets leadEntity to null', () => {
 
 test('Story 2: standard-solo-v2 sets leadEntity to null', () => {
   const state = createAllOwnedState();
-  const allMasterminds = bundle.runtime.indexes.allMasterminds;
-  allMasterminds.forEach((m, index) => {
-    if (m.id !== leadMastermind.id) {
-      state.usage.masterminds[m.id] = {
-        plays: 1,
-        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
-      };
-    }
-  });
+  markAllMastermindsExceptLead(state, bundle, leadMastermind);
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 1, playMode: 'standard-solo-v2', random: () => 0 });
   assert.equal(setup.mastermind.id, leadMastermind.id);
   assert.equal(setup.mastermind.leadEntity, null);
@@ -788,15 +755,7 @@ test('Story 2: standard-solo-v2 sets leadEntity to null', () => {
 
 test('Story 2 regression: non-solo (playerCount=2) leadEntity is non-null', () => {
   const state = createAllOwnedState();
-  const allMasterminds = bundle.runtime.indexes.allMasterminds;
-  allMasterminds.forEach((m, index) => {
-    if (m.id !== leadMastermind.id) {
-      state.usage.masterminds[m.id] = {
-        plays: 1,
-        lastPlayedAt: `2026-04-${String((index % 28) + 1).padStart(2, '0')}T12:00:00.000Z`
-      };
-    }
-  });
+  markAllMastermindsExceptLead(state, bundle, leadMastermind);
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 2, playMode: 'standard', random: () => 0 });
   assert.equal(setup.mastermind.id, leadMastermind.id);
   assert.notEqual(setup.mastermind.leadEntity, null);
@@ -807,10 +766,7 @@ test('Story 2 regression: non-solo (playerCount=2) leadEntity is non-null', () =
 test('When forcedTeam is set and team has enough heroes, setup includes only heroes from that team', () => {
 
   const state = createAllOwnedState();
-  const simpleScheme = bundle.runtime.indexes.allSchemes.find(
-    (entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount
-  );
-  const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((entity) => !entity.lead);
+  const { simpleScheme, simpleMastermind } = findSimpleSchemeAndMastermind(bundle);
 
   const setup = generateSetup({
     runtime: bundle.runtime,
@@ -826,19 +782,17 @@ test('When forcedTeam is set and team has enough heroes, setup includes only her
   });
 
   assert.equal(setup.heroes.length, 5);
+  const heroDesc = setup.heroes.map((h) => `${h.name}[${h.teams.join(',')}]`).join(', ');
   assert.ok(
     setup.heroes.every((hero) => hero.teams.includes('X-Men')),
-    `Expected all heroes to be X-Men, got: ${setup.heroes.map((h) => `${h.name}[${h.teams.join(',')}]`).join(', ')}`
+    `Expected all heroes to be X-Men, got: ${heroDesc}`
   );
 });
 
 test('When forcedTeam pool is smaller than heroCount, fills remaining from general pool', () => {
 
   const state = createAllOwnedState();
-  const simpleScheme = bundle.runtime.indexes.allSchemes.find(
-    (entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount
-  );
-  const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((entity) => !entity.lead);
+  const { simpleScheme, simpleMastermind } = findSimpleSchemeAndMastermind(bundle);
 
   const allHeroes = bundle.runtime.indexes.allHeroes;
   const teamCounts = {};
@@ -875,10 +829,7 @@ test('When forcedTeam pool is smaller than heroCount, fills remaining from gener
 test('Forced heroIds take priority before forcedTeam heroes are selected', () => {
 
   const state = createAllOwnedState();
-  const simpleScheme = bundle.runtime.indexes.allSchemes.find(
-    (entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount
-  );
-  const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((entity) => !entity.lead);
+  const { simpleScheme, simpleMastermind } = findSimpleSchemeAndMastermind(bundle);
 
   const nonXmenHero = bundle.runtime.indexes.allHeroes.find((hero) => !hero.teams.includes('X-Men'));
   assert.ok(nonXmenHero, 'Expected to find a hero outside X-Men');
@@ -906,10 +857,7 @@ test('Forced heroIds take priority before forcedTeam heroes are selected', () =>
 test('Villain groups, henchman groups, scheme, and mastermind are unaffected by forcedTeam', () => {
 
   const state = createAllOwnedState();
-  const simpleScheme = bundle.runtime.indexes.allSchemes.find(
-    (entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount
-  );
-  const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((entity) => !entity.lead);
+  const { simpleScheme, simpleMastermind } = findSimpleSchemeAndMastermind(bundle);
 
   const setup = generateSetup({
     runtime: bundle.runtime,
@@ -933,10 +881,7 @@ test('Villain groups, henchman groups, scheme, and mastermind are unaffected by 
 test('When forcedTeam is null, hero selection behaves as normal', () => {
 
   const state = createAllOwnedState();
-  const simpleScheme = bundle.runtime.indexes.allSchemes.find(
-    (entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount
-  );
-  const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((entity) => !entity.lead);
+  const { simpleScheme, simpleMastermind } = findSimpleSchemeAndMastermind(bundle);
 
   const setup = generateSetup({
     runtime: bundle.runtime,
@@ -959,13 +904,7 @@ test('activeHeroTeamNames contains only team names present on at least one hero 
   const state = createAllOwnedState();
   const effectiveSetIds = state.collection.activeSetIds ?? state.collection.ownedSetIds;
   const pools = buildOwnedPools(bundle.runtime, effectiveSetIds);
-  const teamSet = new Set();
-  for (const hero of pools.heroes) {
-    for (const team of hero.teams) {
-      if (team) teamSet.add(team);
-    }
-  }
-  const activeHeroTeamNames = [...teamSet].sort((a, b) => a.localeCompare(b));
+  const activeHeroTeamNames = computeActiveHeroTeamNames(state, bundle);
 
   assert.ok(activeHeroTeamNames.length > 0, 'Expected at least one team name');
   for (const team of activeHeroTeamNames) {
@@ -976,15 +915,7 @@ test('activeHeroTeamNames contains only team names present on at least one hero 
 
 test('activeHeroTeamNames is sorted alphabetically', () => {
   const state = createAllOwnedState();
-  const effectiveSetIds = state.collection.activeSetIds ?? state.collection.ownedSetIds;
-  const pools = buildOwnedPools(bundle.runtime, effectiveSetIds);
-  const teamSet = new Set();
-  for (const hero of pools.heroes) {
-    for (const team of hero.teams) {
-      if (team) teamSet.add(team);
-    }
-  }
-  const activeHeroTeamNames = [...teamSet].sort((a, b) => a.localeCompare(b));
+  const activeHeroTeamNames = computeActiveHeroTeamNames(state, bundle);
 
   for (let i = 1; i < activeHeroTeamNames.length; i++) {
     assert.ok(
@@ -996,15 +927,7 @@ test('activeHeroTeamNames is sorted alphabetically', () => {
 
 test('activeHeroTeamNames is deduplicated', () => {
   const state = createAllOwnedState();
-  const effectiveSetIds = state.collection.activeSetIds ?? state.collection.ownedSetIds;
-  const pools = buildOwnedPools(bundle.runtime, effectiveSetIds);
-  const teamSet = new Set();
-  for (const hero of pools.heroes) {
-    for (const team of hero.teams) {
-      if (team) teamSet.add(team);
-    }
-  }
-  const activeHeroTeamNames = [...teamSet].sort((a, b) => a.localeCompare(b));
+  const activeHeroTeamNames = computeActiveHeroTeamNames(state, bundle);
 
   const uniqueNames = new Set(activeHeroTeamNames);
   assert.equal(activeHeroTeamNames.length, uniqueNames.size, 'Expected no duplicate team names');
@@ -1012,18 +935,135 @@ test('activeHeroTeamNames is deduplicated', () => {
 
 test('activeHeroTeamNames contains no empty strings', () => {
   const state = createAllOwnedState();
-  const effectiveSetIds = state.collection.activeSetIds ?? state.collection.ownedSetIds;
-  const pools = buildOwnedPools(bundle.runtime, effectiveSetIds);
-  const teamSet = new Set();
-  for (const hero of pools.heroes) {
-    for (const team of hero.teams) {
-      if (team) teamSet.add(team);
-    }
-  }
-  const activeHeroTeamNames = [...teamSet].sort((a, b) => a.localeCompare(b));
+  const activeHeroTeamNames = computeActiveHeroTeamNames(state, bundle);
 
   assert.ok(
     activeHeroTeamNames.every((name) => typeof name === 'string' && name.length > 0),
     'Expected no empty strings in activeHeroTeamNames'
   );
+});
+
+// ── Coverage: applyModifier uncovered switch cases and inner branches ─────────
+
+test('applySchemeModifiersToTemplate covers conditional, require-hero-name-match-count, and default modifier types', () => {
+
+  const template = resolveSetupTemplate(2, {});
+  const craftedScheme = {
+    id: 'coverage-scheme',
+    setId: 'test',
+    name: 'Coverage Scheme',
+    aliases: [],
+    constraints: { minimumPlayerCount: null },
+    forcedGroups: [],
+    notes: [],
+    modifiers: [
+      // conditional-add-villain-group: playerCounts includes playerCount (if true) + truthy amount
+      { type: 'conditional-add-villain-group', playerCounts: [2], amount: 1 },
+      // conditional-add-villain-group: playerCounts doesn't include playerCount (if false)
+      { type: 'conditional-add-villain-group', playerCounts: [3], amount: 1 },
+      // conditional-add-villain-group: no playerCounts property (|| [] falsy side)
+      { type: 'conditional-add-villain-group' },
+      // conditional-add-villain-group: if true, falsy amount (|| 0 falsy side)
+      { type: 'conditional-add-villain-group', playerCounts: [2], amount: 0 },
+      // conditional-set-min-heroes: playerCounts includes playerCount + truthy value
+      { type: 'conditional-set-min-heroes', playerCounts: [2], value: 10 },
+      // conditional-set-min-heroes: playerCounts doesn't include playerCount
+      { type: 'conditional-set-min-heroes', playerCounts: [3], value: 10 },
+      // conditional-set-min-heroes: no playerCounts (|| [] falsy side)
+      { type: 'conditional-set-min-heroes' },
+      // conditional-set-min-heroes: if true, falsy value (|| 0 falsy side)
+      { type: 'conditional-set-min-heroes', playerCounts: [2], value: 0 },
+      // require-hero-name-match-count (switch case 8)
+      { type: 'require-hero-name-match-count', pattern: 'Spider', value: 2 },
+      // unknown modifier type (default case)
+      { type: 'no-op-unknown-type-for-coverage' },
+      // add-hero with falsy amount (|| 0 branch)
+      { type: 'add-hero', amount: 0 },
+      // add-villain-group with falsy amount
+      { type: 'add-villain-group', amount: 0 },
+      // add-henchman-group with falsy amount
+      { type: 'add-henchman-group', amount: 0 },
+      // set-min-heroes with falsy value
+      { type: 'set-min-heroes', value: 0 },
+      // set-bystanders with no value (undefined ?? takes requirements.bystanders)
+      { type: 'set-bystanders' }
+    ]
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const requirements = applySchemeModifiersToTemplate(template, craftedScheme as any);
+  assert.ok(requirements.heroNameRequirements.some((r) => r.pattern === 'Spider'), 'heroNameRequirements should include Spider pattern');
+  assert.ok(requirements.villainGroupCount >= template.villainGroupCount, 'villainGroupCount should be at least the template base');
+
+  // Also covers the scheme.modifiers || [] falsy branch
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const nullModifiersResult = applySchemeModifiersToTemplate(template, { modifiers: null } as any);
+  assert.equal(nullModifiersResult.heroCount, template.heroCount);
+});
+
+// ── Coverage: appendForcedReason existing-entry path ─────────────────────────
+
+test('When the same group appears in both forcedPicks.villainGroupIds and scheme.forcedGroups it carries both reasons', () => {
+
+  const state = createAllOwnedState();
+  const secretInvasion = bundle.runtime.indexes.allSchemes.find((s) => s.name === 'Secret Invasion of the Skrull Shapeshifters');
+  const skrullsId = secretInvasion.forcedGroups[0].id;
+  const simpleMastermind = bundle.runtime.indexes.allMasterminds.find((m) => !m.lead);
+
+  // Forcing skrullsId via villainGroupIds AND having Secret Invasion also force it
+  // causes appendForcedReason to be called for the same id twice with different reasons
+  const setup = generateSetup({
+    runtime: bundle.runtime,
+    state,
+    playerCount: 2,
+    playMode: 'standard',
+    forcedPicks: {
+      schemeId: secretInvasion.id,
+      mastermindId: simpleMastermind.id,
+      villainGroupIds: [skrullsId]
+    },
+    random: () => 0
+  });
+
+  const skrullsGroup = setup.villainGroups.find((g) => g.id === skrullsId);
+  assert.ok(skrullsGroup, 'Skrulls should appear in the setup');
+  assert.equal(skrullsGroup.forced, true, 'Skrulls should be marked as forced');
+  assert.ok(Array.isArray(skrullsGroup.forcedBy), 'forcedBy should be an array when carrying multiple reasons');
+  assert.ok(skrullsGroup.forcedReasons.includes('constraint'), 'Should carry constraint reason from forcedPicks');
+  assert.ok(skrullsGroup.forcedReasons.includes('scheme'), 'Should carry scheme reason from Secret Invasion forced groups');
+});
+
+// ── Coverage: validateSetupLegality missing forced entities and excess heroes ─
+
+test('validateSetupLegality reports missing mastermind, villain group, henchman group, and excess hero forced picks', () => {
+
+  const state = createDefaultState();
+  state.collection.ownedSetIds = ['core-set'];
+
+  const missingMastermind = bundle.runtime.indexes.allMasterminds.find((m) => m.setId !== 'core-set');
+  const missingVG = bundle.runtime.indexes.allVillainGroups.find((vg) => vg.setId !== 'core-set');
+  const missingHG = bundle.runtime.indexes.allHenchmanGroups.find((hg) => hg.setId !== 'core-set');
+  // All core-set heroes are owned but forcing all of them greatly exceeds template.heroCount
+  const ownedHeroIds = bundle.runtime.indexes.allHeroes
+    .filter((h) => h.setId === 'core-set')
+    .map((h) => h.id);
+
+  const legality = validateSetupLegality({
+    runtime: bundle.runtime,
+    state,
+    playerCount: 1,
+    playMode: 'standard',
+    forcedPicks: {
+      mastermindId: missingMastermind.id,
+      villainGroupIds: [missingVG.id],
+      henchmanGroupIds: [missingHG.id],
+      heroIds: ownedHeroIds
+    }
+  });
+
+  assert.equal(legality.ok, false);
+  assert.ok(legality.reasons.some((r) => r.includes('Forced Mastermind is not owned')));
+  assert.ok(legality.reasons.some((r) => r.includes('Forced Villain Groups are not owned')));
+  assert.ok(legality.reasons.some((r) => r.includes('Forced Henchman Groups are not owned')));
+  assert.ok(legality.reasons.some((r) => r.includes('Forced Heroes exceed the base Hero slots')));
 });

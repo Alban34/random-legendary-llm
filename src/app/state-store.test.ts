@@ -23,6 +23,7 @@ import {
   updateState
 } from './state-store.ts';
 import { generateSetup, validateSetupLegality } from './setup-generator.ts';
+import { createMemoryStorage } from './test-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,24 +31,6 @@ const rootDir = path.resolve(__dirname, '../..');
 const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
-
-function createMemoryStorage(initialEntries = {}) {
-  const store = new Map(Object.entries(initialEntries));
-  return {
-    getItem(key) {
-      return store.has(key) ? store.get(key) : null;
-    },
-    setItem(key, value) {
-      store.set(key, String(value));
-    },
-    removeItem(key) {
-      store.delete(key);
-    },
-    dump() {
-      return Object.fromEntries(store.entries());
-    }
-  };
-}
 
 function createSampleSetup(offset = 0) {
   const runtime = bundle.runtime.indexes;
@@ -322,9 +305,9 @@ test('validateSetupLegality uses activeSetIds pool when non-empty', () => {
 
   const result = validateSetupLegality({ runtime, state, playerCount: 2, playMode: 'standard' });
 
-  const setIds = result.pools.sets.map((s) => s.id);
-  assert.ok(setIds.includes('core-set'), 'core-set should be in pools');
-  assert.ok(!setIds.includes('dark-city'), 'dark-city should NOT be in pools when filtered out');
+  const setIds = new Set(result.pools.sets.map((s) => s.id));
+  assert.ok(setIds.has('core-set'), 'core-set should be in pools');
+  assert.ok(!setIds.has('dark-city'), 'dark-city should NOT be in pools when filtered out');
 });
 
 test('validateSetupLegality uses ownedSetIds pool when activeSetIds is null (no filter)', () => {
@@ -336,9 +319,9 @@ test('validateSetupLegality uses ownedSetIds pool when activeSetIds is null (no 
 
   const result = validateSetupLegality({ runtime, state, playerCount: 2, playMode: 'standard' });
 
-  const setIds = result.pools.sets.map((s) => s.id);
-  assert.ok(setIds.includes('core-set'), 'core-set should be in pools');
-  assert.ok(setIds.includes('dark-city'), 'dark-city should be in pools when no filter active');
+  const setIds = new Set(result.pools.sets.map((s) => s.id));
+  assert.ok(setIds.has('core-set'), 'core-set should be in pools');
+  assert.ok(setIds.has('dark-city'), 'dark-city should be in pools when no filter active');
 });
 
 test('generateSetup with activeSetIds filter runs without error', () => {
@@ -553,5 +536,52 @@ test('all other fields are identical after round-trip (legacy record)', () => {
   assert.equal(sanitized.playMode, record.playMode);
   assert.deepEqual(sanitized.setupSnapshot, record.setupSnapshot);
   assert.deepEqual(sanitized.result, record.result);
+});
+
+// ── Branch coverage improvements ─────────────────────────────────────────────
+
+test('loadState recovers when ownedSetIds is not an array', () => {
+  const candidate = {
+    schemaVersion: SCHEMA_VERSION,
+    collection: { ownedSetIds: 'not-an-array', activeSetIds: null },
+    usage: { heroes: {}, masterminds: {}, villainGroups: {}, henchmanGroups: {}, schemes: {} },
+    history: [],
+    preferences: {}
+  };
+  const storage = createMemoryStorage({ [STORAGE_KEY]: JSON.stringify(candidate) });
+  const { notices, state: loaded } = loadState({
+    storageAdapter: createStorageAdapter(storage),
+    indexes: bundle.runtime.indexes
+  });
+  assert.deepEqual(loaded.collection.ownedSetIds, []);
+  assert.ok(notices.some((n) => /collection ownership/i.test(n)));
+});
+
+test('loadState sanitizes non-plain usage buckets and invalid stat values', () => {
+  const indexes = bundle.runtime.indexes;
+  const mmId = indexes.allMasterminds[0].id;
+  const vgId = indexes.allVillainGroups[0].id;
+  const candidate = {
+    schemaVersion: SCHEMA_VERSION,
+    collection: { ownedSetIds: [], activeSetIds: null },
+    usage: {
+      heroes: 42,
+      masterminds: { [mmId]: 'not-an-object' },
+      villainGroups: { [vgId]: { plays: -1, lastPlayedAt: null } },
+      henchmanGroups: {},
+      schemes: {}
+    },
+    history: [],
+    preferences: {}
+  };
+  const storage = createMemoryStorage({ [STORAGE_KEY]: JSON.stringify(candidate) });
+  const { notices, state: loaded } = loadState({
+    storageAdapter: createStorageAdapter(storage),
+    indexes
+  });
+  assert.deepEqual(loaded.usage.heroes, {});
+  assert.deepEqual(loaded.usage.masterminds, {});
+  assert.deepEqual(loaded.usage.villainGroups, {});
+  assert.ok(notices.some((n) => /heroes usage/i.test(n)));
 });
 

@@ -294,11 +294,11 @@ export function normalizeGameData(source: CanonicalSourceData): PipelineRuntime 
   cloneSource.sets.forEach((set) => {
     // @ts-expect-error — replacing MastermindCard[] with MastermindRuntime[] shaped objects
     set.masterminds = set.masterminds.map((mastermind): MastermindRuntime => {
-      const lead = (mastermind as MastermindCard).leadName
+      const lead = mastermind.leadName
         ? resolveGroupReference(
-            (mastermind as MastermindCard).leadName!,
+            mastermind.leadName!,
             set.id,
-            (mastermind as MastermindCard).leadCategory!,
+            mastermind.leadCategory!,
             villainGroupsBySet,
             henchmanGroupsBySet,
             globalVillainIndex,
@@ -311,14 +311,14 @@ export function normalizeGameData(source: CanonicalSourceData): PipelineRuntime 
         name: mastermind.name,
         aliases: mastermind.aliases || [],
         lead,
-        notes: (mastermind as MastermindCard).notes || [],
+        notes: mastermind.notes || [],
         isEpicMastermind: EPIC_MASTERMIND_SUPPORTED_SETS.includes(set.name) || undefined
       };
     });
 
     // @ts-expect-error — replacing SchemeCard[] with SchemeRuntime[] shaped objects
     set.schemes = set.schemes.map((scheme): SchemeRuntime => {
-      const forcedGroups = ((scheme as SchemeCard).forcedGroups || []).map((groupRef) => ({
+      const forcedGroups = (scheme.forcedGroups || []).map((groupRef) => ({
         ...resolveGroupReference(
           groupRef.name,
           set.id,

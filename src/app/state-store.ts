@@ -11,13 +11,11 @@ import type {
   GameOutcome,
   GameResult,
   HistoryRecord,
-  LocaleId,
   PlayMode,
   Preferences,
   RuntimeIndexes,
   StorageAdapter,
   StorageOperationResult,
-  ThemeId,
   UsageCategoryMap,
   UsageState
 } from './types';
@@ -53,8 +51,8 @@ function createDefaultPreferences(): Preferences {
     lastPlayMode: 'standard',
     selectedTab: null,
     onboardingCompleted: false,
-    themeId: DEFAULT_THEME_ID as ThemeId,
-    localeId: DEFAULT_LOCALE_ID as LocaleId
+    themeId: DEFAULT_THEME_ID,
+    localeId: DEFAULT_LOCALE_ID
   };
 }
 
@@ -96,7 +94,7 @@ function sanitizeUsageStat(stat: unknown): { plays: number; lastPlayedAt: string
   const candidate = stat as Record<string, unknown>;
   const plays = Number.isInteger(candidate.plays) && (candidate.plays as number) >= 0 ? (candidate.plays as number) : null;
   const lastPlayedAt = candidate.lastPlayedAt === null || typeof candidate.lastPlayedAt === 'string'
-    ? (candidate.lastPlayedAt as string | null)
+    ? candidate.lastPlayedAt
     : null;
 
   if (plays === null) {
@@ -154,9 +152,9 @@ function sanitizeGameRecord(record: unknown, indexes: Indexes, notices: string[]
     && (r.playerCount as number) <= 5
     && typeof r.advancedSolo === 'boolean'
     && typeof setupSnapshot.mastermindId === 'string'
-    && indexes.mastermindsById[setupSnapshot.mastermindId as string]
+    && indexes.mastermindsById[setupSnapshot.mastermindId]
     && typeof setupSnapshot.schemeId === 'string'
-    && indexes.schemesById[setupSnapshot.schemeId as string]
+    && indexes.schemesById[setupSnapshot.schemeId]
     && isValidSnapshotIds(setupSnapshot.heroIds, indexes.heroesById)
     && isValidSnapshotIds(setupSnapshot.villainGroupIds, indexes.villainGroupsById)
     && isValidSnapshotIds(setupSnapshot.henchmanGroupIds, indexes.henchmanGroupsById);
@@ -194,7 +192,7 @@ function sanitizeGameRecord(record: unknown, indexes: Indexes, notices: string[]
       villainGroupIds: [...(setupSnapshot.villainGroupIds as string[])],
       henchmanGroupIds: [...(setupSnapshot.henchmanGroupIds as string[])]
     },
-    result: sanitizedResult.result as GameResult,
+    result: sanitizedResult.result,
     epicMastermind: r.epicMastermind === true
   };
 }
@@ -242,10 +240,10 @@ function sanitizePreferences(candidatePreferences: unknown, notices: string[]): 
   const onboardingCompleted = sanitizeBoolean(cp.onboardingCompleted, defaultPreferences.onboardingCompleted);
   const themeId = cp.themeId === undefined
     ? defaultPreferences.themeId
-    : normalizeThemeId(cp.themeId) as ThemeId;
+    : normalizeThemeId(cp.themeId);
   const localeId = cp.localeId === undefined
     ? defaultPreferences.localeId
-    : normalizeLocaleId(cp.localeId) as LocaleId;
+    : normalizeLocaleId(cp.localeId);
 
   if (
     lastPlayerCount !== cp.lastPlayerCount
@@ -561,13 +559,13 @@ interface CreateGameRecordParams {
   result?: GameResult;
 }
 
-export function createGameRecord({ playerCount, advancedSolo, playMode, epicMastermind, setupSnapshot, createdAt = new Date().toISOString(), id = createGameRecordId(), result = createPendingGameResult() as GameResult }: CreateGameRecordParams): HistoryRecord {
+export function createGameRecord({ playerCount, advancedSolo, playMode, epicMastermind, setupSnapshot, createdAt = new Date().toISOString(), id = createGameRecordId(), result = createPendingGameResult() }: CreateGameRecordParams): HistoryRecord {
   const normalizedPlayMode = resolvePlayMode(playerCount, { advancedSolo, playMode });
   let effectiveResult = result;
   if (playerCount >= 2 && result.status === GAME_RESULT_STATUS_PENDING) {
     effectiveResult = { ...result, score: createPerPlayerScoreArray(playerCount) } as unknown as GameResult;
   }
-  const sanitizedResult = sanitizeStoredGameResult(effectiveResult, playerCount).result as GameResult;
+  const sanitizedResult = sanitizeStoredGameResult(effectiveResult, playerCount).result;
   return {
     id,
     createdAt,
@@ -630,7 +628,7 @@ export function updateGameResult(state: AppState, { recordId, outcome, score, no
 
   const nextState = structuredClone(state) as AppState;
   const mutableRecord = nextState.history.find((record) => record.id === recordId);
-  mutableRecord!.result = createCompletedGameResult({ outcome, score, notes, updatedAt, playerCount: resolvedPlayerCount }) as GameResult;
+  mutableRecord!.result = createCompletedGameResult({ outcome, score, notes, updatedAt, playerCount: resolvedPlayerCount });
   return nextState;
 }
 

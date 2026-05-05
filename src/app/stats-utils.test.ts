@@ -8,6 +8,7 @@ import { createEpic1Bundle } from './game-data-pipeline.ts';
 import { buildInsightsDashboard, buildOutcomeInsights, buildUsageInsights, buildExpansionUsageInsights, computeExpansionUsagePercent } from './stats-utils.ts';
 import { acceptGameSetup, createDefaultState, updateGameResult } from './state-store.ts';
 import type { HistoryRecord } from './types.ts';
+import { createAllOwnedState, createSampleSnapshot } from './test-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,30 +17,13 @@ const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
 
-function createAllOwnedState() {
-  const state = createDefaultState();
-  state.collection.ownedSetIds = bundle.runtime.sets.map((set) => set.id);
-  return state;
-}
-
-function createSampleSnapshot(offset = 0) {
-  const indexes = bundle.runtime.indexes;
-  return {
-    mastermindId: indexes.allMasterminds[offset].id,
-    schemeId: indexes.allSchemes[offset].id,
-    heroIds: indexes.allHeroes.slice(offset, offset + 3).map((entity) => entity.id),
-    villainGroupIds: [indexes.allVillainGroups[offset].id],
-    henchmanGroupIds: [indexes.allHenchmanGroups[offset].id]
-  };
-}
-
 function acceptLoggedGame(state, { id, createdAt, offset, outcome = null, score = null, notes = '' }) {
   let nextState = acceptGameSetup(state, {
     id,
     createdAt,
     playerCount: 2,
     advancedSolo: false,
-    setupSnapshot: createSampleSnapshot(offset)
+    setupSnapshot: createSampleSnapshot(bundle, offset)
   });
 
   if (outcome) {
@@ -62,7 +46,7 @@ beforeAll(async () => {
 
 test('Derives stable outcome and score metrics for mixed completed and pending histories', () => {
 
-  let state = createAllOwnedState();
+  let state = createAllOwnedState(bundle);
   state = acceptLoggedGame(state, {
     id: 'game-win-1',
     createdAt: '2026-04-10T10:00:00.000Z',
@@ -107,7 +91,7 @@ test('Derives stable outcome and score metrics for mixed completed and pending h
 
 test('Rankings stay deterministic and preserve duplicate-name context with set labels', () => {
 
-  const state = createAllOwnedState();
+  const state = createAllOwnedState(bundle);
   const blackWidows = bundle.runtime.indexes.allHeroes.filter((entity) => entity.name === 'Black Widow');
   assert.equal(blackWidows.length >= 2, true);
 
@@ -220,4 +204,94 @@ test('buildExpansionUsageInsights counts same expansion only once per game even 
   const mastermindSetEntry = result.find(e => e.id === mastermind.setId);
   assert.ok(mastermindSetEntry, 'mastermind set should appear');
   assert.equal(mastermindSetEntry!.games, 1, 'same set should only count once per game even if multiple entities belong to it');
+});
+
+// ── Branch coverage additions ─────────────────────────────────────────────────
+
+test('buildUsageInsights handles null lastPlayedAt via empty-string fallback and uses label as tiebreaker when plays and date tie', () => {
+  const heroA = bundle.runtime.indexes.allHeroes[0];
+  const heroB = bundle.runtime.indexes.allHeroes[1];
+
+  const state = createDefaultState();
+  state.usage.heroes[heroA.id] = { plays: 3, lastPlayedAt: null };
+  state.usage.heroes[heroB.id] = { plays: 3, lastPlayedAt: null };
+
+  const heroInsights = buildUsageInsights(bundle.runtime, state, { limit: 2 })
+    .find((c) => c.category === 'heroes');
+
+  assert.equal(heroInsights.mostPlayed.length, 2);
+  assert.equal(heroInsights.leastPlayed.length, 2);
+  assert.ok(
+    heroInsights.mostPlayed[0].label.localeCompare(heroInsights.mostPlayed[1].label) <= 0,
+    'mostPlayed should be sorted by label when plays and lastPlayedAt tie'
+  );
+  assert.ok(
+    heroInsights.leastPlayed[0].label.localeCompare(heroInsights.leastPlayed[1].label) <= 0,
+    'leastPlayed should be sorted by label when plays and lastPlayedAt tie'
+  );
+});
+
+test('buildExpansionUsageInsights returns empty array when snapshot entity IDs are not found in the runtime index', () => {
+  const record = {
+    setupSnapshot: {
+      mastermindId: 'nonexistent-mm',
+      schemeId: 'nonexistent-scheme',
+      heroIds: ['nonexistent-hero'],
+      villainGroupIds: ['nonexistent-vg'],
+      henchmanGroupIds: ['nonexistent-hg']
+    }
+  } as unknown as HistoryRecord;
+
+  const result = buildExpansionUsageInsights(bundle.runtime, [record], 1);
+  assert.deepEqual(result, [], 'no set entries should appear when no entities are found in the index');
+});
+
+test('buildExpansionUsageInsights falls back to setId as name for unknown sets and breaks ties alphabetically', () => {
+  const customRuntime = {
+    ...bundle.runtime,
+    indexes: {
+      ...bundle.runtime.indexes,
+      mastermindsById: {
+        ...bundle.runtime.indexes.mastermindsById,
+        'orphan-mm': { id: 'orphan-mm', name: 'Kang', setId: 'orphan-set' }
+      }
+    }
+  };
+
+  const record = {
+    setupSnapshot: {
+      mastermindId: 'orphan-mm',
+      schemeId: bundle.runtime.indexes.allSchemes[0].id,
+      heroIds: [],
+      villainGroupIds: [],
+      henchmanGroupIds: []
+    }
+  } as unknown as HistoryRecord;
+
+  const result = buildExpansionUsageInsights(customRuntime, [record], 1);
+  const orphanEntry = result.find((e) => e.id === 'orphan-set');
+  assert.ok(orphanEntry, 'orphan set should appear in results');
+  assert.equal(orphanEntry!.name, 'orphan-set', 'name should fall back to setId when not in setsById');
+});
+
+test('buildUsageInsights falls back to setId for setName and label when setsById entry is missing', () => {
+  const heroA = bundle.runtime.indexes.allHeroes[0];
+  const customRuntime = {
+    ...bundle.runtime,
+    indexes: {
+      ...bundle.runtime.indexes,
+      setsById: {}
+    }
+  };
+
+  const state = createDefaultState();
+  state.usage.heroes[heroA.id] = { plays: 2, lastPlayedAt: '2026-04-10T10:00:00.000Z' };
+
+  const heroInsights = buildUsageInsights(customRuntime, state, { limit: 1 })
+    .find((c) => c.category === 'heroes');
+
+  assert.ok(heroInsights.mostPlayed.length > 0, 'should have mostPlayed entries');
+  const entry = heroInsights.mostPlayed[0];
+  assert.equal(entry.setName, heroA.setId, 'setName falls back to setId when set is missing from setsById');
+  assert.ok(entry.label.includes(heroA.setId), 'label includes the setId fallback');
 });

@@ -10,7 +10,7 @@ import { KO_MESSAGES } from './ko.ts';
 import { ES_MESSAGES } from './es.ts';
 
 test('All locale .ts files expose the same key set as the canonical English locale', () => {
-  const canonicalKeys = Object.keys(EN_MESSAGES).sort();
+  const canonicalKeys = Object.keys(EN_MESSAGES).sort((a, b) => a.localeCompare(b));
 
   const locales = [
     { id: 'fr', messages: FR_MESSAGES },
@@ -21,7 +21,7 @@ test('All locale .ts files expose the same key set as the canonical English loca
   ];
 
   for (const { id, messages } of locales) {
-    const localeKeys = Object.keys(messages).sort();
+    const localeKeys = Object.keys(messages).sort((a, b) => a.localeCompare(b));
 
     const missingKeys = canonicalKeys.filter((k) => !localeKeys.includes(k));
     const extraKeys = localeKeys.filter((k) => !canonicalKeys.includes(k));
@@ -51,7 +51,7 @@ beforeAll(async () => {
 test('Test:epic10 script is absent from package.json', () => {
 
   assert.ok(
-    !Object.prototype.hasOwnProperty.call(pkgJson.scripts, 'test:epic10'),
+    !Object.hasOwn(pkgJson.scripts, 'test:epic10'),
     'package.json must not contain a test:epic10 script'
   );
 });
@@ -59,18 +59,18 @@ test('Test:epic10 script is absent from package.json', () => {
 test('e2e and e2e:filter Playwright scripts are present', () => {
 
   assert.ok(
-    Object.prototype.hasOwnProperty.call(pkgJson.scripts, 'e2e'),
+    Object.hasOwn(pkgJson.scripts, 'e2e'),
     'package.json must contain the e2e Playwright script'
   );
   assert.ok(
-    Object.prototype.hasOwnProperty.call(pkgJson.scripts, 'e2e:filter'),
+    Object.hasOwn(pkgJson.scripts, 'e2e:filter'),
     'package.json must contain the e2e:filter Playwright script'
   );
 });
 
-test('Package.json version is 2.1.0', () => {
+test('Package.json version is 2.1.1', () => {
 
-  assert.equal(pkgJson.version, '2.1.0', 'package.json version must be 2.1.0');
+  assert.equal(pkgJson.version, '2.1.1', 'package.json version must be 2.1.1');
 });
 
 const NON_ENGLISH_LOCALES = {

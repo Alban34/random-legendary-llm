@@ -3,30 +3,7 @@ import assert from 'node:assert/strict';
 
 import { APP_TABS, DEFAULT_TAB_ID, getAdjacentTabId, normalizeSelectedTab } from './app-tabs.ts';
 import { STORAGE_KEY, createDefaultState, createStorageAdapter, loadState, saveState } from './state-store.ts';
-
-function createMemoryStorage(initialEntries = {}) {
-  const store = new Map(Object.entries(initialEntries));
-  return {
-    getItem(key) {
-      return store.has(key) ? store.get(key) : null;
-    },
-    setItem(key, value) {
-      store.set(key, String(value));
-    },
-    removeItem(key) {
-      store.delete(key);
-    }
-  };
-}
-
-const minimalIndexes = {
-  setsById: {},
-  heroesById: {},
-  mastermindsById: {},
-  villainGroupsById: {},
-  henchmanGroupsById: {},
-  schemesById: {}
-};
+import { createMemoryStorage, minimalIndexes } from './test-utils.ts';
 
 test('Defines the expected application tabs with a stable default tab', () => {
 
@@ -77,5 +54,12 @@ test('Selected-tab preferences persist and invalid stored tabs recover safely', 
 
   const recovered = loadState({ storageAdapter, indexes: minimalIndexes });
   assert.equal(recovered.state.preferences.selectedTab, DEFAULT_TAB_ID);
+});
+
+test('getAdjacentTabId falls back to the next-tab result for unrecognised direction strings', () => {
+
+  assert.equal(getAdjacentTabId('browse', 'unknown'), 'collection');
+  assert.equal(getAdjacentTabId('backup', 'fwd'), 'browse');
+  assert.equal(getAdjacentTabId('new-game', 'sideways'), 'history');
 });
 

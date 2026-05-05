@@ -2,31 +2,8 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 
 import { createDefaultState, createStorageAdapter, loadState, saveState } from './state-store.ts';
-import { DEFAULT_THEME_ID, THEME_OPTIONS, getThemeDefinition, normalizeThemeId } from './theme-utils.ts';
-
-function createMemoryStorage(initialEntries = {}) {
-  const store = new Map(Object.entries(initialEntries));
-  return {
-    getItem(key) {
-      return store.has(key) ? store.get(key) : null;
-    },
-    setItem(key, value) {
-      store.set(key, String(value));
-    },
-    removeItem(key) {
-      store.delete(key);
-    }
-  };
-}
-
-const minimalIndexes = {
-  setsById: {},
-  heroesById: {},
-  mastermindsById: {},
-  villainGroupsById: {},
-  henchmanGroupsById: {},
-  schemesById: {}
-};
+import { DEFAULT_THEME_ID, THEME_OPTIONS, getThemeDefinition, getThemeIcon, normalizeThemeId } from './theme-utils.ts';
+import { createMemoryStorage, minimalIndexes } from './test-utils.ts';
 
 test('Theme utilities normalize supported IDs and expose stable theme metadata', () => {
 
@@ -67,13 +44,11 @@ test('Persists the selected theme and safely recovers invalid stored theme value
   assert.equal(recovered.notices.some((notice) => notice.includes('Recovered invalid preference values during state hydration.')), true);
 });
 
-// ── From design-system-epic1-foundation (theme-utils assertions) ────────────
+test('getThemeIcon returns the correct icon for known themes and a fallback for unknown themes', () => {
 
-test('Keeps the canonical theme contract and legacy theme normalization aligned', () => {
-
-  assert.equal(DEFAULT_THEME_ID, 'dark');
-  assert.deepEqual(THEME_OPTIONS.map((theme) => theme.id), ['dark', 'light']);
-  assert.equal(normalizeThemeId('midnight'), 'dark');
-  assert.equal(normalizeThemeId('newsprint'), 'light');
+  assert.equal(getThemeIcon('dark'), '🌙');
+  assert.equal(getThemeIcon('light'), '☀️');
+  assert.equal(getThemeIcon('cosmic-blast'), '🎨');
 });
+
 

@@ -218,6 +218,11 @@ Finding: Epic 88 renamed `epic40-production.spec.ts` to `pwa-installability-prod
 Resolution: (1) `playwright.config.ts` `testIgnore` updated from `**/epic40-production.spec.ts` to `**/pwa-installability-production.spec.ts`. (2) `playwright.prod.config.ts` `testMatch` updated to match. (3) SW registration test removed from `pwa-installability.spec.ts` and added to `pwa-installability-production.spec.ts`. Dev e2e suite now shows 178 passed, 0 failed.
 
 ---
+[F-036] [2026-05-04] Epic: Epic 95 — Test Coverage Improvement
+File: documentation/planning/epic/ready-for-dev/epic-95.md
+Finding: Epic 95 has been fully implemented (Stories 95.1–95.5 complete, 587 tests in 42 test files, 74.2% stmt / 75.1% branch) but the epic spec file remains in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete/move tool available), so the relocation is logged here.
+Suggested action: Move `epic-95.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior completed epics.
+---
 
 ## Summary Table
 
@@ -258,3 +263,4 @@ Resolution: (1) `playwright.config.ts` `testIgnore` updated from `**/epic40-prod
 | F-033 | Epic 82: `package.json` contains stale `test:epicN` Vitest scripts pointing to deleted files | FIXED | 2026-05-03 | 2026-05-03 |
 | F-034 | Epics 83–88 spec files not moved to `done/` | FIXED | 2026-05-03 | 2026-05-03 |
 | F-035 | PWA/SW: Production spec excluded from wrong runner; SW test in wrong spec file | FIXED | 2026-05-03 | 2026-05-03 |
+| F-036 | Epic 95 spec file not moved to `done/` after full implementation | OPEN | 2026-05-04 | — |

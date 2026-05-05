@@ -16,6 +16,7 @@ import {
   summarizeUsageIndicators
 } from './history-utils.ts';
 import { acceptGameSetup, createDefaultState, resetAllState, resetUsageCategory } from './state-store.ts';
+import { createAllOwnedState, createMemoryStorage, createSampleSnapshot } from './test-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,38 +25,6 @@ const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
 
-function createAllOwnedState() {
-  const state = createDefaultState();
-  state.collection.ownedSetIds = bundle.runtime.sets.map((set) => set.id);
-  return state;
-}
-
-function createSampleSnapshot(offset = 0) {
-  const indexes = bundle.runtime.indexes;
-  return {
-    mastermindId: indexes.allMasterminds[offset].id,
-    schemeId: indexes.allSchemes[offset].id,
-    heroIds: indexes.allHeroes.slice(offset, offset + 3).map((entity) => entity.id),
-    villainGroupIds: [indexes.allVillainGroups[offset].id],
-    henchmanGroupIds: [indexes.allHenchmanGroups[offset].id]
-  };
-}
-
-function createMemoryStorage(initialEntries = {}) {
-  const store = new Map(Object.entries(initialEntries));
-  return {
-    getItem(key) {
-      return store.has(key) ? store.get(key) : null;
-    },
-    setItem(key, value) {
-      store.set(key, String(value));
-    },
-    removeItem(key) {
-      store.delete(key);
-    }
-  };
-}
-
 beforeAll(async () => {
   const seed = JSON.parse(await fs.readFile(seedPath, 'utf8'));
   bundle = createEpic1Bundle(seed);
@@ -63,13 +32,13 @@ beforeAll(async () => {
 
 test('Usage indicators reflect persisted usage statistics and never-played totals', () => {
 
-  let state = createAllOwnedState();
+  let state = createAllOwnedState(bundle);
   state = acceptGameSetup(state, {
     id: 'epic8-usage',
     createdAt: '2026-04-10T12:00:00.000Z',
     playerCount: 2,
     advancedSolo: false,
-    setupSnapshot: createSampleSnapshot(0)
+    setupSnapshot: createSampleSnapshot(bundle, 0)
   });
 
   const indicators = summarizeUsageIndicators(bundle.runtime, state);
@@ -84,20 +53,20 @@ test('Usage indicators reflect persisted usage statistics and never-played total
 
 test('History summaries resolve IDs back to readable newest-first metadata', () => {
 
-  let state = createAllOwnedState();
+  let state = createAllOwnedState(bundle);
   state = acceptGameSetup(state, {
     id: 'older-game',
     createdAt: '2026-04-09T12:00:00.000Z',
     playerCount: 1,
     advancedSolo: true,
-    setupSnapshot: createSampleSnapshot(0)
+    setupSnapshot: createSampleSnapshot(bundle, 0)
   });
   state = acceptGameSetup(state, {
     id: 'newer-game',
     createdAt: '2026-04-10T12:00:00.000Z',
     playerCount: 3,
     advancedSolo: false,
-    setupSnapshot: createSampleSnapshot(1)
+    setupSnapshot: createSampleSnapshot(bundle, 1)
   });
 
   assert.equal(state.history[0].id, 'newer-game');
@@ -111,13 +80,13 @@ test('History summaries resolve IDs back to readable newest-first metadata', () 
 
 test('Category resets and full reset preview/behavior stay scoped correctly', () => {
 
-  let state = createAllOwnedState();
+  let state = createAllOwnedState(bundle);
   state = acceptGameSetup(state, {
     id: 'reset-game',
     createdAt: '2026-04-10T12:00:00.000Z',
     playerCount: 2,
     advancedSolo: false,
-    setupSnapshot: createSampleSnapshot(0)
+    setupSnapshot: createSampleSnapshot(bundle, 0)
   });
 
   const heroesReset = resetUsageCategory(state, 'heroes');
@@ -340,10 +309,10 @@ test('Heroes grouping places a record with 3 heroes into exactly 3 groups', () =
     assert.equal(group.count, 1);
     assert.equal(group.records[0].id, 'r1');
   }
-  const ids = groups.map((g) => g.id);
-  assert.ok(ids.includes('hero:core-set-black-widow'));
-  assert.ok(ids.includes('hero:core-set-cyclops'));
-  assert.ok(ids.includes('hero:core-set-deadpool'));
+  const ids = new Set(groups.map((g) => g.id));
+  assert.ok(ids.has('hero:core-set-black-widow'));
+  assert.ok(ids.has('hero:core-set-cyclops'));
+  assert.ok(ids.has('hero:core-set-deadpool'));
 });
 
 test('Heroes grouping accumulates all records that share a hero into the same group', () => {
@@ -359,7 +328,7 @@ test('Heroes grouping accumulates all records that share a hero into the same gr
   const blackWidow = groups.find((g) => g.id === 'hero:core-set-black-widow');
   const deadpool = groups.find((g) => g.id === 'hero:core-set-deadpool');
   assert.equal(blackWidow.count, 2);
-  assert.deepEqual(blackWidow.records.map((r) => r.id).sort(), ['r1', 'r2']);
+  assert.deepEqual(blackWidow.records.map((r) => r.id).sort((a, b) => a.localeCompare(b)), ['r1', 'r2']);
   assert.equal(deadpool.count, 1);
   assert.equal(deadpool.records[0].id, 'r1');
 });
@@ -620,9 +589,9 @@ test('filterHistoryByOutcome "pending" returns records with status pending or nu
 
   const result = filterHistoryByOutcome(allOutcomeRecords, 'pending');
   assert.equal(result.length, 2);
-  const ids = result.map((r) => r.id);
-  assert.ok(ids.includes('r-pending'));
-  assert.ok(ids.includes('r-null'));
+  const ids = new Set(result.map((r) => r.id));
+  assert.ok(ids.has('r-pending'));
+  assert.ok(ids.has('r-null'));
 });
 
 test('filterHistoryByOutcome does not mutate the input array', () => {
@@ -646,5 +615,70 @@ test('filterHistoryByOutcome empty array always returns []', () => {
 
 test('normalizeHistoryGroupingMode returns epic-mastermind for epic-mastermind', () => {
   assert.equal(normalizeHistoryGroupingMode('epic-mastermind'), 'epic-mastermind');
+});
+
+// ── Branch coverage: set name fallbacks (lines 116, 119, 122, 125, 127) ──────
+
+test('formatHistorySummary falls back to setId as set name when setsById entry is missing', () => {
+  const customIndexes = {
+    ...bundle.runtime.indexes,
+    mastermindsById: { 'x-mm': { id: 'x-mm', name: 'Kang', setId: 'orphan-set' } },
+    schemesById: { 'x-scheme': { id: 'x-scheme', name: 'Subjugation', setId: 'orphan-set' } },
+    heroesById: { 'x-hero': { id: 'x-hero', name: 'Thor', setId: 'orphan-set' } },
+    villainGroupsById: { 'x-vg': { id: 'x-vg', name: 'Wrecking Crew', setId: 'orphan-set' } },
+    henchmanGroupsById: { 'x-hg': { id: 'x-hg', name: 'Doombot Legion', setId: 'orphan-set' } },
+    setsById: {}
+  };
+
+  const record = {
+    id: 'orphan-set-test',
+    createdAt: '2026-04-10T12:00:00.000Z',
+    playerCount: 1,
+    advancedSolo: false,
+    playMode: 'standard',
+    setupSnapshot: {
+      mastermindId: 'x-mm',
+      schemeId: 'x-scheme',
+      heroIds: ['x-hero'],
+      villainGroupIds: ['x-vg'],
+      henchmanGroupIds: ['x-hg']
+    },
+    result: { status: 'pending', outcome: null, score: null, notes: '', updatedAt: null }
+  };
+
+  const summary = formatHistorySummary(record, customIndexes);
+  assert.equal(summary.mastermindSetName, 'orphan-set', 'mastermindSetName falls back to setId');
+  assert.equal(summary.schemeSetName, 'orphan-set', 'schemeSetName falls back to setId');
+  assert.equal(summary.heroSetNames[0], 'orphan-set', 'heroSetNames falls back to setId');
+  assert.equal(summary.villainGroupSetNames[0], 'orphan-set', 'villainGroupSetNames falls back to setId');
+  assert.equal(summary.henchmanGroupSetNames[0], 'orphan-set', 'henchmanGroupSetNames falls back to setId');
+});
+
+// ── Branch coverage: epic-mastermind grouping mode (lines 225, 226) ───────────
+
+test('buildHistoryGroups with epic-mastermind mode creates separate groups for epic and non-epic records', () => {
+  const records = [
+    { ...createHistoryRecord34({ id: 'epic-r', createdAt: '2026-04-10T10:00:00.000Z' }), epicMastermind: true },
+    { ...createHistoryRecord34({ id: 'std-r', createdAt: '2026-04-10T11:00:00.000Z' }), epicMastermind: false }
+  ];
+
+  const groups = buildHistoryGroups(records, bundle.runtime.indexes, { mode: 'epic-mastermind' });
+  assert.equal(groups.length, 2);
+
+  const epicGroup = groups.find((g) => g.id === 'epic-mastermind:epic');
+  const standardGroup = groups.find((g) => g.id === 'epic-mastermind:standard');
+  assert.ok(epicGroup, 'epic group must exist');
+  assert.ok(standardGroup, 'standard group must exist');
+  assert.equal(epicGroup.count, 1);
+  assert.equal(standardGroup.count, 1);
+  assert.equal(epicGroup.records[0].id, 'epic-r');
+  assert.equal(standardGroup.records[0].id, 'std-r');
+});
+
+// ── Branch coverage: filterHistoryByOutcome unknown filter (line 244) ─────────
+
+test('filterHistoryByOutcome returns all records unchanged for an unrecognized filter string', () => {
+  const result = filterHistoryByOutcome(allOutcomeRecords, 'not-a-known-filter');
+  assert.equal(result, allOutcomeRecords);
 });
 

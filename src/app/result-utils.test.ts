@@ -11,6 +11,7 @@ import {
   createCompletedGameResult,
   createPerPlayerScoreArray,
   createPlayerScoreEntry,
+  formatGameOutcomeLabel,
   formatGameResultStatus,
   normalizeGameResultDraft,
   sanitizeStoredGameResult,
@@ -25,6 +26,7 @@ import {
   saveState,
   updateGameResult
 } from './state-store.ts';
+import { createMemoryStorage } from './test-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,21 +34,6 @@ const rootDir = path.resolve(__dirname, '../..');
 const seedPath = path.join(rootDir, 'src', 'data', 'canonical-game-data.json');
 
 let bundle;
-
-function createMemoryStorage(initialEntries = {}) {
-  const store = new Map(Object.entries(initialEntries));
-  return {
-    getItem(key) {
-      return store.has(key) ? store.get(key) : null;
-    },
-    setItem(key, value) {
-      store.set(key, String(value));
-    },
-    removeItem(key) {
-      store.delete(key);
-    }
-  };
-}
 
 function createSampleSetup(offset = 0) {
   const runtime = bundle.runtime.indexes;
@@ -640,4 +627,73 @@ test('Loss validation is unaffected by draw addition', () => {
     () => createCompletedGameResult({ outcome: 'loss', score: -1, notes: '', updatedAt: '2026-04-18T10:00:00.000Z' }),
     /whole number/i
   );
+});
+
+// ── Branch coverage improvements ─────────────────────────────────────────────
+
+test('formatGameOutcomeLabel returns Unknown for unrecognised outcome', () => {
+  assert.equal(formatGameOutcomeLabel('???'), 'Unknown');
+});
+
+test('createPlayerScoreEntry coerces non-string playerName to empty string', () => {
+  const entry = createPlayerScoreEntry({ playerName: 42 as unknown as string });
+  assert.deepEqual(entry, { playerName: '', score: null });
+});
+
+test('sanitizeStoredGameResult with null candidate returns recovered pending', () => {
+  const { result, recovered } = sanitizeStoredGameResult(null);
+  assert.ok(recovered);
+  assert.equal(result.status, 'pending');
+});
+
+test('sanitizeStoredGameResult with unknown status returns recovered pending', () => {
+  const { result, recovered } = sanitizeStoredGameResult({ status: 'in-progress', score: null });
+  assert.ok(recovered);
+  assert.equal(result.status, 'pending');
+});
+
+test('sanitizeStoredGameResult pending with playerCount 2 and non-array score recovers', () => {
+  const { result, recovered } = sanitizeStoredGameResult(
+    { status: 'pending', score: 42, outcome: null, notes: '' },
+    2
+  );
+  assert.ok(recovered);
+  assert.equal(result.status, 'pending');
+});
+
+test('createCompletedGameResult throws for an invalid outcome string', () => {
+  assert.throws(
+    () => createCompletedGameResult({ outcome: 'invalid-outcome', score: null }),
+    /valid outcome/i
+  );
+});
+
+test('sanitizeStoredGameResult normalises null score-array entries to blank player entries', () => {
+  const { result, recovered } = sanitizeStoredGameResult(
+    {
+      status: 'completed',
+      outcome: 'win',
+      score: [null, { playerName: 'Alice', score: 42 }],
+      notes: '',
+      updatedAt: '2026-05-01T12:00:00.000Z'
+    },
+    2
+  );
+  assert.ok(!recovered);
+  assert.equal(result.status, 'completed');
+  assert.ok(Array.isArray(result.score));
+  assert.deepEqual(result.score[0], { playerName: '', score: null });
+  assert.deepEqual(result.score[1], { playerName: 'Alice', score: 42 });
+});
+
+test('sanitizeStoredGameResult with non-string notes coerces notes to empty string', () => {
+  const { result, recovered } = sanitizeStoredGameResult({
+    status: 'completed',
+    outcome: 'win',
+    score: 5,
+    notes: 42,
+    updatedAt: '2026-05-01T12:00:00.000Z'
+  });
+  assert.ok(!recovered);
+  assert.equal(result.notes, '');
 });

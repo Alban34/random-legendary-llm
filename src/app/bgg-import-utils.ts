@@ -9,7 +9,7 @@ import type { BggMatchResult, GameSet } from './types';
 type BggFetchResult = { ok: true; gameNames: string[] } | { ok: false; error: string };
 type BggAttemptResult =
   | { retry: true }
-  | ({ retry?: undefined } & BggFetchResult);
+  | ({ retry?: never } & BggFetchResult);
 type FetchFn = (url: string) => Promise<Response>;
 
 const QUEUED_ERROR: BggFetchResult = {

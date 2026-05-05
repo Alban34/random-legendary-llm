@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { generateSetup } from './setup-generator.ts';
 import { createEpic1Bundle } from './game-data-pipeline.ts';
 import { createDefaultState } from './state-store.ts';
-import { createEmptyForcedPicks, normalizeForcedPicks, hasForcedPicks } from './forced-picks-utils.ts';
+import { createEmptyForcedPicks, normalizeForcedPicks, hasForcedPicks, addForcedPick, removeForcedPick } from './forced-picks-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -336,6 +336,88 @@ test('hasForcedPicks returns false when only forcedTeam is null', () => {
 
 test('forcedTeam survives JSON round-trip through normalizeForcedPicks', () => {
   const picks = { ...createEmptyForcedPicks(), forcedTeam: 'X-Men' };
-  const roundTripped = normalizeForcedPicks(JSON.parse(JSON.stringify(picks)));
+  const roundTripped = normalizeForcedPicks(structuredClone(picks));
   assert.equal(roundTripped.forcedTeam, 'X-Men');
+});
+
+// ---------------------------------------------------------------------------
+// addForcedPick
+// ---------------------------------------------------------------------------
+
+test('addForcedPick returns normalized picks unchanged when field is not a known pick field', () => {
+  const empty = createEmptyForcedPicks();
+  const result = addForcedPick(empty, 'unknownField', 'some-value');
+  assert.deepEqual(result, empty);
+});
+
+test('addForcedPick returns normalized picks unchanged when value is an empty string', () => {
+  const empty = createEmptyForcedPicks();
+  const result = addForcedPick(empty, 'schemeId', '');
+  assert.equal(result.schemeId, null);
+});
+
+test('addForcedPick sets a single (non-multi) field', () => {
+  const empty = createEmptyForcedPicks();
+  const result = addForcedPick(empty, 'schemeId', 'scheme-abc');
+  assert.equal(result.schemeId, 'scheme-abc');
+  assert.equal(result.mastermindId, null);
+});
+
+test('addForcedPick overwrites an existing single (non-multi) field value', () => {
+  const empty = createEmptyForcedPicks();
+  const first = addForcedPick(empty, 'mastermindId', 'mm-1');
+  const second = addForcedPick(first, 'mastermindId', 'mm-2');
+  assert.equal(second.mastermindId, 'mm-2');
+});
+
+test('addForcedPick appends to a multi field', () => {
+  const empty = createEmptyForcedPicks();
+  const result = addForcedPick(empty, 'heroIds', 'hero-a');
+  assert.deepEqual(result.heroIds, ['hero-a']);
+});
+
+test('addForcedPick deduplicates duplicate multi values', () => {
+  const empty = createEmptyForcedPicks();
+  const first = addForcedPick(empty, 'heroIds', 'hero-a');
+  const second = addForcedPick(first, 'heroIds', 'hero-a');
+  assert.deepEqual(second.heroIds, ['hero-a']);
+});
+
+test('addForcedPick works for villainGroupIds and henchmanGroupIds', () => {
+  const empty = createEmptyForcedPicks();
+  const withVillain = addForcedPick(empty, 'villainGroupIds', 'vg-1');
+  assert.deepEqual(withVillain.villainGroupIds, ['vg-1']);
+  const withHenchman = addForcedPick(withVillain, 'henchmanGroupIds', 'hg-1');
+  assert.deepEqual(withHenchman.henchmanGroupIds, ['hg-1']);
+});
+
+// ---------------------------------------------------------------------------
+// removeForcedPick
+// ---------------------------------------------------------------------------
+
+test('removeForcedPick returns normalized picks unchanged when field is not a known pick field', () => {
+  const empty = createEmptyForcedPicks();
+  const result = removeForcedPick(empty, 'unknownField');
+  assert.deepEqual(result, empty);
+});
+
+test('removeForcedPick clears a single (non-multi) field to null', () => {
+  const empty = createEmptyForcedPicks();
+  const withScheme = addForcedPick(empty, 'schemeId', 'scheme-abc');
+  const cleared = removeForcedPick(withScheme, 'schemeId');
+  assert.equal(cleared.schemeId, null);
+});
+
+test('removeForcedPick removes the specified value from a multi field', () => {
+  const empty = createEmptyForcedPicks();
+  const withHeroes = addForcedPick(addForcedPick(empty, 'heroIds', 'hero-a'), 'heroIds', 'hero-b');
+  const removed = removeForcedPick(withHeroes, 'heroIds', 'hero-a');
+  assert.deepEqual(removed.heroIds, ['hero-b']);
+});
+
+test('removeForcedPick with a value that does not exist in a multi field leaves the array unchanged', () => {
+  const empty = createEmptyForcedPicks();
+  const withHero = addForcedPick(empty, 'heroIds', 'hero-a');
+  const result = removeForcedPick(withHero, 'heroIds', 'hero-z');
+  assert.deepEqual(result.heroIds, ['hero-a']);
 });

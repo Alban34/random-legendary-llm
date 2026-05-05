@@ -11,6 +11,7 @@ import { getCollectionFeasibility } from './collection-utils.ts';
 import {
   formatHeroTeamLabel,
   formatMastermindLeadLabel,
+  formatPersistedPlayMode,
   getAvailablePlayModes,
   getDisplayedSetupRequirements,
   getPlayModeHelpText,
@@ -228,5 +229,20 @@ test('Persists normalized play-mode metadata while keeping legacy history record
 
   assert.equal(loaded.state.history[0].playMode, 'advanced-solo');
   assert.equal(formatHistorySummary(loaded.state.history[0], bundle.runtime.indexes).modeLabel, 'Advanced Solo');
+});
+
+test('Format helpers handle heroes without teams, masterminds without a mandatory lead, and non-two-handed-solo help text', () => {
+
+  assert.equal(formatHeroTeamLabel({}), 'No team listed');
+  assert.equal(formatHeroTeamLabel({ teams: [] }), 'No team listed');
+
+  assert.equal(formatMastermindLeadLabel({ leadEntity: null }), 'No mandatory lead');
+  assert.equal(formatMastermindLeadLabel({}), 'No mandatory lead');
+
+  assert.match(getPlayModeHelpText(1, 'standard'), /Standard Solo v1/);
+  assert.match(getPlayModeHelpText(1, 'advanced-solo'), /Standard Solo v1/);
+
+  assert.match(formatPersistedPlayMode(2, 'standard'), /2P/);
+  assert.match(formatPersistedPlayMode(1, 'two-handed-solo'), /Two-Handed Solo/);
 });
 

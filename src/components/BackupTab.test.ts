@@ -23,6 +23,30 @@ beforeAll(async () => {
   ]);
 });
 
+function getEnBlock(src: string): string {
+  const start = src.indexOf('const EN_MESSAGES');
+  const end = src.indexOf('\nconst ', start + 10);
+  return src.slice(start, end > -1 ? end : undefined);
+}
+
+function getFrBlock(src: string): string {
+  const start = src.indexOf('const FR_MESSAGES');
+  const end = src.indexOf('\nconst ', start + 10);
+  return src.slice(start, end > -1 ? end : undefined);
+}
+
+function getEnDisclosureBody(src: string): string {
+  const block = getEnBlock(src);
+  const keyIdx = block.indexOf("'storage.disclosureBody'");
+  return block.slice(keyIdx, keyIdx + 400).toLowerCase();
+}
+
+function getFrDisclosureBody(src: string): string {
+  const block = getFrBlock(src);
+  const keyIdx = block.indexOf("'storage.disclosureBody'");
+  return block.slice(keyIdx, keyIdx + 500);
+}
+
 // UX6.1 — Portability panel
 
 test('Renderer contains data-backup-portability-panel section', () => {
@@ -223,77 +247,50 @@ test('BackupTab references both disclosure locale keys', () => {
 
 test('EN_MESSAGES contains storage.disclosureTitle', () => {
 
-  const enStart = localizationSource.indexOf('const EN_MESSAGES');
-  const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
-  const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
+  const enBlock = getEnBlock(localizationSource);
   assert.match(enBlock, /storage\.disclosureTitle/, 'EN_MESSAGES must have storage.disclosureTitle');
 });
 
 test('EN_MESSAGES contains storage.disclosureBody', () => {
 
-  const enStart = localizationSource.indexOf('const EN_MESSAGES');
-  const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
-  const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
+  const enBlock = getEnBlock(localizationSource);
   assert.match(enBlock, /storage\.disclosureBody/, 'EN_MESSAGES must have storage.disclosureBody');
 });
 
 test('FR_MESSAGES contains storage.disclosureTitle and storage.disclosureBody', () => {
 
-  const frStart = localizationSource.indexOf('const FR_MESSAGES');
-  const frEnd = localizationSource.indexOf('\nconst ', frStart + 10);
-  const frBlock = localizationSource.slice(frStart, frEnd > -1 ? frEnd : undefined);
+  const frBlock = getFrBlock(localizationSource);
   assert.match(frBlock, /storage\.disclosureTitle/, 'FR_MESSAGES must have storage.disclosureTitle');
   assert.match(frBlock, /storage\.disclosureBody/, 'FR_MESSAGES must have storage.disclosureBody');
 });
 
 test('EN disclosure body mentions localStorage', () => {
 
-  const enStart = localizationSource.indexOf('const EN_MESSAGES');
-  const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
-  const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
-  const keyIdx = enBlock.indexOf("'storage.disclosureBody'");
-  assert.ok(keyIdx > -1, 'EN_MESSAGES must have storage.disclosureBody key');
-  const bodyCtx = enBlock.slice(keyIdx, keyIdx + 400);
+  const bodyCtx = getEnDisclosureBody(localizationSource);
   assert.match(bodyCtx, /localStorage/i, 'EN disclosure must mention localStorage');
 });
 
 test('EN disclosure body mentions collection ownership', () => {
 
-  const enStart = localizationSource.indexOf('const EN_MESSAGES');
-  const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
-  const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
-  const keyIdx = enBlock.indexOf("'storage.disclosureBody'");
-  const bodyCtx = enBlock.slice(keyIdx, keyIdx + 400).toLowerCase();
+  const bodyCtx = getEnDisclosureBody(localizationSource);
   assert.ok(bodyCtx.includes('collection'), 'EN disclosure must mention collection ownership');
 });
 
 test('EN disclosure body mentions game history', () => {
 
-  const enStart = localizationSource.indexOf('const EN_MESSAGES');
-  const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
-  const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
-  const keyIdx = enBlock.indexOf("'storage.disclosureBody'");
-  const bodyCtx = enBlock.slice(keyIdx, keyIdx + 400).toLowerCase();
+  const bodyCtx = getEnDisclosureBody(localizationSource);
   assert.ok(bodyCtx.includes('history'), 'EN disclosure must mention game history');
 });
 
 test('EN disclosure body mentions user preferences', () => {
 
-  const enStart = localizationSource.indexOf('const EN_MESSAGES');
-  const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
-  const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
-  const keyIdx = enBlock.indexOf("'storage.disclosureBody'");
-  const bodyCtx = enBlock.slice(keyIdx, keyIdx + 400).toLowerCase();
+  const bodyCtx = getEnDisclosureBody(localizationSource);
   assert.ok(bodyCtx.includes('preference'), 'EN disclosure must mention user preferences');
 });
 
 test('EN disclosure body confirms data is never transmitted', () => {
 
-  const enStart = localizationSource.indexOf('const EN_MESSAGES');
-  const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
-  const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
-  const keyIdx = enBlock.indexOf("'storage.disclosureBody'");
-  const bodyCtx = enBlock.slice(keyIdx, keyIdx + 400).toLowerCase();
+  const bodyCtx = getEnDisclosureBody(localizationSource);
   assert.ok(
     bodyCtx.includes('never transmitted') || bodyCtx.includes('never sent'),
     'EN disclosure must state data is never transmitted'
@@ -302,31 +299,18 @@ test('EN disclosure body confirms data is never transmitted', () => {
 
 test('EN disclosure does not mention cookies', () => {
 
-  const enStart = localizationSource.indexOf('const EN_MESSAGES');
-  const enEnd = localizationSource.indexOf('\nconst ', enStart + 10);
-  const enBlock = localizationSource.slice(enStart, enEnd > -1 ? enEnd : undefined);
-  const keyIdx = enBlock.indexOf("'storage.disclosureBody'");
-  const bodyCtx = enBlock.slice(keyIdx, keyIdx + 400);
+  const bodyCtx = getEnDisclosureBody(localizationSource);
   assert.doesNotMatch(bodyCtx, /cookie/i, 'EN disclosure must not mention cookie or cookies');
 });
 
 test('FR disclosure does not mention cookies', () => {
 
-  const frStart = localizationSource.indexOf('const FR_MESSAGES');
-  const frEnd = localizationSource.indexOf('\nconst ', frStart + 10);
-  const frBlock = localizationSource.slice(frStart, frEnd > -1 ? frEnd : undefined);
-  const keyIdx = frBlock.indexOf("'storage.disclosureBody'");
-  assert.ok(keyIdx > -1, 'FR_MESSAGES must have storage.disclosureBody key');
-  const bodyCtx = frBlock.slice(keyIdx, keyIdx + 500);
+  const bodyCtx = getFrDisclosureBody(localizationSource);
   assert.doesNotMatch(bodyCtx, /cookie/i, 'FR disclosure must not mention cookie or cookies');
 });
 
 test('FR disclosure mentions localStorage', () => {
 
-  const frStart = localizationSource.indexOf('const FR_MESSAGES');
-  const frEnd = localizationSource.indexOf('\nconst ', frStart + 10);
-  const frBlock = localizationSource.slice(frStart, frEnd > -1 ? frEnd : undefined);
-  const keyIdx = frBlock.indexOf("'storage.disclosureBody'");
-  const bodyCtx = frBlock.slice(keyIdx, keyIdx + 500);
+  const bodyCtx = getFrDisclosureBody(localizationSource);
   assert.match(bodyCtx, /localStorage/i, 'FR disclosure must mention localStorage');
 });
