@@ -76,6 +76,7 @@ export default defineConfig(({ command }) => ({
   },
   build: {
     outDir: 'dist',
+    target: 'es2022',
   },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
