@@ -186,7 +186,7 @@ function resolveLeadEntity(
 // ---------------------------------------------------------------------------
 function tryMastermindForScheme(mastermind: MastermindRuntime, context: TryMastermindContext): GeneratedSetup | null {
   const { mastermindRanking, scheme, schemeSelection, pools, effectiveRequirements, normalizedForcedPicks, state, runtime, random, constraintFailureReasons, eligibleSchemes, template } = context;
-  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, random, normalizedForcedPicks, { template, preferredExpansionId: normalizedForcedPicks.preferredExpansionId });
+  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, { template, preferredExpansionId: normalizedForcedPicks.preferredExpansionId, random, forcedPicks: normalizedForcedPicks });
   if (!categorySelection.selection) {
     if (categorySelection.reason) {
       constraintFailureReasons.add(categorySelection.reason);
@@ -274,19 +274,19 @@ export function generateSetup({ runtime, state, playerCount, advancedSolo = fals
   const { template, pools, eligibleSchemes, forcedPicks: normalizedForcedPicks } = legality;
 
   if (epicMastermind === true) {
-    const epicPool = pools!.masterminds.filter((m) => m.isEpicMastermind === true);
+    const epicPool = pools.masterminds.filter((m) => m.isEpicMastermind === true);
     if (epicPool.length === 0) {
       throw new Error('newGame.epicMastermind.noCardsError');
     }
-    pools!.masterminds = epicPool;
+    pools.masterminds = epicPool;
   }
 
   const hasConstraintSelections = hasForcedPicks(normalizedForcedPicks);
   const constraintFailureReasons = new Set<string>();
-  const schemeSelection = selectScheme(eligibleSchemes!, normalizedForcedPicks!, state.usage.schemes, random, normalizedForcedPicks!.preferredExpansionId);
+  const schemeSelection = selectScheme(eligibleSchemes, normalizedForcedPicks!, state.usage.schemes, random, normalizedForcedPicks!.preferredExpansionId);
 
   for (const scheme of schemeSelection.selected) {
-    const result = trySchemeForSetup(scheme, { schemeSelection, pools: pools!, template: template!, normalizedForcedPicks: normalizedForcedPicks!, state, runtime, random, hasConstraintSelections, constraintFailureReasons, eligibleSchemes: eligibleSchemes! });
+    const result = trySchemeForSetup(scheme, { schemeSelection, pools: pools, template: template!, normalizedForcedPicks: normalizedForcedPicks!, state, runtime, random, hasConstraintSelections, constraintFailureReasons, eligibleSchemes: eligibleSchemes });
     if (result) {
       return result;
     }

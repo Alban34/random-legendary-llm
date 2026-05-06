@@ -169,3 +169,195 @@ test('all other fields are identical after round-trip (legacy record)', () => {
   assert.deepEqual(sanitized.setupSnapshot, record.setupSnapshot);
   assert.deepEqual(sanitized.result, record.result);
 });
+
+// ── Story 97.5 — sanitizeGameRecord notice paths and ID-string logic ──────────
+
+test('sanitizeGameRecord: invalid schemeId emits Removed notice with the record ID and drops the record', () => {
+  const indexes = bundle.runtime.indexes;
+  const baseRecord = buildValidRecord71(indexes);
+  const record = {
+    ...baseRecord,
+    id: 'test-id',
+    setupSnapshot: {
+      ...baseRecord.setupSnapshot,
+      schemeId: 'invalid-scheme-does-not-exist'
+    }
+  };
+  const { state, notices } = sanitizePersistedState({
+    candidate: buildCandidateState71(indexes, record),
+    indexes
+  });
+
+  assert.equal(state.history.length, 0, 'record with invalid schemeId must be dropped');
+  assert.ok(
+    notices.some((n) => n.includes("Removed invalid stored game history record 'test-id'")),
+    `Expected notice about removed record 'test-id', got: ${JSON.stringify(notices)}`
+  );
+});
+
+test('sanitizeGameRecord: non-string id emits Removed notice with "unknown" and drops the record', () => {
+  const indexes = bundle.runtime.indexes;
+  const baseRecord = buildValidRecord71(indexes);
+  const record = {
+    ...baseRecord,
+    id: 12345,
+    setupSnapshot: {
+      ...baseRecord.setupSnapshot,
+      schemeId: 'invalid-scheme-does-not-exist'
+    }
+  };
+  const { state, notices } = sanitizePersistedState({
+    candidate: buildCandidateState71(indexes, record),
+    indexes
+  });
+
+  assert.equal(state.history.length, 0, 'record with non-string id must be dropped');
+  assert.ok(
+    notices.some((n) => n.includes("Removed invalid stored game history record 'unknown'")),
+    `Expected notice mentioning 'unknown', got: ${JSON.stringify(notices)}`
+  );
+});
+
+test('sanitizeGameRecord: valid snapshot with corrupted result emits Recovered notice with the record ID', () => {
+  const indexes = bundle.runtime.indexes;
+  const record = {
+    ...buildValidRecord71(indexes),
+    id: 'test-id',
+    result: {
+      status: 'completed',
+      outcome: 'invalid-outcome',
+      score: 5,
+      notes: '',
+      updatedAt: '2026-05-01T12:00:00.000Z'
+    }
+  };
+  const { state, notices } = sanitizePersistedState({
+    candidate: buildCandidateState71(indexes, record),
+    indexes
+  });
+
+  assert.equal(state.history.length, 1, 'record with recovered result must be retained');
+  assert.equal(state.history[0].result.status, 'pending', 'corrupted result must be reset to pending');
+  assert.ok(
+    notices.some((n) => n.includes("Recovered invalid stored game result for 'test-id'")),
+    `Expected Recovered notice for 'test-id', got: ${JSON.stringify(notices)}`
+  );
+});
+
+test('sanitizeGameRecord: incompatible playMode/playerCount silently drops the record without a notice', () => {
+  const indexes = bundle.runtime.indexes;
+  const baseRecord = buildValidRecord71(indexes);
+  const record = {
+    ...baseRecord,
+    id: 'test-id',
+    playerCount: 2,
+    advancedSolo: false,
+    playMode: 'advanced-solo'
+  };
+  const { state, notices } = sanitizePersistedState({
+    candidate: buildCandidateState71(indexes, record),
+    indexes
+  });
+
+  assert.equal(state.history.length, 0, 'record must be silently dropped when resolvePlayMode throws');
+  assert.ok(
+    !notices.some((n) => n.includes('test-id')),
+    `No notice should reference 'test-id' for a silent drop, got: ${JSON.stringify(notices)}`
+  );
+});
+
+test('sanitizeGameRecord: non-plain-object history entry is dropped with generic hydration notice', () => {
+  const indexes = bundle.runtime.indexes;
+  const candidateState = {
+    schemaVersion: SCHEMA_VERSION,
+    collection: { ownedSetIds: [], activeSetIds: null },
+    usage: { heroes: {}, masterminds: {}, villainGroups: {}, henchmanGroups: {}, schemes: {} },
+    history: ['not-a-plain-object'],
+    preferences: {
+      lastPlayerCount: 1,
+      lastAdvancedSolo: false,
+      lastPlayMode: 'standard',
+      selectedTab: null,
+      onboardingCompleted: false,
+      themeId: 'dark',
+      localeId: 'en-US'
+    }
+  };
+
+  const { state, notices } = sanitizePersistedState({ candidate: candidateState, indexes });
+
+  assert.equal(state.history.length, 0, 'non-plain-object history entry must be dropped');
+  assert.ok(
+    notices.some((n) => n.includes('Removed an invalid stored game history record during hydration')),
+    `Expected generic hydration notice, got: ${JSON.stringify(notices)}`
+  );
+});
+
+// ── Coverage gap tests: lines 162/163/165, 180, 228, 257 ────────────────────
+
+test('sanitizePreferences pushes a notice when candidatePreferences is a non-plain non-undefined value', () => {
+  const candidate = {
+    schemaVersion: SCHEMA_VERSION,
+    collection: { ownedSetIds: [], activeSetIds: null },
+    usage: { heroes: {}, masterminds: {}, villainGroups: {}, henchmanGroups: {}, schemes: {} },
+    history: [],
+    preferences: 42
+  };
+  const { notices } = sanitizePersistedState({ candidate, indexes: bundle.runtime.indexes });
+  assert.ok(
+    notices.some((n) => n.includes('Recovered preferences because the stored value was invalid.')),
+    `Expected preferences recovery notice, got: ${JSON.stringify(notices)}`
+  );
+});
+
+test('sanitizePreferences falls back to default play mode when lastPlayMode triggers a resolvePlayMode throw', () => {
+  const candidate = {
+    schemaVersion: SCHEMA_VERSION,
+    collection: { ownedSetIds: [], activeSetIds: null },
+    usage: { heroes: {}, masterminds: {}, villainGroups: {}, henchmanGroups: {}, schemes: {} },
+    history: [],
+    preferences: {
+      lastPlayerCount: 1,
+      lastAdvancedSolo: false,
+      lastPlayMode: 'completely-unsupported-mode',
+      selectedTab: null,
+      onboardingCompleted: false,
+      themeId: 'dark',
+      localeId: 'en-US'
+    }
+  };
+  const { state, notices } = sanitizePersistedState({ candidate, indexes: bundle.runtime.indexes });
+  assert.equal(typeof state.preferences.lastPlayMode, 'string');
+  assert.ok(
+    notices.some((n) => n.includes('Recovered invalid preference values during state hydration.')),
+    `Expected preference recovery notice, got: ${JSON.stringify(notices)}`
+  );
+});
+
+test('sanitizeStateCandidate preserves an explicitly empty activeSetIds array', () => {
+  const candidate = {
+    schemaVersion: SCHEMA_VERSION,
+    collection: { ownedSetIds: [], activeSetIds: [] },
+    usage: { heroes: {}, masterminds: {}, villainGroups: {}, henchmanGroups: {}, schemes: {} },
+    history: [],
+    preferences: {}
+  };
+  const { state } = sanitizePersistedState({ candidate, indexes: bundle.runtime.indexes });
+  assert.deepEqual(state.collection.activeSetIds, []);
+});
+
+test('sanitizeStateCandidate pushes a notice when history is a non-array non-undefined value', () => {
+  const candidate = {
+    schemaVersion: SCHEMA_VERSION,
+    collection: { ownedSetIds: [], activeSetIds: null },
+    usage: { heroes: {}, masterminds: {}, villainGroups: {}, henchmanGroups: {}, schemes: {} },
+    history: 'not-an-array',
+    preferences: {}
+  };
+  const { state, notices } = sanitizePersistedState({ candidate, indexes: bundle.runtime.indexes });
+  assert.deepEqual(state.history, []);
+  assert.ok(
+    notices.some((n) => n.includes('Recovered game history because the stored value was invalid.')),
+    `Expected history recovery notice, got: ${JSON.stringify(notices)}`
+  );
+});

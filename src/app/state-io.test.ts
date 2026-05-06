@@ -8,7 +8,7 @@ import { loadState, saveState, updateState } from './state-io.ts';
 import { createDefaultState, STORAGE_KEY, SCHEMA_VERSION } from './state-defaults.ts';
 import { createStorageAdapter } from './storage-adapter.ts';
 import { toggleOwnedSet, acceptGameSetup } from './state-store.ts';
-import { createMemoryStorage } from './test-utils.ts';
+import { createMemoryStorage, minimalIndexes } from './test-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -186,4 +186,154 @@ test('loadState sanitizes non-plain usage buckets and invalid stat values', () =
   assert.deepEqual(loaded.usage.masterminds, {});
   assert.deepEqual(loaded.usage.villainGroups, {});
   assert.ok(notices.some((n) => /heroes usage/i.test(n)));
+});
+
+// ── Story 97.2 — additional branches ────────────────────────────────────────
+
+test('loadState returns default state when storage adapter is unavailable', () => {
+  const storageAdapter = createStorageAdapter(null);
+  assert.equal(storageAdapter.available, false);
+
+  const result = loadState({ storageAdapter, indexes: minimalIndexes });
+
+  assert.deepEqual(result.state, createDefaultState());
+  assert.equal(result.storageAvailable, false);
+  assert.equal(result.hydratedFromStorage, false);
+  assert.equal(result.recovered, true);
+  assert.ok(result.notices.length > 0, 'Should include a notice describing the storage unavailability');
+  assert.ok(result.notices[0].toLowerCase().includes('unavailable'));
+});
+
+test('loadState returns default state with no notices when storage is empty', () => {
+  const storage = createMemoryStorage(); // empty — STORAGE_KEY not set
+  const storageAdapter = createStorageAdapter(storage);
+
+  const result = loadState({ storageAdapter, indexes: minimalIndexes });
+
+  assert.deepEqual(result.state, createDefaultState());
+  assert.equal(result.storageAvailable, true);
+  assert.equal(result.hydratedFromStorage, false);
+  assert.equal(result.recovered, false);
+  assert.deepEqual(result.notices, []);
+});
+
+test('loadState returns default state when stored value is an empty string', () => {
+  const storage = createMemoryStorage({ [STORAGE_KEY]: '' });
+  const storageAdapter = createStorageAdapter(storage);
+
+  const result = loadState({ storageAdapter, indexes: minimalIndexes });
+
+  assert.deepEqual(result.state, createDefaultState());
+  assert.equal(result.hydratedFromStorage, false);
+  assert.equal(result.recovered, false);
+});
+
+test('loadState recovers to default state when stored schemaVersion is unrecognised', () => {
+  const futureState = { schemaVersion: 999, collection: { ownedSetIds: [], activeSetIds: null }, usage: {}, history: [], preferences: {} };
+  const storage = createMemoryStorage({ [STORAGE_KEY]: JSON.stringify(futureState) });
+  const storageAdapter = createStorageAdapter(storage);
+
+  const result = loadState({ storageAdapter, indexes: minimalIndexes });
+
+  assert.deepEqual(result.state, createDefaultState());
+  assert.equal(result.recovered, true);
+  assert.ok(result.notices.some((n) => /unsupported schema/i.test(n)));
+});
+
+test('loadState recovers to default state when stored schemaVersion is zero', () => {
+  const oldState = { schemaVersion: 0, collection: {}, usage: {}, history: [], preferences: {} };
+  const storage = createMemoryStorage({ [STORAGE_KEY]: JSON.stringify(oldState) });
+  const storageAdapter = createStorageAdapter(storage);
+
+  const result = loadState({ storageAdapter, indexes: minimalIndexes });
+
+  assert.deepEqual(result.state, createDefaultState());
+  assert.equal(result.recovered, true);
+  assert.ok(result.notices.some((n) => /unsupported schema/i.test(n)));
+});
+
+test('loadState includes save failure notice when recovery cannot persist the corrected state', () => {
+  // Build a raw storage where the probe key succeeds but STORAGE_KEY writes throw.
+  const rawStorage = {
+    getItem(key: string): string | null {
+      return key === STORAGE_KEY ? '{ broken json' : null;
+    },
+    setItem(key: string, _value: string): void {
+      if (key === STORAGE_KEY) {
+        throw new Error('Storage quota exceeded');
+      }
+    },
+    removeItem(_key: string): void {}
+  };
+  const storageAdapter = createStorageAdapter(rawStorage);
+  assert.equal(storageAdapter.available, true, 'Probe should succeed for the non-STORAGE_KEY write');
+
+  const result = loadState({ storageAdapter, indexes: minimalIndexes });
+
+  assert.equal(result.recovered, true);
+  assert.ok(
+    result.notices.some((n) => n.includes('Failed to save')),
+    'Should include a notice when the recovery save fails'
+  );
+});
+
+test('loadState appends save error notice when re-save of sanitized valid state fails', () => {
+  // State has a valid-looking but unrecognised set ID; sanitization removes it (recovered=true).
+  // The subsequent saveState call throws → save.ok is false → line 58: notices.push(save.message).
+  const invalidState = {
+    schemaVersion: SCHEMA_VERSION,
+    collection: { ownedSetIds: ['nonexistent-set-id-xyz'], activeSetIds: null },
+    usage: { heroes: {}, masterminds: {}, villainGroups: {}, henchmanGroups: {}, schemes: {} },
+    history: [],
+    preferences: {}
+  };
+  const rawStorage = {
+    getItem(key: string): string | null {
+      return key === STORAGE_KEY ? JSON.stringify(invalidState) : null;
+    },
+    setItem(key: string, _value: string): void {
+      // Only STORAGE_KEY writes fail; the probe key (__legendary_storage_probe__) succeeds.
+      if (key === STORAGE_KEY) throw new Error('Storage quota exceeded');
+    },
+    removeItem(_key: string): void {}
+  };
+  const storageAdapter = createStorageAdapter(rawStorage);
+  assert.equal(storageAdapter.available, true, 'Probe should succeed for non-STORAGE_KEY writes');
+
+  const result = loadState({ storageAdapter, indexes: minimalIndexes });
+
+  assert.equal(result.recovered, true);
+  assert.ok(
+    result.notices.some((n) => n.includes('Failed to save browser state')),
+    'Should include the save-failure message appended after sanitization notices'
+  );
+});
+
+// ── line 79 branch coverage ──────────────────────────────────────────────────
+
+test('updateState uses current state as-is when updater is not a function', () => {
+  const storage = createMemoryStorage();
+  const storageAdapter = createStorageAdapter(storage);
+  const result = updateState({
+    storageAdapter,
+    indexes: minimalIndexes,
+    currentState: createDefaultState(),
+    // @ts-expect-error — deliberately passing non-function to exercise the else branch
+    updater: null
+  });
+  assert.deepEqual(result.state.collection.ownedSetIds, []);
+  assert.equal(result.save.ok, true);
+});
+
+test('updateState falls back to draft when updater returns null', () => {
+  const storage = createMemoryStorage();
+  const storageAdapter = createStorageAdapter(storage);
+  const result = updateState({
+    storageAdapter,
+    indexes: minimalIndexes,
+    currentState: createDefaultState(),
+    updater: () => null as unknown as ReturnType<typeof createDefaultState>
+  });
+  assert.deepEqual(result.state.collection.ownedSetIds, []);
+  assert.equal(result.save.ok, true);
 });

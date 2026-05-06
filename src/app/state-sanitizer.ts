@@ -110,7 +110,7 @@ function sanitizeGameRecord(record: unknown, indexes: Indexes, notices: string[]
     && isValidSnapshotIds(setupSnapshot.henchmanGroupIds, indexes.henchmanGroupsById);
 
   if (!isValid) {
-    notices.push(`Removed invalid stored game history record '${String(r.id ?? 'unknown')}'.`);
+    notices.push(`Removed invalid stored game history record '${typeof r.id === 'string' ? r.id : 'unknown'}'.`);
     return null;
   }
 
@@ -126,7 +126,7 @@ function sanitizeGameRecord(record: unknown, indexes: Indexes, notices: string[]
 
   const sanitizedResult = sanitizeStoredGameResult(r.result, r.playerCount as number);
   if (sanitizedResult.recovered) {
-    notices.push(`Recovered invalid stored game result for '${String(r.id ?? 'unknown')}'.`);
+    notices.push(`Recovered invalid stored game result for '${typeof r.id === 'string' ? r.id : 'unknown'}'.`);
   }
 
   return {

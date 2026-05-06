@@ -142,11 +142,9 @@ export function buildCategorySelection(
   scheme: SchemeRuntime,
   mastermind: MastermindRuntime,
   usageBucket: UsageState,
-  random: () => number,
-  forcedPicks: ForcedPicks,
-  opts: { template: SetupTemplate; preferredExpansionId?: string | null }
+  opts: { template: SetupTemplate; preferredExpansionId?: string | null; random: () => number; forcedPicks: ForcedPicks }
 ): CategorySelectionResult {
-  const { template, preferredExpansionId = null } = opts;
+  const { template, preferredExpansionId = null, random, forcedPicks } = opts;
   const forced = resolveForcedCollections(scheme, mastermind, pools, forcedPicks, template);
   if (!forced.allAvailable) {
     return { selection: null, reason: 'One or more forced Villain Group or Henchman Group picks are unavailable in the current owned collection.' };

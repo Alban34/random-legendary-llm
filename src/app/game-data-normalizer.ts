@@ -213,7 +213,7 @@ function resolveGroupReference(
 // ---------------------------------------------------------------------------
 
 export function normalizeGameData(source: CanonicalSourceData): PipelineRuntime {
-  const cloneSource = structuredClone(source) as CanonicalSourceData;
+  const cloneSource = structuredClone(source);
   const allVillainGroups: VillainGroupCard[] = [];
   const allHenchmanGroups: HenchmanGroupCard[] = [];
   const villainGroupsBySet = new Map<string, Map<string, VillainGroupCard[]>>();
@@ -234,7 +234,7 @@ export function normalizeGameData(source: CanonicalSourceData): PipelineRuntime 
     set.masterminds = set.masterminds.map((mastermind): MastermindRuntime => {
       const lead = mastermind.leadName
         ? resolveGroupReference(
-            mastermind.leadName!,
+            mastermind.leadName,
             set.id,
             mastermind.leadCategory!,
             villainGroupsBySet,

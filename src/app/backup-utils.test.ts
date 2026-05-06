@@ -243,3 +243,23 @@ test('mergeUsageBucket handles new entries, null lastPlayedAt on either side, an
   assert.equal(merged.usage.heroes['hero-c'].plays, 5);
   assert.equal(merged.usage.heroes['hero-d'].plays, 4);
 });
+
+test('parseBackupPayload returns ok:false when valid envelope content fails sanitization', () => {
+  const payload = {
+    schemaId: BACKUP_SCHEMA_ID,
+    version: BACKUP_SCHEMA_VERSION,
+    exportedAt: '2026-05-01T00:00:00.000Z',
+    data: {
+      collection: { ownedSetIds: ['nonexistent-set-id-xyz'], activeSetIds: null },
+      usage: { heroes: {}, masterminds: {}, villainGroups: {}, henchmanGroups: {}, schemes: {} },
+      history: [],
+      preferences: {}
+    }
+  };
+  const result = parseBackupPayload(payload, { indexes: bundle.runtime.indexes });
+  assert.equal(result.ok, false);
+  assert.ok(
+    (result as { ok: false; error: string }).error.includes('could not be imported safely'),
+    `Expected safety rejection, got: ${JSON.stringify(result)}`
+  );
+});

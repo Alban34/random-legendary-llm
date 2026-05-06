@@ -682,3 +682,40 @@ test('filterHistoryByOutcome returns all records unchanged for an unrecognized f
   assert.equal(result, allOutcomeRecords);
 });
 
+// ── Story 97.5 — grouping edge cases and formatHistorySummary scoreLabel branch ─
+
+test('buildHistoryGroups with empty records array returns empty array', () => {
+  const groups = buildHistoryGroups([], bundle.runtime.indexes);
+  assert.deepEqual(groups, []);
+});
+
+test('buildHistoryGroups groups two records with identical createdAt into one group', () => {
+  const sharedDate = '2026-05-01T10:00:00.000Z';
+  const records = [
+    createHistoryRecord34({ id: 'r1', createdAt: sharedDate }),
+    createHistoryRecord34({ id: 'r2', createdAt: sharedDate })
+  ];
+
+  const groups = buildHistoryGroups(records, bundle.runtime.indexes, { mode: 'mastermind' });
+  assert.equal(groups.length, 1, 'both records share the same mastermind group');
+  assert.equal(groups[0].count, 2);
+  assert.equal(groups[0].latestCreatedAt, sharedDate);
+});
+
+test('formatHistorySummary with completed solo result produces non-null scoreLabel', () => {
+  const record = {
+    ...createHistoryRecord34({ id: 'r-solo-score', createdAt: '2026-05-01T10:00:00.000Z', playerCount: 1, playMode: 'standard' }),
+    result: {
+      status: 'completed',
+      outcome: 'win',
+      score: 77,
+      notes: '',
+      updatedAt: '2026-05-01T10:00:00.000Z'
+    }
+  };
+
+  const summary = formatHistorySummary(record, bundle.runtime.indexes);
+  assert.equal(summary.scoreLabel, 'Score 77', 'scoreLabel must be "Score 77" for solo completed result');
+  assert.equal(summary.perPlayerScoreLabel, null, 'perPlayerScoreLabel must be null for solo');
+});
+

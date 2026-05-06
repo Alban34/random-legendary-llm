@@ -129,7 +129,7 @@ export function formatHistorySummary(record: HistoryRecord, indexes: RuntimeInde
     playMode,
     result,
     resultLabel: formatGameResultStatus(result),
-    scoreLabel: isCompletedGameResult(result) && result.score !== null && record.playerCount === 1 ? `Score ${String(result.score)}` : null,
+    scoreLabel: isCompletedGameResult(result) && typeof result.score === 'number' && record.playerCount === 1 ? `Score ${String(result.score)}` : null,
     perPlayerScoreLabel: (function() {
       if (record.playerCount < 2 || !isCompletedGameResult(result) || !Array.isArray(result.score)) return null;
       const hasAnyScore = result.score.some((entry) => entry.score !== null);

@@ -54,7 +54,7 @@ export function getDisplayedSetupRequirements({ playerCount, advancedSolo, playM
     currentSetup?.template.playerCount === template.playerCount
     && currentSetup?.template.playMode === template.playMode
   ) {
-    return currentSetup!.requirements;
+    return currentSetup.requirements;
   }
 
   return {

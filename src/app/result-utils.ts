@@ -85,7 +85,7 @@ export function formatGameResultStatus(result: GameResult | null | undefined, lo
     const outcomeLabel = formatGameOutcomeLabel(result.outcome);
     const parts = result.score.map((entry, index) => {
       const name = entry.playerName && entry.playerName.trim() !== '' ? entry.playerName : `Player ${index + 1}`;
-      const scoreStr = entry.score !== null ? new Intl.NumberFormat(locale).format(entry.score) : '\u2014';
+      const scoreStr = entry.score === null ? '\u2014' : new Intl.NumberFormat(locale).format(entry.score);
       return `${name}: ${scoreStr}`;
     });
     return `${outcomeLabel} \u00b7 ${parts.join(' \u00b7 ')}`;
@@ -178,7 +178,7 @@ function sanitizePendingCandidate(c: Record<string, unknown>, playerCount: numbe
 
   return {
     result: createPendingGameResult(),
-    recovered: recovered as boolean
+    recovered: recovered
   };
 }
 
@@ -271,14 +271,14 @@ export function normalizeGameResultDraft(result: GameResult | null | undefined, 
       outcome: result.outcome,
       playerScores: result.score.map((e) => ({
         playerName: e.playerName,
-        score: e.score !== null ? String(e.score) : ''
+        score: e.score === null ? '' : String(e.score)
       })),
       notes: typeof result.notes === 'string' ? result.notes : ''
     };
   }
   return {
     outcome: isCompletedGameResult(result) ? result.outcome : '',
-    score: isCompletedGameResult(result) && result.score !== null ? String(result.score) : '',
+    score: isCompletedGameResult(result) && typeof result.score === 'number' ? String(result.score) : '',
     notes: typeof result?.notes === 'string' ? result.notes : ''
   };
 }

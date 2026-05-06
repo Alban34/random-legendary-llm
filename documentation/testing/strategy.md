@@ -112,7 +112,7 @@ This applies only to files that can run in the Vitest/Node environment. The foll
 | Category | Examples |
 |----------|----------|
 | Browser / SW entry points | `src/sw.ts`, `src/app/app-init.ts`, `src/app/app-renderer.ts`, `src/app/browser-entry.ts` |
-| DOM-dependent utilities | `src/app/collection-actions.ts`, `src/app/feedback-utils.ts`, `src/app/modal-utils.ts`, `src/app/focus-utils.ts` |
+| DOM-dependent utilities | `src/app/feedback-utils.ts`, `src/app/modal-utils.ts`, `src/app/focus-utils.ts` |
 | Svelte reactive VMs | `src/app/backup-vm.svelte.ts`, `src/app/browse-vm.svelte.ts`, `src/app/history-vm.svelte.ts`, `src/app/import-vm.svelte.ts`, `src/app/new-game-vm.svelte.ts`, `src/app/state-store.svelte.ts` |
 | Type-only / data-only | `src/app/env.d.ts`, `src/app/types.ts`, `src/data/canonical-game-data.json` |
 | Svelte components (not `.ts`) | All `src/components/*.svelte` files — outside the `src/**/*.ts` coverage scope |
@@ -120,6 +120,8 @@ This applies only to files that can run in the Vitest/Node environment. The foll
 Excluded modules should be covered by Playwright E2E tests instead.
 
 Coverage is measured by `@vitest/coverage-v8` against the `src/**/*.ts` include pattern (configured in `vitest.config.ts`). The per-module gap analysis is recorded in [`documentation/planning/epic/epic-95-coverage-audit.md`](../planning/epic/epic-95-coverage-audit.md).
+
+**As of Epic 97**, the aggregate ≥ 80% threshold has been achieved: **80.03% lines / 80.65% branches / 80.36% functions**.
 
 ---
 
@@ -192,3 +194,28 @@ Covers: 4 Playwright tests guarding the "Clear selection" button behaviour in th
 Automated verification: `src/app/locales/locales.test.ts`
 
 Covers: cross-locale key-parity check — verifies that every locale's `.ts` catalog file exposes an identical set of keys to the canonical `en.ts`; fails if any key is present in `en.ts` but missing from another locale file, or vice versa, for any of the five non-English locales (`fr`, `de`, `ja`, `ko`, `es`).
+
+---
+
+## Epic 97 — Test Coverage Uplift to 80%
+
+Automated verification: extensions to 9 existing test files; 1 new test file created.
+
+**Before (Epic 95 baseline):** 74.2% stmt / 75.1% branch — 587 tests in 42 files  
+**After:** 80.03% lines / 80.65% branches / 80.36% functions
+
+Test files extended:
+- `src/app/setup-hero-selector.test.ts` — 10 new tests (forced-hero unavailability early-return, team constraint paths, hero name requirements, `preferredExpansionId` tiebreaker)
+- `src/app/state-io.test.ts` — 9 new tests (error recovery during load, version migration edge cases, empty/null input handling)
+- `src/app/state-store.test.ts` — 9 new tests (collection ownership state transitions, action reducer edge cases)
+- `src/app/setup-generator.test.ts` — 3 new tests (Epic Mastermind empty pool error, constraint failure reasons path, terminal no-legal-setup failure path)
+- `src/app/result-utils.test.ts` — 3 new tests (branches resolved by Epic 96 Story 96.3 negated-condition fixes)
+- `src/app/state-sanitizer.test.ts` — 9 new tests (id-narrowing paths introduced by Epic 96 Story 96.2 string-cast fixes)
+- `src/app/history-utils.test.ts` — 3 new tests (grouping edge cases and history manipulation branches)
+- `src/app/theme-utils.test.ts` — 1 new test
+- `src/app/backup-utils.test.ts` — 1 new test
+
+New test file created:
+- `src/app/collection-actions.test.ts` — 9 tests covering the pure-function subset of `collection-actions.ts`
+
+Note: `src/app/collection-actions.ts` was initially classified as DOM-dependent and excluded from the coverage target (see table above). Epic 97 demonstrated that a subset of its functions is testable in the Vitest/Node environment. It has been removed from the exclusion table accordingly.

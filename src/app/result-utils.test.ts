@@ -697,3 +697,35 @@ test('sanitizeStoredGameResult with non-string notes coerces notes to empty stri
   assert.ok(!recovered);
   assert.equal(result.notes, '');
 });
+
+// ── Story 97.5 — normalizeGameResultDraft uncovered branches ─────────────────
+
+test('normalizeGameResultDraft with null result returns solo defaults', () => {
+  const draft = normalizeGameResultDraft(null, 1);
+  assert.equal(draft.outcome, '');
+  assert.equal(draft.score, '');
+  assert.equal(draft.notes, '');
+  assert.equal(draft.playerScores, undefined);
+});
+
+test('normalizeGameResultDraft with pending result returns solo defaults', () => {
+  const pending = { status: 'pending', outcome: null, score: null, notes: '', updatedAt: null };
+  const draft = normalizeGameResultDraft(pending, 1);
+  assert.equal(draft.outcome, '');
+  assert.equal(draft.score, '');
+  assert.equal(draft.notes, '');
+});
+
+test('normalizeGameResultDraft with solo completed result and null score returns score as empty string', () => {
+  const completedLoss = createCompletedGameResult({
+    outcome: 'loss',
+    score: null,
+    notes: 'Conceded early',
+    updatedAt: '2026-05-01T00:00:00.000Z'
+  });
+  const draft = normalizeGameResultDraft(completedLoss, 1);
+  assert.equal(draft.outcome, 'loss');
+  assert.equal(draft.score, '');
+  assert.equal(draft.notes, 'Conceded early');
+  assert.equal(draft.playerScores, undefined);
+});

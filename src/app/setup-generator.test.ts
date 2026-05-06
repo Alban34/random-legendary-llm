@@ -629,3 +629,171 @@ test('When forcedTeam is null, hero selection behaves as normal', () => {
   assert.equal(setup.heroes.length, 5);
   assert.ok(setup.heroes.length > 0);
 });
+
+// ── From epic97-test-coverage-uplift (setup-generator uncovered branches) ────
+
+// Helper: build a minimal mock runtime whose only scheme requires more heroes
+// than the pool contains (via set-min-heroes modifier) so that every scheme
+// iteration fails canSatisfyHeroRequirements. The pool still satisfies the
+// base validateBaseCounts check for 2-player standard (heroes >= 5,
+// villainGroups >= 2, henchmanGroups >= 1).
+function createMinimalOverflowRuntime() {
+  const SET_ID = 'ep97-overflow-set';
+  const heroes = [
+    { id: 'ep97-h1', name: 'Alpha', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep97-h2', name: 'Beta', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep97-h3', name: 'Gamma', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep97-h4', name: 'Delta', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep97-h5', name: 'Epsilon', setId: SET_ID, aliases: [], teams: [], cardCount: 14 }
+  ];
+  const masterminds = [
+    { id: 'ep97-mm1', name: 'Simple Villain', setId: SET_ID, aliases: [], lead: null, notes: [], isEpicMastermind: false }
+  ];
+  const villainGroups = [
+    { id: 'ep97-vg1', name: 'Bad Guys 1', setId: SET_ID, aliases: [], cardCount: 10 },
+    { id: 'ep97-vg2', name: 'Bad Guys 2', setId: SET_ID, aliases: [], cardCount: 10 }
+  ];
+  const henchmanGroups = [
+    { id: 'ep97-hg1', name: 'Minions', setId: SET_ID, aliases: [], cardCount: 10 }
+  ];
+  // set-min-heroes: 7 forces heroCount to 7; pool only has 5 heroes, so
+  // canSatisfyHeroRequirements always returns false for every scheme iteration.
+  const schemes = [
+    {
+      id: 'ep97-sc1',
+      name: 'Impossible Hero Scheme',
+      setId: SET_ID,
+      aliases: [],
+      constraints: { minimumPlayerCount: null },
+      forcedGroups: [],
+      modifiers: [{ type: 'set-min-heroes', value: 7 }],
+      notes: []
+    }
+  ];
+  const set = { id: SET_ID, name: 'Minimal Overflow Set', heroes, masterminds, villainGroups, henchmanGroups, schemes };
+  return {
+    sets: [set],
+    indexes: {
+      villainGroupsById: Object.fromEntries(villainGroups.map((vg) => [vg.id, vg])),
+      henchmanGroupsById: Object.fromEntries(henchmanGroups.map((hg) => [hg.id, hg]))
+    },
+    SET_ID
+  };
+}
+
+// Helper: build a minimal mock runtime where the scheme uses a
+// require-hero-name-match-count modifier. Pool has 6 heroes (4 non-Thor + 2
+// named "Thor …") and heroCount stays at the template value (5). This allows
+// canSatisfyHeroRequirements to pass while forcing 4 non-Thor heroes via
+// forcedPicks leaves only 1 remaining slot — not enough for the 2 required
+// Thor-matching heroes — so selectHeroes returns a reason.
+function createHeroNameRuntime() {
+  const SET_ID = 'ep97-heroname-set';
+  const heroes = [
+    { id: 'ep97-hn-h1', name: 'Alpha', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep97-hn-h2', name: 'Beta', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep97-hn-h3', name: 'Gamma', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep97-hn-h4', name: 'Delta', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep97-hn-thor1', name: 'Thor One', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep97-hn-thor2', name: 'Thor Two', setId: SET_ID, aliases: [], teams: [], cardCount: 14 }
+  ];
+  const masterminds = [
+    { id: 'ep97-hn-mm1', name: 'Simple Villain', setId: SET_ID, aliases: [], lead: null, notes: [], isEpicMastermind: false }
+  ];
+  const villainGroups = [
+    { id: 'ep97-hn-vg1', name: 'Bad Guys 1', setId: SET_ID, aliases: [], cardCount: 10 },
+    { id: 'ep97-hn-vg2', name: 'Bad Guys 2', setId: SET_ID, aliases: [], cardCount: 10 }
+  ];
+  const henchmanGroups = [
+    { id: 'ep97-hn-hg1', name: 'Minions', setId: SET_ID, aliases: [], cardCount: 10 }
+  ];
+  // require-hero-name-match-count: need 2 heroes matching /Thor/; no heroCount modifier
+  // so effective heroCount = template value (5 for 2-player standard).
+  const schemes = [
+    {
+      id: 'ep97-hn-sc1',
+      name: 'Thor Name Scheme',
+      setId: SET_ID,
+      aliases: [],
+      constraints: { minimumPlayerCount: null },
+      forcedGroups: [],
+      modifiers: [{ type: 'require-hero-name-match-count', pattern: 'Thor', value: 2 }],
+      notes: []
+    }
+  ];
+  const set = { id: SET_ID, name: 'Hero Name Test Set', heroes, masterminds, villainGroups, henchmanGroups, schemes };
+  return {
+    sets: [set],
+    indexes: {
+      villainGroupsById: Object.fromEntries(villainGroups.map((vg) => [vg.id, vg])),
+      henchmanGroupsById: Object.fromEntries(henchmanGroups.map((hg) => [hg.id, hg]))
+    },
+    SET_ID
+  };
+}
+
+test('Throws terminal error when all scheme iterations fail with no constraint picks active', () => {
+  // Covers the terminal throw at the bottom of generateSetup.
+  // Scheme requires 7 heroes (set-min-heroes: 7) but pool only has 5.
+  // validateBaseCounts passes (5 >= template heroCount of 5 for 2-player standard).
+  // canSatisfyHeroRequirements returns false for every scheme iteration.
+  // hasConstraintSelections is false (no forced picks) so no constraintFailureReasons
+  // are collected, bypassing the constraint-failure throw and reaching the terminal throw.
+  const { sets, indexes, SET_ID } = createMinimalOverflowRuntime();
+  const runtime = { sets, indexes };
+  const state = createDefaultState();
+  state.collection.ownedSetIds = [SET_ID];
+
+  assert.throws(
+    () => generateSetup({ runtime, state, playerCount: 2, random: () => 0 }),
+    /No legal setup could be generated from the current owned collection for the selected play mode\./
+  );
+});
+
+test('Throws with forced-hero failure reason when heroIds are forced but scheme demands more heroes than the pool can supply', () => {
+  // Covers trySchemeForSetup branch: hasConstraintSelections && normalizedForcedPicks.heroIds.length.
+  // Scheme requires 7 heroes; pool has 5; validateBaseCounts still passes.
+  // canSatisfyHeroRequirements fails, but now hasConstraintSelections=true and heroIds.length>0,
+  // so the specific forced-hero reason is added to constraintFailureReasons.
+  // The hasConstraintSelections && constraintFailureReasons.size throw fires with that reason.
+  const { sets, indexes, SET_ID } = createMinimalOverflowRuntime();
+  const runtime = { sets, indexes };
+  const state = createDefaultState();
+  state.collection.ownedSetIds = [SET_ID];
+
+  assert.throws(
+    () => generateSetup({
+      runtime,
+      state,
+      playerCount: 2,
+      forcedPicks: { heroIds: ['ep97-h1'] },
+      random: () => 0
+    }),
+    /Forced Hero selections cannot satisfy the Hero requirements created by the current scheme and play mode\./
+  );
+});
+
+test('Collects hero selection failure reason when forced picks leave insufficient slots for scheme hero-name requirements', () => {
+  // Covers tryMastermindForScheme branch: heroSelection.reason is set.
+  // canSatisfyHeroRequirements PASSES (6 heroes satisfy the pool check: 2 Thors >= 2,
+  // 4 non-Thors >= 3, 6 >= 5). buildCategorySelection succeeds.
+  // Forcing 4 non-Thor heroes leaves only 1 remaining slot, but 2 Thor-matching
+  // heroes are required, so selectHeroes returns a failure reason.
+  // That reason is collected into constraintFailureReasons, and the
+  // hasConstraintSelections && constraintFailureReasons.size throw fires.
+  const { sets, indexes, SET_ID } = createHeroNameRuntime();
+  const runtime = { sets, indexes };
+  const state = createDefaultState();
+  state.collection.ownedSetIds = [SET_ID];
+
+  assert.throws(
+    () => generateSetup({
+      runtime,
+      state,
+      playerCount: 2,
+      forcedPicks: { heroIds: ['ep97-hn-h1', 'ep97-hn-h2', 'ep97-hn-h3', 'ep97-hn-h4'] },
+      random: () => 0
+    }),
+    /Forced Hero selections leave no legal way to satisfy this scheme/
+  );
+});

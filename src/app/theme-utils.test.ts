@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { test, vi } from 'vitest';
 import assert from 'node:assert/strict';
 
 import { createDefaultState, createStorageAdapter, loadState, saveState } from './state-store.ts';
@@ -49,6 +49,16 @@ test('getThemeIcon returns the correct icon for known themes and a fallback for 
   assert.equal(getThemeIcon('dark'), '🌙');
   assert.equal(getThemeIcon('light'), '☀️');
   assert.equal(getThemeIcon('cosmic-blast'), '🎨');
+});
+
+test('getThemeDefinition falls back to THEME_OPTIONS[0] when find returns nothing', () => {
+  // THEME_OPTIONS.find always matches in production, but this spy exercises the
+  // defensive || fallback branch at line 36 that is otherwise unreachable.
+  const themeArray = THEME_OPTIONS as { id: string }[];
+  const findSpy = vi.spyOn(themeArray, 'find').mockReturnValueOnce(undefined);
+  const result = getThemeDefinition('dark');
+  findSpy.mockRestore();
+  assert.equal(result, THEME_OPTIONS[0]);
 });
 
 

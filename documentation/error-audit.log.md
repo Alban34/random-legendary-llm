@@ -223,10 +223,21 @@ File: documentation/planning/epic/ready-for-dev/epic-95.md
 Finding: Epic 95 has been fully implemented (Stories 95.1–95.5 complete, 587 tests in 42 test files, 74.2% stmt / 75.1% branch) but the epic spec file remains in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete/move tool available), so the relocation is logged here.
 Suggested action: Move `epic-95.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior completed epics.
 ---
+[Resolution → F-036] [FIXED 2026-05-06] Resolution: Confirmed — `epic-95.md` and `epic-95-task-list.md` are present in `documentation/planning/epic/done/`. The `ready-for-dev/` folder is empty.
+---
 [F-037] [2026-05-05] Epic: SRP/File-Size Refactoring (Phase 1 & 2)
 File: documentation/planning/epic/epic-95-coverage-audit.md
 Finding: The coverage audit was generated on 2026-05-04 against the pre-refactoring codebase. After the SRP split, 8 monolithic source files became 22 files. The 14 newly extracted files (`game-data-normalizer.ts`, `game-data-indexes.ts`, `types-game-data.ts`, `types-app-state.ts`, `types-setup.ts`, `types-storage.ts`, `types-locale.ts`, `types-ui.ts`, `state-defaults.ts`, `state-sanitizer.ts`, `state-io.ts`, `storage-adapter.ts`, `setup-pool-builder.ts`, `setup-freshness.ts`, `setup-scheme-modifiers.ts`, `setup-validator.ts`, `setup-hero-selector.ts`, `setup-category-selector.ts`) are absent from the coverage table. The retained files (`setup-generator.ts`, `state-store.ts`, `game-data-pipeline.ts`, `types.ts`) now have smaller line counts and their coverage percentages have changed. The report is therefore an incomplete picture of the current codebase.
 Suggested action: A QC agent should re-run `npm test -- --coverage` after the refactoring and regenerate `documentation/planning/epic/epic-95-coverage-audit.md` to reflect the current split file structure. The regenerated report should add rows for all 14+ new files and update the retained-file rows.
+---
+[Resolution → F-037] [FIXED 2026-05-06] Resolution: `npm run lint` (0 errors) and `npm run test:coverage` (687 tests, 58 files, all passing) were re-run via the QC agent against the post-refactoring codebase. `documentation/planning/epic/epic-95-coverage-audit.md` has been fully regenerated: all 14 newly extracted files are now present in the per-file table, all retained-file rows updated, and the overall summary reflects the current metrics (79.97% stmt / 80.65% branch / 80.36% func / 80.03% lines — all four metrics at or above the ≥ 80% gate).
+---
+[F-038] [2026-05-06] Epic: Epic 96 — SonarCloud Code Quality Remediation (Round 2) / Epic 97 — Test Coverage Uplift to 80%
+File: documentation/release-notes/ (no file exists for the version containing these epics)
+Finding: No release notes file exists covering Epics 96 and 97. The latest file is `v2.1.1-release-notes.md`, which covers Epics 93–95. Epic 96 (pure code-quality fixes: redundant assertion removal, unsafe string-cast fixes, negated-condition simplification, `buildCategorySelection` parameter reduction from 8 to 7, eslint `argsIgnorePattern` addition) and Epic 97 (test coverage uplift from 74.2% to 80.03% lines / 80.65% branches / 80.36% functions; 48 new tests across 9 extended test files and 1 new test file) have not been documented in any release notes.
+Suggested action: Create `documentation/release-notes/v2.1.2-release-notes.md` (or whichever version number the team assigns) and add entries for: (1) Epic 96 — pure code-quality release, no behavioral changes, SonarCloud Maintainability gate now clean; (2) Epic 97 — test coverage now ≥ 80% across all metrics, 48 new tests added, `collection-actions.test.ts` created as a new file.
+---
+[Resolution → F-038] [FIXED 2026-05-06] Resolution: Entries for Epic 96, Epic 97, and the SRP/file-size refactoring have been added to `documentation/release-notes/v2.1.1-release-notes.md`. The summary paragraph was also updated to reflect the full scope of the v2.1.1 release.
 ---
 
 ## Summary Table
@@ -268,5 +279,6 @@ Suggested action: A QC agent should re-run `npm test -- --coverage` after the re
 | F-033 | Epic 82: `package.json` contains stale `test:epicN` Vitest scripts pointing to deleted files | FIXED | 2026-05-03 | 2026-05-03 |
 | F-034 | Epics 83–88 spec files not moved to `done/` | FIXED | 2026-05-03 | 2026-05-03 |
 | F-035 | PWA/SW: Production spec excluded from wrong runner; SW test in wrong spec file | FIXED | 2026-05-03 | 2026-05-03 |
-| F-036 | Epic 95 spec file not moved to `done/` after full implementation | OPEN | 2026-05-04 | — |
-| F-037 | SRP refactoring: coverage audit predates the split; 14 new extracted files absent from report | OPEN | 2026-05-05 | — |
+| F-036 | Epic 95 spec file not moved to `done/` after full implementation | FIXED | 2026-05-04 | 2026-05-06 |
+| F-037 | SRP refactoring: coverage audit predates the split; 14 new extracted files absent from report | FIXED | 2026-05-05 | 2026-05-06 |
+| F-038 | Epics 96 & 97: No release notes file exists for the version shipping these epics | FIXED | 2026-05-06 | 2026-05-06 |

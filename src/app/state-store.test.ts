@@ -1,4 +1,4 @@
-import { test, beforeAll } from 'vitest';
+import { test, beforeAll, vi } from 'vitest';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -10,12 +10,16 @@ import {
   acceptGameSetup,
   clearActiveSetIds,
   createDefaultState,
+  createGameRecordId,
   createStorageAdapter,
+  deactivateAllSets,
   resetAllState,
+  resetOwnedCollection,
   resetUsageCategory,
   saveState,
   setActiveSetIds,
-  toggleOwnedSet
+  toggleOwnedSet,
+  updateGameResult
 } from './state-store.ts';
 import { generateSetup, validateSetupLegality } from './setup-generator.ts';
 import { createMemoryStorage } from './test-utils.ts';
@@ -196,6 +200,115 @@ test('validateSetupLegality works when activeSetIds field is missing (legacy sta
   const result = validateSetupLegality({ runtime, state, playerCount: 2, playMode: 'standard' });
   const setIds = result.pools.sets.map((s) => s.id);
   assert.ok(setIds.includes('core-set'));
+});
+
+// ── Story 97.4 — collection ownership transitions and action reducer edge cases ──
+
+test('deactivateAllSets sets activeSetIds to an empty array', () => {
+
+  let state = createDefaultState();
+  state = setActiveSetIds(state, ['core-set', 'dark-city']);
+  assert.deepEqual(state.collection.activeSetIds, ['core-set', 'dark-city']);
+
+  const deactivated = deactivateAllSets(state);
+  assert.deepEqual(deactivated.collection.activeSetIds, []);
+  // original state must not be mutated
+  assert.deepEqual(state.collection.activeSetIds, ['core-set', 'dark-city']);
+});
+
+test('resetOwnedCollection clears ownedSetIds while leaving other state intact', () => {
+
+  let state = createDefaultState();
+  state = toggleOwnedSet(state, 'core-set');
+  state = toggleOwnedSet(state, 'dark-city');
+  state = acceptGameSetup(state, createSampleSetup(0));
+
+  const reset = resetOwnedCollection(state);
+  assert.deepEqual(reset.collection.ownedSetIds, []);
+  assert.equal(reset.history.length, state.history.length, 'History should be preserved');
+  assert.deepEqual(reset.usage.masterminds, state.usage.masterminds, 'Usage should be preserved');
+});
+
+test('toggleOwnedSet toggling OFF when activeSetIds is null leaves activeSetIds as null', () => {
+
+  let state = createDefaultState();
+  state = toggleOwnedSet(state, 'core-set');
+  assert.equal(state.collection.activeSetIds, null);
+
+  // Toggle it back off — activeSetIds is null so the inner filter branch must not execute
+  state = toggleOwnedSet(state, 'core-set');
+
+  assert.ok(!state.collection.ownedSetIds.includes('core-set'));
+  assert.equal(state.collection.activeSetIds, null, 'activeSetIds should remain null when toggled off from a null baseline');
+});
+
+test('acceptGameSetup with epicMastermind:true records the flag in preferences', () => {
+
+  let state = createDefaultState();
+  state = acceptGameSetup(state, { ...createSampleSetup(0), epicMastermind: true });
+
+  assert.equal(state.preferences.lastEpicMastermind, true);
+  assert.equal(state.history[0].epicMastermind, true);
+});
+
+test('updateGameResult returns original state unchanged when recordId is not found', () => {
+
+  const state = acceptGameSetup(createDefaultState(), createSampleSetup(0));
+  const next = updateGameResult(state, { recordId: 'does-not-exist', outcome: 'win', score: 42 });
+
+  assert.strictEqual(next, state, 'Should return the exact same state reference when record is not found');
+});
+
+test('updateGameResult updates a solo game result with a numeric score', () => {
+
+  let state = createDefaultState();
+  state = acceptGameSetup(state, createSampleSetup(0));
+  const recordId = state.history[0].id;
+
+  const updated = updateGameResult(state, { recordId, outcome: 'win', score: 120, notes: 'Great game', playerCount: 1 });
+
+  const record = updated.history.find((r) => r.id === recordId)!;
+  assert.equal(record.result.status, 'completed');
+  assert.equal(record.result.outcome, 'win');
+  assert.equal(record.result.score, 120);
+  assert.equal(record.result.notes, 'Great game');
+});
+
+test('updateGameResult updates a multiplayer game result with a per-player score array', () => {
+
+  let state = createDefaultState();
+  state = acceptGameSetup(state, createSampleSetup(1)); // playerCount=2
+  const recordId = state.history[0].id;
+
+  const perPlayerScore = [
+    { playerName: 'Alice', score: 15 },
+    { playerName: 'Bob', score: 8 }
+  ];
+  const updated = updateGameResult(state, { recordId, outcome: 'win', score: perPlayerScore });
+
+  const record = updated.history.find((r) => r.id === recordId)!;
+  assert.equal(record.result.status, 'completed');
+  assert.equal(record.result.outcome, 'win');
+  assert.deepEqual(record.result.score, perPlayerScore);
+});
+
+// ── Story 97.6 — createGameRecordId fallback branch ──────────────────────────
+
+test('createGameRecordId uses crypto.randomUUID when available', () => {
+  const id = createGameRecordId();
+  assert.equal(typeof id, 'string');
+  assert.ok(id.length > 0);
+});
+
+test('createGameRecordId falls back to timestamp-based id when crypto.randomUUID is not available', () => {
+  vi.stubGlobal('crypto', {});
+  try {
+    const id = createGameRecordId();
+    assert.ok(id.startsWith('game-'), 'Fallback id must start with "game-"');
+    assert.match(id, /^game-\d+-[0-9a-f]+$/);
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });
 
 
