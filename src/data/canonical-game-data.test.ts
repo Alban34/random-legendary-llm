@@ -58,3 +58,15 @@ test('No set remains classified as standalone', () => {
 
   assert.doesNotMatch(gameDataSource, /"type": "standalone"/);
 });
+
+// From epic27 / v2.1.2 — Marvel Studios Phase 1 reclassification
+
+test('Marvel Studios, Phase 1 is classified as base in canonical-game-data.json', () => {
+
+  assert.match(gameDataSource, /"Marvel Studios, Phase 1"[\s\S]{0,60}"type": "base"/);
+});
+
+test('Marvel Studios, Phase 1 is NOT classified as small-expansion', () => {
+
+  assert.doesNotMatch(gameDataSource, /"Marvel Studios, Phase 1"[\s\S]{0,60}"type": "small-expansion"/);
+});

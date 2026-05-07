@@ -93,7 +93,7 @@ The normalized result must support flattened runtime indexes such as:
 | `Deadpool` | `deadpool` | 2017 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `Champions` | `champions` | 2018 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `Villains` | `villains` | 2014 | `base` | 15 | 4 | 7 | 4 | 8 |
-| `Marvel Studios, Phase 1` | `marvel-studios-phase-1` | 2019 | `small-expansion` | 7 | 3 | 5 | 4 | 8 |
+| `Marvel Studios, Phase 1` | `marvel-studios-phase-1` | 2019 | `base` | 7 | 3 | 5 | 4 | 8 |
 | `Marvel Studios' Guardians of the Galaxy` | `marvel-studios-guardians-of-the-galaxy` | 2019 | `small-expansion` | 5 | 2 | 2 | 0 | 4 |
 | `World War Hulk` | `world-war-hulk` | 2018 | `large-expansion` | 15 | 6 | 7 | 3 | 8 |
 | `S.H.I.E.L.D.` | `shield` | 2019 | `large-expansion` | 4 | 2 | 2 | 0 | 4 |

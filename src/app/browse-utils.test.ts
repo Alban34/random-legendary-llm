@@ -35,8 +35,8 @@ test('Browse filtering keeps every included set available with stable type metad
 
   assert.equal(allVisible.length, sets.length);
   assert.equal(new Set(allVisible.map((set) => set.id)).size, sets.length);
-  assert.equal(base.length, 3);
-  assert.deepEqual(base.map((set) => set.name), ['Core Set', "Marvel Studios' What If...?", 'Villains']);
+  assert.equal(base.length, 4);
+  assert.deepEqual(base.map((set) => set.name), ['Core Set', 'Marvel Studios, Phase 1', "Marvel Studios' What If...?", 'Villains']);
   assert.deepEqual(standalone.map((set) => set.name), []);
   assert.equal(getBrowseTypeLabel('large-expansion'), 'Large Expansion');
   assert.equal(getBrowseTypeLabel('small-expansion'), 'Small Expansion');
@@ -57,7 +57,7 @@ test('Search filtering supports canonical names, aliases, and no-match cases', (
     ['S.H.I.E.L.D.']
   );
   assert.deepEqual(
-    filterBrowseSets(sets, { searchTerm: 'MCU Phase 1', typeFilter: 'small-expansion' }).map((set) => set.name),
+    filterBrowseSets(sets, { searchTerm: 'MCU Phase 1', typeFilter: 'base' }).map((set) => set.name),
     ['Marvel Studios, Phase 1']
   );
   assert.equal(filterBrowseSets(sets, { searchTerm: 'no match', typeFilter: 'all' }).length, 0);

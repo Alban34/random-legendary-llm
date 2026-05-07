@@ -68,9 +68,9 @@ test('e2e and e2e:filter Playwright scripts are present', () => {
   );
 });
 
-test('Package.json version is 2.1.1', () => {
+test('Package.json version is 2.1.2', () => {
 
-  assert.equal(pkgJson.version, '2.1.1', 'package.json version must be 2.1.1');
+  assert.equal(pkgJson.version, '2.1.2', 'package.json version must be 2.1.2');
 });
 
 const NON_ENGLISH_LOCALES = {
