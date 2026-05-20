@@ -80,6 +80,9 @@ jobs:
     name: Docker build & GitOps prod deploy
     runs-on: ubuntu-latest
     needs: lint-and-test
+    permissions:
+      contents: write    # required to git push on the gitops branch
+      packages: write    # required to push the image to GHCR
 
     steps:
       - name: Checkout
@@ -97,7 +100,7 @@ jobs:
         with:
           context: .
           push: true
-          # Tag avec le numéro de version du tag git (ex: v2.1.3)
+          # Tagged with the git tag version number (e.g. v2.1.3)
           tags: ghcr.io/alban34/random-legendary-llm:${{ github.ref_name }}
 
       - name: Update deployment manifest on gitops branch (prod overlay)

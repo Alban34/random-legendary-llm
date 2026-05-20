@@ -109,9 +109,12 @@ jobs:
   docker-build-and-deploy:
     name: Docker build & GitOps deploy
     runs-on: ubuntu-latest
-    # Ne tourne que sur push (pas sur PR) et seulement si les tests passent
+    # Only runs on push (not on PR) and only if tests pass
     if: github.event_name == 'push'
     needs: lint-and-test
+    permissions:
+      contents: write    # required to git push on the gitops branch
+      packages: write    # required to push the image to GHCR
 
     steps:
       - name: Checkout
@@ -129,7 +132,7 @@ jobs:
         with:
           context: .
           push: true
-          # Tag avec le préfixe "dev-" pour distinguer des images de release
+          # Tagged with "dev-" prefix to distinguish from release images
           tags: ghcr.io/alban34/random-legendary-llm:dev-${{ github.sha }}
 
       - name: Update deployment manifest on gitops branch
