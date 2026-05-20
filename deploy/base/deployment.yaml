@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: random-legendary-llm
-          image: ghcr.io/alban34/random-legendary-llm:dev-520df6001720d9fef20970c121a5c92b71cf2ea2
+          image: ghcr.io/alban34/random-legendary-llm:dev-81a9504ea2f0282e9f215a91d4cc8361b3de27dc
           imagePullPolicy: Always
           ports:
             - containerPort: 80
