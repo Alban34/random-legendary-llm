@@ -39,3 +39,17 @@ terraform {
     }
   }
 }
+
+# -------------------------------------------------------------------------
+# Module: cluster-local
+# Provisions the k3d cluster for the dev environment.
+# The output kubeconfig_context is passed to the argocd module in Step 4.
+# -------------------------------------------------------------------------
+module "cluster" {
+  source = "../../modules/cluster-local"
+
+  cluster_name = "argocd-dev"
+  servers      = 1
+  agents       = 2
+  lb_port      = 80
+}
