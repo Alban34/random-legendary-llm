@@ -6,13 +6,15 @@ Two workflows are in place:
 
 ### On push to `main` (`ci.yml`)
 ```
-Push to main
+Push to main (or manual trigger via workflow_dispatch)
       ↓
 GitHub Actions (ubuntu-latest)
   1. lint + unit tests          (lint-and-test job)
-  2. docker build               (docker-build-and-deploy job, after lint-and-test)
-  3. docker push to GHCR        → ghcr.io/alban34/random-legendary-llm:dev-<sha>
-  4. update deploy/base/deployment.yaml on gitops branch
+  2. security audit             (security-audit job, parallel)
+  3. SonarCloud analysis        (code-analysis job, after lint-and-test)
+  4. docker build               (docker-build-and-deploy job, after lint-and-test)
+  5. docker push to GHCR        → ghcr.io/alban34/random-legendary-llm:dev-<sha>
+  6. update newTag in deploy/overlays/dev/kustomization.yaml on gitops branch
       ↓
 ArgoCD detects the change → deploys automatically to dev cluster
 ```
@@ -26,10 +28,32 @@ GitHub Actions (ubuntu-latest)
   2. build → deploy to GitHub Pages  (build + deploy jobs, in parallel with docker)
   3. docker build               (docker-build-and-deploy job, after lint-and-test)
   4. docker push to GHCR        → ghcr.io/alban34/random-legendary-llm:v2.1.3
-  5. update deploy/overlays/prod/kustomization.yaml on gitops branch
+  5. update newTag in deploy/overlays/prod/kustomization.yaml on gitops branch
       ↓
 ArgoCD detects the change → deploys automatically to prod cluster
 ```
+
+---
+
+## Kustomize overlay structure
+
+The `gitops` branch contains only the Kubernetes manifests:
+
+```
+deploy/
+  base/
+    deployment.yaml       # image: ghcr.io/alban34/random-legendary-llm:latest (neutral tag)
+    service.yaml
+    ingress.yaml
+    kustomization.yaml
+  overlays/
+    dev/
+      kustomization.yaml  # images.newTag updated automatically by ci.yml on each push to main
+    prod/
+      kustomization.yaml  # images.newTag updated automatically by release.yml on each tag push
+```
+
+The `base` is never modified by CI. Each overlay owns its own image tag via the `images.newTag` field.
 
 ---
 
@@ -51,7 +75,7 @@ Tag conventions:
 
 | File | Trigger | Runner | Purpose |
 |------|---------|--------|---------|
-| `ci.yml` | push to `main` | ubuntu-latest | lint, tests, dev Docker image |
+| `ci.yml` | push to `main`, `workflow_dispatch` | ubuntu-latest | lint, tests, security audit, SonarCloud, dev Docker image |
 | `release.yml` | tag `v*` | ubuntu-latest | lint, tests, E2E, GitHub Pages + prod Docker image |
 
 ---
@@ -59,8 +83,8 @@ Tag conventions:
 ## Useful commands
 
 ```bash
-# Check triggered workflows
-# → GitHub → repo → Actions tab
+# Trigger CI manually without a commit
+# → GitHub → repo → Actions → CI → Run workflow
 
 # List published Docker images
 # → github.com/alban34?tab=packages
@@ -69,4 +93,3 @@ Tag conventions:
 argocd app get random-legendary-llm
 kubectl get pods -o wide
 ```
-
