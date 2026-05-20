@@ -75,3 +75,38 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  docker-build-and-deploy:
+    name: Docker build & GitOps prod deploy
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Tag avec le numéro de version du tag git (ex: v2.1.3)
+          tags: ghcr.io/alban34/random-legendary-llm:${{ github.ref_name }}
+
+      - name: Update deployment manifest on gitops branch (prod overlay)
+        run: |
+          git fetch origin gitops
+          git checkout gitops
+          sed -i "s|image: .*random-legendary-llm:.*|image: ghcr.io/alban34/random-legendary-llm:${{ github.ref_name }}|" deploy/overlays/prod/kustomization.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add deploy/overlays/prod/kustomization.yaml
+          git commit -m "release: deploy ${{ github.ref_name }} to prod"
+          git push origin gitops

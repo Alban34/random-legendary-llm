@@ -70,7 +70,7 @@ function swInjectPlugin(command: 'build' | 'serve'): Plugin {
 
 export default defineConfig(({ command }) => ({
   plugins: [svelte(), swCompilePlugin(command), swInjectPlugin(command)],
-  base: command === 'build' ? '/random-legendary-llm/' : '/',
+  base: process.env.VITE_BASE_PATH ?? (command === 'build' ? '/random-legendary-llm/' : '/'),
   server: {
     host: '127.0.0.1',
   },
