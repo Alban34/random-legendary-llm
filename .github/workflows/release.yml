@@ -107,7 +107,7 @@ jobs:
         run: |
           git fetch origin gitops
           git checkout gitops
-          sed -i "s|image: .*random-legendary-llm:.*|image: ghcr.io/alban34/random-legendary-llm:${{ github.ref_name }}|" deploy/overlays/prod/kustomization.yaml
+          sed -i "s|newTag: .*|newTag: ${{ github.ref_name }}|" deploy/overlays/prod/kustomization.yaml
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add deploy/overlays/prod/kustomization.yaml

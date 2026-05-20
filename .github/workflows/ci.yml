@@ -136,13 +136,13 @@ jobs:
           # Tagged with "dev-" prefix to distinguish from release images
           tags: ghcr.io/alban34/random-legendary-llm:dev-${{ github.sha }}
 
-      - name: Update deployment manifest on gitops branch
+      - name: Update dev overlay on gitops branch
         run: |
           git fetch origin gitops
           git checkout gitops
-          sed -i "s|image: .*random-legendary-llm:.*|image: ghcr.io/alban34/random-legendary-llm:dev-${{ github.sha }}|" deploy/base/deployment.yaml
+          sed -i "s|newTag: .*|newTag: dev-${{ github.sha }}|" deploy/overlays/dev/kustomization.yaml
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add deploy/base/deployment.yaml
+          git add deploy/overlays/dev/kustomization.yaml
           git commit -m "ci: update dev image to dev-${{ github.sha }}"
           git push origin gitops
