@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: random-legendary-llm
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: legendary.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: random-legendary-llm
+                port:
+                  number: 80

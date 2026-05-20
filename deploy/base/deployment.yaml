@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: random-legendary-llm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: random-legendary-llm
+  template:
+    metadata:
+      labels:
+        app: random-legendary-llm
+    spec:
+      containers:
+        - name: random-legendary-llm
+          image: ghcr.io/alban34/random-legendary-llm:dev-b3835e7dcedb207f9e88b4e9129e14ac64b141ae
+          imagePullPolicy: Never   # image locale injectée via k3d, pas de registry
+          ports:
+            - containerPort: 80
