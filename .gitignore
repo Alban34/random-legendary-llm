@@ -36,3 +36,7 @@ test-results
 dist
 personal-data/
 coverage
+
+# Terraform
+.terraform/
+
