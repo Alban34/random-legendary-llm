@@ -452,3 +452,11 @@ Localization is broader and more cross-cutting than history grouping. Deferring 
 ### v2.1.1 — Code Quality and Test Coverage (May 2026, Epics 93–95)
 
 All 99 open SonarCloud issues resolved across Critical, Major, and Minor severities (Epic 93): cognitive complexity reductions in `result-utils.ts`, `stats-utils.ts`, and `setup-generator.ts`; non-mutating sort, parameter grouping, and top-level-await corrections; and a language-modernization sweep across the full source tree. Thirteen duplicate test cases were removed by extracting shared test helpers into `src/app/test-utils.ts`, reducing the test count from 480 to 467 (Epic 94). Unit test coverage was raised from 63.3% to 74.2% statement coverage and from 60.0% to 75.1% branch coverage by adding 120 new tests across 9 new test files targeting the most under-covered modules (Epic 95). No user-facing behavior changes were introduced. See [`release-notes/v2.1.1-release-notes.md`](../release-notes/v2.1.1-release-notes.md).
+
+### v2.1.2 — Data Correction (May 2026)
+
+*Marvel Studios, Phase 1* reclassified from `small-expansion` to `base`, correcting an error in the set catalog. No other behavior changes. See [`release-notes/v2.1.2-release-notes.md`](../release-notes/v2.1.2-release-notes.md).
+
+### v2.1.3 — Replay from History, Data Fix, and Code Quality (May 2026, Epics 98–101)
+
+Introduced a **Replay** action in the History tab: users can reconstruct any previously accepted game setup and route it through the standard New Game acceptance flow without re-randomisation (Epic 99). Corrected the forced villain group lead for the "Hank Pym, Yellowjacket" mastermind in the *Marvel Studios' What If…?* expansion — the `leadName` field erroneously referenced "Black Order Guards" and has been removed so the mastermind can lead any villain group (Epic 100). Version files bumped to 2.1.3 (Epic 98). A follow-on SonarCloud code smell pass (Epic 101) removed redundant type casts and replaced `&&`-based null-guard chains with optional chaining across 8 source files; no behavioural changes were introduced. See [`release-notes/v2.1.3-release-notes.md`](../release-notes/v2.1.3-release-notes.md).

@@ -24,7 +24,7 @@ const LOCALE_IDS = new Set<LocaleId>(SELECTABLE_LOCALES.map((locale) => locale.i
 function interpolate(template: string, params?: Record<string, unknown>): string {
   return String(template).replaceAll(/\{([^}]+)\}/g, (_, key: string) => {
     const value = params?.[key];
-    return value === undefined || value === null ? '' : String(value as string | number | boolean);
+    return value === undefined || value === null ? '' : String(value);
   });
 }
 

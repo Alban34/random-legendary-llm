@@ -70,7 +70,7 @@ async function attemptBggFetch(url: string, fetchFn: FetchFn): Promise<BggAttemp
     .map((item) => {
       const nameEls = [...item.querySelectorAll('name')];
       const el = nameEls.find((n) => n.getAttribute('sortindex') === '1');
-      return el ? el.textContent!.trim() : null;
+      return el ? (el.textContent ?? '').trim() : null;
     })
     .filter((name): name is string => name !== null);
 
@@ -90,7 +90,7 @@ async function attemptBggFetch(url: string, fetchFn: FetchFn): Promise<BggAttemp
  */
 export async function fetchBggCollection(
   username: string,
-  { maxRetries = 5, retryDelayMs = 2000, fetchFn = globalThis.fetch as FetchFn }: {
+  { maxRetries = 5, retryDelayMs = 2000, fetchFn = globalThis.fetch }: {
     maxRetries?: number;
     retryDelayMs?: number;
     fetchFn?: FetchFn;

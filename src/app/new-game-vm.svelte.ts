@@ -9,6 +9,7 @@ import { resolvePlayMode } from './setup-rules.ts';
 import { acceptGameSetup, createGameRecordId, createDefaultState } from './state-store.ts';
 import type { PlayMode, GeneratedSetup, AppState, LocaleTools } from './types.ts';
 import type { Epic1Bundle } from './game-data-pipeline.ts';
+import { reconstructSetupFromRecord } from './replay-utils.ts';
 
 export const newGameVm = $state<{
   currentSetup: GeneratedSetup | null;
@@ -221,6 +222,44 @@ export function createNewGameActions(deps: NewGameActionDeps) {
       deps.clearGeneratedSetup();
       deps.ui.lastActionNotice = deps.getLocale().t('actions.clearDefaults');
       toast.info(deps.getLocale().t('actions.clearDefaults'));
+    },
+
+    replaySetup(recordId: string) {
+      const record = deps.getAppState().history.find((r) => r.id === recordId);
+      if (!record) {
+        deps.ui.lastActionNotice = deps.getLocale().t('actions.replayNotFound');
+        return;
+      }
+      try {
+        const reconstructed = reconstructSetupFromRecord(record, deps.getBundle().runtime);
+        newGameVm.currentSetup = reconstructed;
+        newGameVm.generatorError = null;
+        newGameVm.generatorNotices = [];
+        newGameVm.selectedPlayerCount = record.playerCount;
+        const resolvedMode = resolvePlayMode(record.playerCount, {
+          advancedSolo: record.advancedSolo,
+          playMode: record.playMode
+        });
+        newGameVm.selectedPlayMode = resolvedMode;
+        newGameVm.advancedSolo = record.advancedSolo;
+        newGameVm.forcedPicks = reconstructed.forcedPicks as unknown as ForcedPicks;
+        deps.applyStateUpdate(
+          (s: AppState) => ({
+            ...s,
+            preferences: {
+              ...s.preferences,
+              lastEpicMastermind: record.epicMastermind ?? false
+            }
+          }),
+          deps.getLocale().t('actions.replayedSetup')
+        );
+        deps.ui.selectedTab = 'new-game';
+        toast.success(deps.getLocale().t('actions.replayedSetupToast'));
+      } catch (error: unknown) {
+        newGameVm.currentSetup = null;
+        deps.ui.lastActionNotice = deps.getLocale().t('actions.replayFailed');
+        toast.error(error instanceof Error ? error.message : String(error), { duration: Infinity });
+      }
     }
   };
 }

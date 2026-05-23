@@ -91,7 +91,7 @@ function validateMastermindLeadSlots(
   const forcedMastermind = forcedPicks.mastermindId ? mastermindsById[forcedPicks.mastermindId] : null;
   const mastermindLeadIsVillain = forcedMastermind?.lead?.category === 'villains';
   const mastermindLeadVillainAlreadyForced =
-    mastermindLeadIsVillain && forcedMastermind !== null && forcedMastermind.lead !== null && forcedPicks.villainGroupIds.includes(forcedMastermind.lead.id);
+    mastermindLeadIsVillain && forcedMastermind?.lead != null && forcedPicks.villainGroupIds.includes(forcedMastermind.lead.id);
   const mastermindLeadVillainGroupCount = mastermindLeadIsVillain && !mastermindLeadVillainAlreadyForced && !isSoloMode(template) ? 1 : 0;
   const effectiveForcedVillainCount = forcedPicks.villainGroupIds.length + mastermindLeadVillainGroupCount;
 
@@ -101,7 +101,7 @@ function validateMastermindLeadSlots(
 
   const mastermindLeadIsHenchman = forcedMastermind?.lead?.category === 'henchmen';
   const mastermindLeadHenchmanAlreadyForced =
-    mastermindLeadIsHenchman && forcedMastermind !== null && forcedMastermind.lead !== null && forcedPicks.henchmanGroupIds.includes(forcedMastermind.lead.id);
+    mastermindLeadIsHenchman && forcedMastermind?.lead != null && forcedPicks.henchmanGroupIds.includes(forcedMastermind.lead.id);
   const mastermindLeadHenchmanGroupCount = mastermindLeadIsHenchman && !mastermindLeadHenchmanAlreadyForced && !isSoloMode(template) ? 1 : 0;
   const effectiveForcedHenchmanCount = forcedPicks.henchmanGroupIds.length + mastermindLeadHenchmanGroupCount;
 

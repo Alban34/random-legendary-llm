@@ -115,6 +115,20 @@ test('Mastermind leads consume the correct villain or henchman slot', () => {
   assert.ok(drDoomSetup.henchmanGroups.some((group) => group.name === 'Doombot Legion' && group.forced));
 });
 
+// Regression for Epic 100 — Hank Pym, Yellowjacket had an erroneous
+// leadName: 'Black Order Guards' in the data that forced this villain group
+// into every setup. The fix removes the leadName/leadCategory fields so the
+// mastermind has no forced lead, confirmed by: no 'Black Order Guards' entry
+// with forced===true, and villainGroups.length matching requirements exactly.
+test('Hank Pym, Yellowjacket does not force Black Order Guards as a villain group', () => {
+
+  const hankPymState = makeTargetedState({ mastermindName: 'Hank Pym, Yellowjacket' });
+  const hankPymSetup = generateSetup({ runtime: bundle.runtime, state: hankPymState, playerCount: 2, advancedSolo: false, random: () => 0 });
+  assert.equal(hankPymSetup.mastermind.name, 'Hank Pym, Yellowjacket');
+  assert.ok(!hankPymSetup.villainGroups.some((group) => group.forced === true && group.name === 'Black Order Guards'));
+  assert.equal(hankPymSetup.villainGroups.length, hankPymSetup.requirements.villainGroupCount);
+});
+
 test('Least-played fallback is used when fresh heroes are insufficient', () => {
 
   const simpleScheme = bundle.runtime.indexes.allSchemes.find((entity) => !entity.modifiers.length && !entity.forcedGroups.length && !entity.constraints.minimumPlayerCount);

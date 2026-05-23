@@ -49,8 +49,8 @@ export function buildIndexes(sets: GameSet[]): PipelineIndexes {
   sets.forEach((set) => {
     indexes.setsById[set.id] = set;
     set.heroes.forEach((hero) => {
-      indexes.heroesById[hero.id] = hero as HeroRuntime;
-      indexes.allHeroes.push(hero as HeroRuntime);
+      indexes.heroesById[hero.id] = hero;
+      indexes.allHeroes.push(hero);
     });
     // @ts-expect-error — masterminds array contains MastermindRuntime objects after normalization
     set.masterminds.forEach((mastermind: MastermindRuntime) => {
@@ -58,12 +58,12 @@ export function buildIndexes(sets: GameSet[]): PipelineIndexes {
       indexes.allMasterminds.push(mastermind);
     });
     set.villainGroups.forEach((group) => {
-      indexes.villainGroupsById[group.id] = group as VillainGroupRuntime;
-      indexes.allVillainGroups.push(group as VillainGroupRuntime);
+      indexes.villainGroupsById[group.id] = group;
+      indexes.allVillainGroups.push(group);
     });
     set.henchmanGroups.forEach((group) => {
-      indexes.henchmanGroupsById[group.id] = group as HenchmanGroupRuntime;
-      indexes.allHenchmanGroups.push(group as HenchmanGroupRuntime);
+      indexes.henchmanGroupsById[group.id] = group;
+      indexes.allHenchmanGroups.push(group);
     });
     // @ts-expect-error — schemes array contains SchemeRuntime objects after normalization
     set.schemes.forEach((scheme: SchemeRuntime) => {

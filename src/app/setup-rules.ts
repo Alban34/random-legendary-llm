@@ -131,7 +131,7 @@ export function resolveSetupTemplate(playerCount: number, modeOptions: boolean |
     modeLabel: getPlayModeLabel(playMode, normalizedPlayerCount),
     modeDescription: PLAY_MODE_OPTIONS[playMode].description,
     ...template
-  } as SetupTemplate;
+  };
 }
 
 export function summarizeSetupTemplate(template: SetupTemplate): SetupTemplateSummary {

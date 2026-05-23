@@ -346,7 +346,7 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
     ▼  Accepted Apr 9, 2026 · 2 Players · Win · Score 77
       Mastermind: Dr. Doom  ·  Scheme: Secret Invasion...
       Heroes: Iron Man, Wolverine, Thor, Captain America, Storm
-      [Edit result]
+      [Edit result]  [Replay]
     ▶  Accepted Apr 2, 2026 · 1 Player · Pending result
 
   ▶  Magneto                            [1 game]
@@ -380,6 +380,7 @@ The Collection tab exposes two mutually exclusive views selected by a segmented 
 - Accepted records stay primary; insights are secondary and appear after grouped records
 - Pending and completed results are both supported, and completed results can be corrected later
 - Opening result entry from History moves focus into the active editor, invalid saves announce errors with field-level invalid state, and save/skip/cancel return focus to the originating record action
+- Each expanded history record exposes a **Replay** action (`[Replay]`); triggering Replay reconstructs the original setup from the history snapshot via `replay-utils.ts` and navigates the user to the New Game tab pre-populated with that setup; the setup enters the standard acceptance flow without any re-randomisation; the original history entry is unchanged; the Replay action is keyboard-accessible and meets the app's existing accessibility conventions (Epic 99)
 - A row of outcome filter buttons — All, Won, Lost, Pending — appears above the game list whenever at least one history record exists; the active option is visually distinguished; selecting a filter immediately re-renders the list to show only matching records; a count line (e.g. "3 games") appears below the filter row when a non-All filter is active; when the filtered list is empty a contextual message is shown (e.g. "No won games yet") in place of the list; the filter is not persisted across page reloads
 
 **CSS classes introduced by Epic 78 (History tab):** `.button-row-scroll`, `.button-row-scroll > *`

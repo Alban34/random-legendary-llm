@@ -34,7 +34,7 @@ export const historyVm = $state<{
 }>({
   expandedRecordId: null,
   insightsExpanded: false,
-  groupingMode: DEFAULT_HISTORY_GROUPING_MODE as HistoryGroupingMode,
+  groupingMode: DEFAULT_HISTORY_GROUPING_MODE,
   outcomeFilter: 'all',
   resultEditorRecordId: null,
   resultEditorReturnFocusSelector: null,
@@ -48,7 +48,7 @@ export function toggleHistoryInsights(): void {
 }
 
 export function resetHistoryGroupingMode(): void {
-  historyVm.groupingMode = DEFAULT_HISTORY_GROUPING_MODE as HistoryGroupingMode;
+  historyVm.groupingMode = DEFAULT_HISTORY_GROUPING_MODE;
 }
 
 export function resetHistoryOutcomeFilter(): void {

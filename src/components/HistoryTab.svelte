@@ -29,6 +29,7 @@
     setResultNotes: (notes: string) => void;
     setResultPlayerScore: (index: number, value: string) => void;
     setResultPlayerName: (index: number, value: string) => void;
+    replaySetup: (recordId: string) => void;
   };
   type OutcomeInsight = {
     totalGames: number;
@@ -231,6 +232,13 @@
                     data-record-id={summary.id}
                     onclick={() => historyActions.editGameResult(summary.id)}
                   >{isCompletedGameResult(summary.result) ? locale.t('history.editResult') : locale.t('history.addResult')}</button>
+                  <button
+                    type="button"
+                    class="button button-secondary"
+                    data-action="replay-setup"
+                    data-record-id={summary.id}
+                    onclick={() => historyActions.replaySetup(summary.id)}
+                  >{locale.t('history.replaySetup')}</button>
                 </div>
 
                 {#if isEditing}

@@ -242,7 +242,7 @@ function tryMastermindForScheme(mastermind: MastermindRuntime, context: TryMaste
     notices,
     fallbackUsed: notices.length > 0,
     legalSchemesCount: eligibleSchemes.length
-  } as GeneratedSetup;
+  };
 }
 
 function trySchemeForSetup(scheme: SchemeRuntime, context: TrySchemeContext): GeneratedSetup | null {

@@ -127,7 +127,7 @@ export function createCompletedGameResult({ outcome, score, notes = '', updatedA
     return createMultiplayerCompletedGameResult(outcome, score, notes, updatedAt);
   }
 
-  const normalizedScore = normalizeScore(score as number | null | undefined);
+  const normalizedScore = normalizeScore(score);
   if (outcome === 'win' && normalizedScore === null) {
     throw new Error('Enter a whole-number score that is 0 or greater before saving the game result.');
   }

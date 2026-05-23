@@ -412,6 +412,7 @@
     acceptCurrentSetup: () => void;
     clearForcedPicks: () => void;
     generateSetup: () => void;
+    replaySetup: (recordId: string) => void;
     toggleAboutPanel: () => void;
     startOnboarding: () => void;
     previousOnboardingStep: () => void;
@@ -514,7 +515,8 @@
     setResultScore: actions.setResultScore,
     setResultNotes: actions.setResultNotes,
     setResultPlayerScore: actions.setResultPlayerScore,
-    setResultPlayerName: actions.setResultPlayerName
+    setResultPlayerName: actions.setResultPlayerName,
+    replaySetup: actions.replaySetup
   };
 
   const backupActions = {
