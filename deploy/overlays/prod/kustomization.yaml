@@ -6,4 +6,4 @@ resources:
 
 images:
   - name: ghcr.io/alban34/random-legendary-llm
-    newTag: prod-placeholder
+    newTag: v2.1.3
