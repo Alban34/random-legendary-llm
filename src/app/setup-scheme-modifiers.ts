@@ -49,6 +49,11 @@ export function applyModifier(requirements: SchemeRequirements, modifier: Modifi
         requirements.villainGroupCount += modifier.amount || 0;
       }
       break;
+    case 'conditional-add-hero':
+      if ((modifier.playerCounts || []).includes(playerCount)) {
+        requirements.heroCount += modifier.amount || 0;
+      }
+      break;
     case 'set-min-heroes':
       requirements.heroCount = Math.max(requirements.heroCount, modifier.value || 0);
       break;

@@ -244,7 +244,8 @@ export function createHistoryActions(deps: HistoryActionDeps) {
             outcome: validation.result.outcome!,
             score: validation.result.score,
             notes: validation.result.notes ?? undefined,
-            updatedAt: validation.result.updatedAt ?? new Date().toISOString()
+            updatedAt: validation.result.updatedAt ?? new Date().toISOString(),
+            playerCount
           }),
         wasPending
           ? deps.getLocale().t('actions.savedResult')

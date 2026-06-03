@@ -53,6 +53,7 @@ export interface MastermindCard {
   aliases: string[];
   leadName: string | null;
   leadCategory: string | null;
+  leadNameFilter?: string[];
   notes: string[];
 }
 
@@ -115,6 +116,7 @@ export interface MastermindRuntime {
   name: string;
   aliases: string[];
   lead: { category: string; id: string } | null;
+  leadCandidates?: Array<{ category: string; id: string }>;
   notes: string[];
   isEpicMastermind?: boolean;
 }

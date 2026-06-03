@@ -91,3 +91,35 @@ test('buildCanonicalSourceData falls back to [] and default numeric values when 
   assert.deepEqual(set.schemes[0].modifiers, [], 'Scheme modifiers should default to []');
   assert.deepEqual(set.schemes[0].notes, [], 'Scheme notes should default to []');
 });
+
+// ── From epic107-mastermind-lead-corrections ──────────────────────────────────
+
+test('107.1 — Omega Red MastermindRuntime has lead === null', () => {
+  const omegaRed = runtime.indexes.allMasterminds.find((m) => m.name === 'Omega Red');
+  assert.ok(omegaRed, 'Omega Red mastermind not found in runtime indexes');
+  assert.equal(omegaRed.lead, null, 'Omega Red lead should be null (Any Villain Group rule)');
+});
+
+test('107.2 — Sinister Six 2099 MastermindRuntime has lead === null and leadCandidates with at least 2 villain entries', () => {
+  const sinisterSix = runtime.indexes.allMasterminds.find((m) => m.name === 'Sinister Six 2099');
+  assert.ok(sinisterSix, 'Sinister Six 2099 mastermind not found in runtime indexes');
+  assert.equal(sinisterSix.lead, null, 'Sinister Six 2099 lead should be null');
+  assert.ok(Array.isArray(sinisterSix.leadCandidates), 'leadCandidates should be an array');
+  assert.ok(
+    sinisterSix.leadCandidates!.length >= 2,
+    `Expected at least 2 lead candidates, got ${sinisterSix.leadCandidates!.length}`
+  );
+  assert.ok(
+    sinisterSix.leadCandidates!.every((c) => c.category === 'villains'),
+    'All leadCandidates should have category "villains"'
+  );
+});
+
+test("107.3 — Emperor Vulcan of the Shi'Ar MastermindRuntime has lead.id resolving to Shi'Ar Imperial Elite", () => {
+  const vulcan = runtime.indexes.allMasterminds.find((m) => m.name === "Emperor Vulcan of the Shi'Ar");
+  assert.ok(vulcan, "Emperor Vulcan of the Shi'Ar mastermind not found in runtime indexes");
+  assert.ok(vulcan.lead, "Emperor Vulcan of the Shi'Ar lead should be non-null");
+  const shiArGroup = runtime.indexes.villainGroupsById[vulcan.lead!.id];
+  assert.ok(shiArGroup, "Shi'Ar Imperial Elite villain group not found by resolved lead id");
+  assert.equal(shiArGroup.name, "Shi'Ar Imperial Elite");
+});

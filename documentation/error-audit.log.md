@@ -240,6 +240,27 @@ Suggested action: Create `documentation/release-notes/v2.1.2-release-notes.md` (
 [Resolution → F-038] [FIXED 2026-05-06] Resolution: Entries for Epic 96, Epic 97, and the SRP/file-size refactoring have been added to `documentation/release-notes/v2.1.1-release-notes.md`. The summary paragraph was also updated to reflect the full scope of the v2.1.1 release.
 ---
 
+[F-039] [2026-05-27] Epic: Epics 102, 103, 104
+File: documentation/planning/epic/ready-for-dev/epic-102.md, epic-103.md, epic-104.md
+Finding: Epics 102, 103, and 104 have all been fully implemented but their spec files remain in `documentation/planning/epic/ready-for-dev/` rather than `documentation/planning/epic/done/`. The tech-writer agent cannot move files (no delete/move tool available), so the relocation is logged here.
+Suggested action: Move `epic-102.md`, `epic-103.md`, and `epic-104.md` from `documentation/planning/epic/ready-for-dev/` to `documentation/planning/epic/done/` to keep the lifecycle folders consistent with all prior completed epics.
+---
+[F-040] [2026-05-27] Epic: Epic 104 — Apply scheme special setup rules (Story 104.10)
+File: src/data/canonical-game-data.json (Marvel Zombies scheme entry)
+Finding: Story 104.10 specified adding a `conditional-add-bystanders` modifier (amount: 3, playerCounts: [1,2]) for the Marvel Zombies scheme's 1–2 player conditional bystander rule. No such modifier type exists in the codebase; the rule is recorded as a note only. The `canonical-game-data.json` Marvel Zombies entry contains no `conditional-add-bystanders` modifier.
+Suggested action: Define and implement a `conditional-add-bystanders` modifier type in the setup modifier pipeline, then replace the note-only entry in the Marvel Zombies scheme with a structured `{ type: "conditional-add-bystanders", amount: 3, playerCounts: [1, 2] }` modifier. Until then, the generator does not apply the 3-bystander rule for 1–2 player games.
+---
+[F-041] [2026-05-27] Epic: Epic 104 — Apply scheme special setup rules (Stories 104.12, 104.13)
+File: src/data/canonical-game-data.json (Infiltrate the Lair with Spies and Graduation at Xavier's X-Academy scheme entries)
+Finding: Stories 104.12 and 104.13 specified using a `set-side-bystanders` modifier type if it exists. No such modifier type exists in the codebase. Both schemes use note-only representation. As a result, the generator cannot programmatically model the side-stack bystander count for these schemes.
+Suggested action: Define and implement a `set-side-bystanders` modifier type in the setup modifier pipeline for side-stack bystander counts (tokens placed beside the scheme, not in the villain deck), then replace the note-only entries with structured modifiers: `{ type: "set-side-bystanders", value: 21 }` for Infiltrate the Lair with Spies and `{ type: "set-side-bystanders", value: 8 }` for Graduation at Xavier's X-Academy.
+---
+[F-042] [2026-05-27] Epic: Epic 104 — Apply scheme special setup rules (Stories 104.2, 104.5, 104.10)
+File: src/data/canonical-game-data.json (Secret Invasion of the Skrull Shapeshifters, Enslave Minds with the Chitauri Scepter, Marvel Zombies scheme entries)
+Finding: Stories 104.2, 104.5, and 104.10 each specified adding an `add-hero` modifier to encode "N heroes shuffled from the Hero Deck into the Villain Deck." In all three cases, no `add-hero` modifier was added to the scheme's `modifiers` array; the rule is represented as a note only. The existing `add-hero` modifier type (used for schemes like HYDRA Helicarriers Hunt Heroes) increases heroCount but does not encode the villain-deck destination. No modifier type currently exists to represent "shuffle heroes into villain deck" as a distinct setup instruction.
+Suggested action: Define a new modifier type (e.g., `add-hero-to-villain-deck`) that encodes both the count and the destination, and apply it to the three affected schemes. Until then, the generator does not structurally enforce the hero-shuffle rule for these schemes; users must apply it manually based on the note text.
+---
+
 ## Summary Table
 
 | ID | Summary | Status | Found | Fixed |
@@ -282,3 +303,7 @@ Suggested action: Create `documentation/release-notes/v2.1.2-release-notes.md` (
 | F-036 | Epic 95 spec file not moved to `done/` after full implementation | FIXED | 2026-05-04 | 2026-05-06 |
 | F-037 | SRP refactoring: coverage audit predates the split; 14 new extracted files absent from report | FIXED | 2026-05-05 | 2026-05-06 |
 | F-038 | Epics 96 & 97: No release notes file exists for the version shipping these epics | FIXED | 2026-05-06 | 2026-05-06 |
+| F-039 | Epics 102–104 spec files not moved to `done/` after full implementation | OPEN | 2026-05-27 | — |
+| F-040 | Epic 104: `conditional-add-bystanders` modifier type not implemented — Marvel Zombies 1–2p bystanders are note-only | OPEN | 2026-05-27 | — |
+| F-041 | Epic 104: `set-side-bystanders` modifier type not implemented — side-stack bystanders for Infiltrate the Lair and Graduation are note-only | OPEN | 2026-05-27 | — |
+| F-042 | Epic 104: `add-hero` modifier not applied to schemes with hero-shuffle-into-villain-deck rules; no suitable modifier type exists | OPEN | 2026-05-27 | — |

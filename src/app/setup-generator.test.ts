@@ -90,7 +90,7 @@ test('Applies scheme constraints, forced groups, and modifiers to generated setu
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 2, advancedSolo: false, random: () => 0 });
 
   assert.equal(setup.scheme.name, 'Secret Invasion of the Skrull Shapeshifters');
-  assert.equal(setup.requirements.heroCount, 6);
+  assert.equal(setup.requirements.heroCount, 7);
   assert.ok(setup.villainGroups.some((group) => group.name === 'Skrulls' && group.forced));
 
   const restrictedScheme = bundle.runtime.indexes.allSchemes.find((entity) => entity.name === 'Super Hero Civil War');
@@ -809,5 +809,91 @@ test('Collects hero selection failure reason when forced picks leave insufficien
       random: () => 0
     }),
     /Forced Hero selections leave no legal way to satisfy this scheme/
+  );
+});
+
+// ── From epic107-mastermind-lead-corrections (setup-generator parts) ──────────
+
+// Helper: build a minimal mock runtime that has Sinister Six 2099 (with
+// leadCandidates) but whose villain pool contains only unrelated groups.
+// This forces availableCandidates to be empty so tryMastermindForScheme
+// returns null and generateSetup reaches the terminal throw.
+function createSinister6_2099NoLeadCandidateRuntime() {
+  const SET_ID = 'ep107-s62099-set';
+  const heroes = [
+    { id: 'ep107-h1', name: 'Hero One', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep107-h2', name: 'Hero Two', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep107-h3', name: 'Hero Three', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep107-h4', name: 'Hero Four', setId: SET_ID, aliases: [], teams: [], cardCount: 14 },
+    { id: 'ep107-h5', name: 'Hero Five', setId: SET_ID, aliases: [], teams: [], cardCount: 14 }
+  ];
+  const masterminds = [
+    {
+      id: 'ep107-mm1',
+      name: 'Sinister Six 2099',
+      setId: SET_ID,
+      aliases: [],
+      lead: null,
+      leadCandidates: [
+        { id: 'ep107-vg-alch', category: 'villains' },
+        { id: 'ep107-vg-sin', category: 'villains' }
+      ],
+      notes: [],
+      isEpicMastermind: false
+    }
+  ];
+  // Villain pool IDs deliberately do NOT match any leadCandidate id.
+  const villainGroups = [
+    { id: 'ep107-vg1', name: 'Unrelated Group 1', setId: SET_ID, aliases: [], cardCount: 10 },
+    { id: 'ep107-vg2', name: 'Unrelated Group 2', setId: SET_ID, aliases: [], cardCount: 10 }
+  ];
+  const henchmanGroups = [
+    { id: 'ep107-hg1', name: 'Minions', setId: SET_ID, aliases: [], cardCount: 10 }
+  ];
+  const schemes = [
+    {
+      id: 'ep107-sc1',
+      name: 'Simple 107 Scheme',
+      setId: SET_ID,
+      aliases: [],
+      constraints: { minimumPlayerCount: null },
+      forcedGroups: [],
+      modifiers: [],
+      notes: []
+    }
+  ];
+  const set = { id: SET_ID, name: 'Sinister 2099 No-Lead Test Set', heroes, masterminds, villainGroups, henchmanGroups, schemes };
+  return {
+    sets: [set],
+    indexes: {
+      villainGroupsById: Object.fromEntries(villainGroups.map((vg) => [vg.id, vg])),
+      henchmanGroupsById: Object.fromEntries(henchmanGroups.map((hg) => [hg.id, hg]))
+    },
+    SET_ID
+  };
+}
+
+test('107.2f — generator with Sinister Six 2099 produces a setup whose villain groups contain "Alchemax" or "Sinister"', () => {
+  const state = makeTargetedState({ mastermindName: 'Sinister Six 2099' });
+  const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 2, random: () => 0 });
+  assert.equal(setup.mastermind.name, 'Sinister Six 2099');
+  assert.ok(
+    setup.villainGroups.some((vg) => /alchemax|sinister/i.test(vg.name)),
+    `Expected a villain group containing "Alchemax" or "Sinister", got: ${setup.villainGroups.map((vg) => vg.name).join(', ')}`
+  );
+});
+
+test('107.2g — generator with Sinister Six 2099 and no matching villain groups in owned pool throws (no valid lead candidate)', () => {
+  // Covers the availableCandidates.length === 0 branch in tryMastermindForScheme.
+  // The only mastermind in the pool (Sinister Six 2099) has leadCandidates whose
+  // IDs are absent from the villain pool, so every scheme iteration returns null
+  // and generateSetup reaches the terminal throw.
+  const { sets, indexes, SET_ID } = createSinister6_2099NoLeadCandidateRuntime();
+  const runtime = { sets, indexes };
+  const state = createDefaultState();
+  state.collection.ownedSetIds = [SET_ID];
+  assert.throws(
+    () => generateSetup({ runtime, state, playerCount: 2, random: () => 0 }),
+    /No legal setup could be generated from the current owned collection for the selected play mode\./
   );
 });

@@ -729,3 +729,247 @@ test('normalizeGameResultDraft with solo completed result and null score returns
   assert.equal(draft.notes, 'Conceded early');
   assert.equal(draft.playerScores, undefined);
 });
+
+// ── Epic 103 Story 103.1 — Failing test: multiplayer result stays pending ─────
+
+test('Epic 103.1 — saveGameResult pipeline for playerCount=2 win produces completed status', () => {
+
+  // Reproduce the exact data flow from saveGameResult in history-vm.svelte.ts:
+  // validateGameResultDraft(draft, playerCount) → updateGameResult(state, {
+  //   score: validation.result.score, /* playerCount NOT passed */
+  // })
+  // The bug: when playerCount is omitted, updateGameResult cannot reliably
+  // activate the multiplayer path via Array.isArray alone for all cases.
+
+  const twoPlayerSetup = createSampleSetup(1); // playerCount: 2
+  const state = acceptGameSetup(createDefaultState(), twoPlayerSetup);
+  const recordId = state.history[0].id;
+
+  const draft = {
+    outcome: 'win',
+    playerScores: [
+      { playerName: 'Alice', score: '42' },
+      { playerName: 'Bob', score: '35' }
+    ],
+    notes: ''
+  };
+
+  const playerCount = state.history[0].playerCount; // 2 — as read in saveGameResult
+  const validation = validateGameResultDraft(draft, playerCount);
+  assert.ok(validation.ok, `Validation failed unexpectedly: ${validation.ok ? '' : validation.errors.join(', ')}`);
+
+  // Mimic saveGameResult: pass score from validation.result but omit playerCount
+  const updatedState = updateGameResult(state, {
+    recordId,
+    outcome: validation.result.outcome!,
+    score: validation.result.score,
+    notes: validation.result.notes ?? undefined,
+    updatedAt: validation.result.updatedAt ?? new Date().toISOString()
+    // playerCount intentionally omitted — this is the bug
+  });
+
+  assert.equal(updatedState.history[0].result.status, 'completed',
+    'result.status must be completed after saving a multiplayer result');
+  assert.ok(Array.isArray(updatedState.history[0].result.score),
+    'score must be a per-player array for a multiplayer completed result');
+  assert.equal(updatedState.history[0].result.outcome, 'win');
+});
+
+// ── Epic 103 Story 103.3 — Extended multiplayer coverage ──────────────────────
+
+test('Epic 103.3 — playerCount=2 loss with no scores produces completed status', () => {
+
+  const state = acceptGameSetup(createDefaultState(), createSampleSetup(1)); // playerCount: 2
+  const recordId = state.history[0].id;
+
+  // loss — no scores required
+  const draft = {
+    outcome: 'loss',
+    playerScores: [
+      { playerName: '', score: '' },
+      { playerName: '', score: '' }
+    ],
+    notes: ''
+  };
+
+  const validation = validateGameResultDraft(draft, 2);
+  assert.ok(validation.ok, 'loss with no scores should pass validation');
+
+  const updatedState = updateGameResult(state, {
+    recordId,
+    outcome: validation.result.outcome!,
+    score: validation.result.score,
+    notes: validation.result.notes ?? undefined,
+    updatedAt: validation.result.updatedAt ?? new Date().toISOString(),
+    playerCount: 2
+  });
+
+  assert.equal(updatedState.history[0].result.status, 'completed');
+  assert.equal(updatedState.history[0].result.outcome, 'loss');
+  assert.ok(Array.isArray(updatedState.history[0].result.score));
+  assert.ok(updatedState.history[0].result.score.every((e) => e.score === null),
+    'all per-player scores should be null when no scores were entered');
+});
+
+test('Epic 103.3 — playerCount=2 draw with no scores produces completed status', () => {
+
+  const state = acceptGameSetup(createDefaultState(), createSampleSetup(1)); // playerCount: 2
+  const recordId = state.history[0].id;
+
+  // draw — no scores required
+  const draft = {
+    outcome: 'draw',
+    playerScores: [
+      { playerName: '', score: '' },
+      { playerName: '', score: '' }
+    ],
+    notes: ''
+  };
+
+  const validation = validateGameResultDraft(draft, 2);
+  assert.ok(validation.ok, 'draw with no scores should pass validation');
+
+  const updatedState = updateGameResult(state, {
+    recordId,
+    outcome: validation.result.outcome!,
+    score: validation.result.score,
+    notes: validation.result.notes ?? undefined,
+    updatedAt: validation.result.updatedAt ?? new Date().toISOString(),
+    playerCount: 2
+  });
+
+  assert.equal(updatedState.history[0].result.status, 'completed');
+  assert.equal(updatedState.history[0].result.outcome, 'draw');
+  assert.ok(Array.isArray(updatedState.history[0].result.score));
+});
+
+test('Epic 103.3 — playerCount=2 win with scores produces completed status with correct score array', () => {
+
+  const state = acceptGameSetup(createDefaultState(), createSampleSetup(1)); // playerCount: 2
+  const recordId = state.history[0].id;
+
+  const draft = {
+    outcome: 'win',
+    playerScores: [
+      { playerName: 'Alice', score: '100' },
+      { playerName: 'Bob', score: '80' }
+    ],
+    notes: 'Close game'
+  };
+
+  const validation = validateGameResultDraft(draft, 2);
+  assert.ok(validation.ok);
+
+  const updatedState = updateGameResult(state, {
+    recordId,
+    outcome: validation.result.outcome!,
+    score: validation.result.score,
+    notes: validation.result.notes ?? undefined,
+    updatedAt: '2026-05-27T10:00:00.000Z',
+    playerCount: 2
+  });
+
+  assert.equal(updatedState.history[0].result.status, 'completed');
+  assert.equal(updatedState.history[0].result.outcome, 'win');
+  assert.ok(Array.isArray(updatedState.history[0].result.score));
+  assert.deepEqual(updatedState.history[0].result.score[0], { playerName: 'Alice', score: 100 });
+  assert.deepEqual(updatedState.history[0].result.score[1], { playerName: 'Bob', score: 80 });
+});
+
+test('Epic 103.3 — playerCount=3 win with scores produces completed status with 3-entry array', () => {
+
+  // createSampleSetup with odd offset produces playerCount: 2, but we need 3
+  // Build a 3-player record directly
+  const runtime = bundle.runtime.indexes;
+  const threePlayerSetup = {
+    id: 'epic103-3p',
+    createdAt: '2026-05-27T10:00:00.000Z',
+    playerCount: 3,
+    advancedSolo: false,
+    setupSnapshot: {
+      mastermindId: runtime.allMasterminds[0].id,
+      schemeId: runtime.allSchemes[0].id,
+      heroIds: runtime.allHeroes.slice(0, 3).map((e: { id: string }) => e.id),
+      villainGroupIds: [runtime.allVillainGroups[0].id],
+      henchmanGroupIds: [runtime.allHenchmanGroups[0].id]
+    }
+  };
+  const state = acceptGameSetup(createDefaultState(), threePlayerSetup);
+  const recordId = state.history[0].id;
+
+  const draft = {
+    outcome: 'win',
+    playerScores: [
+      { playerName: 'Alice', score: '50' },
+      { playerName: 'Bob', score: '40' },
+      { playerName: 'Carol', score: '60' }
+    ],
+    notes: ''
+  };
+
+  const validation = validateGameResultDraft(draft, 3);
+  assert.ok(validation.ok, 'win with three player scores should pass validation');
+
+  const updatedState = updateGameResult(state, {
+    recordId,
+    outcome: validation.result.outcome!,
+    score: validation.result.score,
+    notes: validation.result.notes ?? undefined,
+    updatedAt: '2026-05-27T10:00:00.000Z',
+    playerCount: 3
+  });
+
+  assert.equal(updatedState.history[0].result.status, 'completed');
+  assert.equal(updatedState.history[0].result.outcome, 'win');
+  assert.ok(Array.isArray(updatedState.history[0].result.score));
+  assert.equal(updatedState.history[0].result.score.length, 3);
+  assert.deepEqual(updatedState.history[0].result.score[0], { playerName: 'Alice', score: 50 });
+  assert.deepEqual(updatedState.history[0].result.score[2], { playerName: 'Carol', score: 60 });
+});
+
+test('Epic 103.3 — playerCount=3 loss with no scores produces completed status', () => {
+
+  const runtime = bundle.runtime.indexes;
+  const threePlayerSetup = {
+    id: 'epic103-3p-loss',
+    createdAt: '2026-05-27T10:00:00.000Z',
+    playerCount: 3,
+    advancedSolo: false,
+    setupSnapshot: {
+      mastermindId: runtime.allMasterminds[0].id,
+      schemeId: runtime.allSchemes[0].id,
+      heroIds: runtime.allHeroes.slice(0, 3).map((e: { id: string }) => e.id),
+      villainGroupIds: [runtime.allVillainGroups[0].id],
+      henchmanGroupIds: [runtime.allHenchmanGroups[0].id]
+    }
+  };
+  const state = acceptGameSetup(createDefaultState(), threePlayerSetup);
+  const recordId = state.history[0].id;
+
+  const draft = {
+    outcome: 'loss',
+    playerScores: [
+      { playerName: '', score: '' },
+      { playerName: '', score: '' },
+      { playerName: '', score: '' }
+    ],
+    notes: ''
+  };
+
+  const validation = validateGameResultDraft(draft, 3);
+  assert.ok(validation.ok);
+
+  const updatedState = updateGameResult(state, {
+    recordId,
+    outcome: validation.result.outcome!,
+    score: validation.result.score,
+    notes: validation.result.notes ?? undefined,
+    updatedAt: '2026-05-27T10:00:00.000Z',
+    playerCount: 3
+  });
+
+  assert.equal(updatedState.history[0].result.status, 'completed');
+  assert.equal(updatedState.history[0].result.outcome, 'loss');
+  assert.ok(Array.isArray(updatedState.history[0].result.score));
+  assert.equal(updatedState.history[0].result.score.length, 3);
+});

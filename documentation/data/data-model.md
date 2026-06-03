@@ -113,9 +113,12 @@ That canonical source remains nested by set.
   aliases: string[],
   leadName: string | null,
   leadCategory: "villains" | "henchmen" | null,
+  leadNameFilter?: string[],
   notes: string[]
 }
 ```
+
+`leadNameFilter` is an optional list of name substrings (case-insensitive). When present, `leadName` must be `null` and the generator will pick exactly one villain group at runtime whose name contains any of the filter strings. Used for masterminds whose card text reads "Always Leads: Any '…' Villain Group" where the eligible groups share a common name keyword (e.g. Sinister Six 2099 uses `["Alchemax", "Sinister"]`).
 
 ### `VillainGroup`
 
@@ -218,10 +221,13 @@ The shipped runtime bundle shape is:
     category: "villains" | "henchmen",
     id: string
   } | null,
+  leadCandidates?: Array<{ category: string; id: string }>,
   isEpicMastermind?: boolean,
   notes: string[]
 }
 ```
+
+`leadCandidates` is present when the canonical source has a non-empty `leadNameFilter`. The normalizer pre-resolves all globally-known villain groups (across the full index) whose names contain any of the filter strings and stores them as `{ category, id }` pairs. `lead` remains `null` for these masterminds; the generator picks one candidate at random from those present in the owned pool at generation time. When no owned candidate survives filtering the generator skips this mastermind for that setup attempt.
 
 `isEpicMastermind` is `true` for mastermind cards that belong to the Epic Mastermind card pool (introduced in the X-Men expansion). When absent or `false`, the mastermind is treated as a standard card. The Epic Mastermind setup-generator filter uses this field in conjunction with `EPIC_MASTERMIND_SUPPORTED_SETS` to restrict the mastermind pool when Epic Mastermind mode is active (Epic 71).
 
@@ -253,14 +259,30 @@ The shipped runtime bundle shape is:
   type: string,
   value?: number,
   amount?: number,
+  pattern?: string,
+  playerCounts?: number[],
   category?: "heroes" | "villainGroups" | "henchmanGroups" | "schemes" | "bystanders"
 }
 ```
 
-Examples:
-- `{ type: "set-bystanders", value: 12 }`
-- `{ type: "add-villain-group", amount: 1 }`
-- `{ type: "set-min-heroes", value: 6 }`
+**Known modifier types (as of Epic 105):**
+
+| Type | Fields used | Effect |
+|------|-------------|--------|
+| `set-bystanders` | `value` | Sets the bystander count in the villain deck to a fixed number |
+| `set-min-heroes` | `value` | Overrides the minimum hero count for the setup |
+| `conditional-set-min-heroes` | `value`, `playerCounts` | Overrides hero count only for specified player counts |
+| `add-villain-group` | `amount` | Adds extra villain groups to the setup |
+| `conditional-add-villain-group` | `amount`, `playerCounts` | Adds extra villain groups only for specified player counts |
+| `conditional-add-hero` | `amount`, `playerCounts` | Adds extra heroes only for specified player counts |
+| `add-henchman-group` | `amount` | Adds extra henchman groups to the setup |
+| `add-hero` | `amount` | Adds extra heroes to the setup (increases heroCount) |
+| `replace-villain-group-with-specific-group` | `amount` | Replaces a random villain group slot with a named forced group |
+| `require-hero-name-match-count` | `pattern`, `value` | Requires exactly N heroes whose names match a substring pattern |
+
+> **Not yet implemented:** `conditional-add-bystanders` (conditional bystanders by player count, e.g. Marvel Zombies 1–2 player rule) and `set-side-bystanders` (bystanders placed in a side stack next to the scheme rather than in the villain deck, e.g. Infiltrate the Lair with Spies, Graduation at Xavier's X-Academy). Both are currently represented as `notes` only.
+>
+> **Semantic note on `add-hero`:** where a card rule states "shuffle N heroes from the Hero Deck into the Villain Deck", the `add-hero` modifier increases `heroCount` but does not encode the destination. The full shuffle-into-villain-deck rule is preserved in the scheme's `notes` field.
 
 ### Why both canonical and normalized layers exist
 

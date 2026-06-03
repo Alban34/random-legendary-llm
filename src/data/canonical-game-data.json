@@ -3106,7 +3106,7 @@
         "name": "Emperor Vulcan of the Shi'Ar",
         "setName": "Realm of Kings",
         "aliases": [],
-        "leadName": null,
+        "leadName": "Shi'Ar Imperial Elite",
         "leadCategory": "villains",
         "notes": []
       },
@@ -3522,8 +3522,8 @@
         "name": "Omega Red",
         "setName": "Weapon X",
         "aliases": [],
-        "leadName": "Berserkers",
-        "leadCategory": "villains",
+        "leadName": null,
+        "leadCategory": null,
         "notes": [
           "Epic Mastermind.",
           "Expansion includes 10 Enraging Wounds (special wound variant)."
@@ -3635,8 +3635,12 @@
         "name": "Sinister Six 2099",
         "setName": "2099",
         "aliases": [],
-        "leadName": "False Aesir of Alchemax",
-        "leadCategory": "villains",
+        "leadName": null,
+        "leadCategory": null,
+        "leadNameFilter": [
+          "Alchemax",
+          "Sinister"
+        ],
         "notes": [
           "Epic Adapting Mastermind. Card count: 6."
         ]
@@ -4837,7 +4841,7 @@
         "forcedGroups": [],
         "modifiers": [
           {
-            "type": "conditional-add-villain-group",
+            "type": "conditional-add-hero",
             "amount": 1,
             "playerCounts": [
               4,
@@ -4846,7 +4850,7 @@
           }
         ],
         "notes": [
-          "For 4 or 5 players, add 1 extra Villain Group."
+          "For 4 or 5 players, add 1 extra Hero."
         ]
       },
       {
@@ -4856,9 +4860,22 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "forcedGroups": [
+          {
+            "category": "henchmen",
+            "name": "The Brood"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "add-henchman-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "8 Twists. Add 10 Brood as extra Henchmen. No Bystanders in Villain Deck.",
+          "Always include The Brood henchman group."
+        ]
       },
       {
         "name": "Annihilation:Conquest",
@@ -4880,7 +4897,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists. 30 Wounds."
+        ]
       },
       {
         "name": "Asgard Under Siege",
@@ -4890,8 +4909,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-henchman-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add 1 extra Henchman Group."
+        ]
       },
       {
         "name": "Asgardian Test of Worth",
@@ -4902,7 +4928,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists Twist 1-7: Each player who is not Worthy discards a card."
+        ]
       },
       {
         "name": "Auction Shrink Tech to Highest Bidder",
@@ -4913,7 +4941,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists. Set aside all 14 cards of a random extra Hero that has any Size-Changing cards as “Shrink Tech.” Twist: Stack this Twist next to the Scheme as a “Hostile Bid.” Reveal a random Hero from the Shrink Tech. This turn you may recruit that Hero, but it costs 1 7* more for each Hostile Bid. If you recruit it, either KO that Hero or choose any player to gain it. If you don’t recruit it by the end of this turn, stack it next to the Scheme as “Controlled by Arms Dealers.”"
+        ]
       },
       {
         "name": "Avengers vs. X-Men",
@@ -4924,7 +4954,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "9 Twists. Hero Deck has 3 Heroes of one Team and 3 Heroes of another Team. Twist 1-7: Each player reveals their hand; each player that has cards of both those teams gains a Wound. Twist 8: Evil wins!"
+        ]
       },
       {
         "name": "Bathe Earth in Cosmic Rays",
@@ -4946,7 +4978,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists Special Rules: Once per turn, you may stack one of your non-grey Heroes next to this Scheme to earn “Ten Million Votes” for that Hero Name. If you do, you may also send one of your grey Heroes Undercover as “Secret Service.”"
+        ]
       },
       {
         "name": "Befoul Earth into a Polluted Wasteland",
@@ -4956,8 +4990,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add an extra Hero. 8 Twists, representing “Toxic Sludge.” Twist: Put this Toxic Sludge under an HQ space. No space can have two Sludges unless all spaces already have one."
+        ]
       },
       {
         "name": "Brainwash the Military",
@@ -4968,7 +5009,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "7 Twists. Add 12 S.H.I.E.L.D. Officers to the Villain Deck."
+        ]
       },
       {
         "name": "Breach Parallel Dimensions",
@@ -4979,7 +5022,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists. Add 4 extra Bystanders to the Villain Deck. Deal the shuffled Villain Deck into several “Dimension” decks where the first. Dimension has 1 card, the next has 2 cards, then 3, 4, etc. (The final Dimension might not have enough cards to reach its full number.) Special Rules: Each turn, you choose which Dimension you play a card from."
+        ]
       },
       {
         "name": "Breach the Nexus of All Realities",
@@ -4989,8 +5034,19 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "conditional-add-villain-group",
+            "amount": 1,
+            "playerCounts": [
+              1,
+              2
+            ]
+          }
+        ],
+        "notes": [
+          "For 1–2 players, use 3 Villain Groups."
+        ]
       },
       {
         "name": "Break the Planet Asunder",
@@ -5019,7 +5075,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "9 Twists. Put 10 extra Annihilation Wave Henchmen in the KO pile."
+        ]
       },
       {
         "name": "Build an Underground Mega-Vault Prison",
@@ -5041,7 +5099,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Stack 2 Cops per player next to this Plot."
+        ]
       },
       {
         "name": "Capture Baby Hope",
@@ -5052,7 +5112,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Put.a token on this Scheme to represent the baby, Hope Summers."
+        ]
       },
       {
         "name": "Change the Outcome of WWII",
@@ -5062,8 +5124,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "7 Twists. Add an extra Villain Group. ‘Twist: The Axis invades a new country. Put all Villains and Bystanders from the city on the bottarn of the Villain Deck. ‘The number of city spaces changes. Play 2 cards from the Villain Deck. If any Villains escape this country, stack a Twist next to the Scheme as a “conquered capital.”"
+        ]
       },
       {
         "name": "Claim Souls for Demons",
@@ -5085,7 +5154,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "10 Twists. 6 Wounds per player in the Wound Stack. Shuffle 8 Monsters Unleashed Villains into a face down “Monster Pit’ deck."
+        ]
       },
       {
         "name": "Collect an Interstellar Zoo",
@@ -5096,7 +5167,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists."
+        ]
       },
       {
         "name": "Condition Logan into Weapon X",
@@ -5106,8 +5179,16 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "require-hero-name-match-count",
+            "pattern": "wolverine|logan",
+            "value": 1
+          }
+        ],
+        "notes": [
+          "8 Twists. Include exactly 1 Hero with Wolverine or Logan in its name."
+        ]
       },
       {
         "name": "Corrupt the Next Generation of Heroes",
@@ -5140,7 +5221,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists. Twist 1,3,5,7: Moonlight: Stack this Twist next to the Scheme as tered Orbit."
+        ]
       },
       {
         "name": "Crown Thor King of Asgard",
@@ -5151,7 +5234,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists."
+        ]
       },
       {
         "name": "Crush Hydra",
@@ -5162,7 +5247,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists."
+        ]
       },
       {
         "name": "Crush Them with My Bare hands",
@@ -5202,7 +5289,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "10 Twists. Shuffle together 20 Bystanders and 410 Cytoplasm Spike Henchmen as an “Infected Deck.” Twist: Reveal the top three cards of the Infected Deck. KO all Bystanders you revealed. All Spikes you revealed enter the city."
+        ]
       },
       {
         "name": "Dark Alliance",
@@ -5213,7 +5302,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists."
+        ]
       },
       {
         "name": "Dark Reign of H.A.M.M.E.R. Officers",
@@ -5224,7 +5315,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "7 Twists."
+        ]
       },
       {
         "name": "Deadlands Hordes Charge the Wall",
@@ -5253,7 +5346,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Use Deadpool as one of the Heroes."
+        ]
       },
       {
         "name": "Deadpool Wants a Chimichanga",
@@ -5264,7 +5359,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists. 12 total Bystanders in the Villain Deck. All Bystanders represent “Chimichangas.” (They're Bystanders too.) 3-5 players: Add a Villain Group. Nobody Eats Just One Chimichanga! Whenever you play a Chimichanga from the Villain Deck, play another card fram the Villain Deck."
+        ]
       },
       {
         "name": "Deadpool Writes a Scheme",
@@ -5275,7 +5372,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Use the Deadpool Hero. Add 6 Twists."
+        ]
       },
       {
         "name": "Destroy the Cities of Earth!",
@@ -5285,7 +5384,12 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
+        "modifiers": [
+          {
+            "type": "set-bystanders",
+            "value": 12
+          }
+        ],
         "notes": []
       },
       {
@@ -5297,7 +5401,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "9 Twists. Exactly one Hero must be a Nova Hero. 1 player: 5 Heroes. Each player's starting deck adds 2 Wounds, 1 S.H.I.E.L.D. Officer, and a Nova card that costs 2 Special Rules: All S.H.I.E.L.D. Officers and Nova Heroes count as “Nova Centurions.” Twist 1-5: Each player must reveal their hand and discard a Nova Centurion. Each player that discarded this way gains a Shard. Each player that didn’t discard this way must KO a card from the S.H.I.E.L.D. Officer Stack. ‘Twist 6-9: Each player must KO a Nova Centurion from the S.H.I.E.L.D. Officer Stack or from their hand or discard pile Evil Wins: When there are 5 KO'd Nova Centurions per player."
+        ]
       },
       {
         "name": "Detonate the Helicarrier",
@@ -5325,8 +5431,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-henchman-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add Twists equal to the number of players plus 3. Add an extra Henchman Group of 10 cards as “Xerogen Experiments.”"
+        ]
       },
       {
         "name": "Distract the Hero",
@@ -5337,7 +5450,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Use at least 1 Spider Friends Team Hero."
+        ]
       },
       {
         "name": "Divide and Conquer",
@@ -5366,7 +5481,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists."
+        ]
       },
       {
         "name": "Duels of Science and Magic",
@@ -5377,7 +5494,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "2 players: 9 Twists. 1 or 4 players: 10 Twists. 3 or 5 players: 11 Twists."
+        ]
       },
       {
         "name": "Earthquake Drains the Ocean / Tsunami Crushes the Coast",
@@ -5387,8 +5506,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "11 Twists. Add an extra Villain Group."
+        ]
       },
       {
         "name": "Enslave Minds with the Chitauri Scepter",
@@ -5397,9 +5523,27 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "forcedGroups": [
+          {
+            "category": "villains",
+            "name": "Chitauri"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "set-min-heroes",
+            "value": 6
+          },
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Always include Chitauri Villain Group.",
+          "Use at least 6 Heroes in the setup.",
+          "Shuffle 12 random Heroes from the Hero Deck into the Villain Deck."
+        ]
       },
       {
         "name": "Enthrone the Barons of Battleworld",
@@ -5410,7 +5554,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Twists 1-7: The Villain in the city or Escape Pile with the highest printed & ascends to become a new Mastermind. It gets +2 [Fight]. It gains the ability “Master Strike: Each player discards a card with cost equal to this Mastermind's printed [Recruit].\"(Keep them separate from any Villains who ascend through Escape effects. ) Twist 8: The Villain in each player's Victory Pile with the highest printed [Fight] ascends the same way."
+        ]
       },
       {
         "name": "Epic Super Hero Civil War",
@@ -5442,7 +5588,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "5 Twists."
+        ]
       },
       {
         "name": "Everybody Hates Deadpool",
@@ -5453,7 +5601,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists. Use at least 1 Mercs for Money Team Hero."
+        ]
       },
       {
         "name": "Explosion at the Washington Monument",
@@ -5464,7 +5614,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Shuffle 18 Bystanders and 14 Wounds, then deal them evenly into eight decks. Put these decks in a row, as Floors of the Washington Monument. Special Rules: Whenever you fight a Villain, you may reveal any face-down card from any Floor. If it's a Bystander, rescue it. If it's a Wound, put it back face-up."
+        ]
       },
       {
         "name": "Fall of the Hulks",
@@ -5494,7 +5646,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "10 Twists."
+        ]
       },
       {
         "name": "Ferry Disaster",
@@ -5516,7 +5670,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists."
+        ]
       },
       {
         "name": "Five Families of Crime",
@@ -5526,8 +5682,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 2
+          }
+        ],
+        "notes": [
+          "8 Twists. Add two extra Villain Groups. Split the Villain Deck into 5 shuffled decks, one above each city space Special Rules: Each Villain Deck uses its own city of one city space. Each turn, you choose which Villain Deck plays a card from."
+        ]
       },
       {
         "name": "Flood the Planet with Melted Glaciers",
@@ -5571,8 +5734,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add an extra Villain Group. Shuffle the Villain Deck, then split it as evenly as possible into a Villain Deck for each player. Then, shuffle 2 Twists into each player's Villain Deck."
+        ]
       },
       {
         "name": "Frame Heroes for Murder",
@@ -5582,8 +5752,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "set-min-heroes",
+            "value": 6
+          }
+        ],
+        "notes": [
+          "7 Twists. 6 Heroes."
+        ]
       },
       {
         "name": "Gladiator Pits of Sakaar",
@@ -5594,7 +5771,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists."
+        ]
       },
       {
         "name": "Go After Heroes' Loved Ones",
@@ -5604,8 +5783,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add an extra Hero. Don’t use multiple Heroes that have the same Hero Name. 1 player: 8 Twists. 2-4 players: 10 Twists."
+        ]
       },
       {
         "name": "Go Back in Time to Slay Heroes' Ancestors",
@@ -5627,7 +5813,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Place 8 Bystanders next to this Scheme as Young Mutants."
+        ]
       },
       {
         "name": "Hack Cerebro to / Manipulate the Mutant Messiah",
@@ -5638,7 +5826,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "10 Twists."
+        ]
       },
       {
         "name": "Hail Hydra",
@@ -5660,7 +5850,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "5 Twists Twist 1,3,5: Choose 3 Heroes from the HQ and KO them."
+        ]
       },
       {
         "name": "Hidden Heart of Darkness",
@@ -5671,7 +5863,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Shuffle the Mastermind Tactics into the Villain Deck as Villains."
+        ]
       },
       {
         "name": "Hire Singularity Investigations to / Reveal Heroes' Evil Clones",
@@ -5682,7 +5876,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "9 Twists."
+        ]
       },
       {
         "name": "Horror of Horrors",
@@ -5693,7 +5889,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists. Twist 1-5: Play a random Horror. Twist 6: Evil wins!"
+        ]
       },
       {
         "name": "House of M / No More Mutants",
@@ -5703,8 +5901,19 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "set-min-heroes",
+            "value": 6
+          },
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "8 Twists. Hero Deck is 4 X-Men Team Heroes and 2 non-X-Men Team Heroes. (Or substitute another team for all X-Men Team icons on both sides.) Add 14 Scarlet Witch Hero cards to the Villain Deck."
+        ]
       },
       {
         "name": "HYDRA Helicarriers Hunt Heroes",
@@ -5755,7 +5964,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists. Twist 1, 3, 5, 7, 9: This Scheme fortifies the city space to its right starting with the bridge. Villains in that space get +1\\\\."
+        ]
       },
       {
         "name": "Inescapable \"Kyln\" Space Prison",
@@ -5777,7 +5988,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Place 21 Bystanders next to this Scheme as Infiltrating Spies."
+        ]
       },
       {
         "name": "Intergalactic Kree Nega-Bomb",
@@ -5788,7 +6001,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Make a face down 'Nega-Bomb Deck' of Villain cards."
+        ]
       },
       {
         "name": "Invade Asgard",
@@ -5799,7 +6014,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "7 Twists. Each Twist is a Dark Portal."
+        ]
       },
       {
         "name": "Invade the Daily Bugle News HQ",
@@ -5810,7 +6027,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists: Add 6 extra Henchmen froma single Henchman Group to the Hero Deck."
+        ]
       },
       {
         "name": "Invasion of the Venom Symbiotes",
@@ -5843,7 +6062,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists"
+        ]
       },
       {
         "name": "Marvel Zombies",
@@ -5852,9 +6073,23 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "forcedGroups": [
+          {
+            "category": "villains",
+            "name": "Zombie Avengers"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 8
+          }
+        ],
+        "notes": [
+          "Include exactly one Villain Group with \"Rise of the Living Dead.\"",
+          "Add 8 random Hero cards to the Villain Deck.",
+          "For 1–2 players, add 3 extra Bystanders to the Villain Deck."
+        ]
       },
       {
         "name": "Mass Produce War Machine Armor",
@@ -5863,9 +6098,16 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
+        "forcedGroups": [
+          {
+            "category": "henchmen",
+            "name": "S.H.I.E.L.D. Assault Squad"
+          }
+        ],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Always include S.H.I.E.L.D. Assault Squad as a Henchman Group."
+        ]
       },
       {
         "name": "Massive Earthquake Generator",
@@ -5887,7 +6129,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Choose 3 other Masterminds."
+        ]
       },
       {
         "name": "Master the Mysteries of Kung-Fu",
@@ -5898,7 +6142,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists."
+        ]
       },
       {
         "name": "Maximum Carnage",
@@ -5909,7 +6155,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "10 Twists. Wound Stack has 6 Wounds per player."
+        ]
       },
       {
         "name": "Midnight Massacre",
@@ -5920,7 +6168,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists. Add all 14 cards for any Blade Hero to the Villain Deck."
+        ]
       },
       {
         "name": "Midtown Bank Robbery",
@@ -5936,9 +6186,7 @@
             "value": 12
           }
         ],
-        "notes": [
-          "Set Bystanders to 12."
-        ]
+        "notes": []
       },
       {
         "name": "Mutant-Hunting Super Sentinels",
@@ -5947,9 +6195,22 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "forcedGroups": [
+          {
+            "category": "henchmen",
+            "name": "Sentinels"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "add-henchman-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "9 Twists. Include 10 Sentinels as extra Henchmen (or substitute another Henchman Group). Twist: Stack this Twist next to the Scheme as a “Sentinel Upgrade.” Shuffle all Sentinels from players’ Victory Piles into the Villain Deck. Play another card from the Villain Deck.",
+          "Always include Sentinels henchman group."
+        ]
       },
       {
         "name": "Mutating Gamma Rays",
@@ -6036,7 +6297,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists. All Bystanders are also “Biochemists.” Twist: Each player KOs a Biochemist from their Victory Pile or discards down to 4 cards in hand."
+        ]
       },
       {
         "name": "Plunder Wakanda's Vibranium",
@@ -6047,7 +6310,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "10 Twists, representing “Vibranium.”"
+        ]
       },
       {
         "name": "Poison Lakes with Nanite Microbots",
@@ -6058,7 +6323,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Twists equal to 5 plus the number of players."
+        ]
       },
       {
         "name": "Portals to the Dark Dimension",
@@ -6079,8 +6346,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "6 Twists. Add an extra Villain Group. Twist: Reveal the top 3 cards of the Villain Deck. Play each Villain you revealed. Put the rest back in any order."
+        ]
       },
       {
         "name": "Provoke a Clash of Nations",
@@ -6091,7 +6365,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists."
+        ]
       },
       {
         "name": "Provoke the Sovereign War Fleet",
@@ -6101,8 +6377,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "11 Twists. Add an extra Villain Group."
+        ]
       },
       {
         "name": "Pull Earth Into Medieval Times",
@@ -6113,7 +6396,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "9 Twists. Twist 1-6: Until the start of your next turn, all Villains and Masterminds everywhere have Chivalrous Duel. Each player puts a Villain from their Victory Pile on the Escape Pile. Evil Wins: When 3 Villains per player have escaped."
+        ]
       },
       {
         "name": "Pull Reality Into Cyberspace",
@@ -6124,7 +6409,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "7 Twists, representing “Cyberspace.”"
+        ]
       },
       {
         "name": "Pull Reality into the Negative Zone",
@@ -6135,7 +6422,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists."
+        ]
       },
       {
         "name": "Pulse Waves from the Negative Zone",
@@ -6157,7 +6446,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists. Stack 11 Bystanders next to the Scheme face down as “Galactic Jurors.” Special Rules: Each Twist gives you a challenge to achieve this turn. If you do it, you have convinced a Juror, and you rescue them. If you don't, put that Juror face up next to the Villain Deck, voting to condemn Humanity. Twist 1-2: “Opening Arguments”: Discard three cards with different names. Twist 3,5,7: “Question Witnesses”: Recruit a Hero that costs 5 or more."
+        ]
       },
       {
         "name": "Radioactive Palladium Poisoning",
@@ -6179,7 +6470,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists."
+        ]
       },
       {
         "name": "Raid Gene Bank to / Unleash an Anti-Mutant Bioweapon",
@@ -6190,7 +6483,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Twist 1-3: If there is a Villain in the Bank, stack this Twist next to the Mastermind as a 'Mutant Genome.' Otherwise, move a Villain from another city space to the Bank. Twist 4: This Scheme Transforms into a random scheme."
+        ]
       },
       {
         "name": "Replace Earth's Leaders with Killbots",
@@ -6200,8 +6495,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "set-bystanders",
+            "value": 18
+          }
+        ],
+        "notes": [
+          "Set Bystanders to 18."
+        ]
       },
       {
         "name": "Replace Earth's Leaders with HYDRA",
@@ -6211,8 +6513,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "set-bystanders",
+            "value": 18
+          }
+        ],
+        "notes": [
+          "Set Bystanders to 18."
+        ]
       },
       {
         "name": "Resurrect Heroes with the Norn Stones",
@@ -6233,8 +6542,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "set-min-heroes",
+            "value": 7
+          }
+        ],
+        "notes": [
+          "6 Twists. 7 Heroes in Hero Deck."
+        ]
       },
       {
         "name": "Ritual Sacrifice To Summon Chthon // Great Old One Chthon",
@@ -6243,9 +6559,22 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "forcedGroups": [
+          {
+            "category": "villains",
+            "name": "Lilin"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add Lilin as an extra Villain Group. Always include Lilin Villain Group.",
+          "6 Twists, plus 1 per player. If using Lilith: Use 1 Twist total (and still use an extra Villain Group)."
+        ]
       },
       {
         "name": "Ruin the Perfect Wedding",
@@ -6255,8 +6584,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 2
+          }
+        ],
+        "notes": [
+          "11 Twists. Set aside two extra Heroes to get married. Prepare each Wedding Hero into a separate 14-card stack, ordered by cost with the lowest cost on top."
+        ]
       },
       {
         "name": "S.H.I.E.L.D. Vs. HYDRA War",
@@ -6278,7 +6614,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Twists equal to the number of players plus 4."
+        ]
       },
       {
         "name": "Safeguard Dark Secrets",
@@ -6289,7 +6627,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "5 Twists."
+        ]
       },
       {
         "name": "Save Humanity",
@@ -6300,7 +6640,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. 24 Bystanders in the Hero Deck."
+        ]
       },
       {
         "name": "Scavenge Alien Weaponry",
@@ -6310,8 +6652,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-henchman-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "7 Twists. Add an extra Henchmen Group of 10 cards as “Smugglers."
+        ]
       },
       {
         "name": "Secret Empire of Betrayal",
@@ -6321,8 +6670,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "11 Twists. Randomly pick 5 cards that cost 5 or less from an additional Hero. Shuffle them to form a “Dark Loyalty” deck."
+        ]
       },
       {
         "name": "Secret HYDRA Corruption / Open HYDRA Revolution",
@@ -6333,7 +6689,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "30 Officers in the S.H.I.E.L.D. Officer stack. 1 player: 7 Twists. 2–3 players: 9 Twists. 4–5 players: 11 Twists."
+        ]
       },
       {
         "name": "Secret Invasion of the Skrull Shapeshifters",
@@ -6352,10 +6710,15 @@
           {
             "type": "set-min-heroes",
             "value": 6
+          },
+          {
+            "type": "add-hero",
+            "amount": 1
           }
         ],
         "notes": [
-          "Force the Skrulls Villain Group and use at least 6 Heroes in the setup."
+          "Force the Skrulls Villain Group and use at least 6 Heroes in the setup.",
+          "Shuffle 12 random Heroes from the Hero Deck into the Villain Deck."
         ]
       },
       {
@@ -6367,7 +6730,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists."
+        ]
       },
       {
         "name": "Seize The Wakandan Throne",
@@ -6378,7 +6743,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists."
+        ]
       },
       {
         "name": "Shoot Hulk into Space",
@@ -6388,8 +6755,20 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          },
+          {
+            "type": "require-hero-name-match-count",
+            "pattern": "hulk",
+            "value": 1
+          }
+        ],
+        "notes": [
+          "8 Twists. Take 14 cards from an extra Hero with “Hulk” in its Hero Name. Shuffle them into the Villain Deck."
+        ]
       },
       {
         "name": "Silence the Witnesses",
@@ -6400,7 +6779,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists."
+        ]
       },
       {
         "name": "Sinister Ambitions",
@@ -6411,7 +6792,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists. Add 10 random Ambition cards to the Villain Deck."
+        ]
       },
       {
         "name": "Siphon Energy from the Quantum Realm",
@@ -6422,7 +6805,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "9 Twists. Set aside the “Quantum Realm’ Villain Group as an extra group. Shuffle its Ambush Scheme into the Villain Deck."
+        ]
       },
       {
         "name": "Sire Vampires at the Blood Bank",
@@ -6432,8 +6817,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-henchman-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "10 Twists. Add an extra Henchman Group of 10 cards as “Vampire Neonates.’Put this Scheme above the Bank to mark it as the “Blood Bank.”"
+        ]
       },
       {
         "name": "Smash Two Dimensions Together",
@@ -6443,8 +6835,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "8 Twists. Add an extra Villain Group. Put the Villain Deck on the Bank space."
+        ]
       },
       {
         "name": "Sneak Attack the Heroes' Homes",
@@ -6455,7 +6854,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists. Each player chooses a Hero to be part of the Hero Deck. Randomly select other Heroes up TODO: text truncated in OCR source; verify from physical card."
+        ]
       },
       {
         "name": "Sniper Rifle Assassins",
@@ -6466,7 +6867,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists, minus 1 Twist per player."
+        ]
       },
       {
         "name": "Splice Humans with Spider DNA",
@@ -6487,8 +6890,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "set-min-heroes",
+            "value": 7
+          }
+        ],
+        "notes": [
+          "7 Twists. Use 7 Heroes including at least one © Hero. Use double the normal number of Villain and Henchman Groups, but use only half the cards from each of those groups, randomly & secretly. (7 player: 2 Henchmen per group)"
+        ]
       },
       {
         "name": "Steal All Oxygen on Earth",
@@ -6499,7 +6909,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. The “Oxygen Level” starts at 8."
+        ]
       },
       {
         "name": "Steal the Weaponized Plutonium",
@@ -6527,8 +6939,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "Add an extra Hero. 11 Twists."
+        ]
       },
       {
         "name": "Subjugate With Obedience Disks",
@@ -6552,9 +6971,20 @@
           ]
         },
         "forcedGroups": [],
-        "modifiers": [],
+        "modifiers": [
+          {
+            "type": "conditional-set-min-heroes",
+            "value": 4,
+            "playerCounts": [
+              2
+            ]
+          }
+        ],
         "notes": [
-          "Requires at least 2 players."
+          "Requires at least 2 players.",
+          "For 2 players, use 4 Heroes in the Hero Deck.",
+          "For 2–3 players, use 8 Twists.",
+          "For 4–5 players, use 5 Twists."
         ]
       },
       {
@@ -6570,7 +7000,10 @@
         "forcedGroups": [],
         "modifiers": [],
         "notes": [
-          "Requires at least 2 players."
+          "Requires at least 2 players.",
+          "For 2 players, use 4 Heroes in the Hero Deck.",
+          "For 2–3 players, use 8 Twists.",
+          "For 4–5 players, use 5 Twists."
         ]
       },
       {
@@ -6581,8 +7014,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "9 Twists. Add an extra Villain Group. Special Rules: The Bank and the Streets do not exist. Put the Villain Deck under the HQ as “Home Plate.” The Sewers, Rooftops, and Bridge are First, Second, and Third Base. Twist: Play the top card of the Villain Deck. If it's a Bystander, rescue that “Cheering Fan.” If it's a Master Strike, then after it resolves, any Villain on Third Base “Steals Home” and Escapes. If it’s a Villain, it “Hits a Double,” pushes to Second Base (the Rooftops) and you play the top card from the Villain Deck. Evil Wins: When Evil has 4 “runs” (Villains in the Escape Pile)"
+        ]
       },
       {
         "name": "Symbiotic Absorption",
@@ -6592,8 +7032,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "11 Twists. Set aside a second “Drained” Mastermind and its 4 Tactics, out of play. Add its “Always Leads” Villains as an extra Villain Group."
+        ]
       },
       {
         "name": "Televised Deathtraps of Mojoworld",
@@ -6604,7 +7051,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists. 6 Wounds per player in Wound Stack. Twist: Stack this Twist next to the Scheme as a “Deathtrap.” This turn you may pay IN for each Deathtrap stacked there. If you don’t, each player gains a Wound."
+        ]
       },
       {
         "name": "The Clone Saga",
@@ -6625,8 +7074,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "11 Twists. Add an extra Hero. Put 11 random cards from the Hero Deck face up in a “Contest Row.\""
+        ]
       },
       {
         "name": "The Dark Phoenix Saga",
@@ -6635,9 +7091,21 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "forcedGroups": [
+          {
+            "category": "villains",
+            "name": "Hellfire Club"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "10 Twists. Include Hellfire Club as one of the Villain Groups. Add 14 Jean Grey Hero cards to the Villain Deck."
+        ]
       },
       {
         "name": "The Dark World of Svartalfheim",
@@ -6648,7 +7116,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "10 Twists."
+        ]
       },
       {
         "name": "The Demon Bear Saga",
@@ -6659,7 +7129,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Include Demons of Limbo as one of the Villain Groups. Put the Demon Beer Villain from that group next to the Scheme."
+        ]
       },
       {
         "name": "The Fountain of Eternal Life",
@@ -6670,7 +7142,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. (1 player: 4 Twists)"
+        ]
       },
       {
         "name": "The God-Emperor of Battleworld",
@@ -6681,7 +7155,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists."
+        ]
       },
       {
         "name": "The Korvac Saga / Korvac Revealed",
@@ -6692,7 +7168,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists."
+        ]
       },
       {
         "name": "The Kree-Skrull War",
@@ -6701,9 +7179,20 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
+        "forcedGroups": [
+          {
+            "category": "villains",
+            "name": "Kree Starforce"
+          },
+          {
+            "category": "villains",
+            "name": "Skrulls"
+          }
+        ],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Always include Kree Starforce and Skrull Villain Groups."
+        ]
       },
       {
         "name": "The Legacy Virus",
@@ -6723,9 +7212,21 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "forcedGroups": [
+          {
+            "category": "henchmen",
+            "name": "Khonshu Guardians"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "10 Twists. Always include Khonshu Guardians. Add all fourteen cards for an extra Hero to the Villain Deck."
+        ]
       },
       {
         "name": "The Time Heist",
@@ -6736,7 +7237,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Use 4 Heroes in the Hero Deck. Set aside 4 extra Heroes to form a 'Past Hero Deck.' Above the board, make room for an alternate city called 'The Past,' with the normal 5 spaces (Sewers to Bridge) and its own 'Past HQ.'"
+        ]
       },
       {
         "name": "The Traitor",
@@ -6747,7 +7250,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "2+ players only. 8 Twists. Shuffle a 'Betrayal Deck' of 3 [cards] into the Villain Deck. TODO: Verify Betrayal Deck composition from physical card (OCR source is truncated)."
+        ]
       },
       {
         "name": "The Unbreakable Enigma Code",
@@ -6758,7 +7263,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "6 Twists. Twists 1-5: Put a card from the Hero Deck face down next to the Scheme as part of the \"Enigma Code.”"
+        ]
       },
       {
         "name": "Tornado of Terrigen Mists",
@@ -6769,7 +7276,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "10 Twists. Each player puts a small object above the sewers to represent themself."
+        ]
       },
       {
         "name": "Train Black Widows in the Red Room",
@@ -6780,7 +7289,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists, minus 1 Twist per player. Add 8 S.H.I.E.L.D. Officers to the Villain Deck."
+        ]
       },
       {
         "name": "Transform Citizens into Demons",
@@ -6791,7 +7302,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Villain Deck includes 14 extra Jean Grey-cards and no Bystanders."
+        ]
       },
       {
         "name": "Transform Commuters Into Giant Ants",
@@ -6802,7 +7315,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Twists equal to the number of players plus 6. Twist: Stack this Twist next to the Scheme. Then for each Twist in that stack, put a Bystander face down next to the Mastermind as a 2\\ “Giant Ant” Villain. When you fight one, rescue it as a Bystander."
+        ]
       },
       {
         "name": "Trap Heroes In The Microverse",
@@ -6824,7 +7339,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "1 Twist, plus 2 Twists per player. Twist: You face a “Sanity Test’: Either keep this Twist in front of you as a “Psychotic Break’, or discard a card and pass this Twist to the player on your left and that player faces a Sanity Test."
+        ]
       },
       {
         "name": "Trash Earth with Hugest Party Ever",
@@ -6833,9 +7350,23 @@
         "constraints": {
           "minimumPlayerCount": null
         },
-        "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "forcedGroups": [
+          {
+            "category": "villains",
+            "name": "Intergalactic Party Animals"
+          }
+        ],
+        "modifiers": [
+          {
+            "type": "require-hero-name-match-count",
+            "pattern": "Party Thor",
+            "value": 1
+          }
+        ],
+        "notes": [
+          "Always include Intergalactic Party Animals Villain Group.",
+          "Always include Party Thor."
+        ]
       },
       {
         "name": "Turn the Soul of Adam Warlock",
@@ -6846,7 +7377,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "14 Twists (using 3 Wounds to represent extra Scheme Twists). Put 14 Adam Warlock Hero cards in a face up stack, ordered from the lowest-cost on top, to the highest- cost on the bottom. ‘Twist: Set aside the top card of the Adam Warlock stack. This turn you may “Purify” it by spending & equal to double its cost. If you do, choose a player to gain that card, then you rescue a Bystander, and you may KO one of your Heroes. If you don’t do this by the end of your turn, put that Adam Warlock card into a “Soul's Corruption” stack next to the Scheme. Evil Wins: When there are 8 Soul's Corruptions. nue, 270 wc Eos. TODO: OCR-garbled text in this note; verify from physical card."
+        ]
       },
       {
         "name": "Unite the Shards",
@@ -6857,7 +7390,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "30:Shards in the supply. Twists equal to the number of players plus 5."
+        ]
       },
       {
         "name": "United States Split by Civil War",
@@ -6879,7 +7414,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "9 Twists."
+        ]
       },
       {
         "name": "Unleash the Power of the Cosmic Cube",
@@ -6911,8 +7448,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 2
+          }
+        ],
+        "notes": [
+          "11 Twists. Add two extra Heroes. Twist: Reveal cards from the Hero Deck, adding up their total cost until you choose to stop or your Total exceeds 21. If your Total exceeds 21 you “bust” and the Mastermind wins the wager. If you didn't bust, then do the same thing for the Mastermind, stopping as soon as their Total is at least 17. If their Total exceeds 21, then they “bust” and you win the wager. If no one busts, then you win the wager if your Total is higher. If the Mastermind’s Total is equal or higher, they win."
+        ]
       },
       {
         "name": "War for the Dream Dimension",
@@ -6922,8 +7466,15 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-villain-group",
+            "amount": 1
+          }
+        ],
+        "notes": [
+          "7 Twists. Add an extra Villain Group."
+        ]
       },
       {
         "name": "War of Kings",
@@ -6945,7 +7496,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "9 Twists."
+        ]
       },
       {
         "name": "Warp Reality into a TV Show",
@@ -6956,7 +7509,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "11 Twists. The vichiicic city space represents a TV show from “the 50s.” The space on its left is “the 60s,” then “the 70s.” The city is only those 3 spaces. The HG is only the 3 Spaces beneath those. Move the Mastermind & Officer Deck to mark the city’s left edge."
+        ]
       },
       {
         "name": "Weave a Web of Lies",
@@ -6967,7 +7522,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "7 Twists"
+        ]
       },
       {
         "name": "Wipe Heroes' Memories",
@@ -6978,7 +7535,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "Twists equal to the number of players plus 4. Twist: You “forget your past”: If you have any face up Villains or Tactics in your Victory Pile, put one of them on the bot- tom of your Victory Pile face down, then shuffle this Twist back into the Villain Deck, then play a card from the Villain Deck. If you didn’t have any face up Villains or Tactics, then instead stack this Twist next to the Scheme as a “Total Memory Wipe.”"
+        ]
       },
       {
         "name": "World War Hulk",
@@ -6989,7 +7548,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "9 Twists. Put three additional Masterminds out of play, “Lurking.” Each of the four Masterminds has two random Tactics."
+        ]
       },
       {
         "name": "X-Cutioner's Song",
@@ -6999,8 +7560,19 @@
           "minimumPlayerCount": null
         },
         "forcedGroups": [],
-        "modifiers": [],
-        "notes": []
+        "modifiers": [
+          {
+            "type": "add-hero",
+            "amount": 1
+          },
+          {
+            "type": "set-bystanders",
+            "value": 0
+          }
+        ],
+        "notes": [
+          "8 Twists. Villain Deck includes 14 cards for an extra Hero and no Bystanders."
+        ]
       },
       {
         "name": "X-Men Danger Room Goes Berserk",
@@ -7011,7 +7583,9 @@
         },
         "forcedGroups": [],
         "modifiers": [],
-        "notes": []
+        "notes": [
+          "8 Twists. Twist: Trap! By End of Turn: You may pay 2%. If you do, shuffle this Twist back into the Villain Deck, then play a card from the Villain Deck. Or Suffer: Stack this Twist next to the Scheme as an “Airborne Neurotoxin.”"
+        ]
       }
     ]
   }

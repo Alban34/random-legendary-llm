@@ -180,7 +180,7 @@ This layer converts canonical data into app-safe structures.
 
 Examples of fields that belong here:
 - stable IDs
-- resolved mastermind lead IDs
+- resolved mastermind lead IDs and categorical lead candidate pools
 - resolved scheme forced-group IDs
 - runtime indexes
 

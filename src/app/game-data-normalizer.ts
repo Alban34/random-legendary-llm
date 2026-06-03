@@ -80,6 +80,7 @@ export function buildCanonicalSourceData(seed: SeedData): CanonicalSourceData {
       aliases: (item['aliases'] as string[]) || [],
       leadName: (item['leadName'] as string) ?? null,
       leadCategory: (item['leadCategory'] as string) ?? null,
+      leadNameFilter: Array.isArray(item['leadNameFilter']) ? (item['leadNameFilter'] as string[]) : undefined,
       notes: (item['notes'] as string[]) || []
     }),
     villainGroups: (item, set): VillainGroupCard => ({
@@ -243,12 +244,19 @@ export function normalizeGameData(source: CanonicalSourceData): PipelineRuntime 
             globalHenchmanIndex
           )
         : null;
+      const leadNameFilter = (mastermind as MastermindCard).leadNameFilter;
+      const leadCandidates = leadNameFilter && leadNameFilter.length > 0
+        ? allVillainGroups
+            .filter((vg) => leadNameFilter.some((f) => vg.name.toLowerCase().includes(f.toLowerCase())))
+            .map((vg) => ({ category: 'villains' as const, id: vg.id }))
+        : undefined;
       return {
         id: mastermind.id,
         setId: mastermind.setId,
         name: mastermind.name,
         aliases: mastermind.aliases || [],
         lead,
+        ...(leadCandidates && { leadCandidates }),
         notes: mastermind.notes || [],
         isEpicMastermind: EPIC_MASTERMIND_SUPPORTED_SETS.includes(set.name) || undefined
       };

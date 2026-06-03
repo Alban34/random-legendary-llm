@@ -186,7 +186,32 @@ function resolveLeadEntity(
 // ---------------------------------------------------------------------------
 function tryMastermindForScheme(mastermind: MastermindRuntime, context: TryMastermindContext): GeneratedSetup | null {
   const { mastermindRanking, scheme, schemeSelection, pools, effectiveRequirements, normalizedForcedPicks, state, runtime, random, constraintFailureReasons, eligibleSchemes, template } = context;
-  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, { template, preferredExpansionId: normalizedForcedPicks.preferredExpansionId, random, forcedPicks: normalizedForcedPicks });
+
+  // 107.2d — categorical lead: pick one candidate at random from the owned pool
+  let activeForcedPicks = normalizedForcedPicks;
+  if (mastermind.lead === null && mastermind.leadCandidates && mastermind.leadCandidates.length > 0) {
+    const poolVillainIds = new Set(pools.villainGroups.map((vg) => vg.id));
+    const poolHenchmanIds = new Set(pools.henchmanGroups.map((hg) => hg.id));
+    const availableCandidates = mastermind.leadCandidates.filter((c) =>
+      c.category === 'villains' ? poolVillainIds.has(c.id) : poolHenchmanIds.has(c.id)
+    );
+    if (availableCandidates.length === 0) {
+      constraintFailureReasons.add(`No eligible lead candidate for ${mastermind.name} is present in the current owned collection.`);
+      return null;
+    }
+    const picked = availableCandidates[Math.floor(random() * availableCandidates.length)];
+    activeForcedPicks = {
+      ...normalizedForcedPicks,
+      villainGroupIds: picked.category === 'villains'
+        ? [...normalizedForcedPicks.villainGroupIds, picked.id]
+        : normalizedForcedPicks.villainGroupIds,
+      henchmanGroupIds: picked.category === 'henchmen'
+        ? [...normalizedForcedPicks.henchmanGroupIds, picked.id]
+        : normalizedForcedPicks.henchmanGroupIds
+    };
+  }
+
+  const categorySelection = buildCategorySelection(pools, effectiveRequirements, scheme, mastermind, state.usage, { template, preferredExpansionId: activeForcedPicks.preferredExpansionId, random, forcedPicks: activeForcedPicks });
   if (!categorySelection.selection) {
     if (categorySelection.reason) {
       constraintFailureReasons.add(categorySelection.reason);
