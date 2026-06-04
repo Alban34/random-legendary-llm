@@ -1,4 +1,5 @@
 import { createDefaultState } from './state-store.ts';
+import type { Epic1Bundle } from './game-data-pipeline.ts';
 
 // ---------------------------------------------------------------------------
 // createMemoryStorage — a lightweight in-memory storage adapter used across
@@ -44,11 +45,9 @@ export const minimalIndexes = {
 // each load their own bundle in beforeAll.
 // ---------------------------------------------------------------------------
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createAllOwnedState(bundle: any) {
+export function createAllOwnedState(bundle: Epic1Bundle) {
   const state = createDefaultState();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  state.collection.ownedSetIds = bundle.runtime.sets.map((set: any) => set.id);
+  state.collection.ownedSetIds = bundle.runtime.sets.map((set) => set.id);
   return state;
 }
 
@@ -57,15 +56,13 @@ export function createAllOwnedState(bundle: any) {
 // at a given offset. Shared between history-utils and stats-utils tests.
 // ---------------------------------------------------------------------------
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createSampleSnapshot(bundle: any, offset = 0) {
+export function createSampleSnapshot(bundle: Epic1Bundle, offset = 0) {
   const indexes = bundle.runtime.indexes;
   return {
     mastermindId: indexes.allMasterminds[offset].id,
     schemeId: indexes.allSchemes[offset].id,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    heroIds: indexes.allHeroes.slice(offset, offset + 3).map((entity: any) => entity.id),
-    villainGroupIds: [indexes.allVillainGroups[offset].id],
-    henchmanGroupIds: [indexes.allHenchmanGroups[offset].id]
+    heroIds: indexes.allHeroes.slice(offset, offset + 3).map((entity) => entity.id),
+    villainGroupIds: indexes.allVillainGroups.slice(offset, offset + 1).map((entity) => entity.id),
+    henchmanGroupIds: indexes.allHenchmanGroups.slice(offset, offset + 1).map((entity) => entity.id)
   };
 }

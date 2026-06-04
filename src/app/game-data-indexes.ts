@@ -1,10 +1,10 @@
 import type {
-  GameSet,
   HeroRuntime,
   MastermindRuntime,
   VillainGroupRuntime,
   HenchmanGroupRuntime,
-  SchemeRuntime
+  SchemeRuntime,
+  RuntimeGameSet
 } from './types.ts';
 
 // ---------------------------------------------------------------------------
@@ -12,13 +12,13 @@ import type {
 // ---------------------------------------------------------------------------
 
 export interface PipelineIndexes {
-  setsById: Record<string, GameSet>;
+  setsById: Record<string, RuntimeGameSet>;
   heroesById: Record<string, HeroRuntime>;
   mastermindsById: Record<string, MastermindRuntime>;
   villainGroupsById: Record<string, VillainGroupRuntime>;
   henchmanGroupsById: Record<string, HenchmanGroupRuntime>;
   schemesById: Record<string, SchemeRuntime>;
-  setsList: GameSet[];
+  setsList: RuntimeGameSet[];
   allHeroes: HeroRuntime[];
   allMasterminds: MastermindRuntime[];
   allVillainGroups: VillainGroupRuntime[];
@@ -30,7 +30,7 @@ export interface PipelineIndexes {
 // Build indexes
 // ---------------------------------------------------------------------------
 
-export function buildIndexes(sets: GameSet[]): PipelineIndexes {
+export function buildIndexes(sets: RuntimeGameSet[]): PipelineIndexes {
   const indexes: PipelineIndexes = {
     setsById: {},
     heroesById: {},
@@ -52,8 +52,7 @@ export function buildIndexes(sets: GameSet[]): PipelineIndexes {
       indexes.heroesById[hero.id] = hero;
       indexes.allHeroes.push(hero);
     });
-    // @ts-expect-error — masterminds array contains MastermindRuntime objects after normalization
-    set.masterminds.forEach((mastermind: MastermindRuntime) => {
+    set.masterminds.forEach((mastermind) => {
       indexes.mastermindsById[mastermind.id] = mastermind;
       indexes.allMasterminds.push(mastermind);
     });
@@ -65,8 +64,7 @@ export function buildIndexes(sets: GameSet[]): PipelineIndexes {
       indexes.henchmanGroupsById[group.id] = group;
       indexes.allHenchmanGroups.push(group);
     });
-    // @ts-expect-error — schemes array contains SchemeRuntime objects after normalization
-    set.schemes.forEach((scheme: SchemeRuntime) => {
+    set.schemes.forEach((scheme) => {
       indexes.schemesById[scheme.id] = scheme;
       indexes.allSchemes.push(scheme);
     });
@@ -79,7 +77,7 @@ export function buildIndexes(sets: GameSet[]): PipelineIndexes {
 // Validate normalized data
 // ---------------------------------------------------------------------------
 
-export function validateNormalizedData(sets: GameSet[], indexes: PipelineIndexes): void {
+export function validateNormalizedData(sets: ReadonlyArray<{ id: string }>, indexes: PipelineIndexes): void {
   const uniqueBuckets: Array<[string, string[]]> = [
     ['set', sets.map((set) => set.id)],
     ['hero', indexes.allHeroes.map((entity) => entity.id)],

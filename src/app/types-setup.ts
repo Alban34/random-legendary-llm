@@ -14,6 +14,13 @@ export interface SetupRequirements {
   heroNameRequirements: Array<{ pattern: string; value: number }>;
 }
 
+// Localizable generator notice descriptor: a locale key plus optional ICU
+// interpolation values resolved at the component boundary via locale.t().
+export interface GeneratorNotice {
+  key: string;
+  values?: Record<string, string | number>;
+}
+
 export interface GeneratedSetup {
   template: {
     playerCount: number;
@@ -55,7 +62,7 @@ export interface GeneratedSetup {
     henchmanGroupIds: string[];
     forcedTeam: string | null;
   };
-  notices: string[];
+  notices: GeneratorNotice[];
   fallbackUsed: boolean;
   legalSchemesCount: number;
 }

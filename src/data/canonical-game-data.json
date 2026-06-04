@@ -6710,10 +6710,6 @@
           {
             "type": "set-min-heroes",
             "value": 6
-          },
-          {
-            "type": "add-hero",
-            "amount": 1
           }
         ],
         "notes": [

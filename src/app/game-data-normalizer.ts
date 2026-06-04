@@ -1,4 +1,4 @@
-import { EPIC_MASTERMIND_SUPPORTED_SETS, type SetType, type GameSet, type HeroCard, type MastermindCard, type VillainGroupCard, type HenchmanGroupCard, type SchemeCard, type MastermindRuntime, type SchemeRuntime } from './types.ts';
+import { EPIC_MASTERMIND_SUPPORTED_SETS, type SetType, type GameSet, type HeroCard, type MastermindCard, type VillainGroupCard, type HenchmanGroupCard, type SchemeCard, type MastermindRuntime, type SchemeRuntime, type RuntimeGameSet } from './types.ts';
 import { buildIndexes, validateNormalizedData, type PipelineIndexes } from './game-data-indexes.ts';
 
 // ---------------------------------------------------------------------------
@@ -42,6 +42,41 @@ export function slugify(value: unknown): string {
 // Build canonical source data
 // ---------------------------------------------------------------------------
 
+type SeedEntityBuilders = {
+  heroes: (item: Record<string, unknown>, set: GameSet) => HeroCard;
+  masterminds: (item: Record<string, unknown>, set: GameSet) => MastermindCard;
+  villainGroups: (item: Record<string, unknown>, set: GameSet) => VillainGroupCard;
+  henchmanGroups: (item: Record<string, unknown>, set: GameSet) => HenchmanGroupCard;
+  schemes: (item: Record<string, unknown>, set: GameSet) => SchemeCard;
+};
+
+function appendSeedEntity(
+  builders: SeedEntityBuilders,
+  set: GameSet,
+  category: string,
+  item: Record<string, unknown>
+): void {
+  switch (category) {
+    case 'heroes':
+      set.heroes.push(builders.heroes(item, set));
+      break;
+    case 'masterminds':
+      set.masterminds.push(builders.masterminds(item, set));
+      break;
+    case 'villainGroups':
+      set.villainGroups.push(builders.villainGroups(item, set));
+      break;
+    case 'henchmanGroups':
+      set.henchmanGroups.push(builders.henchmanGroups(item, set));
+      break;
+    case 'schemes':
+      set.schemes.push(builders.schemes(item, set));
+      break;
+    default:
+      throw new Error(`Unknown card category in seed: ${category}`);
+  }
+}
+
 export function buildCanonicalSourceData(seed: SeedData): CanonicalSourceData {
   const setsByName = new Map<string, GameSet>();
   const source: CanonicalSourceData = { sets: [] };
@@ -64,8 +99,8 @@ export function buildCanonicalSourceData(seed: SeedData): CanonicalSourceData {
     setsByName.set(entry.name, set);
   });
 
-  const entityBuilders: Record<string, (item: Record<string, unknown>, set: GameSet) => unknown> = {
-    heroes: (item, set): HeroCard => ({
+  const entityBuilders = {
+    heroes: (item: Record<string, unknown>, set: GameSet): HeroCard => ({
       id: `${set.id}-${slugify(item['name'])}`,
       setId: set.id,
       name: item['name'] as string,
@@ -73,7 +108,7 @@ export function buildCanonicalSourceData(seed: SeedData): CanonicalSourceData {
       teams: (item['teams'] as string[]) || [],
       cardCount: (item['cardCount'] as number) ?? 14
     }),
-    masterminds: (item, set): MastermindCard => ({
+    masterminds: (item: Record<string, unknown>, set: GameSet): MastermindCard => ({
       id: `${set.id}-${slugify(item['name'])}`,
       setId: set.id,
       name: item['name'] as string,
@@ -83,21 +118,21 @@ export function buildCanonicalSourceData(seed: SeedData): CanonicalSourceData {
       leadNameFilter: Array.isArray(item['leadNameFilter']) ? (item['leadNameFilter'] as string[]) : undefined,
       notes: (item['notes'] as string[]) || []
     }),
-    villainGroups: (item, set): VillainGroupCard => ({
+    villainGroups: (item: Record<string, unknown>, set: GameSet): VillainGroupCard => ({
       id: `${set.id}-${slugify(item['name'])}`,
       setId: set.id,
       name: item['name'] as string,
       aliases: (item['aliases'] as string[]) || [],
       cardCount: (item['cardCount'] as number) ?? 8
     }),
-    henchmanGroups: (item, set): HenchmanGroupCard => ({
+    henchmanGroups: (item: Record<string, unknown>, set: GameSet): HenchmanGroupCard => ({
       id: `${set.id}-${slugify(item['name'])}`,
       setId: set.id,
       name: item['name'] as string,
       aliases: (item['aliases'] as string[]) || [],
       cardCount: (item['cardCount'] as number) ?? 10
     }),
-    schemes: (item, set): SchemeCard => ({
+    schemes: (item: Record<string, unknown>, set: GameSet): SchemeCard => ({
       id: `${set.id}-${slugify(item['name'])}`,
       setId: set.id,
       name: item['name'] as string,
@@ -115,9 +150,7 @@ export function buildCanonicalSourceData(seed: SeedData): CanonicalSourceData {
       if (!set) {
         throw new Error(`Unknown set name in seed: ${item['setName']}`);
       }
-      const key = category === 'villainGroups' ? 'villainGroups' : category;
-      // @ts-expect-error — dynamic property push into typed GameSet arrays
-      set[key].push(entityBuilders[key](item, set));
+      appendSeedEntity(entityBuilders, set, category, item);
     });
   });
 
@@ -213,6 +246,81 @@ function resolveGroupReference(
 // Normalize game data
 // ---------------------------------------------------------------------------
 
+interface GroupResolutionContext {
+  villainGroupsBySet: Map<string, Map<string, VillainGroupCard[]>>;
+  henchmanGroupsBySet: Map<string, Map<string, HenchmanGroupCard[]>>;
+  globalVillainIndex: Map<string, VillainGroupCard[]>;
+  globalHenchmanIndex: Map<string, HenchmanGroupCard[]>;
+  allVillainGroups: VillainGroupCard[];
+}
+
+function normalizeMasterminds(
+  masterminds: MastermindCard[],
+  set: GameSet,
+  context: GroupResolutionContext
+): MastermindRuntime[] {
+  return masterminds.map((mastermind): MastermindRuntime => {
+    const lead = mastermind.leadName
+      ? resolveGroupReference(
+          mastermind.leadName,
+          set.id,
+          mastermind.leadCategory!,
+          context.villainGroupsBySet,
+          context.henchmanGroupsBySet,
+          context.globalVillainIndex,
+          context.globalHenchmanIndex
+        )
+      : null;
+    const leadNameFilter = mastermind.leadNameFilter;
+    const leadCandidates = leadNameFilter && leadNameFilter.length > 0
+      ? context.allVillainGroups
+          .filter((vg) => leadNameFilter.some((f) => vg.name.toLowerCase().includes(f.toLowerCase())))
+          .map((vg) => ({ category: 'villains' as const, id: vg.id }))
+      : undefined;
+    return {
+      id: mastermind.id,
+      setId: mastermind.setId,
+      name: mastermind.name,
+      aliases: mastermind.aliases || [],
+      lead,
+      ...(leadCandidates && { leadCandidates }),
+      notes: mastermind.notes || [],
+      isEpicMastermind: EPIC_MASTERMIND_SUPPORTED_SETS.includes(set.name) || undefined
+    };
+  });
+}
+
+function normalizeSchemes(
+  schemes: SchemeCard[],
+  set: GameSet,
+  context: GroupResolutionContext
+): SchemeRuntime[] {
+  return schemes.map((scheme): SchemeRuntime => {
+    const forcedGroups = (scheme.forcedGroups || []).map((groupRef) => ({
+      ...resolveGroupReference(
+        groupRef.name,
+        set.id,
+        groupRef.category,
+        context.villainGroupsBySet,
+        context.henchmanGroupsBySet,
+        context.globalVillainIndex,
+        context.globalHenchmanIndex
+      )
+    }));
+
+    return {
+      id: scheme.id,
+      setId: scheme.setId,
+      name: scheme.name,
+      aliases: scheme.aliases || [],
+      constraints: scheme.constraints || { minimumPlayerCount: null },
+      forcedGroups,
+      modifiers: scheme.modifiers || [],
+      notes: scheme.notes || []
+    };
+  });
+}
+
 export function normalizeGameData(source: CanonicalSourceData): PipelineRuntime {
   const cloneSource = structuredClone(source);
   const allVillainGroups: VillainGroupCard[] = [];
@@ -227,69 +335,35 @@ export function normalizeGameData(source: CanonicalSourceData): PipelineRuntime 
     allHenchmanGroups.push(...set.henchmanGroups);
   });
 
-  const globalVillainIndex = createNameIndex(allVillainGroups);
-  const globalHenchmanIndex = createNameIndex(allHenchmanGroups);
+  const context: GroupResolutionContext = {
+    villainGroupsBySet,
+    henchmanGroupsBySet,
+    globalVillainIndex: createNameIndex(allVillainGroups),
+    globalHenchmanIndex: createNameIndex(allHenchmanGroups),
+    allVillainGroups
+  };
 
-  cloneSource.sets.forEach((set) => {
-    // @ts-expect-error — replacing MastermindCard[] with MastermindRuntime[] shaped objects
-    set.masterminds = set.masterminds.map((mastermind): MastermindRuntime => {
-      const lead = mastermind.leadName
-        ? resolveGroupReference(
-            mastermind.leadName,
-            set.id,
-            mastermind.leadCategory!,
-            villainGroupsBySet,
-            henchmanGroupsBySet,
-            globalVillainIndex,
-            globalHenchmanIndex
-          )
-        : null;
-      const leadNameFilter = (mastermind as MastermindCard).leadNameFilter;
-      const leadCandidates = leadNameFilter && leadNameFilter.length > 0
-        ? allVillainGroups
-            .filter((vg) => leadNameFilter.some((f) => vg.name.toLowerCase().includes(f.toLowerCase())))
-            .map((vg) => ({ category: 'villains' as const, id: vg.id }))
-        : undefined;
-      return {
-        id: mastermind.id,
-        setId: mastermind.setId,
-        name: mastermind.name,
-        aliases: mastermind.aliases || [],
-        lead,
-        ...(leadCandidates && { leadCandidates }),
-        notes: mastermind.notes || [],
-        isEpicMastermind: EPIC_MASTERMIND_SUPPORTED_SETS.includes(set.name) || undefined
-      };
-    });
+  // Build new runtime-shaped sets instead of mutating the source-typed arrays in
+  // place. heroes / villainGroups / henchmanGroups are structurally compatible
+  // with their runtime counterparts; masterminds and schemes are transformed.
+  const runtimeSets: RuntimeGameSet[] = cloneSource.sets.map((set) => ({
+    id: set.id,
+    name: set.name,
+    year: set.year,
+    type: set.type,
+    aliases: set.aliases,
+    heroes: set.heroes,
+    masterminds: normalizeMasterminds(set.masterminds, set, context),
+    villainGroups: set.villainGroups,
+    henchmanGroups: set.henchmanGroups,
+    schemes: normalizeSchemes(set.schemes, set, context)
+  }));
 
-    // @ts-expect-error — replacing SchemeCard[] with SchemeRuntime[] shaped objects
-    set.schemes = set.schemes.map((scheme): SchemeRuntime => {
-      const forcedGroups = (scheme.forcedGroups || []).map((groupRef) => ({
-        ...resolveGroupReference(
-          groupRef.name,
-          set.id,
-          groupRef.category,
-          villainGroupsBySet,
-          henchmanGroupsBySet,
-          globalVillainIndex,
-          globalHenchmanIndex
-        )
-      }));
-
-      return {
-        id: scheme.id,
-        setId: scheme.setId,
-        name: scheme.name,
-        aliases: scheme.aliases || [],
-        constraints: scheme.constraints || { minimumPlayerCount: null },
-        forcedGroups,
-        modifiers: scheme.modifiers || [],
-        notes: scheme.notes || []
-      };
-    });
-  });
-
-  const indexes = buildIndexes(cloneSource.sets);
-  validateNormalizedData(cloneSource.sets, indexes);
-  return { sets: cloneSource.sets, indexes };
+  const indexes = buildIndexes(runtimeSets);
+  validateNormalizedData(runtimeSets, indexes);
+  // PipelineRuntime.sets is exposed through the legacy GameSet[] contract that the
+  // app-wide runtime consumers still rely on. The arrays now hold fully normalized
+  // runtime entities, so a single boundary cast replaces the former per-field
+  // ts-expect-error suppressions.
+  return { sets: runtimeSets as unknown as GameSet[], indexes };
 }

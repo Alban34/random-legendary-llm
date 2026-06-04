@@ -90,7 +90,7 @@ test('Applies scheme constraints, forced groups, and modifiers to generated setu
   const setup = generateSetup({ runtime: bundle.runtime, state, playerCount: 2, advancedSolo: false, random: () => 0 });
 
   assert.equal(setup.scheme.name, 'Secret Invasion of the Skrull Shapeshifters');
-  assert.equal(setup.requirements.heroCount, 7);
+  assert.equal(setup.requirements.heroCount, 6);
   assert.ok(setup.villainGroups.some((group) => group.name === 'Skrulls' && group.forced));
 
   const restrictedScheme = bundle.runtime.indexes.allSchemes.find((entity) => entity.name === 'Super Hero Civil War');
@@ -152,7 +152,7 @@ test('Least-played fallback is used when fresh heroes are insufficient', () => {
   assert.equal(setup.scheme.name, simpleScheme.name);
   assert.equal(setup.mastermind.name, simpleMastermind.name);
   assert.equal(setup.heroes.length, 5);
-  assert.equal(setup.notices.some((notice) => notice.includes('Hero selection')), true);
+  assert.equal(setup.notices.some((notice) => notice.key === 'newGame.generator.notice.heroFallback'), true);
 });
 
 test('Generate/Regenerate remain ephemeral and do not mutate persisted state inputs', () => {
@@ -212,7 +212,7 @@ test('Supports forced picks across setup categories when a legal setup exists', 
   assert.ok(setup.heroes.some((hero) => hero.id === forcedHero.id));
   assert.ok(setup.villainGroups.some((group) => group.id === forcedVillainGroup.id));
   assert.ok(setup.henchmanGroups.some((group) => group.id === forcedHenchmanGroup.id));
-  assert.ok(setup.notices.some((notice) => notice.includes('Applied forced picks')));
+  assert.ok(setup.notices.some((notice) => notice.key === 'newGame.generator.notice.forcedPicks'));
 });
 
 test('Explains impossible forced-pick collisions with scheme and mastermind requirements', () => {
@@ -325,7 +325,7 @@ test('Setup messaging surfaces invalid requests clearly and reports least-played
 
   assert.equal(setup.scheme.id, simpleScheme.id);
   assert.equal(setup.mastermind.id, simpleMastermind.id);
-  assert.equal(setup.notices.some((notice) => notice.includes('Least-played fallback used for Hero selection')), true);
+  assert.equal(setup.notices.some((notice) => notice.key === 'newGame.generator.notice.heroFallback'), true);
   assert.equal(setup.fallbackUsed, true);
   assert.equal(JSON.stringify(state), before);
 });
@@ -760,7 +760,7 @@ test('Throws terminal error when all scheme iterations fail with no constraint p
 
   assert.throws(
     () => generateSetup({ runtime, state, playerCount: 2, random: () => 0 }),
-    /No legal setup could be generated from the current owned collection for the selected play mode\./
+    /newGame\.generator\.error\.noLegalSetup/
   );
 });
 
@@ -894,6 +894,6 @@ test('107.2g — generator with Sinister Six 2099 and no matching villain groups
   state.collection.ownedSetIds = [SET_ID];
   assert.throws(
     () => generateSetup({ runtime, state, playerCount: 2, random: () => 0 }),
-    /No legal setup could be generated from the current owned collection for the selected play mode\./
+    /newGame\.generator\.error\.noLegalSetup/
   );
 });

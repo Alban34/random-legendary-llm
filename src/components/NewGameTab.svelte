@@ -7,7 +7,7 @@
   import { validateSetupLegality } from '../app/setup-validator.ts';
   import { getSoloRulesItems, SOLO_RULES_PANEL_MODES } from '../app/solo-rules.ts';
   import type { Epic1Bundle } from '../app/game-data-pipeline.ts';
-  import type { AppState, LocaleTools, GeneratedSetup, PlayMode } from '../app/types.ts';
+  import type { AppState, LocaleTools, GeneratedSetup, PlayMode, GeneratorNotice } from '../app/types.ts';
   import { EPIC_MASTERMIND_SUPPORTED_SETS } from '../app/types.ts';
   import ActiveSetFilterPanel from './ActiveSetFilterPanel.svelte';
   import ForcedPicksPanel from './ForcedPicksPanel.svelte';
@@ -35,7 +35,7 @@
     advancedSolo: boolean;
     currentSetup: GeneratedSetup | null;
     generatorError: string | null;
-    generatorNotices: string[];
+    generatorNotices: GeneratorNotice[];
     forcedPicks: ForcedPicks;
     compactViewport: boolean;
     gameActions: {

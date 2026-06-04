@@ -31,3 +31,5 @@ Cross-locale key parity is enforced by `src/app/locales/locales.test.ts`, which 
 ## Where to add new keys
 
 Add new locale keys at the bottom of the relevant message group within `en.ts`, above the closing `}`. Follow the existing grouping conventions (e.g. `newGame.forcedPicks.*`, `history.*`, `backup.*`). After adding to `en.ts`, propagate to the other five `.ts` locale files before committing.
+
+> **Note (clean-code cleanup, 3 June 2026):** Four key groups were added to localize previously hardcoded English strings — `collection.typeGroup.*` and `collection.feasibilityMode.*` (collection type-group and feasibility-mode labels, formerly literal `label` strings in `collection-utils.ts`) and `newGame.generator.notice.*` and `newGame.generator.error.*` (generator notices and generic generator errors, formerly plain English in `setup-generator.ts`). This added 18 new keys to each of the six locale catalogs.

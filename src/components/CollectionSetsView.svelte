@@ -63,7 +63,7 @@
           data-feasibility-mode={mode.id}
         >
           <div class="row space-between gap-sm wrap align-center">
-            <strong>{mode.playerCount === 1 ? locale.getPlayModeLabel(mode.playMode, mode.playerCount) : locale.formatPlayerLabel(mode.playerCount)}</strong>
+            <strong>{locale.t(mode.labelKey)}</strong>
             <span class={"pill " + (mode.ok ? 'feasibility-pill-ok' : 'feasibility-pill-warning')}>
               {mode.ok ? `✓ ${locale.t('collection.feasibility.legal')}` : `⚠ ${locale.t('collection.feasibility.warning')}`}
             </span>
@@ -153,7 +153,7 @@
 
 {#each groupedSets as group (group.id)}
   <section class="panel collection-group" data-collection-group={group.id}>
-    <h3>{locale.getCollectionGroupLabel(group.id)}</h3>
+    <h3>{locale.t(group.labelKey)}</h3>
     <div class="stack gap-sm">
       {#each group.sets as set (set.id)}
         {@const counts = summarizeBrowseSet(set)}

@@ -5,6 +5,7 @@ import type {
   PlayMode,
   AppState,
   GeneratedSetup,
+  GeneratorNotice,
   HeroRuntime,
   MastermindRuntime,
   VillainGroupRuntime,
@@ -72,25 +73,25 @@ interface NoticeInput {
   forcedConstraintSummary: string[];
 }
 
-function createGeneratorNotices({ schemeFallback, mastermindFallback, heroFallback, categoryFallback, forcedConstraintSummary }: NoticeInput): string[] {
-  const notices: string[] = [];
+function createGeneratorNotices({ schemeFallback, mastermindFallback, heroFallback, categoryFallback, forcedConstraintSummary }: NoticeInput): GeneratorNotice[] {
+  const notices: GeneratorNotice[] = [];
   if (forcedConstraintSummary.length) {
-    notices.push(`Applied forced picks: ${forcedConstraintSummary.join('; ')}.`);
+    notices.push({ key: 'newGame.generator.notice.forcedPicks', values: { summary: forcedConstraintSummary.join('; ') } });
   }
   if (schemeFallback.length) {
-    notices.push(`Least-played fallback used for Scheme selection: ${schemeFallback.map((entity) => entity.name).join(', ')}.`);
+    notices.push({ key: 'newGame.generator.notice.schemeFallback', values: { names: schemeFallback.map((entity) => entity.name).join(', ') } });
   }
   if (mastermindFallback.length) {
-    notices.push(`Least-played fallback used for Mastermind selection: ${mastermindFallback.map((entity) => entity.name).join(', ')}.`);
+    notices.push({ key: 'newGame.generator.notice.mastermindFallback', values: { names: mastermindFallback.map((entity) => entity.name).join(', ') } });
   }
   if (heroFallback.length) {
-    notices.push(`Least-played fallback used for Hero selection: ${heroFallback.map((entity) => entity.name).join(', ')}.`);
+    notices.push({ key: 'newGame.generator.notice.heroFallback', values: { names: heroFallback.map((entity) => entity.name).join(', ') } });
   }
   if (categoryFallback.villainGroups.length) {
-    notices.push(`Least-played fallback used for Villain Groups: ${categoryFallback.villainGroups.map((entity) => entity.name).join(', ')}.`);
+    notices.push({ key: 'newGame.generator.notice.villainFallback', values: { names: categoryFallback.villainGroups.map((entity) => entity.name).join(', ') } });
   }
   if (categoryFallback.henchmanGroups.length) {
-    notices.push(`Least-played fallback used for Henchman Groups: ${categoryFallback.henchmanGroups.map((entity) => entity.name).join(', ')}.`);
+    notices.push({ key: 'newGame.generator.notice.henchmanFallback', values: { names: categoryFallback.henchmanGroups.map((entity) => entity.name).join(', ') } });
   }
   return notices;
 }
@@ -308,20 +309,33 @@ export function generateSetup({ runtime, state, playerCount, advancedSolo = fals
 
   const hasConstraintSelections = hasForcedPicks(normalizedForcedPicks);
   const constraintFailureReasons = new Set<string>();
-  const schemeSelection = selectScheme(eligibleSchemes, normalizedForcedPicks!, state.usage.schemes, random, normalizedForcedPicks!.preferredExpansionId);
+  const tmpl = template!;
+  const normalizedPicks = normalizedForcedPicks!;
+  const schemeSelection = selectScheme(eligibleSchemes, normalizedPicks, state.usage.schemes, random, normalizedPicks.preferredExpansionId);
 
   for (const scheme of schemeSelection.selected) {
-    const result = trySchemeForSetup(scheme, { schemeSelection, pools: pools, template: template!, normalizedForcedPicks: normalizedForcedPicks!, state, runtime, random, hasConstraintSelections, constraintFailureReasons, eligibleSchemes: eligibleSchemes });
+    const result = trySchemeForSetup(scheme, {
+      schemeSelection,
+      pools,
+      template: tmpl,
+      normalizedForcedPicks: normalizedPicks,
+      state,
+      runtime,
+      random,
+      hasConstraintSelections,
+      constraintFailureReasons,
+      eligibleSchemes
+    });
     if (result) {
       return result;
     }
   }
 
   if (hasConstraintSelections && constraintFailureReasons.size) {
-    throw new Error([...constraintFailureReasons].join(' ') || 'No legal setup could be generated due to constraint conflicts.');
+    throw new Error([...constraintFailureReasons].join(' ') || 'newGame.generator.error.constraintConflict');
   }
 
-  throw new Error('No legal setup could be generated from the current owned collection for the selected play mode.');
+  throw new Error('newGame.generator.error.noLegalSetup');
 }
 
 export function buildHistoryReadySetupSnapshot(setup: GeneratedSetup): GeneratedSetup['setupSnapshot'] {

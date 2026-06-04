@@ -7,14 +7,14 @@ import type { ForcedPicks } from './forced-picks-utils.ts';
 import { buildHistoryReadySetupSnapshot, generateSetup as generateSetupFn } from './setup-generator.ts';
 import { resolvePlayMode } from './setup-rules.ts';
 import { acceptGameSetup, createGameRecordId, createDefaultState } from './state-store.ts';
-import type { PlayMode, GeneratedSetup, AppState, LocaleTools } from './types.ts';
+import type { PlayMode, GeneratedSetup, AppState, LocaleTools, GeneratorNotice } from './types.ts';
 import type { Epic1Bundle } from './game-data-pipeline.ts';
 import { reconstructSetupFromRecord } from './replay-utils.ts';
 
 export const newGameVm = $state<{
   currentSetup: GeneratedSetup | null;
   generatorError: string | null;
-  generatorNotices: string[];
+  generatorNotices: GeneratorNotice[];
   selectedPlayerCount: number;
   selectedPlayMode: PlayMode;
   advancedSolo: boolean;
@@ -126,11 +126,17 @@ export function createNewGameActions(deps: NewGameActionDeps) {
         newGameVm.generatorNotices = setup.notices;
         deps.ui.lastActionNotice = deps.getLocale().t('actions.generatedSetup');
       } catch (error: unknown) {
+        const locale = deps.getLocale();
+        const rawMessage = error instanceof Error ? error.message : String(error);
+        // Generator/epic throws are locale KEYS; resolve for display. t() returns
+        // the key unchanged for unknown keys, so fall back to the raw message then.
+        const resolved = locale.t(rawMessage as Parameters<typeof locale.t>[0]);
+        const displayMessage = resolved === rawMessage ? rawMessage : resolved;
         newGameVm.currentSetup = null;
         newGameVm.generatorNotices = [];
-        newGameVm.generatorError = (error as Error).message;
-        deps.ui.lastActionNotice = deps.getLocale().t('actions.failedSetup');
-        toast.error(error instanceof Error ? error.message : String(error), { duration: Infinity });
+        newGameVm.generatorError = displayMessage;
+        deps.ui.lastActionNotice = locale.t('actions.failedSetup');
+        toast.error(displayMessage, { duration: Infinity });
       }
     },
 

@@ -93,10 +93,10 @@ export function runEpic1Tests(seed: SeedData, source: CanonicalSourceData, runti
     const secretInvasion = runtime.indexes.allSchemes.find((entity) => entity.name === 'Secret Invasion of the Skrull Shapeshifters');
     const negativeZone = runtime.indexes.allSchemes.find((entity) => entity.name === 'Negative Zone Prison Breakout');
     assert(secretInvasion && secretInvasion.forcedGroups.length > 0, 'Secret Invasion missing forced group');
-    // @ts-expect-error — modifiers are typed as unknown[] but have runtime shape
-    assert(secretInvasion.modifiers.some((modifier) => modifier.type === 'set-min-heroes' && modifier.value === 6), 'Secret Invasion modifier missing');
-    // @ts-expect-error — modifiers are typed as unknown[] but have runtime shape
-    assert(negativeZone?.modifiers.some((modifier) => modifier.type === 'add-henchman-group'), 'Negative Zone modifier missing');
+    const secretInvasionModifiers = (secretInvasion?.modifiers ?? []) as Array<{ type: string; value?: number }>;
+    assert(secretInvasionModifiers.some((modifier) => modifier.type === 'set-min-heroes' && modifier.value === 6), 'Secret Invasion modifier missing');
+    const negativeZoneModifiers = (negativeZone?.modifiers ?? []) as Array<{ type: string }>;
+    assert(negativeZoneModifiers.some((modifier) => modifier.type === 'add-henchman-group'), 'Negative Zone modifier missing');
   });
 
   run('Runtime indexes match canonical entity totals', () => {

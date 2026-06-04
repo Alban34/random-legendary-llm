@@ -152,12 +152,26 @@ export interface SchemeRuntime {
   notes: string[];
 }
 
+// Set whose card arrays hold normalized runtime entities (pipeline output).
+export interface RuntimeGameSet {
+  id: string;
+  name: string;
+  year: number;
+  type: SetType;
+  aliases: string[];
+  heroes: HeroRuntime[];
+  masterminds: MastermindRuntime[];
+  villainGroups: VillainGroupRuntime[];
+  henchmanGroups: HenchmanGroupRuntime[];
+  schemes: SchemeRuntime[];
+}
+
 export interface RuntimeIndexes {
-  setsById: Record<string, GameSet>;
+  setsById: Record<string, RuntimeGameSet>;
   heroesById: Record<string, HeroRuntime>;
   mastermindsById: Record<string, MastermindRuntime>;
   villainGroupsById: Record<string, VillainGroupRuntime>;
   henchmanGroupsById: Record<string, HenchmanGroupRuntime>;
   schemesById: Record<string, SchemeRuntime>;
-  setsList: GameSet[];
+  setsList: RuntimeGameSet[];
 }

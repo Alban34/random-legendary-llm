@@ -1,6 +1,7 @@
 import { sanitizeStoredGameResult } from './result-utils.ts';
 import { USAGE_CATEGORIES } from './state-store.ts';
 import { summarizeOwnedCollection } from './collection-utils.ts';
+import type { GameRuntimeIndexes } from './setup-pool-builder.ts';
 import type { AppState, GameSet } from './types.ts';
 
 const INDEX_KEYS: Record<string, string> = {
@@ -31,7 +32,7 @@ export const RECENT_SCORE_WINDOW: number = 5;
 
 interface AppRuntime {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  indexes: Record<string, any>;
+  indexes: GameRuntimeIndexes & Record<string, any>;
   sets: GameSet[];
 }
 

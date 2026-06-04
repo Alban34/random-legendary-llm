@@ -53,7 +53,7 @@ The current release keeps the architecture described below and implements it wit
 - `src/app/setup-hero-selector.ts` — hero selection with team/name constraints: `selectHeroes`, `canSatisfyHeroRequirements`
 - `src/app/setup-category-selector.ts` — villain/henchman category selection: `buildCategorySelection`, `resolveForcedCollections`
 - `src/app/solo-rules.ts` — solo mode rules reference data; exports `SOLO_RULES_PANEL_MODES` (a `Set` of the three eligible solo mode keys: `standard`, `advanced-solo`, `standard-solo-v2`) and `getSoloRulesItems(playMode)` (returns an ordered array of `newGame.soloRules.*` locale string keys for the eligible modes, or `null` for ineligible modes including `two-handed-solo` and all multiplayer modes); added in Epic 57
-- `src/app/app-renderer.ts` — transitional render functions used via `{@html}` blocks in Svelte tab components
+- `src/app/app-renderer.ts` — diagnostics render helper that builds DOM directly via the document API (`document.createElement(...)` / `appendChild` / `textContent`); `renderInitializationError(doc, error)` surfaces initialization-failure details into the diagnostics shell. It does not use Svelte `{@html}` blocks (the codebase contains zero `{@html}` usages)
 - `src/app/browse-vm.svelte.ts` — browse tab view-model; owns browse-specific reactive state
 - `src/app/new-game-vm.svelte.ts` — new-game tab view-model; owns new-game-specific reactive state
 - `src/app/history-vm.svelte.ts` — history tab view-model; owns history-specific reactive state
@@ -328,7 +328,7 @@ Current module responsibilities:
 - `src/app/browser-entry.ts` — mounts `App.svelte` via Svelte 5 `mount()` and registers the Service Worker (Epic 40); no longer owns ephemeral UI state or rendering
 - `src/components/App.svelte` — root Svelte 5 component; owns viewModel `$state` and wires state into all child tab components
 - a dedicated Epic 2 state/storage module under `src/app/` — default-state creation, load/save/update helpers, reset helpers, and storage availability handling
-- renderer modules — transitional render functions consumed via `{@html}` in Svelte tab components; surface recovery or validation messages, notifications, and confirmation UI, but do not own persistence logic
+- renderer modules — render helpers that build DOM directly via the document API (`document.createElement(...)`); surface recovery or validation messages, notifications, and confirmation UI, but do not own persistence logic
 
 Recommended hydration order:
 1. load canonical game data and build `RUNTIME_DATA`

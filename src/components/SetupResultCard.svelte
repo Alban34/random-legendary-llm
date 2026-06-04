@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LocaleTools, GeneratedSetup } from '../app/types.ts';
+  import type { LocaleTools, GeneratedSetup, GeneratorNotice } from '../app/types.ts';
 
   let {
     currentSetup,
@@ -12,7 +12,7 @@
     soloRulesItems: string[] | null;
     locale: LocaleTools;
     generatorError: string | null;
-    generatorNotices: string[];
+    generatorNotices: GeneratorNotice[];
   } = $props();
 
   function formatForcedByLabel(forcedBy: string | string[]): string {
@@ -36,8 +36,8 @@
     {:else if !generatorNotices.length}
       <div class="notice success">{locale.t('newGame.generator.freshNotice')}</div>
     {:else}
-      {#each generatorNotices as notice (notice)}
-        <div class="notice info">{notice}</div>
+      {#each generatorNotices as notice (notice.key)}
+        <div class="notice info">{locale.t(notice.key, notice.values)}</div>
       {/each}
     {/if}
 

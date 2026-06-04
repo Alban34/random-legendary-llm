@@ -186,13 +186,13 @@ test.describe('Setup: player-mode requirement display', () => {
     expect(result.setup.requirements.heroCount).toBe(6);
     expect(new Set(result.setup.heroes.map((hero) => hero.id)).size).toBe(result.setup.heroes.length);
     expect(new Set(result.setup.villainGroups.map((group) => group.id)).size).toBe(result.setup.villainGroups.length);
-    expect(result.setup.notices.some((notice) => notice.includes('Least-played fallback used for Hero selection'))).toBeTruthy();
+    expect(result.setup.notices.some((notice) => notice.key === 'newGame.generator.notice.heroFallback')).toBeTruthy();
     expect(JSON.stringify(await readAppState(page))).toBe(stateBefore);
 
     await page.locator('#panel-new-game [data-action="generate-setup"]').click();
     await page.waitForFunction(() => window.__CURRENT_SETUP__ !== null);
     result = await page.evaluate(() => ({ notices: window.__CURRENT_SETUP__.notices }));
-    expect(result.notices.some((notice) => notice.includes('Least-played fallback used for Hero selection'))).toBeTruthy();
+    expect(result.notices.some((notice) => notice.key === 'newGame.generator.notice.heroFallback')).toBeTruthy();
     expect(JSON.stringify(await readAppState(page))).toBe(stateBefore);
   });
 
