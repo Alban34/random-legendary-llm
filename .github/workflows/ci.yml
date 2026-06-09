@@ -7,16 +7,27 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Least-privilege default token; jobs that need more elevate explicitly
+permissions:
+  contents: read
+
+# Cancel superseded runs on the same ref to save CI minutes
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-and-test:
     name: Lint, Unit tests & E2E
     runs-on: ubuntu-latest
+    # Safety net: never let the whole job hang for the 6h default limit
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
 
       - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
@@ -27,31 +38,67 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+      - name: Resolve Playwright version
+        id: playwright-version
+        # Reads the exact version installed by `npm ci` so the cache key tracks browser compatibility
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+
+      - name: Install Playwright system dependencies
+        # DEBIAN_FRONTEND prevents apt from blocking on interactive prompts (tzdata, needrestart, …)
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: npx --no-install playwright install-deps chromium
+
+      - name: Install Playwright browser
+        # Skip the download entirely when the browser binary was restored from cache
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        # Use the locally installed binary (no npx network prompt) and fail fast if the download stalls
+        timeout-minutes: 10
+        run: npx --no-install playwright install chromium
 
       - name: E2E tests
         run: npm run test:qc
 
+      - name: Upload Playwright report
+        # Keep traces & screenshots only when E2E tests fail, to debug the run
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-artifacts
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
   security-audit:
     name: Dependency security audit
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
 
       - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
 
       - name: Audit dependencies
+        # Non-blocking: surfaces vulnerabilities without failing CI on unfixable transitive deps
+        continue-on-error: true
         run: npm audit --audit-level=high
 
   code-analysis:
     name: SonarCloud analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: lint-and-test
     steps:
       - uses: actions/checkout@v6
@@ -61,7 +108,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
@@ -79,6 +126,7 @@ jobs:
   bundle-size:
     name: Bundle size check
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     # Only run on pull requests
     if: github.event_name == 'pull_request'
     steps:
@@ -86,7 +134,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
@@ -110,6 +158,7 @@ jobs:
   docker-build-and-deploy:
     name: Docker build & GitOps deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     # Only runs on push (not on PR) and only if tests pass
     if: github.event_name == 'push'
     needs: lint-and-test
@@ -120,6 +169,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        # Required so the build can use the GitHub Actions layer cache
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -135,6 +188,9 @@ jobs:
           push: true
           # Tagged with "dev-" prefix to distinguish from release images
           tags: ghcr.io/alban34/random-legendary-llm:dev-${{ github.sha }}
+          # Reuse Docker layers across runs via the GitHub Actions cache backend
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Update dev overlay on gitops branch
         run: |

@@ -70,6 +70,9 @@ export const sharedConfig = {
   use: {
     headless: true,
     viewport: { width: 1440, height: 1080 },
+    // Capture debugging artifacts only when a test fails (kept lightweight for local runs)
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
     ...(CHROMIUM_EXECUTABLE_PATH ? { launchOptions: { executablePath: CHROMIUM_EXECUTABLE_PATH } } : {}),
   },
 };
