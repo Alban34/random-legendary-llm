@@ -66,12 +66,15 @@ export const sharedConfig = {
   },
   fullyParallel: false,
   workers: 1,
+  // Retry flaky tests on CI; locally a failure is a failure
+  retries: process.env.CI ? 2 : 0,
   reporter: 'list',
   use: {
     headless: true,
     viewport: { width: 1440, height: 1080 },
-    // Capture debugging artifacts only when a test fails (kept lightweight for local runs)
-    trace: 'retain-on-failure' as const,
+    // Record a trace only when a test is retried (zero overhead on the first pass,
+    // avoids the continuous trace recording that exhausts the single CI browser's memory)
+    trace: 'on-first-retry' as const,
     screenshot: 'only-on-failure' as const,
     ...(CHROMIUM_EXECUTABLE_PATH ? { launchOptions: { executablePath: CHROMIUM_EXECUTABLE_PATH } } : {}),
   },
