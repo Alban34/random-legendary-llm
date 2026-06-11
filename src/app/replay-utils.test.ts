@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { createEpic1Bundle } from './game-data-pipeline.ts';
 import { reconstructSetupFromRecord } from './replay-utils.ts';
-import { createAllOwnedState, createSampleSnapshot } from './test-utils.ts';
+import { createSampleSnapshot } from './test-utils.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
