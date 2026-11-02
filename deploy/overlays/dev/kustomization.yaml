@@ -6,4 +6,4 @@ resources:
 
 images:
   - name: ghcr.io/alban34/random-legendary-llm
-    newTag: dev-f236533a43a2de1d03c6ca532a0e514052d642b0
+    newTag: dev-3ab542ea178ad9d7c4a0283a3046a723790f9b25
