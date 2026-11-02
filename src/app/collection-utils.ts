@@ -12,11 +12,15 @@ interface CardEntry {
   name: string;
 }
 
-interface CategoryEntry {
-  categoryId: string;
-  labelKey: string;
-  cards: CardEntry[];
+interface HeroCardEntry extends CardEntry {
+  teams: string[];
 }
+
+type NonHeroCategoryKey = Exclude<PoolCategoryKey, 'heroes'>;
+
+type CategoryEntry =
+  | { categoryId: 'heroes'; labelKey: string; cards: HeroCardEntry[] }
+  | { categoryId: NonHeroCategoryKey; labelKey: string; cards: CardEntry[] };
 
 interface ExpansionEntry {
   setId: string;
@@ -61,11 +65,21 @@ export const CARD_CATEGORIES: ReadonlyArray<{ id: PoolCategoryKey; labelKey: str
 ];
 
 export function getCardsByCategory(pools: GamePool): CategoryEntry[] {
-  return CARD_CATEGORIES.map(({ id, labelKey }) => ({
-    categoryId: id,
-    labelKey,
-    cards: [...(pools[id] ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
-  }));
+  return CARD_CATEGORIES.map(({ id, labelKey }) => {
+    if (id === 'heroes') {
+      return {
+        categoryId: id,
+        labelKey,
+        cards: [...(pools.heroes ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
+      };
+    }
+
+    return {
+      categoryId: id,
+      labelKey,
+      cards: [...(pools[id] ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
+    };
+  });
 }
 
 export function getCardsByExpansion(pools: GamePool): ExpansionEntry[] {

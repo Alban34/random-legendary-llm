@@ -144,6 +144,33 @@ test('getCardsByCategory Heroes bucket contains known core-set hero names sorted
   assert.deepEqual(heroNames, sorted, 'Heroes must be sorted A-Z by name');
 });
 
+test('getCardsByCategory preserves existing team affiliations on heroes only', () => {
+
+  const pools = buildOwnedPools(bundle.runtime, ['core-set']);
+  const categories = getCardsByCategory(pools);
+  const heroesBucket = categories.find((category) => category.categoryId === 'heroes');
+
+  assert.ok(heroesBucket, 'Heroes bucket must exist');
+  const sourceHeroes = new Map(pools.heroes.map((hero) => [hero.id, hero]));
+  for (const hero of heroesBucket.cards) {
+    assert.deepEqual(
+      hero.teams,
+      sourceHeroes.get(hero.id)?.teams,
+      `Hero "${hero.name}" must retain its existing teams`
+    );
+  }
+  assert.ok(
+    heroesBucket.cards.some((hero) => hero.teams?.length),
+    'At least one core-set hero should retain a non-empty team affiliation'
+  );
+  for (const category of categories.filter((entry) => entry.categoryId !== 'heroes')) {
+    assert.ok(
+      category.cards.every((card) => !('teams' in card)),
+      `${category.categoryId} entries must not gain a teams field`
+    );
+  }
+});
+
 test('getCardsByCategory Masterminds bucket contains known mastermind names sorted A-Z', () => {
 
   const pools = buildOwnedPools(bundle.runtime, ['core-set']);
@@ -288,7 +315,7 @@ test('mergeOwnedSets does not mutate the original state', () => {
 
 test('getCardsByCategory falls back to an empty array when a pool category key is missing', () => {
 
-  const partialPools = { heroes: [{ id: 'h1', setId: 'core-set', name: 'Hero One' }] };
+  const partialPools = { heroes: [{ id: 'h1', setId: 'core-set', name: 'Hero One', teams: [] }] };
   const categories = getCardsByCategory(partialPools);
   assert.equal(categories.length, 5);
   const masterminds = categories.find((c) => c.categoryId === 'masterminds');
@@ -316,4 +343,3 @@ test('getCardsByExpansion silently skips cards whose setId is not in pools.sets'
   assert.equal(expansions[0].cards.length, 1);
   assert.equal(expansions[0].cards[0].name, 'Hero One');
 });
-

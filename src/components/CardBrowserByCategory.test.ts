@@ -63,3 +63,32 @@ test('CardBrowserByCategory all groups render with the open attribute', () => {
     'Template must contain a bare unconditional open attribute on the <details> element'
   );
 });
+
+test('CardBrowserByCategory shows available hero teams after the name in smaller italic parentheses', () => {
+  assert.match(
+    source,
+    /<li>\s*\{card\.name\}\s*\{#if category\.categoryId === 'heroes' && getAvailableTeams\(card\)\.length > 0\}\s*\{'\s*'\}\s*<span class="hero-teams">\(\{getAvailableTeams\(card\)\.join\(', '\)\}\)<\/span>/,
+    'Hero team names must follow the card name in parentheses and render only for Heroes with available teams'
+  );
+  assert.match(
+    source,
+    /\.hero-teams\s*\{[^}]*font-size:\s*0\.85em;[^}]*font-style:\s*italic;/,
+    'Hero team names must be italic and smaller than the main name'
+  );
+});
+
+test('CardBrowserByCategory omits missing and empty hero team values', () => {
+  assert.match(
+    source,
+    /return card\.teams\?\.filter\(\(team\) => team\.trim\(\)\.length > 0\)\.map\(\(team\) => team\.trim\(\)\) \?\? \[\];/,
+    'Missing teams and empty team names must result in no displayed team value'
+  );
+});
+
+test('CardBrowserByCategory keeps non-Hero card names unchanged and limits team display to Heroes', () => {
+  assert.match(
+    source,
+    /\{#each category\.cards as card \(card\.id\)\}\s*<li>\s*\{card\.name\}\s*\{#if category\.categoryId === 'heroes'/,
+    'Every category must retain the existing card-name list rendering, with team display guarded to Heroes only'
+  );
+});

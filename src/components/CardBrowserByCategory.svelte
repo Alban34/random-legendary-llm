@@ -6,6 +6,10 @@
   let { pools, locale }: { pools: GamePool; locale: LocaleTools } = $props();
 
   let categories: ReturnType<typeof getCardsByCategory> = $derived(getCardsByCategory(pools));
+
+  function getAvailableTeams(card: { id: string; setId: string; name: string; teams?: string[] }): string[] {
+    return card.teams?.filter((team) => team.trim().length > 0).map((team) => team.trim()) ?? [];
+  }
 </script>
 
 {#if pools.sets.length === 0}
@@ -17,7 +21,12 @@
         <summary><span class="history-group-title">{locale.t(category.labelKey)}</span><span class="pill">({category.cards.length})</span></summary>
         <ul class="card-browser-columns">
           {#each category.cards as card (card.id)}
-            <li>{card.name}</li>
+            <li>
+              {card.name}
+              {#if category.categoryId === 'heroes' && getAvailableTeams(card).length > 0}
+                {' '}<span class="hero-teams">({getAvailableTeams(card).join(', ')})</span>
+              {/if}
+            </li>
           {/each}
         </ul>
       </details>
@@ -37,5 +46,10 @@
   .card-browser-columns li {
     padding: var(--space-xs, 0.2rem) 0;
     break-inside: avoid;
+  }
+
+  .hero-teams {
+    font-size: 0.85em;
+    font-style: italic;
   }
 </style>

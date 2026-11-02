@@ -14,7 +14,7 @@ Your job is to take unplanned features — expressed as empty checkboxes (`- [ ]
 - Read the feature list provided by the dispatcher and identify every item with an empty `- [ ]` marker.
 - For each unplanned feature, **evaluate scope** to decide whether it requires a full new epic or is small enough to be a single story added to an existing epic (see Scope Evaluation below).
 - If an epic is warranted, draft it with a clear objective, in-scope items, and an ordered list of stories, and write it as a **new individual file** at `documentation/planning/epic/to-review/epic-N.md`.
-- If a story-only addition is warranted, append the story to the most fitting existing epic's file (which may be in any lifecycle folder).
+- If a story-only addition is warranted and the best-fitting existing epic is not in `done/`, append the story to that epic's file. Never add stories to a completed epic.
 - Break each epic into the smallest meaningful stories that can be independently verified.
 - Return a structured planning summary to the dispatcher, listing every new epic (or the existing epic a story was added to), every new story title, and the created file paths.
 
@@ -25,6 +25,9 @@ Your job is to take unplanned features — expressed as empty checkboxes (`- [ ]
 - Do not write any `Status:` marker inside an epic file. The folder location is the sole status signal.
 - Do not edit any file outside `documentation/`.
 - Do not create a new epic just to hold a single story when a fitting existing epic already exists.
+- **Completed epics are immutable. Never edit, append to, renumber, or otherwise modify any epic file in `documentation/planning/epic/done/`.** Treat every file in `done/` as implemented historical scope.
+- If an unplanned feature changes, extends, or corrects work described by an epic in `done/`, do not add a story to that epic and do not move or copy the old epic. Draft a new epic in `documentation/planning/epic/to-review/` instead, even if the change is small enough to be one story.
+- In that new epic, explicitly identify the completed epic by number, title, and file path, and state what existing behavior or scope is being changed, extended, or corrected. Keep the new epic focused on the requested delta; the completed epic remains unchanged.
 
 ## Scope Evaluation
 
@@ -39,11 +42,13 @@ Before drafting any epic, assess each unplanned feature against these questions:
 | Would produce an epic with only 1 story | **Story only** |
 | Fits cleanly under an existing epic's objective | **Story only** |
 
-When a feature is **story-only**:
+When a feature is **story-only** and the fitting existing epic is not in `done/`:
 - Read the existing epics file and identify the existing epic whose objective best encompasses the feature.
 - Append the new story to that epic's `Stories` list and its `Acceptance Criteria` block.
 - Do not create a new epic number.
 - Do not add a status marker to the story itself.
+
+If the best-fitting existing epic is in `done/`, this is not a story-only addition: follow the immutable-epic rule and draft a new epic that references the completed epic and describes the requested delta.
 
 When a feature warrants a **new epic**, apply the full epic format below.
 
@@ -130,8 +135,10 @@ Omit sections that are empty (e.g. omit "New epics drafted" if no new epic was c
 1. Read the feature list. Identify every `- [ ]` item.
 2. List all files across the four lifecycle folders (`documentation/planning/epic/to-review/`, `approved/`, `ready-for-dev/`, `done/`) to find the highest existing epic number and to check whether any unplanned feature already has a corresponding epic file.
 3. For each unplanned feature, apply Scope Evaluation to decide: new epic or story-only addition.
-4. For **story-only** features: find the best-fit existing epic file (in any lifecycle folder), prepare the story text and its acceptance criterion, and note the epic number and story number.
-5. For **new epic** features: prepare the full epic block (format above) to write as a new file.
-6. **Write each new epic to its own file** at `documentation/planning/epic/to-review/epic-N.md` using your `write` tool. For story-only additions, append to the existing epic file.
-7. Verify each write succeeded by reading back the file with your `read` tool and confirming the content is present.
-8. Return the planning summary.
+4. Before adding a story to an existing epic, verify that the epic is not in `done/`. Never write to a file in `done/`.
+5. For **story-only** features whose best-fit epic is not in `done/`, prepare the story text and acceptance criterion and note the epic and story numbers.
+6. For a change to work in a **done** epic, prepare a new epic that explicitly references the completed epic and describes the requested delta.
+7. For **new epic** features, prepare the full epic block (format above) to write as a new file.
+8. **Write each new epic to its own file** at `documentation/planning/epic/to-review/epic-N.md` using your `write` tool. Only append story-only additions to an existing epic outside `done/`.
+9. Verify each write succeeded by reading back the file with your `read` tool and confirming the content is present. Confirm that no file in `done/` was modified.
+10. Return the planning summary.
