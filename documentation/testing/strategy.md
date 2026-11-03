@@ -175,7 +175,7 @@ Automated verification: `src/app/collection-utils.test.ts`
 
 Browser QC: `test/playwright/card-browser.spec.ts`
 
-Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion`, `mergeOwnedSets` (all via `collection-utils.ts`), `CardBrowserByCategory.svelte`, `CardBrowserByExpansion.svelte`, the "Sets" / "Browse Cards" view toggle in `CollectionTab.svelte`, the "By Category" / "By Expansion" grouping selector, session-scoped grouping persistence, and `aria-pressed` state on all toggle controls.
+Covers: `CARD_CATEGORIES`, `getCardsByCategory`, `getCardsByExpansion`, `mergeOwnedSets` (all via `collection-utils.ts`), `CardBrowserByCategory.svelte`, `CardBrowserByExpansion.svelte`, the "Sets" / "Browse Cards" view toggle in `CollectionTab.svelte`, the "By Category" / "By Expansion" grouping selector, session-scoped grouping persistence, and `aria-pressed` state on all toggle controls. Epic 109 coverage also verifies that hero entries retain their existing team affiliations, available teams render after hero names in parentheses/italics/smaller text, unavailable teams are omitted, and non-Hero category entries remain unchanged (`src/app/collection-utils.test.ts`, `src/components/CardBrowserByCategory.test.ts`).
 
 Note (Epic 94): 6 `mergeOwnedSets` tests were consolidated into this file from `myludo-import-utils.test.ts` and `bgg-import-utils.test.ts` as the canonical location for `collection-utils.ts` coverage.
 
